@@ -25,13 +25,9 @@
         <!-- Form Container -->
         <div class="flex-grow flex flex-col justify-center max-w-md mx-auto w-full group">
             
-            <!-- Step Indicators -->
-            <div class="flex items-center space-x-2 mb-10">
-                <div id="step-dot-1" class="h-1 w-8 bg-white transition-all duration-300"></div>
-                <div id="step-dot-2" class="h-1 w-8 bg-[#374151] transition-all duration-300"></div>
-            </div>
 
-            <form id="business-form" class="space-y-8" onsubmit="event.preventDefault();">
+
+            <form id="business-form" class="space-y-8" onsubmit="event.preventDefault(); window.location.href='/';">
                 
                 <!-- STEP 1: Account Info -->
                 <div id="step-1" class="space-y-8 animate-fade-in-up">
@@ -42,13 +38,13 @@
 
                     <div class="space-y-6">
                         <div class="group/input relative">
-                            <input type="email" id="email" class="peer w-full bg-transparent border-b border-[#374151] py-3 text-white focus:border-white focus:outline-none transition-colors placeholder-transparent" placeholder="Email Address" />
-                            <label for="email" class="absolute left-0 -top-3.5 text-[#9CA3AF] text-xs transition-all peer-placeholder-shown:text-base peer-placeholder-shown:top-3 peer-focus:-top-3.5 peer-focus:text-xs peer-focus:text-white">Email Address</label>
+                            <input type="email" id="email" class="peer w-full bg-transparent border-b border-[#374151] py-3 text-white focus:border-white focus:outline-none transition-colors placeholder-transparent" placeholder="Correo electrónico" />
+                            <label for="email" class="absolute left-0 -top-3.5 text-[#9CA3AF] text-xs transition-all peer-placeholder-shown:text-base peer-placeholder-shown:top-3 peer-focus:-top-3.5 peer-focus:text-xs peer-focus:text-white">Correo electrónico</label>
                         </div>
                         
                         <div class="group/input relative">
-                            <input type="text" id="fullname" class="peer w-full bg-transparent border-b border-[#374151] py-3 text-white focus:border-white focus:outline-none transition-colors placeholder-transparent" placeholder="Full Name" />
-                            <label for="fullname" class="absolute left-0 -top-3.5 text-[#9CA3AF] text-xs transition-all peer-placeholder-shown:text-base peer-placeholder-shown:top-3 peer-focus:-top-3.5 peer-focus:text-xs peer-focus:text-white">Full Name</label>
+                            <input type="text" id="fullname" class="peer w-full bg-transparent border-b border-[#374151] py-3 text-white focus:border-white focus:outline-none transition-colors placeholder-transparent" placeholder="Nombre completo" />
+                            <label for="fullname" class="absolute left-0 -top-3.5 text-[#9CA3AF] text-xs transition-all peer-placeholder-shown:text-base peer-placeholder-shown:top-3 peer-focus:-top-3.5 peer-focus:text-xs peer-focus:text-white">Nombre completo</label>
                         </div>
 
                         <div class="group/input relative">
@@ -67,67 +63,13 @@
                         </div>
                     </div>
 
-                    <button type="button" onclick="nextStep()" class="w-full py-4 px-6 bg-[#F3F4F6] text-[#1a1a1a] font-bold tracking-widest uppercase text-sm border border-transparent transition-all duration-300 hover:bg-black hover:text-white hover:border-[#F3F4F6] mt-8">
-                        Continuar
+                    <button type="submit" class="w-full py-4 px-6 bg-[#F3F4F6] text-[#1a1a1a] font-bold tracking-widest uppercase text-sm border border-transparent transition-all duration-300 hover:bg-black hover:text-white hover:border-[#F3F4F6] mt-8">
+                        Registrarse
                     </button>
                 </div>
 
                 <!-- STEP 2: Business Info -->
-                <div id="step-2" class="hidden space-y-8 animate-fade-in-up">
-                     <div class="space-y-2">
-                        <h1 class="text-3xl font-bold uppercase tracking-wide text-white">Mi negocio</h1>
-                        <p class="text-[#9CA3AF] text-sm tracking-wide">DETALLES DEL COMERCIO</p>
-                    </div>
 
-                    <div class="grid grid-cols-1 gap-8">
-                         <!-- Description -->
-                        <div class="group/input relative">
-                            <h3 class="text-xs uppercase tracking-wider text-[#9CA3AF] mb-2">Acerca de mi negocio</h3>
-                            <textarea id="description" rows="3" class="w-full bg-transparent border border-[#374151] p-3 text-white focus:border-white focus:outline-none transition-colors text-sm" placeholder="Añade una pequeña descripción..."></textarea>
-                        </div>
-
-                         <!-- Photo Upload -->
-                        <div class="group/input relative">
-                             <h3 class="text-xs uppercase tracking-wider text-[#9CA3AF] mb-2">Foto del negocio</h3>
-                            <div class="border border-dashed border-[#374151] h-32 w-full flex items-center justify-center text-[#9CA3AF] hover:border-white hover:text-white transition-all cursor-pointer">
-                                <span class="text-xs uppercase tracking-wide">Subir Imagen</span>
-                            </div>
-                        </div>
-
-                        <!-- Business Fields -->
-                        <div class="space-y-6">
-                            <div class="group/input relative">
-                                <input type="text" id="business_name" class="peer w-full bg-transparent border-b border-[#374151] py-3 text-white focus:border-white focus:outline-none transition-colors placeholder-transparent" placeholder="Nombre del negocio" />
-                                <label for="business_name" class="absolute left-0 -top-3.5 text-[#9CA3AF] text-xs transition-all peer-placeholder-shown:text-base peer-placeholder-shown:top-3 peer-focus:-top-3.5 peer-focus:text-xs peer-focus:text-white">Nombre del negocio</label>
-                            </div>
-                             <div class="group/input relative">
-                                <input type="text" id="state" class="peer w-full bg-transparent border-b border-[#374151] py-3 text-white focus:border-white focus:outline-none transition-colors placeholder-transparent" placeholder="Estado" />
-                                <label for="state" class="absolute left-0 -top-3.5 text-[#9CA3AF] text-xs transition-all peer-placeholder-shown:text-base peer-placeholder-shown:top-3 peer-focus:-top-3.5 peer-focus:text-xs peer-focus:text-white">Estado</label>
-                            </div>
-                             <div class="group/input relative">
-                                <input type="text" id="city" class="peer w-full bg-transparent border-b border-[#374151] py-3 text-white focus:border-white focus:outline-none transition-colors placeholder-transparent" placeholder="Ciudad" />
-                                <label for="city" class="absolute left-0 -top-3.5 text-[#9CA3AF] text-xs transition-all peer-placeholder-shown:text-base peer-placeholder-shown:top-3 peer-focus:-top-3.5 peer-focus:text-xs peer-focus:text-white">Ciudad</label>
-                            </div>
-                             <div class="group/input relative">
-                                <input type="text" id="address" class="peer w-full bg-transparent border-b border-[#374151] py-3 text-white focus:border-white focus:outline-none transition-colors placeholder-transparent" placeholder="Dirección" />
-                                <label for="address" class="absolute left-0 -top-3.5 text-[#9CA3AF] text-xs transition-all peer-placeholder-shown:text-base peer-placeholder-shown:top-3 peer-focus:-top-3.5 peer-focus:text-xs peer-focus:text-white">Dirección</label>
-                            </div>
-                             <div class="group/input relative">
-                                <input type="text" id="type" class="peer w-full bg-transparent border-b border-[#374151] py-3 text-white focus:border-white focus:outline-none transition-colors placeholder-transparent" placeholder="Tipo de negocio" />
-                                <label for="type" class="absolute left-0 -top-3.5 text-[#9CA3AF] text-xs transition-all peer-placeholder-shown:text-base peer-placeholder-shown:top-3 peer-focus:-top-3.5 peer-focus:text-xs peer-focus:text-white">Tipo de negocio</label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="flex gap-4 mt-8">
-                         <button type="button" onclick="prevStep()" class="w-1/3 py-4 px-6 bg-transparent text-[#F3F4F6] font-bold tracking-widest uppercase text-sm border border-[#374151] transition-all duration-300 hover:border-white">
-                            Atrás
-                        </button>
-                        <button type="submit" class="flex-grow py-4 px-6 bg-[#F3F4F6] text-[#1a1a1a] font-bold tracking-widest uppercase text-sm border border-transparent transition-all duration-300 hover:bg-black hover:text-white hover:border-[#F3F4F6]">
-                            Finalizar
-                        </button>
-                    </div>
-                </div>
 
             </form>
         </div>
@@ -153,28 +95,6 @@
     </div>
 
     <!-- Script for Wizard Logic -->
-    <script>
-        function nextStep() {
-            // In a real app, validate step 1 here
-            document.getElementById('step-1').classList.add('hidden');
-            document.getElementById('step-2').classList.remove('hidden');
-            
-            document.getElementById('step-dot-1').classList.replace('bg-white', 'bg-[#374151]');
-            document.getElementById('step-dot-1').classList.add('opacity-50');
-            document.getElementById('step-dot-2').classList.replace('bg-[#374151]', 'bg-white');
-            
-            // Scroll to top of form
-            document.querySelector('.overflow-y-auto').scrollTop = 0;
-        }
 
-        function prevStep() {
-            document.getElementById('step-2').classList.add('hidden');
-            document.getElementById('step-1').classList.remove('hidden');
-            
-            document.getElementById('step-dot-2').classList.replace('bg-white', 'bg-[#374151]');
-            document.getElementById('step-dot-1').classList.replace('bg-[#374151]', 'bg-white');
-            document.getElementById('step-dot-1').classList.remove('opacity-50');
-        }
-    </script>
 </body>
 </html>

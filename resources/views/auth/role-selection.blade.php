@@ -10,9 +10,9 @@
 
     <!-- Navbar Minimalista -->
     <header class="w-full py-6 px-8 flex justify-between items-center border-b border-[#374151]/50">
-        <div class="text-xl tracking-widest font-bold uppercase text-white">
+        <a href="{{ url('/') }}" class="text-xl tracking-widest font-bold uppercase text-white hover:text-white/80 transition-colors">
             NexoApp
-        </div>
+        </a>
         <div class="text-sm tracking-wide text-[#9CA3AF]">
             BIENVENIDO A LA EXPERIENCIA
         </div>
@@ -77,7 +77,7 @@
                         Promociona tu marca, gestiona clientes y expande tu alcance con herramientas de gestión premium.
                     </p>
                     
-                    <a href="/register/business" class="mt-auto w-full py-4 px-6 bg-[#1a1a1a] text-[#F3F4F6] text-center font-bold tracking-widest uppercase text-sm border border-[#374151] transition-all duration-300 hover:bg-[#F3F4F6] hover:text-[#1a1a1a]">
+                    <a href="/register/business" class="mt-auto w-full py-4 px-6 bg-[#F3F4F6] text-[#1a1a1a] text-center font-bold tracking-widest uppercase text-sm border border-transparent transition-all duration-300 hover:bg-black hover:text-white hover:border-[#F3F4F6]">
                         Empezar Ahora
                     </a>
                 </div>

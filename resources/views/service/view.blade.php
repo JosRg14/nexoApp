@@ -107,9 +107,9 @@
                                 $350 <span class="text-sm font-normal text-[#9CA3AF]">MXN</span>
                             </div>
                         </div>
-                        <button class="w-full py-4 px-6 bg-[#F3F4F6] text-[#1a1a1a] font-bold tracking-[0.2em] uppercase text-sm border border-transparent transition-all duration-300 hover:bg-black hover:text-white hover:border-[#F3F4F6]">
+                        <a href="{{ route('booking.availability') }}" class="block w-full text-center py-4 px-6 bg-[#F3F4F6] text-[#1a1a1a] font-bold tracking-[0.2em] uppercase text-sm border border-transparent transition-all duration-300 hover:bg-black hover:text-white hover:border-[#F3F4F6]">
                             Reservar Cita
-                        </button>
+                        </a>
                     </div>
 
                 </div>

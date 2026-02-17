@@ -31,7 +31,7 @@
                     <p class="text-[#9CA3AF] text-sm tracking-wide">RELLENA LOS SIGUIENTES REQUISITOS</p>
                 </div>
 
-                <form class="space-y-8" onsubmit="event.preventDefault();">
+                <form class="space-y-8" onsubmit="event.preventDefault(); window.location.href='/';">
                     
                     <div class="space-y-6">
                         <div class="group/input relative">

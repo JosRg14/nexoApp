@@ -38,8 +38,8 @@
 
             <!-- Navigation Actions -->
             <nav class="flex items-center gap-6 w-full md:w-auto justify-between md:justify-end">
-                <a href="#" class="text-xs uppercase tracking-widest text-[#9CA3AF] hover:text-white transition-colors">Servicios</a>
-                <a href="/register" class="text-xs uppercase tracking-widest text-[#9CA3AF] hover:text-white transition-colors">Tu Negocio</a>
+                <a href="/dashboard" class="text-xs uppercase tracking-widest text-[#9CA3AF] hover:text-white transition-colors">Dashboard</a>
+                <a href="/business/profile" class="text-xs uppercase tracking-widest text-[#9CA3AF] hover:text-white transition-colors">Tu Negocio</a>
                 <a href="/login" class="px-5 py-2.5 bg-[#F3F4F6] text-[#1a1a1a] text-xs font-bold uppercase tracking-widest hover:bg-black hover:text-white hover:border hover:border-[#F3F4F6] transition-all duration-300">
                     Iniciar Sesión
                 </a>

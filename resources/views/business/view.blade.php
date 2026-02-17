@@ -61,12 +61,7 @@
                     </div>
                 </div>
 
-                <!-- Action Button -->
-                <div class="pb-4 w-full md:w-auto">
-                    <button class="w-full md:w-auto px-8 py-3 bg-[#F3F4F6] text-[#1a1a1a] font-bold tracking-widest uppercase text-sm border border-transparent transition-all duration-300 hover:bg-black hover:text-white hover:border-[#F3F4F6]">
-                        Contactar
-                    </button>
-                </div>
+
             </div>
         </div>
 
