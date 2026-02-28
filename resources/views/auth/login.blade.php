@@ -116,11 +116,11 @@
 
                 // If API returns token/user, persist locally
                 if (response.data && response.data.token) {
-                    localStorage.setItem('auth_token', response.data.token);
-                    localStorage.setItem('user', JSON.stringify(response.data.user || {}));
-                }
+                    }
 
-                window.location.href = '/dashboard';
+                if (response.data && response.data.redirect) {
+                window.location.href = response.data.redirect;
+                }
 
             } catch (error) {
                 errorDiv.classList.remove('hidden');

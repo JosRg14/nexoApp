@@ -19,6 +19,15 @@ Route::get('/login', function () {
 })->name('login');
 
 Route::get('/business/profile', function () {
+
+    if (!session()->has('auth_token')) {
+        return redirect('/login');
+    }
+
+    if (session('rol') !== 'admin') {
+        abort(403);
+    }
+
     return view('business.profile');
 })->name('business.profile');
 
@@ -61,13 +70,25 @@ Route::get('/booking/availability', function () {
     ]);
 })->name('booking.availability');
 
+
 Route::get('/dashboard', function () {
+
+    if (!session()->has('auth_token')) {
+        return redirect('/login');
+    }
+
+    if (session('rol') !== 'superusuario') {
+        abort(403);
+    }
+
     return view('dashboard.index');
+
 })->name('dashboard');
 
 Route::get('/dashboard/businesses', function () {
     return view('dashboard.businesses.index');
 })->name('dashboard.businesses');
+
 
 Route::get('/dashboard/businesses/{id}', function ($id) {
     return view('dashboard.businesses.show', ['id' => $id]);
