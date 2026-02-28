@@ -258,6 +258,11 @@
                                 <label class="absolute left-0 -top-3.5 text-[#9CA3AF] text-xs transition-all peer-placeholder-shown:text-base peer-placeholder-shown:top-3 peer-focus:-top-3.5 peer-focus:text-xs peer-focus:text-white">Precio</label>
                             </div>
 
+                            <div class="group/input relative">
+                                <input type="number" class="peer w-full bg-transparent border-b border-[#374151] py-3 text-white focus:border-white focus:outline-none transition-colors placeholder-transparent" placeholder="Duración (Minutos)" />
+                                <label class="absolute left-0 -top-3.5 text-[#9CA3AF] text-xs transition-all peer-placeholder-shown:text-base peer-placeholder-shown:top-3 peer-focus:-top-3.5 peer-focus:text-xs peer-focus:text-white">Duración (Minutos)</label>
+                            </div>
+
                             <div class="space-y-2">
                                 <span class="text-[#9CA3AF] text-xs">Imagen del servicio (opcional)</span>
                                 <div class="h-32 w-full bg-[#262626] border border-dashed border-[#374151] flex items-center justify-center text-[#374151] hover:text-white hover:border-white transition-all cursor-pointer">
