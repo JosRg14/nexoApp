@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Admin\ServiceController;
 
 Route::get('/register', function () {
     return view('auth.role-selection');
@@ -18,22 +19,34 @@ Route::get('/login', function () {
     return view('auth.login');
 })->name('login');
 
-Route::get('/business/profile', function () {
-
-    if (!session()->has('auth_token')) {
-        return redirect('/login');
-    }
-
-    if (session('rol') !== 'admin') {
-        abort(403);
-    }
-
-    return view('business.profile');
-})->name('business.profile');
+Route::get('/business/profile', [ServiceController::class, 'index'])->name('business.profile');
 
 Route::get('/business/view', function () {
     return view('business.view');
 })->name('business.show');
+
+
+
+//** API Routes for business services management*/
+Route::put('/business/services/{id}', 
+    [ServiceController::class, 'update']
+)->name('business.services.update');
+
+Route::delete('/business/services/{id}', 
+    [ServiceController::class, 'destroy']
+)->name('business.services.destroy');
+
+Route::middleware(['auth.session', 'inject.api.token', 'role:admin'])
+    ->prefix('business')
+    ->name('business.')
+    ->group(function () {
+
+        Route::get('/profile', [ServiceController::class, 'index'])
+            ->name('profile');
+
+        Route::post('/services', [ServiceController::class, 'store'])
+            ->name('services.store');
+    });
 
 Route::get('/service/view', function () {
     return view('service.view');
@@ -107,5 +120,10 @@ use App\Http\Controllers\AuthController;
 Route::post('/proxy/login', [AuthController::class, 'login']);
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('home');
+});
+
+Route::post('/logout', function () {
+    session()->flush();   // elimina todo
+    return redirect('/'); // vuelve a welcome
 });

@@ -10,6 +10,7 @@ class AuthController extends Controller
     
 public function login(Request $request)
 {
+
     $response = Http::post(config('services.api.url') . '/api/login', [
         'correo' => $request->email,
         'contrasena' => $request->password,
@@ -44,6 +45,10 @@ public function login(Request $request)
             'admin' => '/business/profile',
             default => '/',
         }
+
+        
     ]);
+
+    
 }
 }

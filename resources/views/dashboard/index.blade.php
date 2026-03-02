@@ -1,3 +1,8 @@
+@php
+    $correo = session('usuario.correo') ?? session('usuario');
+    $inicial = $correo ? strtoupper(substr($correo, 0, 1)) : '?';
+@endphp
+
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="h-full">
 <head>
@@ -15,10 +20,15 @@
         </a>
         <div class="flex items-center gap-6">
             <!-- User Menu Placeholder -->
-            <div class="h-8 w-8 rounded-full bg-[#262626] border border-[#374151] flex items-center justify-center text-xs text-[#9CA3AF]">
-                U
-            </div>
+<div class="h-9 w-9 rounded-full 
+            bg-gradient-to-br from-[#374151] to-black 
+            flex items-center justify-center 
+            text-white font-bold text-sm 
+            shadow-md">
+    {{ $inicial }}
+</div>
         </div>
+        
     </header>
 
     <div class="flex flex-1 overflow-hidden">

@@ -14,6 +14,7 @@ return [
     |
     */
 
+    
     'postmark' => [
         'key' => env('POSTMARK_API_KEY'),
     ],
@@ -37,6 +38,10 @@ return [
 
     'api' => [
     'url' => env('API_URL'),
+],
+
+'nexoapi' => [
+    'base_url' => env('NEXOAPI_BASE_URL'),
 ],
 
 ];

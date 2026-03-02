@@ -1,51 +1,10 @@
-<!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="h-full">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>NexoApp - Bienvenido</title>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-</head>
-<body class="bg-[#1a1a1a] text-[#F3F4F6] font-sans antialiased min-h-screen flex flex-col">
+@extends('layouts.app')
 
-    <!-- Top Banner -->
-    <div class="bg-black py-2 text-center">
-        <p class="text-[10px] uppercase tracking-[0.2em] text-[#9CA3AF]">Bienvenido a NexoApp</p>
-    </div>
+@section('title', 'Inicio')
 
-    <!-- Navbar -->
-    <header class="w-full border-b border-[#374151]/50 sticky top-0 bg-[#1a1a1a]/95 backdrop-blur-sm z-50">
-        <div class="max-w-7xl mx-auto px-6 py-5 flex flex-col md:flex-row justify-between items-center gap-6">
-            
-            <!-- Logo & Search Group -->
-            <div class="flex items-center w-full md:w-auto gap-8">
-                <div class="text-2xl font-bold tracking-widest uppercase text-white shrink-0">
-                    NEXOAPP
-                </div>
+@section('content')
 
-                <!-- Minimal Search Bar -->
-                <div class="relative hidden md:block w-full max-w-md group">
-                    <input type="text" 
-                        class="w-64 focus:w-80 transition-all duration-500 bg-transparent border-b border-[#374151] py-2 pl-2 pr-8 text-sm text-white focus:border-white focus:outline-none placeholder-transparent" 
-                        placeholder="Buscar..." 
-                    />
-                    <label class="absolute left-2 top-2 text-[#9CA3AF] text-xs pointer-events-none uppercase tracking-wider transition-all group-focus-within:-top-3 group-focus-within:text-[10px] group-focus-within:text-white">
-                        Buscar Servicios...
-                    </label>
-                    <svg class="w-4 h-4 absolute right-0 top-2.5 text-[#9CA3AF]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                </div>
-            </div>
 
-            <!-- Navigation Actions -->
-            <nav class="flex items-center gap-6 w-full md:w-auto justify-between md:justify-end">
-                <a href="/dashboard" class="text-xs uppercase tracking-widest text-[#9CA3AF] hover:text-white transition-colors">Dashboard</a>
-                <a href="/business/profile" class="text-xs uppercase tracking-widest text-[#9CA3AF] hover:text-white transition-colors">Tu Negocio</a>
-                <a href="/login" class="px-5 py-2.5 bg-[#F3F4F6] text-[#1a1a1a] text-xs font-bold uppercase tracking-widest hover:bg-black hover:text-white hover:border hover:border-[#F3F4F6] transition-all duration-300">
-                    Iniciar Sesión
-                </a>
-            </nav>
-        </div>
-    </header>
 
     <!-- Main Content -->
     <main class="flex-grow">
@@ -163,17 +122,4 @@
 
     </main>
 
-    <!-- Simple Footer -->
-    <footer class="border-t border-[#374151]/30 py-12 bg-black">
-        <div class="max-w-7xl mx-auto px-6 flex justify-between items-center">
-            <div class="text-sm font-bold tracking-widest uppercase text-[#374151]">
-                NexoAPP
-            </div>
-            <div class="text-[10px] text-[#52525b] tracking-wider">
-                © 2026 DARK LUXURY UI
-            </div>
-        </div>
-    </footer>
-
-</body>
-</html>
+    @endsection

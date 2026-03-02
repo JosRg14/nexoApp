@@ -1,3 +1,9 @@
+@php
+    $correo = session('usuario.correo') ?? session('usuario');
+    $inicial = $correo ? strtoupper(substr($correo, 0, 1)) : '?';
+@endphp
+
+
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="h-full">
 <head>
@@ -11,17 +17,28 @@
 
     <!-- Navbar -->
     <header class="w-full py-5 px-8 flex justify-between items-center border-b border-[#374151]/50 bg-[#1a1a1a]/95 backdrop-blur-sm sticky top-0 z-50">
-        <a href="{{ url('/') }}" class="text-xl tracking-widest font-bold uppercase text-white hover:text-white/80 transition-colors">
-            NexoApp
-        </a>
-        <div class="flex items-center gap-6">
-            <span class="text-xs uppercase tracking-widest text-[#9CA3AF]">Hola, Urban Fade</span>
-            <div class="h-8 w-8 rounded-full bg-[#374151] overflow-hidden border border-[#374151]">
-                <!-- Avatar placeholder -->
-                <svg class="h-full w-full text-[#9CA3AF]" fill="currentColor" viewBox="0 0 24 24"><path d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
-            </div>
+    
+    <a href="{{ url('/') }}" class="text-xl tracking-widest font-bold uppercase text-white hover:text-white/80 transition-colors">
+        NexoApp
+    </a>
+
+    <div class="flex items-center gap-4">
+
+        <span class="text-xs uppercase tracking-widest text-[#9CA3AF] hidden md:block">
+            Hola, {{ $correo }}
+        </span>
+
+        <div class="h-9 w-9 rounded-full 
+                    bg-gradient-to-br from-[#374151] to-black 
+                    flex items-center justify-center 
+                    text-white font-bold text-sm 
+                    shadow-md">
+            {{ $inicial }}
         </div>
-    </header>
+
+    </div>
+
+</header>
 
     <!-- Main Content -->
     <main class="flex-grow max-w-7xl mx-auto w-full px-6 py-12">
@@ -195,86 +212,156 @@
                     <div class="w-full lg:w-1/2 space-y-6">
                         <div class="flex justify-between items-center mb-6">
                             <h2 class="text-xl font-bold uppercase tracking-wide text-white">Mis Servicios</h2>
-                            <span class="text-xs text-[#9CA3AF] tracking-widest">TOTAL: 2</span>
+                            <span id="services-total"
+      data-count="{{ count($services) }}"
+      class="text-xs text-[#9CA3AF] tracking-widest">
+    TOTAL: {{ count($services) }}
+</span>
                         </div>
 
                         <!-- Service Card Example -->
-                        <div class="flex bg-[#1a1a1a] border border-[#374151] p-4 gap-4 hover:border-[#F3F4F6]/50 transition-colors group cursor-pointer">
-                            <div class="w-24 h-24 bg-[#262626] shrink-0"></div>
-                            <div class="flex-grow flex flex-col justify-between">
-                                <div class="flex justify-between items-start">
-                                    <div>
-                                        <h3 class="text-white font-bold uppercase tracking-wide text-sm">Corte Clásico</h3>
-                                        <p class="text-[#9CA3AF] text-[10px] mt-1">Incluye lavado y peinado.</p>
-                                    </div>
-                                    <span class="text-lg font-bold text-white">$25.00</span>
-                                </div>
-                                <div class="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <button class="text-[10px] uppercase tracking-widest text-[#9CA3AF] hover:text-white">Editar</button>
-                                    <button class="text-[10px] uppercase tracking-widest text-red-500 hover:text-red-400">Eliminar</button>
-                                </div>
-                            </div>
-                        </div>
+                    
+                        @foreach($services as $service)
+<div id="service-{{ $service['id'] }}"
+    class="service-card flex bg-[#1a1a1a] border border-[#374151] p-4 gap-4 hover:border-[#F3F4F6]/50 transition-all duration-300 group">
+    <div class="w-24 h-24 bg-[#262626] shrink-0"></div>
 
-                        <div class="flex bg-[#1a1a1a] border border-[#374151] p-4 gap-4 hover:border-[#F3F4F6]/50 transition-colors group cursor-pointer">
-                            <div class="w-24 h-24 bg-[#262626] shrink-0"></div>
-                            <div class="flex-grow flex flex-col justify-between">
-                                <div class="flex justify-between items-start">
-                                    <div>
-                                        <h3 class="text-white font-bold uppercase tracking-wide text-sm">Afeitado Navaja</h3>
-                                        <p class="text-[#9CA3AF] text-[10px] mt-1">Toalla caliente y aceites esenciales.</p>
-                                    </div>
-                                    <span class="text-lg font-bold text-white">$15.00</span>
-                                </div>
-                                <div class="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <button class="text-[10px] uppercase tracking-widest text-[#9CA3AF] hover:text-white">Editar</button>
-                                    <button class="text-[10px] uppercase tracking-widest text-red-500 hover:text-red-400">Eliminar</button>
-                                </div>
-                            </div>
-                        </div>
+    <div class="flex-grow flex flex-col justify-between">
+        <div class="flex justify-between items-start">
+            <div>
+                <h3 class="text-white font-bold uppercase tracking-wide text-sm">
+                    {{ $service['nombre_servicio'] }}
+                </h3>
+                <p class="text-[#9CA3AF] text-[10px] mt-1">
+                    {{ $service['descripcion'] ?? 'Sin descripción' }}
+                </p>
+            </div>
+
+            <span class="text-lg font-bold text-white">
+                ${{ $service['precio'] }}
+            </span>
+        </div>
+
+        <div class="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+            <button 
+    onclick='openEditModal(
+        @json($service["id"]),
+        @json($service["nombre_servicio"]),
+        @json($service["descripcion"] ?? ""),
+        @json($service["precio"]),
+        @json($service["duracion_estimada"] ?? 0)
+    )'
+    class="text-[10px] uppercase tracking-widest text-[#9CA3AF] hover:text-white">
+    Editar
+</button>
+        </div>
+        <button 
+    onclick="openDeleteModal({{ $service['id'] }}, '{{ $service['nombre_servicio'] }}')"
+    class="text-[10px] uppercase tracking-widest text-red-500 hover:text-red-400">
+    Eliminar
+</button>
+    </div>
+</div>
+@endforeach
+
 
                     </div>
 
                     <!-- Right: Add Service Form -->
                     <div class="w-full lg:w-1/2 border-l border-[#374151]/30 lg:pl-12">
-                         <div class="mb-8">
-                            <h2 class="text-3xl font-bold uppercase tracking-wide text-white">Agregar Servicio</h2>
-                            <p class="text-[#9CA3AF] text-xs mt-2 tracking-wide">COMPLETA LOS DETALLES DEL NUEVO SERVICIO</p>
-                        </div>
-                        
-                        <form class="space-y-6" onsubmit="event.preventDefault();">
-                             <div class="group/input relative">
-                                <input type="text" class="peer w-full bg-transparent border-b border-[#374151] py-3 text-white focus:border-white focus:outline-none transition-colors placeholder-transparent" placeholder="Nombre del servicio" />
-                                <label class="absolute left-0 -top-3.5 text-[#9CA3AF] text-xs transition-all peer-placeholder-shown:text-base peer-placeholder-shown:top-3 peer-focus:-top-3.5 peer-focus:text-xs peer-focus:text-white">Nombre del servicio</label>
-                            </div>
+    <div class="mb-8">
+        <h2 class="text-3xl font-bold uppercase tracking-wide text-white">
+            Agregar Servicio
+        </h2>
+        <p class="text-[#9CA3AF] text-xs mt-2 tracking-wide">
+            COMPLETA LOS DETALLES DEL NUEVO SERVICIO
+        </p>
+    </div>
 
-                            <div class="group/input relative">
-                                <input type="text" class="peer w-full bg-transparent border-b border-[#374151] py-3 text-white focus:border-white focus:outline-none transition-colors placeholder-transparent" placeholder="Descripción breve" />
-                                <label class="absolute left-0 -top-3.5 text-[#9CA3AF] text-xs transition-all peer-placeholder-shown:text-base peer-placeholder-shown:top-3 peer-focus:-top-3.5 peer-focus:text-xs peer-focus:text-white">Descripción breve</label>
-                            </div>
+    <form method="POST" action="{{ route('business.services.store') }}" class="space-y-6">
+        @csrf
 
-                            <div class="group/input relative">
-                                <input type="text" class="peer w-full bg-transparent border-b border-[#374151] py-3 text-white focus:border-white focus:outline-none transition-colors placeholder-transparent" placeholder="Precio" />
-                                <label class="absolute left-0 -top-3.5 text-[#9CA3AF] text-xs transition-all peer-placeholder-shown:text-base peer-placeholder-shown:top-3 peer-focus:-top-3.5 peer-focus:text-xs peer-focus:text-white">Precio</label>
-                            </div>
+        {{-- NOMBRE --}}
+        <div class="group/input relative">
+            <input 
+                type="text" 
+                name="nombre"
+                value="{{ old('nombre') }}"
+                maxlength="100"
+                required
+                class="peer w-full bg-transparent border-b border-[#374151] py-3 text-white focus:border-white focus:outline-none transition-colors placeholder-transparent" 
+                placeholder="Nombre del servicio" />
+            <label class="absolute left-0 -top-3.5 text-[#9CA3AF] text-xs transition-all peer-placeholder-shown:text-base peer-placeholder-shown:top-3 peer-focus:-top-3.5 peer-focus:text-xs peer-focus:text-white">
+                Nombre del servicio
+            </label>
+            @error('nombre')
+                <p class="text-red-400 text-xs mt-1">{{ $message }}</p>
+            @enderror
+        </div>
 
-                            <div class="group/input relative">
-                                <input type="number" class="peer w-full bg-transparent border-b border-[#374151] py-3 text-white focus:border-white focus:outline-none transition-colors placeholder-transparent" placeholder="Duración (Minutos)" />
-                                <label class="absolute left-0 -top-3.5 text-[#9CA3AF] text-xs transition-all peer-placeholder-shown:text-base peer-placeholder-shown:top-3 peer-focus:-top-3.5 peer-focus:text-xs peer-focus:text-white">Duración (Minutos)</label>
-                            </div>
+        {{-- DESCRIPCIÓN --}}
+        <div class="group/input relative">
+            <input 
+                type="text" 
+                name="descripcion"
+                value="{{ old('descripcion') }}"
+                maxlength="255"
+                class="peer w-full bg-transparent border-b border-[#374151] py-3 text-white focus:border-white focus:outline-none transition-colors placeholder-transparent" 
+                placeholder="Descripción breve" />
+            <label class="absolute left-0 -top-3.5 text-[#9CA3AF] text-xs transition-all peer-placeholder-shown:text-base peer-placeholder-shown:top-3 peer-focus:-top-3.5 peer-focus:text-xs peer-focus:text-white">
+                Descripción breve
+            </label>
+            @error('descripcion')
+                <p class="text-red-400 text-xs mt-1">{{ $message }}</p>
+            @enderror
+        </div>
 
-                            <div class="space-y-2">
-                                <span class="text-[#9CA3AF] text-xs">Imagen del servicio (opcional)</span>
-                                <div class="h-32 w-full bg-[#262626] border border-dashed border-[#374151] flex items-center justify-center text-[#374151] hover:text-white hover:border-white transition-all cursor-pointer">
-                                    <span class="text-xs uppercase tracking-widest">Subir Foto</span>
-                                </div>
-                            </div>
+        {{-- PRECIO --}}
+        <div class="group/input relative">
+            <input 
+                type="number" 
+                name="precio"
+                value="{{ old('precio') }}"
+                min="1"
+                max="10000"
+                step="0.01"
+                required
+                class="peer w-full bg-transparent border-b border-[#374151] py-3 text-white focus:border-white focus:outline-none transition-colors placeholder-transparent" 
+                placeholder="Precio" />
+            <label class="absolute left-0 -top-3.5 text-[#9CA3AF] text-xs transition-all peer-placeholder-shown:text-base peer-placeholder-shown:top-3 peer-focus:-top-3.5 peer-focus:text-xs peer-focus:text-white">
+                Precio
+            </label>
+            @error('precio')
+                <p class="text-red-400 text-xs mt-1">{{ $message }}</p>
+            @enderror
+        </div>
 
-                             <button class="w-full py-4 px-6 bg-[#1a1a1a] text-[#F3F4F6] font-bold tracking-widest uppercase text-sm border border-[#374151] transition-all duration-300 hover:bg-[#F3F4F6] hover:text-[#1a1a1a] mt-4">
-                                Agregar Servicio
-                            </button>
-                        </form>
-                    </div>
+        {{-- DURACIÓN --}}
+        <div class="group/input relative">
+            <input 
+                type="number" 
+                name="duracion"
+                value="{{ old('duracion') }}"
+                min="5"
+                max="480"
+                required
+                class="peer w-full bg-transparent border-b border-[#374151] py-3 text-white focus:border-white focus:outline-none transition-colors placeholder-transparent" 
+                placeholder="Duración (Minutos)" />
+            <label class="absolute left-0 -top-3.5 text-[#9CA3AF] text-xs transition-all peer-placeholder-shown:text-base peer-placeholder-shown:top-3 peer-focus:-top-3.5 peer-focus:text-xs peer-focus:text-white">
+                Duración (Minutos)
+            </label>
+            @error('duracion')
+                <p class="text-red-400 text-xs mt-1">{{ $message }}</p>
+            @enderror
+        </div>
+
+        <button 
+            type="submit"
+            class="w-full py-4 px-6 bg-[#1a1a1a] text-[#F3F4F6] font-bold tracking-widest uppercase text-sm border border-[#374151] transition-all duration-300 hover:bg-[#F3F4F6] hover:text-[#1a1a1a] mt-4">
+            Agregar Servicio
+        </button>
+    </form>
+</div>
 
                 </div>
             </section>
@@ -360,13 +447,11 @@
                     <h2 class="text-xl font-bold uppercase tracking-wide text-white mb-6">Servicios Top</h2>
                     
                     <div class="space-y-6">
+
+
                         <!-- Service 1 -->
                         <div class="flex items-center justify-between gap-4">
                             <span class="text-white font-bold text-sm w-32 shrink-0">Corte Clásico</span>
-                            <div class="flex-1 rounded-full overflow-hidden" style="height: 8px; background-color: #333333;">
-                                <div class="h-full rounded-full" style="width: 75%; background-color: #ffffff;"></div>
-                            </div>
-                            <span class="text-[#9CA3AF] text-sm w-8 text-right">45</span>
                         </div>
 
                         <!-- Service 2 -->
@@ -529,6 +614,126 @@
         </div>
     </div>
 
+    <div id="modal-edit-service" class="fixed inset-0 hidden z-50">
+    <div class="absolute inset-0 bg-black/80" onclick="closeEditModal()"></div>
+
+    <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 
+                bg-[#1a1a1a] border border-[#374151] p-8 w-full max-w-md">
+
+        <h3 id="editModalTitle" class="text-white font-bold mb-6 uppercase">
+    Editar Servicio
+</h3>
+
+        <form method="POST" id="editServiceForm">
+            @csrf
+            @method('PUT')
+
+            <input type="hidden" name="id" id="edit_id">
+
+            <div class="space-y-5">
+
+    <div>
+        <label class="block text-xs text-[#9CA3AF] uppercase tracking-widest mb-1">
+            Nombre del servicio
+        </label>
+        <input type="text"
+               name="nombre"
+               id="edit_nombre"
+               maxlength="100"
+               required
+               class="w-full bg-transparent border-b border-[#374151] py-2 text-white focus:border-white outline-none">
+    </div>
+
+    <div>
+        <label class="block text-xs text-[#9CA3AF] uppercase tracking-widest mb-1">
+            Descripción
+        </label>
+        <input type="text"
+               name="descripcion"
+               id="edit_descripcion"
+               maxlength="255"
+               class="w-full bg-transparent border-b border-[#374151] py-2 text-white focus:border-white outline-none">
+    </div>
+
+    <div>
+        <label class="block text-xs text-[#9CA3AF] uppercase tracking-widest mb-1">
+            Precio ($)
+        </label>
+        <input type="number"
+               name="precio"
+               id="edit_precio"
+               min="1"
+               max="10000"
+               step="0.01"
+               required
+               class="w-full bg-transparent border-b border-[#374151] py-2 text-white focus:border-white outline-none">
+    </div>
+
+    <div>
+        <label class="block text-xs text-[#9CA3AF] uppercase tracking-widest mb-1">
+            Duración (minutos)
+        </label>
+        <input type="number"
+               name="duracion"
+               id="edit_duracion"
+               min="5"
+               max="480"
+               required
+               class="w-full bg-transparent border-b border-[#374151] py-2 text-white focus:border-white outline-none">
+    </div>
+
+</div>
+
+            <button class="mt-6 w-full bg-white text-black py-2 uppercase text-xs font-bold">
+                Guardar Cambios
+            </button>
+        </form>
+    </div>
+</div>
+
+<div id="modal-delete-service" class="fixed inset-0 hidden z-50">
+    <div class="absolute inset-0 bg-black/80" onclick="closeDeleteModal()"></div>
+
+    <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 
+                bg-[#1a1a1a] border border-[#374151] p-8 w-full max-w-md">
+
+        <h3 class="text-red-500 font-bold mb-4 uppercase">
+            Confirmar eliminación
+        </h3>
+
+        <p class="text-white text-sm mb-6">
+            ¿Estás seguro que deseas eliminar 
+            <span id="deleteServiceName" class="font-bold"></span>?
+        </p>
+
+        <form method="POST" id="deleteServiceForm">
+            @csrf
+            @method('DELETE')
+
+            <div class="flex gap-4">
+                <button type="button" 
+                    onclick="closeDeleteModal()"
+                    class="w-1/2 py-2 border border-[#374151] text-white text-xs uppercase">
+                    Cancelar
+                </button>
+
+                <button type="submit"
+                    class="w-1/2 py-2 bg-red-600 text-white text-xs uppercase font-bold hover:bg-red-700">
+                    Eliminar
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div id="global-loader" class="fixed inset-0 hidden z-50 flex items-center justify-center bg-black/70">
+    <div class="w-10 h-10 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+</div>
+
+<div id="toast"
+     class="fixed bottom-6 right-6 hidden bg-[#1a1a1a] border border-[#374151] text-white px-6 py-3 text-sm uppercase tracking-widest shadow-lg">
+</div>
+
     <script>
         function switchTab(tab) {
             const tabs = ['info', 'services', 'finances', 'personnel'];
@@ -557,6 +762,79 @@
                 }
             });
         }
+
+        function openEditModal(id, nombre, descripcion, precio, duracion) {
+
+    document.getElementById('modal-edit-service').classList.remove('hidden');
+
+    document.getElementById('editModalTitle').innerText =
+        `Editando: ${nombre}`;
+
+    document.getElementById('edit_nombre').value = nombre;
+    document.getElementById('edit_descripcion').value = descripcion;
+    document.getElementById('edit_precio').value = precio;
+    document.getElementById('edit_duracion').value = duracion;
+
+    document.getElementById('editServiceForm').action =
+        `/business/services/${id}`;
+}
+
+function openDeleteModal(id, nombre) {
+    document.getElementById('modal-delete-service').classList.remove('hidden');
+    document.getElementById('deleteServiceName').innerText = nombre;
+    document.getElementById('deleteServiceForm').action = `/business/services/${id}`;
+}
+
+function closeDeleteModal() {
+    document.getElementById('modal-delete-service').classList.add('hidden');
+}
+
+document.getElementById('deleteServiceForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    const form = this;
+    const url = form.action;
+    const serviceId = url.split('/').pop();
+    const card = document.getElementById(`service-${serviceId}`);
+
+    showLoader();
+
+    fetch(url, {
+        method: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value,
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: new URLSearchParams(new FormData(form))
+    })
+    .then(() => {
+        hideLoader();
+
+        // Animación fade out
+        card.style.opacity = '0';
+        card.style.transform = 'translateX(20px)';
+
+        setTimeout(() => {
+    card.remove();
+
+    // 🔥 ACTUALIZAR CONTADOR
+    const totalElement = document.getElementById('services-total');
+const newTotal = document.querySelectorAll('.service-card').length;
+totalElement.dataset.count = newTotal;
+totalElement.innerText = "TOTAL: " + newTotal;
+
+    showToast("Servicio eliminado correctamente");
+}, 300);
+
+        closeDeleteModal();
+    });
+});
+
+    
+function closeEditModal() {
+    document.getElementById('modal-edit-service').classList.add('hidden');
+}
+
 
         // Initialize Chart
         document.addEventListener('DOMContentLoaded', function() {
@@ -653,6 +931,40 @@
                 modal.classList.add('hidden');
             }
         }
+
+        function showLoader() {
+    document.getElementById('global-loader').classList.remove('hidden');
+}
+
+function hideLoader() {
+    document.getElementById('global-loader').classList.add('hidden');
+}
+
+function showToast(message) {
+    const toast = document.getElementById('toast');
+    toast.innerText = message;
+    toast.classList.remove('hidden');
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateY(10px)';
+
+    setTimeout(() => {
+        toast.style.transition = 'all 0.3s ease';
+        toast.style.opacity = '1';
+        toast.style.transform = 'translateY(0)';
+    }, 10);
+
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        setTimeout(() => {
+            toast.classList.add('hidden');
+        }, 300);
+    }, 3000);
+}
+
+
     </script>
+
+
+
 </body>
 </html>
