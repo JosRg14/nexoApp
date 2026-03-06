@@ -212,25 +212,47 @@
                     <div class="w-full lg:w-1/2 space-y-6">
                         <div class="flex justify-between items-center mb-6">
                             <h2 class="text-xl font-bold uppercase tracking-wide text-white">Mis Servicios</h2>
-                            <span id="services-total"
-      data-count="{{ count($services) }}"
-      class="text-xs text-[#9CA3AF] tracking-widest">
-    TOTAL: {{ count($services) }}
-</span>
+                            @if(isset($services) && count($services) > 0)
+    <span id="services-total"
+          class="text-xs text-[#9CA3AF] tracking-widest">
+        TOTAL: {{ count($services) }}
+    </span>
+@endif
                         </div>
 
                         <!-- Service Card Example -->
                     
                         @foreach($services as $service)
+
+
 <div id="service-{{ $service['id'] }}"
     class="service-card flex bg-[#1a1a1a] border border-[#374151] p-4 gap-4 hover:border-[#F3F4F6]/50 transition-all duration-300 group">
-    <div class="w-24 h-24 bg-[#262626] shrink-0"></div>
 
+    {{-- IMAGEN --}}
+    <div class="w-24 h-24 shrink-0 bg-[#262626] rounded overflow-hidden">
+
+    @if($service['imagen'])
+        <img 
+            src="{{ $service['imagen'] }}" 
+            class="block w-24 h-24 object-cover"
+        >
+    @else
+        <div class="w-24 h-24 flex items-center justify-center text-[#374151] text-xs">
+            SIN IMAGEN
+        </div>
+    @endif
+
+</div>
+
+    
+
+    {{-- CONTENIDO --}}
     <div class="flex-grow flex flex-col justify-between">
+        
         <div class="flex justify-between items-start">
             <div>
                 <h3 class="text-white font-bold uppercase tracking-wide text-sm">
-                    {{ $service['nombre_servicio'] }}
+                    {{ $service['nombre'] }}
                 </h3>
                 <p class="text-[#9CA3AF] text-[10px] mt-1">
                     {{ $service['descripcion'] ?? 'Sin descripción' }}
@@ -244,24 +266,30 @@
 
         <div class="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
             <button 
-    onclick='openEditModal(
-        @json($service["id"]),
-        @json($service["nombre_servicio"]),
-        @json($service["descripcion"] ?? ""),
-        @json($service["precio"]),
-        @json($service["duracion_estimada"] ?? 0)
-    )'
-    class="text-[10px] uppercase tracking-widest text-[#9CA3AF] hover:text-white">
-    Editar
-</button>
+                onclick='openEditModal(
+                    @json($service["id"]),
+                    @json($service["nombre"]),
+                    @json($service["descripcion"] ?? ""),
+                    @json($service["precio"]),
+                    @json($service["duracion"] ?? 0),
+                    @json($service["imagen"] ?? null)
+                )'
+                class="text-[10px] uppercase tracking-widest text-[#9CA3AF] hover:text-white">
+                Editar
+            </button>
+
+            <button 
+                onclick="openDeleteModal({{ $service['id'] }}, '{{ $service['nombre'] }}')"
+                class="text-[10px] uppercase tracking-widest text-red-500 hover:text-red-400">
+                Eliminar
+            </button>
         </div>
-        <button 
-    onclick="openDeleteModal({{ $service['id'] }}, '{{ $service['nombre_servicio'] }}')"
-    class="text-[10px] uppercase tracking-widest text-red-500 hover:text-red-400">
-    Eliminar
-</button>
+
     </div>
+
 </div>
+
+
 @endforeach
 
 
@@ -278,7 +306,10 @@
         </p>
     </div>
 
-    <form method="POST" action="{{ route('business.services.store') }}" class="space-y-6">
+    <form method="POST"
+      action="{{ route('business.services.store') }}"
+      enctype="multipart/form-data"
+      class="space-y-6">
         @csrf
 
         {{-- NOMBRE --}}
@@ -315,6 +346,16 @@
                 <p class="text-red-400 text-xs mt-1">{{ $message }}</p>
             @enderror
         </div>
+
+        <div>
+    <label class="block text-xs text-[#9CA3AF] uppercase tracking-widest mb-2">
+        Imagen del servicio
+    </label>
+    <input type="file"
+           name="imagen"
+           accept="image/*"
+           class="w-full text-xs text-[#9CA3AF]">
+</div>
 
         {{-- PRECIO --}}
         <div class="group/input relative">
@@ -624,13 +665,38 @@
     Editar Servicio
 </h3>
 
-        <form method="POST" id="editServiceForm">
+        <form method="POST"
+      id="editServiceForm"
+      enctype="multipart/form-data">
             @csrf
             @method('PUT')
 
             <input type="hidden" name="id" id="edit_id">
 
             <div class="space-y-5">
+
+    <!-- 🔥 PREVIEW IMAGEN -->
+    <div>
+        <label class="block text-xs text-[#9CA3AF] uppercase tracking-widest mb-2">
+            Imagen actual
+        </label>
+
+        <img id="edit_imagen_preview"
+             class="w-full h-40 object-cover rounded-lg mb-3 hidden border border-[#374151]"
+             alt="Imagen del servicio">
+    </div>
+
+    <!-- 🔥 INPUT IMAGEN -->
+    <div>
+        <label class="block text-xs text-[#9CA3AF] uppercase tracking-widest mb-1">
+            Cambiar imagen
+        </label>
+        <input type="file"
+               name="imagen"
+               id="edit_imagen"
+               accept="image/*"
+               class="w-full text-xs text-[#9CA3AF]">
+    </div>
 
     <div>
         <label class="block text-xs text-[#9CA3AF] uppercase tracking-widest mb-1">
@@ -684,9 +750,9 @@
 
 </div>
 
-            <button class="mt-6 w-full bg-white text-black py-2 uppercase text-xs font-bold">
-                Guardar Cambios
-            </button>
+<button class="mt-6 w-full bg-white text-black py-2 uppercase text-xs font-bold">
+    Guardar Cambios
+</button>
         </form>
     </div>
 </div>
@@ -763,7 +829,7 @@
             });
         }
 
-        function openEditModal(id, nombre, descripcion, precio, duracion) {
+        function openEditModal(id, nombre, descripcion, precio, duracion, imagen) {
 
     document.getElementById('modal-edit-service').classList.remove('hidden');
 
@@ -774,6 +840,17 @@
     document.getElementById('edit_descripcion').value = descripcion;
     document.getElementById('edit_precio').value = precio;
     document.getElementById('edit_duracion').value = duracion;
+
+    // 🔥 NUEVO: Mostrar imagen actual
+    const preview = document.getElementById('edit_imagen_preview');
+
+if (imagen) {
+    preview.src = imagen;
+    preview.classList.remove('hidden');
+} else {
+    preview.src = '';
+    preview.classList.add('hidden');
+}
 
     document.getElementById('editServiceForm').action =
         `/business/services/${id}`;

@@ -2,6 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\ServiceController;
+use App\Http\Controllers\AuthController;
+
 
 Route::get('/register', function () {
     return view('auth.role-selection');
@@ -19,8 +21,6 @@ Route::get('/login', function () {
     return view('auth.login');
 })->name('login');
 
-Route::get('/business/profile', [ServiceController::class, 'index'])->name('business.profile');
-
 Route::get('/business/view', function () {
     return view('business.view');
 })->name('business.show');
@@ -28,15 +28,7 @@ Route::get('/business/view', function () {
 
 
 //** API Routes for business services management*/
-Route::put('/business/services/{id}', 
-    [ServiceController::class, 'update']
-)->name('business.services.update');
-
-Route::delete('/business/services/{id}', 
-    [ServiceController::class, 'destroy']
-)->name('business.services.destroy');
-
-Route::middleware(['auth.session', 'inject.api.token', 'role:admin'])
+Route::middleware('role:admin')
     ->prefix('business')
     ->name('business.')
     ->group(function () {
@@ -46,7 +38,38 @@ Route::middleware(['auth.session', 'inject.api.token', 'role:admin'])
 
         Route::post('/services', [ServiceController::class, 'store'])
             ->name('services.store');
-    });
+
+        Route::put('/services/{id}', [ServiceController::class, 'update'])
+            ->name('services.update');
+
+        Route::delete('/services/{id}', [ServiceController::class, 'destroy'])
+            ->name('services.destroy');
+
+});
+
+//** Api routes for super */
+Route::middleware('role:superusuario')
+    ->prefix('dashboard')
+    ->name('dashboard.')
+    ->group(function () {
+
+        Route::get('/', function () {
+            return view('dashboard.index');
+        })->name('index');
+
+        Route::get('/promotions', function () {
+    return view('dashboard.promotions.index');
+})->name('promotions');
+
+Route::get('/notices', function () {
+    return view('dashboard.notices.index');
+})->name('notices');
+
+        Route::get('/businesses', function () {
+            return view('dashboard.businesses.index');
+        })->name('businesses');
+});
+//
 
 Route::get('/service/view', function () {
     return view('service.view');
@@ -83,47 +106,17 @@ Route::get('/booking/availability', function () {
     ]);
 })->name('booking.availability');
 
-
-Route::get('/dashboard', function () {
-
-    if (!session()->has('auth_token')) {
-        return redirect('/login');
-    }
-
-    if (session('rol') !== 'superusuario') {
-        abort(403);
-    }
-
-    return view('dashboard.index');
-
-})->name('dashboard');
-
-Route::get('/dashboard/businesses', function () {
-    return view('dashboard.businesses.index');
-})->name('dashboard.businesses');
-
-
-Route::get('/dashboard/businesses/{id}', function ($id) {
-    return view('dashboard.businesses.show', ['id' => $id]);
-})->name('dashboard.businesses.show');
-
-Route::get('/dashboard/promotions', function () {
-    return view('dashboard.promotions.index');
-})->name('dashboard.promotions');
-
-Route::get('/dashboard/notices', function () {
-    return view('dashboard.notices.index');
-})->name('dashboard.notices');
-
-use App\Http\Controllers\AuthController;
-
 Route::post('/proxy/login', [AuthController::class, 'login']);
 
 Route::get('/', function () {
     return view('home');
-});
+})->name('home');
 
 Route::post('/logout', function () {
     session()->flush();   // elimina todo
     return redirect('/'); // vuelve a welcome
 });
+
+Route::post('/proxy/register-client', [AuthController::class, 'registerCliente']);
+
+Route::post('/proxy/register-admin', [AuthController::class, 'registerAdmin']);

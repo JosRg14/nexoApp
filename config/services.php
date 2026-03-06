@@ -40,8 +40,8 @@ return [
     'url' => env('API_URL'),
 ],
 
-'nexoapi' => [
-    'base_url' => env('NEXOAPI_BASE_URL'),
-],
+
+
+
 
 ];

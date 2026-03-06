@@ -8,12 +8,12 @@ class RoleMiddleware
 {
     public function handle($request, Closure $next, $role)
 {
-    if (!session()->has('rol')) {
-        abort(403, 'No autorizado');
+    if (!session()->has('auth_token')) {
+        return redirect('/login');
     }
 
     if (session('rol') !== $role) {
-        abort(403, 'No autorizado');
+        abort(403);
     }
 
     return $next($request);

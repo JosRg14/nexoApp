@@ -23,21 +23,23 @@ class ServiceController extends Controller
      */
     public function index()
 {
-    
     try {
         $response = $this->service->list();
 
         $services = collect($response['data'] ?? [])->map(function ($item) {
             return [
                 'id' => $item['id'] ?? null,
-                'nombre_servicio' => $item['nombre'] ?? '',
+                'nombre' => $item['nombre'] ?? '', // 🔥 CORREGIDO
                 'descripcion' => $item['descripcion'] ?? '',
                 'precio' => $item['precio'] ?? 0,
-                'duracion_estimada' => $item['duracion'] ?? 0,
+                'duracion' => $item['duracion'] ?? 0,
+                'imagen' => isset($item['imagen'])
+    ? config('services.api.url') . $item['imagen']
+    : null, 
             ];
         })->toArray();
 
-
+       
 
     } catch (\RuntimeException $e) {
         $services = [];
@@ -80,37 +82,36 @@ class ServiceController extends Controller
 public function update(Request $request, int $id)
 {
     $validated = $request->validate([
-    'nombre' => 'required|string|max:100',
-    'descripcion' => 'nullable|string|max:255',
-    'precio' => 'required|numeric|min:1|max:10000',
-    'duracion' => 'required|integer|min:5|max:480',
-]);
+        'nombre' => 'required|string|max:100',
+        'descripcion' => 'nullable|string|max:255',
+        'precio' => 'required|numeric|min:1|max:10000',
+        'duracion' => 'required|integer|min:5|max:480',
+    ]);
 
     try {
 
-        //Enviar EXACTAMENTE lo que la API espera
         $payload = [
-    'nombre_servicio' => $validated['nombre'] ?? null,
-    'descripcion' => $validated['descripcion'] ?? null,
-    'precio' => $validated['precio'] ?? null,
-    'duracion_estimada' => $validated['duracion'] ?? null,
-];
+            'nombre_servicio' => $validated['nombre'],
+            'descripcion' => $validated['descripcion'],
+            'precio' => $validated['precio'],
+            'duracion_estimada' => $validated['duracion'],
+        ];
 
-        $response = $this->service->update($id, $payload);
-
+        $this->service->update($id, $payload);
 
         return redirect()->back()
-        ->with('status', 'Servicio actualizado');
+            ->with('status', 'Servicio actualizado');
 
     } catch (\RuntimeException $e) {
         return redirect()->back()
-        ->withErrors(['api' => $e->getMessage()]);
+            ->withErrors(['api' => $e->getMessage()]);
     }
 }
 
 public function destroy(int $id)
 {
     try {
+
         $this->service->delete($id);
 
         return redirect()->back()

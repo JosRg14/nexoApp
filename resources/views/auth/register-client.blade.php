@@ -31,33 +31,44 @@
                     <p class="text-[#9CA3AF] text-sm tracking-wide">RELLENA LOS SIGUIENTES REQUISITOS</p>
                 </div>
 
-                <form class="space-y-8" onsubmit="event.preventDefault(); window.location.href='/';">
+                <form id="registerForm" class="space-y-8" method="POST" action="/proxy/register-client">
                     
                     <div class="space-y-6">
                         <div class="group/input relative">
-                            <input type="email" id="email" class="peer w-full bg-transparent border-b border-[#374151] py-3 text-white focus:border-white focus:outline-none transition-colors placeholder-transparent" placeholder="Email Address" />
+                            <input type="email" id="email" name="correo" class="peer w-full bg-transparent border-b border-[#374151] py-3 text-white focus:border-white focus:outline-none transition-colors placeholder-transparent" placeholder="Email Address" />
                             <label for="email" class="absolute left-0 -top-3.5 text-[#9CA3AF] text-xs transition-all peer-placeholder-shown:text-base peer-placeholder-shown:top-3 peer-focus:-top-3.5 peer-focus:text-xs peer-focus:text-white">Email Address</label>
                         </div>
                         
                         <div class="group/input relative">
-                            <input type="text" id="fullname" class="peer w-full bg-transparent border-b border-[#374151] py-3 text-white focus:border-white focus:outline-none transition-colors placeholder-transparent" placeholder="Full Name" />
+                            <input type="text" id="fullname" name="nombre" class="peer w-full bg-transparent border-b border-[#374151] py-3 text-white focus:border-white focus:outline-none transition-colors placeholder-transparent" placeholder="Full Name" />
                             <label for="fullname" class="absolute left-0 -top-3.5 text-[#9CA3AF] text-xs transition-all peer-placeholder-shown:text-base peer-placeholder-shown:top-3 peer-focus:-top-3.5 peer-focus:text-xs peer-focus:text-white">Full Name</label>
                         </div>
 
                         <div class="group/input relative">
-                            <input type="password" id="password" class="peer w-full bg-transparent border-b border-[#374151] py-3 text-white focus:border-white focus:outline-none transition-colors placeholder-transparent" placeholder="Contraseña" />
+                            <input type="text" id="app_paterno" name="app_paterno" class="peer w-full bg-transparent border-b border-[#374151] py-3 text-white focus:border-white focus:outline-none transition-colors placeholder-transparent" placeholder="Apellido Paterno" />
+                            <label for="app_paterno" class="absolute left-0 -top-3.5 text-[#9CA3AF] text-xs transition-all peer-placeholder-shown:text-base peer-placeholder-shown:top-3 peer-focus:-top-3.5 peer-focus:text-xs peer-focus:text-white">Apellido Paterno</label>
+                        </div>
+
+                        <div class="group/input relative">
+                            <input type="text" id="app_materno" name="app_materno" class="peer w-full bg-transparent border-b border-[#374151] py-3 text-white focus:border-white focus:outline-none transition-colors placeholder-transparent" placeholder="Apellido Materno" />
+                            <label for="app_materno" class="absolute left-0 -top-3.5 text-[#9CA3AF] text-xs transition-all peer-placeholder-shown:text-base peer-placeholder-shown:top-3 peer-focus:-top-3.5 peer-focus:text-xs peer-focus:text-white">Apellido Materno</label>
+                        </div>
+
+                        <div class="group/input relative">
+                            <input type="text" id="telefono" name="telefono" class="peer w-full bg-transparent border-b border-[#374151] py-3 text-white focus:border-white focus:outline-none transition-colors placeholder-transparent" placeholder="Teléfono" />
+                            <label for="telefono" class="absolute left-0 -top-3.5 text-[#9CA3AF] text-xs transition-all peer-placeholder-shown:text-base peer-placeholder-shown:top-3 peer-focus:-top-3.5 peer-focus:text-xs peer-focus:text-white">Teléfono</label>
+                        </div>
+                    
+                        <div class="group/input relative">
+                            <input type="password" id="password" name="contrasena" class="peer w-full bg-transparent border-b border-[#374151] py-3 text-white focus:border-white focus:outline-none transition-colors placeholder-transparent" placeholder="Contraseña" />
                             <label for="password" class="absolute left-0 -top-3.5 text-[#9CA3AF] text-xs transition-all peer-placeholder-shown:text-base peer-placeholder-shown:top-3 peer-focus:-top-3.5 peer-focus:text-xs peer-focus:text-white">Contraseña</label>
                         </div>
 
                         <div class="group/input relative">
-                            <input type="password" id="password_confirmation" class="peer w-full bg-transparent border-b border-[#374151] py-3 text-white focus:border-white focus:outline-none transition-colors placeholder-transparent" placeholder="Confirmar contraseña" />
+                            <input type="password" id="password_confirmation" name="contrasena_confirmation" class="peer w-full bg-transparent border-b border-[#374151] py-3 text-white focus:border-white focus:outline-none transition-colors placeholder-transparent" placeholder="Confirmar contraseña" />
                             <label for="password_confirmation" class="absolute left-0 -top-3.5 text-[#9CA3AF] text-xs transition-all peer-placeholder-shown:text-base peer-placeholder-shown:top-3 peer-focus:-top-3.5 peer-focus:text-xs peer-focus:text-white">Confirmar contraseña</label>
                         </div>
 
-                        <div class="group/input relative">
-                            <input type="text" id="city" class="peer w-full bg-transparent border-b border-[#374151] py-3 text-white focus:border-white focus:outline-none transition-colors placeholder-transparent" placeholder="Ciudad" />
-                            <label for="city" class="absolute left-0 -top-3.5 text-[#9CA3AF] text-xs transition-all peer-placeholder-shown:text-base peer-placeholder-shown:top-3 peer-focus:-top-3.5 peer-focus:text-xs peer-focus:text-white">Ciudad</label>
-                        </div>
                     </div>
 
                     <div class="pt-4">
@@ -92,5 +103,40 @@
         </div>
     </div>
 
+<script>
+document.getElementById('registerForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+    const formData = new FormData(this);
+
+    try {
+        const response = await fetch('/proxy/register-client', {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'Accept': 'application/json'
+            },
+            body: formData
+        });
+
+        const data = await response.json().catch(() => null);
+
+        if (!response.ok) {
+            alert(data?.message || 'Error en registro');
+            return;
+        }
+
+        if (data?.redirect) {
+            window.location.href = data.redirect;
+        } else {
+            alert('Registro exitoso');
+        }
+
+    } catch (error) {
+        console.error(error);
+        alert('Error de conexión con el servidor');
+    }
+});
+</script>
 </body>
 </html>

@@ -27,8 +27,8 @@
             
 
 
-            <form id="business-form" class="space-y-8" onsubmit="event.preventDefault(); window.location.href='/';">
-                
+            <form id="business-form" class="space-y-8">  
+                @csrf 
                 <!-- STEP 1: Account Info -->
                 <div id="step-1" class="space-y-8 animate-fade-in-up">
                     <div class="space-y-2">
@@ -38,32 +38,32 @@
 
                     <div class="space-y-6">
                         <div class="group/input relative">
-                            <input type="email" id="email" class="peer w-full bg-transparent border-b border-[#374151] py-3 text-white focus:border-white focus:outline-none transition-colors placeholder-transparent" placeholder="Correo electrónico" />
+                            <input type="email" id="email" name="correo" class="peer w-full bg-transparent border-b border-[#374151] py-3 text-white focus:border-white focus:outline-none transition-colors placeholder-transparent" placeholder="Correo electrónico" />
                             <label for="email" class="absolute left-0 -top-3.5 text-[#9CA3AF] text-xs transition-all peer-placeholder-shown:text-base peer-placeholder-shown:top-3 peer-focus:-top-3.5 peer-focus:text-xs peer-focus:text-white">Correo electrónico</label>
                         </div>
                         
                         <div class="group/input relative">
-                            <input type="text" id="fullname" class="peer w-full bg-transparent border-b border-[#374151] py-3 text-white focus:border-white focus:outline-none transition-colors placeholder-transparent" placeholder="Nombre completo" />
+                            <input type="text" id="fullname" name="nombre_completo" class="peer w-full bg-transparent border-b border-[#374151] py-3 text-white focus:border-white focus:outline-none transition-colors placeholder-transparent" placeholder="Nombre completo" />
                             <label for="fullname" class="absolute left-0 -top-3.5 text-[#9CA3AF] text-xs transition-all peer-placeholder-shown:text-base peer-placeholder-shown:top-3 peer-focus:-top-3.5 peer-focus:text-xs peer-focus:text-white">Nombre completo</label>
                         </div>
 
                         <div class="group/input relative">
-                            <input type="password" id="password" class="peer w-full bg-transparent border-b border-[#374151] py-3 text-white focus:border-white focus:outline-none transition-colors placeholder-transparent" placeholder="Contraseña" />
+                            <input type="password" id="password" name="contrasena" class="peer w-full bg-transparent border-b border-[#374151] py-3 text-white focus:border-white focus:outline-none transition-colors placeholder-transparent" placeholder="Contraseña" />
                             <label for="password" class="absolute left-0 -top-3.5 text-[#9CA3AF] text-xs transition-all peer-placeholder-shown:text-base peer-placeholder-shown:top-3 peer-focus:-top-3.5 peer-focus:text-xs peer-focus:text-white">Contraseña</label>
                         </div>
 
                         <div class="group/input relative">
-                            <input type="password" id="password_confirmation" class="peer w-full bg-transparent border-b border-[#374151] py-3 text-white focus:border-white focus:outline-none transition-colors placeholder-transparent" placeholder="Confirmar contraseña" />
+                            <input type="password" id="password_confirmation" name="contrasena_confirmation" class="peer w-full bg-transparent border-b border-[#374151] py-3 text-white focus:border-white focus:outline-none transition-colors placeholder-transparent" placeholder="Confirmar contraseña" />
                             <label for="password_confirmation" class="absolute left-0 -top-3.5 text-[#9CA3AF] text-xs transition-all peer-placeholder-shown:text-base peer-placeholder-shown:top-3 peer-focus:-top-3.5 peer-focus:text-xs peer-focus:text-white">Confirmar contraseña</label>
                         </div>
 
                          <div class="group/input relative">
-                            <input type="text" id="user_city" class="peer w-full bg-transparent border-b border-[#374151] py-3 text-white focus:border-white focus:outline-none transition-colors placeholder-transparent" placeholder="Ciudad" />
+                            <input type="text" id="user_city" name="ciudad" class="peer w-full bg-transparent border-b border-[#374151] py-3 text-white focus:border-white focus:outline-none transition-colors placeholder-transparent" placeholder="Ciudad" />
                             <label for="user_city" class="absolute left-0 -top-3.5 text-[#9CA3AF] text-xs transition-all peer-placeholder-shown:text-base peer-placeholder-shown:top-3 peer-focus:-top-3.5 peer-focus:text-xs peer-focus:text-white">Ciudad</label>
                         </div>
                     </div>
 
-                    <button type="submit" class="w-full py-4 px-6 bg-[#F3F4F6] text-[#1a1a1a] font-bold tracking-widest uppercase text-sm border border-transparent transition-all duration-300 hover:bg-black hover:text-white hover:border-[#F3F4F6] mt-8">
+                    <button type="submit"  class="w-full py-4 px-6 bg-[#F3F4F6] text-[#1a1a1a] font-bold tracking-widest uppercase text-sm border border-transparent transition-all duration-300 hover:bg-black hover:text-white hover:border-[#F3F4F6] mt-8">
                         Registrarse
                     </button>
                 </div>
@@ -95,6 +95,52 @@
     </div>
 
     <!-- Script for Wizard Logic -->
+<script>
+document.addEventListener('DOMContentLoaded', function () {
 
+    console.log("SCRIPT FUNCIONANDO");
+
+    const form = document.getElementById('business-form');
+
+    if (!form) {
+        console.log("NO ENCONTRÓ EL FORM");
+        return;
+    }
+
+    form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        const formData = new FormData(this);
+
+        try {
+            const response = await fetch('/proxy/register-admin', {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json'
+                },
+                body: formData
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                alert(data?.message || 'Error en registro');
+                return;
+            }
+
+            if (data.redirect) {
+                window.location.href = data.redirect;
+            }
+
+        } catch (error) {
+            console.error(error);
+            alert('Error de conexión');
+        }
+    });
+
+});
+</script>
 </body>
 </html>

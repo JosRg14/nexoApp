@@ -65,8 +65,8 @@
                         <input type="checkbox" class="form-checkbox h-3 w-3 bg-transparent border border-[#374151] rounded-none checked:bg-white checked:border-white focus:ring-0 text-black appearance-none transition duration-200 cursor-pointer" />
                         <span class="tracking-wide">Recordarme</span>
                     </label>
-                    <a href="#" class="text-[#9CA3AF] hover:text-white underline decoration-1 underline-offset-4 tracking-wide transition-colors">
-                        ¿Olvidaste tu contraseña?
+                    <a href="/password/reset" class="text-[#9CA3AF] hover:text-white underline decoration-1 underline-offset-4 tracking-wide transition-colors">
+                        OLVIDASTE TU CONTRASEÑA?
                     </a>
                 </div>
 

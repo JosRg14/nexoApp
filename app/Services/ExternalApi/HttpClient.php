@@ -15,7 +15,7 @@ class HttpClient
 
     public function __construct()
     {
-        $this->baseUrl = config('services.nexoapi.base_url');
+        $this->baseUrl = config('services.api.url');
     }
 
     /**
@@ -31,24 +31,39 @@ class HttpClient
 {
     $headers = [
         'Accept' => 'application/json',
+        'ngrok-skip-browser-warning' => 'true', // 🔥 evita bloqueo ngrok
+        'User-Agent' => 'Mozilla/5.0', // 🔥 evita empty reply
     ];
 
     if ($this->token) {
         $headers['Authorization'] = "Bearer {$this->token}";
     }
 
+    $url = rtrim($this->baseUrl, '/') . '/' . ltrim($uri, '/');
+
     $request = Http::withHeaders($headers)
-    ->timeout($this->timeout);
+        ->timeout($this->timeout)
+        ->retry(2, 500); // 🔥 reintenta si ngrok corta conexión
 
-    $url = $this->baseUrl . $uri;
+    try {
 
-    if ($method === 'GET') {
-        return $request->get($url, $payload);
+        if ($method === 'GET') {
+            return $request->get($url, $payload);
+        }
+
+        return $request->send($method, $url, [
+            'json' => $payload,
+        ]);
+
+    } catch (\Exception $e) {
+
+        Log::error('External API connection failed', [
+            'url' => $url,
+            'error' => $e->getMessage(),
+        ]);
+
+        throw new RuntimeException('No se pudo conectar con el servidor externo.');
     }
-
-    return $request->send($method, $url, [
-        'json' => $payload,
-    ]);
 }
 
     // -----------------------------------------------------------------
