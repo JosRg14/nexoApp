@@ -52,6 +52,20 @@ public function login(Request $request)
 
 public function registerCliente(Request $request)
 {
+    $request->validate([
+        'contrasena' => [
+            'required',
+            'confirmed',
+            'min:8',
+            'regex:/^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/'
+        ],
+        'correo' => 'required|email',
+        'nombre' => 'required',
+    ], [
+        'contrasena.regex' => 'La contraseña debe tener al menos 8 caracteres, una mayúscula, un número y un carácter especial.',
+        'contrasena.confirmed' => 'Las contraseñas no coinciden.',
+    ]);
+
     $response = Http::withHeaders([
         'Accept' => 'application/json'
     ])->post(
@@ -73,9 +87,12 @@ public function registerCliente(Request $request)
 
         // 🔥 GUARDAR SESIÓN CORRECTAMENTE
         session([
-            'auth_token' => $data['data']['token'],
-            'rol' => $data['data']['usuario']['rol']
-        ]);
+    'auth_token' => $data['data']['token'],
+    'rol' => $data['data']['usuario']['rol'],
+    'usuario' => $data['data']['usuario'],
+    'nombre' => $data['data']['usuario']['nombre'] ?? $data['data']['usuario']['nombre_completo'],
+    'correo' => $data['data']['usuario']['correo']
+]);
 
         return response()->json([
     'message' => 'Cliente registrado correctamente',
@@ -91,6 +108,20 @@ public function registerCliente(Request $request)
 
 public function registerAdmin(Request $request)
 {
+    $request->validate([
+        'contrasena' => [
+            'required',
+            'confirmed',
+            'min:8',
+            'regex:/^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/'
+        ],
+        'correo' => 'required|email',
+        'nombre_completo' => 'required',
+    ], [
+        'contrasena.regex' => 'La contraseña debe tener al menos 8 caracteres, una mayúscula, un número y un carácter especial.',
+        'contrasena.confirmed' => 'Las contraseñas no coinciden.',
+    ]);
+
     $response = Http::withHeaders([
         'Accept' => 'application/json'
     ])->post(
@@ -109,9 +140,12 @@ public function registerAdmin(Request $request)
     $data = $response->json();
 
     session([
-        'auth_token' => $data['data']['token'], 
-        'rol' => $data['data']['usuario']['rol'] 
-    ]);
+    'auth_token' => $data['data']['token'],
+    'rol' => $data['data']['usuario']['rol'],
+    'usuario' => $data['data']['usuario'],
+    'nombre' => $data['data']['usuario']['nombre'] ?? $data['data']['usuario']['nombre_completo'],
+    'correo' => $data['data']['usuario']['correo']
+]);
 
     return response()->json([
         'message' => 'Administrador registrado correctamente',

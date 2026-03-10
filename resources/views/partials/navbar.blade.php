@@ -27,9 +27,11 @@
 <div class="flex items-center gap-3">
 
     @php
-        $correo = session('usuario.correo') ?? session('usuario');
-        $inicial = $correo ? strtoupper(substr($correo, 0, 1)) : '?';
-        $correoCorto = $correo ? substr($correo, 0, 12) . '...' : '';
+        $correo = session('usuario.correo') ?? session('usuario');//
+        $nombre = session('usuario.nombre') ?? session('usuario.nombre_completo');
+        $displayName = $nombre ?? ($correo ? (strlen($correo) > 12 ? substr($correo, 0, 12) . '...' : $correo) : 'Usuario');
+        $inicial = ($nombre ? substr($nombre, 0, 1) : ($correo ? substr($correo, 0, 1) : '?'));
+        $inicial = strtoupper($inicial);
     @endphp
 
     <!-- Avatar con inicial -->
@@ -37,9 +39,9 @@
         {{ $inicial }}
     </div>
 
-    <!-- Correo corto -->
+    <!-- Nombre o correo -->
     <span class="text-xs text-[#9CA3AF] tracking-wide">
-        {{ $correoCorto }}
+        {{ $displayName }}
     </span>
 
 </div>

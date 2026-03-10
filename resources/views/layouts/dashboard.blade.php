@@ -1,6 +1,8 @@
 @php
     $correo = session('usuario.correo') ?? session('usuario');
-    $inicial = $correo ? strtoupper(substr($correo, 0, 1)) : '?';
+    $nombre = session('usuario.nombre') ?? session('usuario.nombre_completo');
+    $inicial = ($nombre ? substr($nombre, 0, 1) : ($correo ? substr($correo, 0, 1) : '?'));
+    $inicial = strtoupper($inicial);
 @endphp
 
 <!DOCTYPE html>

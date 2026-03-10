@@ -48,12 +48,12 @@
                 
                 <div class="space-y-6">
                     <div class="group/input relative">
-                        <input type="email" id="email" name="email" class="peer w-full bg-transparent border-b border-[#374151] py-3 text-white focus:border-white focus:outline-none transition-colors placeholder-transparent" placeholder="Email Address" required />
+                        <input type="email" id="email" name="email" autocomplete="username email" class="peer w-full bg-transparent border-b border-[#374151] py-3 text-white focus:border-white focus:outline-none transition-colors placeholder-transparent" placeholder="Email Address" required />
                         <label for="email" class="absolute left-0 -top-3.5 text-[#9CA3AF] text-xs transition-all peer-placeholder-shown:text-base peer-placeholder-shown:top-3 peer-focus:-top-3.5 peer-focus:text-xs peer-focus:text-white">Email Address</label>
                     </div>
                     
                     <div class="group/input relative">
-                        <input type="password" id="password" name="password" class="peer w-full bg-transparent border-b border-[#374151] py-3 text-white focus:border-white focus:outline-none transition-colors placeholder-transparent" placeholder="Contraseña" required />
+                        <input type="password" id="password" name="password" autocomplete="current-password" class="peer w-full bg-transparent border-b border-[#374151] py-3 text-white focus:border-white focus:outline-none transition-colors placeholder-transparent" placeholder="Contraseña" required />
                         <label for="password" class="absolute left-0 -top-3.5 text-[#9CA3AF] text-xs transition-all peer-placeholder-shown:text-base peer-placeholder-shown:top-3 peer-focus:-top-3.5 peer-focus:text-xs peer-focus:text-white">Contraseña</label>
                     </div>
                 </div>
@@ -62,11 +62,11 @@
 
                 <div class="flex items-center justify-between text-xs">
                     <label class="flex items-center space-x-2 cursor-pointer text-[#9CA3AF] hover:text-white transition-colors">
-                        <input type="checkbox" class="form-checkbox h-3 w-3 bg-transparent border border-[#374151] rounded-none checked:bg-white checked:border-white focus:ring-0 text-black appearance-none transition duration-200 cursor-pointer" />
+                        <input type="checkbox" id="remember" class="form-checkbox h-3 w-3 bg-transparent border border-[#374151] rounded-none checked:bg-white checked:border-white focus:ring-0 text-black appearance-none transition duration-200 cursor-pointer" />
                         <span class="tracking-wide">Recordarme</span>
                     </label>
                     <a href="/password/reset" class="text-[#9CA3AF] hover:text-white underline decoration-1 underline-offset-4 tracking-wide transition-colors">
-                        OLVIDASTE TU CONTRASEÑA?
+                        ¿OLVIDASTE TU CONTRASEÑA?
                     </a>
                 </div>
 
@@ -94,19 +94,35 @@
     </footer>
 
     <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedEmail = localStorage.getItem('remembered_email');
+            if (savedEmail) {
+                document.getElementById('email').value = savedEmail;
+                document.getElementById('remember').checked = true;
+            }
+        });
+
         document.getElementById('loginForm').addEventListener('submit', async function(e) {
             e.preventDefault();
 
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
+            const remember = document.getElementById('remember').checked;
             const errorDiv = document.getElementById('errorMessage');
             const loginBtn = document.querySelector('button[type="submit"]');
 
+            if (remember) {
+                localStorage.setItem('remembered_email', email);
+            } else {
+                localStorage.removeItem('remembered_email');
+            }
+            
             errorDiv.classList.add('hidden');
             errorDiv.textContent = '';
 
             loginBtn.disabled = true;
             loginBtn.textContent = 'Procesando...';
+
 
             try {
                 const response = await window.axios.post('/proxy/login', {

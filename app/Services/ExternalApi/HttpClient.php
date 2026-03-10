@@ -90,6 +90,107 @@ class HttpClient
         return $this->handle($this->request('DELETE', $uri, $data));
     }
 
+    public function postMultipart(string $uri, array $data = []): array
+{
+    $headers = [
+        'Accept' => 'application/json',
+        'ngrok-skip-browser-warning' => 'true',
+        'User-Agent' => 'Mozilla/5.0',
+    ];
+
+    if ($this->token) {
+        $headers['Authorization'] = "Bearer {$this->token}";
+    }
+
+    $url = rtrim($this->baseUrl, '/') . '/' . ltrim($uri, '/');
+
+    $request = Http::withHeaders($headers)
+        ->timeout($this->timeout)
+        ->retry(2, 500);
+
+    // 🔥 preparar multipart
+    foreach ($data as $key => $value) {
+
+        if ($value instanceof \Illuminate\Http\UploadedFile) {
+
+            $request = $request->attach(
+                $key,
+                file_get_contents($value->getRealPath()),
+                $value->getClientOriginalName()
+            );
+
+            unset($data[$key]);
+        }
+    }
+
+    try {
+
+        $response = $request->post($url, $data);
+
+    } catch (\Exception $e) {
+
+        Log::error('External API connection failed', [
+            'url' => $url,
+            'error' => $e->getMessage(),
+        ]);
+
+        throw new RuntimeException('No se pudo conectar con el servidor externo.');
+    }
+
+    return $this->handle($response);
+}
+
+public function putMultipart(string $uri, array $data = []): array
+{
+    $headers = [
+        'Accept' => 'application/json',
+        'ngrok-skip-browser-warning' => 'true',
+        'User-Agent' => 'Mozilla/5.0',
+    ];
+
+    if ($this->token) {
+        $headers['Authorization'] = "Bearer {$this->token}";
+    }
+
+    $url = rtrim($this->baseUrl, '/') . '/' . ltrim($uri, '/');
+
+    $request = Http::withHeaders($headers)
+        ->timeout($this->timeout)
+        ->retry(2, 500);
+
+    foreach ($data as $key => $value) {
+
+        if ($value instanceof \Illuminate\Http\UploadedFile) {
+
+            $request = $request->attach(
+                $key,
+                file_get_contents($value->getRealPath()),
+                $value->getClientOriginalName()
+            );
+
+            unset($data[$key]);
+        }
+    }
+
+    try {
+
+        $data['_method'] = 'PUT';
+
+$response = $request->post($url, $data);
+
+    } catch (\Exception $e) {
+
+        Log::error('External API connection failed', [
+            'url' => $url,
+            'error' => $e->getMessage(),
+        ]);
+
+        throw new RuntimeException('No se pudo conectar con el servidor externo.');
+    }
+
+    return $this->handle($response);
+}
+
     /** Uniform error handling */
     protected function handle(Response $response): array
     {

@@ -35,7 +35,7 @@
                     
                     <div class="space-y-6">
                         <div class="group/input relative">
-                            <input type="email" id="email" name="correo" class="peer w-full bg-transparent border-b border-[#374151] py-3 text-white focus:border-white focus:outline-none transition-colors placeholder-transparent" placeholder="Email Address" />
+                            <input type="email" id="email" name="correo" autocomplete="email" class="peer w-full bg-transparent border-b border-[#374151] py-3 text-white focus:border-white focus:outline-none transition-colors placeholder-transparent" placeholder="Email Address" />
                             <label for="email" class="absolute left-0 -top-3.5 text-[#9CA3AF] text-xs transition-all peer-placeholder-shown:text-base peer-placeholder-shown:top-3 peer-focus:-top-3.5 peer-focus:text-xs peer-focus:text-white">Email Address</label>
                         </div>
                         
@@ -60,12 +60,21 @@
                         </div>
                     
                         <div class="group/input relative">
-                            <input type="password" id="password" name="contrasena" class="peer w-full bg-transparent border-b border-[#374151] py-3 text-white focus:border-white focus:outline-none transition-colors placeholder-transparent" placeholder="Contraseña" />
+                            <input type="password" id="password" name="contrasena" 
+                                autocomplete="new-password"
+                                pattern="^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$"
+                                title="Mínimo 8 caracteres, una mayúscula, un número y un carácter especial"
+                                required
+                                class="peer w-full bg-transparent border-b border-[#374151] py-3 text-white focus:border-white focus:outline-none transition-colors placeholder-transparent" placeholder="Contraseña" />
                             <label for="password" class="absolute left-0 -top-3.5 text-[#9CA3AF] text-xs transition-all peer-placeholder-shown:text-base peer-placeholder-shown:top-3 peer-focus:-top-3.5 peer-focus:text-xs peer-focus:text-white">Contraseña</label>
+                            <p class="text-[10px] text-[#9CA3AF] mt-1 uppercase tracking-widest">Mínimo 8 caracteres, 1 mayúscula, 1 número y 1 símbolo</p>
                         </div>
 
                         <div class="group/input relative">
-                            <input type="password" id="password_confirmation" name="contrasena_confirmation" class="peer w-full bg-transparent border-b border-[#374151] py-3 text-white focus:border-white focus:outline-none transition-colors placeholder-transparent" placeholder="Confirmar contraseña" />
+                            <input type="password" id="password_confirmation" name="contrasena_confirmation" 
+                                autocomplete="new-password"
+                                required
+                                class="peer w-full bg-transparent border-b border-[#374151] py-3 text-white focus:border-white focus:outline-none transition-colors placeholder-transparent" placeholder="Confirmar contraseña" />
                             <label for="password_confirmation" class="absolute left-0 -top-3.5 text-[#9CA3AF] text-xs transition-all peer-placeholder-shown:text-base peer-placeholder-shown:top-3 peer-focus:-top-3.5 peer-focus:text-xs peer-focus:text-white">Confirmar contraseña</label>
                         </div>
 

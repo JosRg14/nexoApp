@@ -29,13 +29,13 @@ class ServiceController extends Controller
         $services = collect($response['data'] ?? [])->map(function ($item) {
             return [
                 'id' => $item['id'] ?? null,
-                'nombre' => $item['nombre'] ?? '', // 🔥 CORREGIDO
+                'nombre' => $item['nombre'] ?? '', // CORREGIDO
                 'descripcion' => $item['descripcion'] ?? '',
                 'precio' => $item['precio'] ?? 0,
                 'duracion' => $item['duracion'] ?? 0,
                 'imagen' => isset($item['imagen'])
-    ? config('services.api.url') . $item['imagen']
-    : null, 
+    ? rtrim(config('services.api.url'), '/') . '/' . ltrim($item['imagen'], '/')
+    : null,
             ];
         })->toArray();
 
@@ -55,27 +55,34 @@ class ServiceController extends Controller
     public function store(Request $request)
 {
     $validated = $request->validate([
-    'nombre' => 'required|string|max:100',
-    'descripcion' => 'nullable|string|max:255',
-    'precio' => 'required|numeric|min:1|max:10000',
-    'duracion' => 'required|integer|min:5|max:480',
-], [
-    'nombre.max' => 'El nombre no puede superar 100 caracteres.',
-    'precio.min' => 'El precio debe ser mayor a 0.',
-    'duracion.max' => 'La duración no puede ser mayor a 8 horas.',
-]);
+        'nombre' => 'required|string|max:100',
+        'descripcion' => 'nullable|string|max:255',
+        'precio' => 'required|numeric|min:1|max:10000',
+        'duracion' => 'required|integer|min:5|max:480',
+        'imagen' => 'nullable|image|max:2048'
+    ]);
 
     try {
-        $this->service->create([
+
+        $payload = [
     'nombre_servicio' => $validated['nombre'],
     'descripcion' => $validated['descripcion'],
     'precio' => $validated['precio'],
     'duracion_estimada' => $validated['duracion'],
-]);
-        return redirect()->back()
-        ->with('status', 'Servicio creado');
+];
+
+if ($request->hasFile('imagen')) {
+    $payload['imagen'] = $request->file('imagen');
+}
+
+$this->service->create($payload);
+
+        return redirect()->back()->with('status', 'Servicio creado');
+
     } catch (\RuntimeException $e) {
-        return redirect()->back()->withErrors(['api' => $e->getMessage()])->withInput();
+        return redirect()->back()
+            ->withErrors(['api' => $e->getMessage()])
+            ->withInput();
     }
 }
 
@@ -86,6 +93,7 @@ public function update(Request $request, int $id)
         'descripcion' => 'nullable|string|max:255',
         'precio' => 'required|numeric|min:1|max:10000',
         'duracion' => 'required|integer|min:5|max:480',
+        'imagen' => 'nullable|image|max:2048'
     ]);
 
     try {
@@ -96,6 +104,10 @@ public function update(Request $request, int $id)
             'precio' => $validated['precio'],
             'duracion_estimada' => $validated['duracion'],
         ];
+
+        if ($request->hasFile('imagen')) {
+            $payload['imagen'] = $request->file('imagen');
+        }
 
         $this->service->update($id, $payload);
 

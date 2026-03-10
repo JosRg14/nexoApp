@@ -17,12 +17,20 @@ class ServiceService
     }
 
     public function create(array $data): array
-    {
-        return $this->client->post('/api/servicios', $data);
+{
+    if (isset($data['imagen'])) {
+        return $this->client->postMultipart('/api/servicios', $data);
     }
 
-    public function update(int $id, array $data): array
+    return $this->client->post('/api/servicios', $data);
+}
+
+   public function update(int $id, array $data): array
 {
+    if (isset($data['imagen'])) {
+        return $this->client->putMultipart("/api/servicios/{$id}", $data);
+    }
+
     return $this->client->put("/api/servicios/{$id}", $data);
 }
 
