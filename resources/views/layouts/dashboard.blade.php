@@ -12,6 +12,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>@yield('title', 'NexoApp - Dashboard')</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <!-- Alpine.js -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body class="bg-[#1a1a1a] text-[#F3F4F6] font-sans antialiased min-h-screen flex flex-col">
 
@@ -21,13 +25,47 @@
             NexoApp
         </a>
         <div class="flex items-center gap-6">
-            <!-- User Menu Placeholder -->
-            <div class="h-9 w-9 rounded-full 
-                        bg-gradient-to-br from-[#374151] to-black 
-                        flex items-center justify-center 
-                        text-white font-bold text-sm 
-                        shadow-md">
-                {{ $inicial }}
+            <div x-data="{ open: false }" class="relative">
+                <button @click="open = !open" @click.away="open = false" class="flex items-center gap-3 focus:outline-none group">
+                    @php
+                        $nombre_completo = session('usuario.nombre_completo') ?? session('usuario.correo');
+                        $inicial = strtoupper(substr($nombre_completo, 0, 1));
+                    @endphp
+
+                    <!-- Avatar con inicial -->
+                    <div class="w-9 h-9 rounded-full bg-gradient-to-br from-[#374151] to-black flex items-center justify-center text-white font-bold text-sm shadow-lg group-hover:border group-hover:border-white/20 transition-all">
+                        {{ $inicial }}
+                    </div>
+                    
+                    <i class="fa-solid fa-chevron-down text-[10px] text-[#9CA3AF] group-hover:text-white transition-colors"></i>
+                </button>
+
+                <!-- Dropdown Menu -->
+                <div x-show="open" 
+                     x-transition:enter="transition ease-out duration-100"
+                     x-transition:enter-start="transform opacity-0 scale-95"
+                     x-transition:enter-end="transform opacity-100 scale-100"
+                     x-transition:leave="transition ease-in duration-75"
+                     x-transition:leave-start="transform opacity-100 scale-100"
+                     x-transition:leave-end="transform opacity-0 scale-95"
+                     class="absolute right-0 mt-2 w-48 bg-[#1a1a1a] border border-[#374151] shadow-xl z-50 py-2">
+                    
+                    <div class="px-4 py-2 border-b border-[#374151]/50 mb-1">
+                        <p class="text-[10px] uppercase tracking-widest text-[#9CA3AF] mb-1">Usuario</p>
+                        <p class="text-xs font-bold text-white truncate">{{ $nombre_completo }}</p>
+                    </div>
+
+                    <a href="{{ url('/profile') }}" class="block px-4 py-2 text-xs text-[#9CA3AF] hover:text-white hover:bg-[#374151]/30 transition-colors uppercase tracking-widest font-bold">
+                        <i class="fa-solid fa-user mr-2 w-4"></i> Mi Perfil
+                    </a>
+
+                    <form method="POST" action="/logout">
+                        @csrf
+                        <button type="submit" class="w-full text-left px-4 py-2 text-xs text-red-400 hover:text-red-300 hover:bg-[#374151]/30 transition-colors uppercase tracking-widest font-bold">
+                            <i class="fa-solid fa-right-from-bracket mr-2 w-4"></i> Cerrar Sesión
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
     </header>

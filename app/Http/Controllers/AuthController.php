@@ -8,150 +8,164 @@ use Illuminate\Support\Facades\Http;
 class AuthController extends Controller
 {
     
-public function login(Request $request)
-{
+    public function login(Request $request)
+    {
+        $response = Http::post(config('services.api.url') . '/api/login', [
+            'correo' => $request->email,
+            'contrasena' => $request->password,
+        ]);
 
-    $response = Http::post(config('services.api.url') . '/api/login', [
-        'correo' => $request->email,
-        'contrasena' => $request->password,
-    ]);
-
-    if (!$response->successful()) {
-        return response()->json([
-            'message' => 'Credenciales incorrectas'
-        ], 401);
-    }
-
-    $data = $response->json();
-
-    // Validamos que venga la estructura correcta
-    if (!isset($data['data']['token']) || !isset($data['data']['rol'])) {
-        return response()->json([
-            'message' => 'Respuesta inesperada del servidor'
-        ], 500);
-    }
-
-    // Guardamos en sesión
-    session([
-        'auth_token' => $data['data']['token'],
-        'rol' => $data['data']['rol'],
-        'usuario' => $data['data']['usuario'],
-    ]);
-
-    // Devolvemos solo la redirección
-    return response()->json([
-    'redirect' => match ($data['data']['rol']) {
-        'superusuario' => route('dashboard.index'),
-        'admin' => route('business.profile'),
-        default => '/',
-    }
-]);
-
-    
-}
-
-public function registerCliente(Request $request)
-{
-    $request->validate([
-        'contrasena' => [
-            'required',
-            'confirmed',
-            'min:8',
-            'regex:/^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/'
-        ],
-        'correo' => 'required|email',
-        'nombre' => 'required',
-    ], [
-        'contrasena.regex' => 'La contraseña debe tener al menos 8 caracteres, una mayúscula, un número y un carácter especial.',
-        'contrasena.confirmed' => 'Las contraseñas no coinciden.',
-    ]);
-
-    $response = Http::withHeaders([
-        'Accept' => 'application/json'
-    ])->post(
-        config('services.api.url') . '/api/register/cliente',
-        [
-            'nombre' => $request->nombre,
-            'app_paterno' => $request->app_paterno,
-            'app_materno' => $request->app_materno,
-            'telefono' => $request->telefono,
-            'correo' => $request->correo,
-            'contrasena' => $request->contrasena,
-            'contrasena_confirmation' => $request->contrasena_confirmation,
-        ]
-    );
-
-    if ($response->successful()) {
+        if (!$response->successful()) {
+            return response()->json([
+                'message' => 'Credenciales incorrectas'
+            ], 401);
+        }
 
         $data = $response->json();
 
-        // 🔥 GUARDAR SESIÓN CORRECTAMENTE
+        if (!isset($data['data']['token']) || !isset($data['data']['rol'])) {
+            return response()->json([
+                'message' => 'Respuesta inesperada del servidor'
+            ], 500);
+        }
+
+        $usuario = $this->formatUserData($data['data']['usuario']);
+
         session([
-    'auth_token' => $data['data']['token'],
-    'rol' => $data['data']['usuario']['rol'],
-    'usuario' => $data['data']['usuario'],
-    'nombre' => $data['data']['usuario']['nombre'] ?? $data['data']['usuario']['nombre_completo'],
-    'correo' => $data['data']['usuario']['correo']
-]);
+            'auth_token' => $data['data']['token'],
+            'rol' => $data['data']['rol'],
+            'usuario' => $usuario,
+        ]);
 
         return response()->json([
-    'message' => 'Cliente registrado correctamente',
-    'redirect' => route('home')
-]);
+            'redirect' => match ($data['data']['rol']) {
+                'superusuario' => route('dashboard.index'),
+                'admin' => route('business.profile'),
+                default => '/',
+            }
+        ]);
     }
 
-    return response()->json([
-        'message' => $response->json()['message'] ?? 'Error en registro'
-    ], $response->status());
+    public function registerCliente(Request $request)
+    {
+        $request->validate([
+            'contrasena' => [
+                'required',
+                'confirmed',
+                'min:8',
+                'regex:/^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/'
+            ],
+            'correo' => 'required|email',
+            'nombre' => 'required',
+        ], [
+            'contrasena.regex' => 'La contraseña debe tener al menos 8 caracteres, una mayúscula, un número y un carácter especial.',
+            'contrasena.confirmed' => 'Las contraseñas no coinciden.',
+        ]);
 
-}
+        $response = Http::withHeaders([
+            'Accept' => 'application/json'
+        ])->post(
+            config('services.api.url') . '/api/register/cliente',
+            [
+                'nombre' => $request->nombre,
+                'app_paterno' => $request->app_paterno,
+                'app_materno' => $request->app_materno,
+                'telefono' => $request->telefono,
+                'correo' => $request->correo,
+                'contrasena' => $request->contrasena,
+                'contrasena_confirmation' => $request->contrasena_confirmation,
+            ]
+        );
 
-public function registerAdmin(Request $request)
-{
-    $request->validate([
-        'contrasena' => [
-            'required',
-            'confirmed',
-            'min:8',
-            'regex:/^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/'
-        ],
-        'correo' => 'required|email',
-        'nombre_completo' => 'required',
-    ], [
-        'contrasena.regex' => 'La contraseña debe tener al menos 8 caracteres, una mayúscula, un número y un carácter especial.',
-        'contrasena.confirmed' => 'Las contraseñas no coinciden.',
-    ]);
+        if ($response->successful()) {
+            $data = $response->json();
+            $usuario = $this->formatUserData($data['data']['usuario']);
 
-    $response = Http::withHeaders([
-        'Accept' => 'application/json'
-    ])->post(
-        config('services.api.url') . '/api/register/admin',
-        [
-            'correo' => $request->correo,
-            'contrasena' => $request->contrasena,
-            'contrasena_confirmation' => $request->contrasena_confirmation,
-            'nombre_completo' => $request->nombre_completo,
-            'ciudad' => $request->ciudad,
-        ]
-    );
+            session([
+                'auth_token' => $data['data']['token'],
+                'rol' => $usuario['rol'],
+                'usuario' => $usuario,
+            ]);
 
-    if ($response->successful()) {
+            return response()->json([
+                'message' => 'Cliente registrado correctamente',
+                'redirect' => route('home')
+            ]);
+        }
 
-    $data = $response->json();
+        return response()->json([
+            'message' => $response->json()['message'] ?? 'Error en registro'
+        ], $response->status());
+    }
 
-    session([
-    'auth_token' => $data['data']['token'],
-    'rol' => $data['data']['usuario']['rol'],
-    'usuario' => $data['data']['usuario'],
-    'nombre' => $data['data']['usuario']['nombre'] ?? $data['data']['usuario']['nombre_completo'],
-    'correo' => $data['data']['usuario']['correo']
-]);
+    public function registerAdmin(Request $request)
+    {
+        $request->validate([
+            'contrasena' => [
+                'required',
+                'confirmed',
+                'min:8',
+                'regex:/^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/'
+            ],
+            'correo' => 'required|email',
+            'nombre_completo' => 'required',
+        ], [
+            'contrasena.regex' => 'La contraseña debe tener al menos 8 caracteres, una mayúscula, un número y un carácter especial.',
+            'contrasena.confirmed' => 'Las contraseñas no coinciden.',
+        ]);
 
-    return response()->json([
-        'message' => 'Administrador registrado correctamente',
-        'redirect' => route('business.profile')
-    ]);
-}
-}
+        $response = Http::withHeaders([
+            'Accept' => 'application/json'
+        ])->post(
+            config('services.api.url') . '/api/register/admin',
+            [
+                'correo' => $request->correo,
+                'contrasena' => $request->contrasena,
+                'contrasena_confirmation' => $request->contrasena_confirmation,
+                'nombre_completo' => $request->nombre_completo,
+                'ciudad' => $request->ciudad,
+            ]
+        );
+
+        if ($response->successful()) {
+            $data = $response->json();
+            $usuario = $this->formatUserData($data['data']['usuario']);
+
+            session([
+                'auth_token' => $data['data']['token'],
+                'rol' => $usuario['rol'],
+                'usuario' => $usuario,
+            ]);
+
+            return response()->json([
+                'message' => 'Administrador registrado correctamente',
+                'redirect' => route('business.profile')
+            ]);
+        }
+    }
+
+    /**
+     * Helper to format user data and ensure common fields exist.
+     */
+    protected function formatUserData(array $usuario): array
+    {
+        // Construct full name if missing
+        if (!isset($usuario['nombre_completo'])) {
+            $nombre = $usuario['nombre'] ?? '';
+            $paterno = $usuario['app_paterno'] ?? $usuario['apellido_paterno'] ?? '';
+            $materno = $usuario['app_materno'] ?? $usuario['apellido_materno'] ?? '';
+            
+            $fullName = trim("$nombre $paterno $materno");
+            
+            $usuario['nombre_completo'] = !empty($fullName) ? $fullName : ($usuario['correo'] ?? 'Usuario');
+        }
+
+        // Extract first name
+        $parts = explode(' ', $usuario['nombre_completo']);
+        $usuario['primer_nombre'] = $parts[0] ?? ($usuario['correo'] ?? 'Usuario');
+
+        return $usuario;
+    }
+
 
 }

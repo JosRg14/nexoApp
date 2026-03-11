@@ -3,8 +3,10 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\ServiceController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ProfileController;
 
 
+Route::get('/profile', [ProfileController::class, 'index'])->name('profile.show');
 Route::get('/register', function () {
     return view('auth.role-selection');
 })->name('register.role-selection');

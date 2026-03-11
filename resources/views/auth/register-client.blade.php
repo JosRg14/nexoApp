@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>NexoApp - Registro de Cliente</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body class="h-full bg-[#1a1a1a] text-[#F3F4F6] font-sans antialiased flex overflow-hidden">
 
@@ -31,7 +33,7 @@
                     <p class="text-[#9CA3AF] text-sm tracking-wide">RELLENA LOS SIGUIENTES REQUISITOS</p>
                 </div>
 
-                <form id="registerForm" class="space-y-8" method="POST" action="/proxy/register-client">
+                <form id="registerForm" class="space-y-8" method="POST" action="/proxy/register-client" autocomplete="on">
                     
                     <div class="space-y-6">
                         <div class="group/input relative">
@@ -40,42 +42,48 @@
                         </div>
                         
                         <div class="group/input relative">
-                            <input type="text" id="fullname" name="nombre" class="peer w-full bg-transparent border-b border-[#374151] py-3 text-white focus:border-white focus:outline-none transition-colors placeholder-transparent" placeholder="Full Name" />
-                            <label for="fullname" class="absolute left-0 -top-3.5 text-[#9CA3AF] text-xs transition-all peer-placeholder-shown:text-base peer-placeholder-shown:top-3 peer-focus:-top-3.5 peer-focus:text-xs peer-focus:text-white">Full Name</label>
+                            <input type="text" id="fullname" name="nombre" autocomplete="name" class="peer w-full bg-transparent border-b border-[#374151] py-3 text-white focus:border-white focus:outline-none transition-colors placeholder-transparent" placeholder="Full Name" />
+                            <label for="fullname" class="absolute left-0 -top-3.5 text-[#9CA3AF] text-xs transition-all peer-placeholder-shown:text-base peer-placeholder-shown:top-3 peer-focus:-top-3.5 peer-focus:text-xs peer-focus:text-white">Nombre(s)</label>
                         </div>
 
                         <div class="group/input relative">
-                            <input type="text" id="app_paterno" name="app_paterno" class="peer w-full bg-transparent border-b border-[#374151] py-3 text-white focus:border-white focus:outline-none transition-colors placeholder-transparent" placeholder="Apellido Paterno" />
+                            <input type="text" id="app_paterno" name="app_paterno" autocomplete="family-name" class="peer w-full bg-transparent border-b border-[#374151] py-3 text-white focus:border-white focus:outline-none transition-colors placeholder-transparent" placeholder="Apellido Paterno" />
                             <label for="app_paterno" class="absolute left-0 -top-3.5 text-[#9CA3AF] text-xs transition-all peer-placeholder-shown:text-base peer-placeholder-shown:top-3 peer-focus:-top-3.5 peer-focus:text-xs peer-focus:text-white">Apellido Paterno</label>
                         </div>
 
                         <div class="group/input relative">
-                            <input type="text" id="app_materno" name="app_materno" class="peer w-full bg-transparent border-b border-[#374151] py-3 text-white focus:border-white focus:outline-none transition-colors placeholder-transparent" placeholder="Apellido Materno" />
+                            <input type="text" id="app_materno" name="app_materno" autocomplete="additional-name" class="peer w-full bg-transparent border-b border-[#374151] py-3 text-white focus:border-white focus:outline-none transition-colors placeholder-transparent" placeholder="Apellido Materno" />
                             <label for="app_materno" class="absolute left-0 -top-3.5 text-[#9CA3AF] text-xs transition-all peer-placeholder-shown:text-base peer-placeholder-shown:top-3 peer-focus:-top-3.5 peer-focus:text-xs peer-focus:text-white">Apellido Materno</label>
                         </div>
 
                         <div class="group/input relative">
-                            <input type="text" id="telefono" name="telefono" class="peer w-full bg-transparent border-b border-[#374151] py-3 text-white focus:border-white focus:outline-none transition-colors placeholder-transparent" placeholder="Teléfono" />
+                            <input type="text" id="telefono" name="telefono" autocomplete="tel" class="peer w-full bg-transparent border-b border-[#374151] py-3 text-white focus:border-white focus:outline-none transition-colors placeholder-transparent" placeholder="Teléfono" />
                             <label for="telefono" class="absolute left-0 -top-3.5 text-[#9CA3AF] text-xs transition-all peer-placeholder-shown:text-base peer-placeholder-shown:top-3 peer-focus:-top-3.5 peer-focus:text-xs peer-focus:text-white">Teléfono</label>
                         </div>
                     
-                        <div class="group/input relative">
-                            <input type="password" id="password" name="contrasena" 
+                        <div class="group/input relative" x-data="{ show: false }">
+                            <input :type="show ? 'text' : 'password'" id="password" name="contrasena" 
                                 autocomplete="new-password"
                                 pattern="^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$"
                                 title="Mínimo 8 caracteres, una mayúscula, un número y un carácter especial"
                                 required
-                                class="peer w-full bg-transparent border-b border-[#374151] py-3 text-white focus:border-white focus:outline-none transition-colors placeholder-transparent" placeholder="Contraseña" />
+                                class="peer w-full bg-transparent border-b border-[#374151] py-3 pr-10 text-white focus:border-white focus:outline-none transition-colors placeholder-transparent" placeholder="Contraseña" />
                             <label for="password" class="absolute left-0 -top-3.5 text-[#9CA3AF] text-xs transition-all peer-placeholder-shown:text-base peer-placeholder-shown:top-3 peer-focus:-top-3.5 peer-focus:text-xs peer-focus:text-white">Contraseña</label>
+                            <button type="button" @click="show = !show" class="absolute right-0 top-1/2 -translate-y-1/2 text-[#9CA3AF] hover:text-white transition-colors">
+                                <i class="fa-solid" :class="show ? 'fa-eye-slash' : 'fa-eye'"></i>
+                            </button>
                             <p class="text-[10px] text-[#9CA3AF] mt-1 uppercase tracking-widest">Mínimo 8 caracteres, 1 mayúscula, 1 número y 1 símbolo</p>
                         </div>
 
-                        <div class="group/input relative">
-                            <input type="password" id="password_confirmation" name="contrasena_confirmation" 
+                        <div class="group/input relative" x-data="{ show: false }">
+                            <input :type="show ? 'text' : 'password'" id="password_confirmation" name="contrasena_confirmation" 
                                 autocomplete="new-password"
                                 required
-                                class="peer w-full bg-transparent border-b border-[#374151] py-3 text-white focus:border-white focus:outline-none transition-colors placeholder-transparent" placeholder="Confirmar contraseña" />
+                                class="peer w-full bg-transparent border-b border-[#374151] py-3 pr-10 text-white focus:border-white focus:outline-none transition-colors placeholder-transparent" placeholder="Confirmar contraseña" />
                             <label for="password_confirmation" class="absolute left-0 -top-3.5 text-[#9CA3AF] text-xs transition-all peer-placeholder-shown:text-base peer-placeholder-shown:top-3 peer-focus:-top-3.5 peer-focus:text-xs peer-focus:text-white">Confirmar contraseña</label>
+                            <button type="button" @click="show = !show" class="absolute right-0 top-1/2 -translate-y-1/2 text-[#9CA3AF] hover:text-white transition-colors">
+                                <i class="fa-solid" :class="show ? 'fa-eye-slash' : 'fa-eye'"></i>
+                            </button>
                         </div>
 
                     </div>

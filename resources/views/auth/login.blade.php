@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>NexoApp - Iniciar Sesión</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body class="h-full bg-[#1a1a1a] text-[#F3F4F6] font-sans antialiased flex flex-col relative overflow-hidden">
 
@@ -52,9 +54,12 @@
                         <label for="email" class="absolute left-0 -top-3.5 text-[#9CA3AF] text-xs transition-all peer-placeholder-shown:text-base peer-placeholder-shown:top-3 peer-focus:-top-3.5 peer-focus:text-xs peer-focus:text-white">Email Address</label>
                     </div>
                     
-                    <div class="group/input relative">
-                        <input type="password" id="password" name="password" autocomplete="current-password" class="peer w-full bg-transparent border-b border-[#374151] py-3 text-white focus:border-white focus:outline-none transition-colors placeholder-transparent" placeholder="Contraseña" required />
+                    <div class="group/input relative" x-data="{ show: false }">
+                        <input :type="show ? 'text' : 'password'" id="password" name="password" autocomplete="current-password" class="peer w-full bg-transparent border-b border-[#374151] py-3 pr-10 text-white focus:border-white focus:outline-none transition-colors placeholder-transparent" placeholder="Contraseña" required />
                         <label for="password" class="absolute left-0 -top-3.5 text-[#9CA3AF] text-xs transition-all peer-placeholder-shown:text-base peer-placeholder-shown:top-3 peer-focus:-top-3.5 peer-focus:text-xs peer-focus:text-white">Contraseña</label>
+                        <button type="button" @click="show = !show" class="absolute right-0 top-3 text-[#9CA3AF] hover:text-white transition-colors">
+                            <i class="fa-solid" :class="show ? 'fa-eye-slash' : 'fa-eye'"></i>
+                        </button>
                     </div>
                 </div>
 

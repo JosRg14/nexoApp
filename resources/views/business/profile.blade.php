@@ -26,7 +26,7 @@
     <div class="flex items-center gap-4">
 
         <span class="text-xs uppercase tracking-widest text-[#9CA3AF] hidden md:block">
-            Hola, {{ session('usuario.nombre') ?? session('usuario.nombre_completo') ?? $correo }}
+            Hola, {{ session('usuario.primer_nombre') ?? session('usuario.correo') }}
         </span>
 
         <div class="h-9 w-9 rounded-full 
