@@ -3,6 +3,7 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use App\Http\Middleware\RedirectIfAuthenticated;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -12,12 +13,14 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-    $middleware->alias([
-        'inject.api.token' => \App\Http\Middleware\InjectApiToken::class,
-        'role' => \App\Http\Middleware\RoleMiddleware::class,
-    ]);
-})
 
+        $middleware->alias([
+            'inject.api.token' => \App\Http\Middleware\InjectApiToken::class,
+            'role' => \App\Http\Middleware\RoleMiddleware::class,
+            'guest.session' => RedirectIfAuthenticated::class,
+        ]);
+
+    })
     
     ->withExceptions(function (Exceptions $exceptions): void {
         //

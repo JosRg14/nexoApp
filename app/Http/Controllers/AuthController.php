@@ -8,6 +8,29 @@ use Illuminate\Support\Facades\Http;
 class AuthController extends Controller
 {
     
+
+//VISTAS
+
+public function showLogin()
+{
+    return view('auth.login');
+}
+
+public function showRoleSelection()
+{
+    return view('auth.role-selection');
+}
+
+public function showBusinessRegister()
+{
+    return view('auth.register-business');
+}
+
+public function showClientRegister()
+{
+    return view('auth.register-client');
+}
+
     public function login(Request $request)
     {
         $response = Http::post(config('services.api.url') . '/api/login', [

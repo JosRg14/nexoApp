@@ -4,24 +4,11 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\ServiceController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Middleware\RedirectIfAuthenticated;
 
 
 Route::get('/profile', [ProfileController::class, 'index'])->name('profile.show');
-Route::get('/register', function () {
-    return view('auth.role-selection');
-})->name('register.role-selection');
 
-Route::get('/register/business', function () {
-    return view('auth.register-business');
-})->name('register.business');
-
-Route::get('/register/client', function () {
-    return view('auth.register-client');
-})->name('register.client');
-
-Route::get('/login', function () {
-    return view('auth.login');
-})->name('login');
 
 Route::get('/business/view', function () {
     return view('business.view');
@@ -122,3 +109,16 @@ Route::post('/logout', function () {
 Route::post('/proxy/register-client', [AuthController::class, 'registerCliente']);
 
 Route::post('/proxy/register-admin', [AuthController::class, 'registerAdmin']);
+
+Route::middleware(['guest.session'])->group(function () {
+
+    Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
+
+    Route::get('/register', [AuthController::class, 'showRoleSelection'])->name('register');
+
+    Route::get('/register/business', [AuthController::class, 'showBusinessRegister'])->name('register.business');
+
+    Route::get('/register/client', [AuthController::class, 'showClientRegister'])->name('register.client');
+
+
+});
