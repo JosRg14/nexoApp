@@ -27,15 +27,11 @@
         <div class="flex items-center gap-6">
             <div x-data="{ open: false }" class="relative">
                 <button @click="open = !open" @click.away="open = false" class="flex items-center gap-3 focus:outline-none group">
-                    @php
-                        $nombre_completo = session('usuario.nombre_completo') ?? session('usuario.correo');
-                        $inicial = strtoupper(substr($nombre_completo, 0, 1));
-                    @endphp
+                    <span class="text-sm font-bold text-[#F3F4F6] hidden md:block">
+                        Hola, {{ session('usuario.primer_nombre') ?? session('usuario.correo') ?? 'Usuario' }}
+                    </span>
 
-                    <!-- Avatar con inicial -->
-                    <div class="w-9 h-9 rounded-full bg-gradient-to-br from-[#374151] to-black flex items-center justify-center text-white font-bold text-sm shadow-lg group-hover:border group-hover:border-white/20 transition-all">
-                        {{ $inicial }}
-                    </div>
+                    <x-profile-avatar size="small" />
                     
                     <i class="fa-solid fa-chevron-down text-[10px] text-[#9CA3AF] group-hover:text-white transition-colors"></i>
                 </button>
@@ -52,7 +48,7 @@
                     
                     <div class="px-4 py-2 border-b border-[#374151]/50 mb-1">
                         <p class="text-[10px] uppercase tracking-widest text-[#9CA3AF] mb-1">Usuario</p>
-                        <p class="text-xs font-bold text-white truncate">{{ $nombre_completo }}</p>
+                        <p class="text-xs font-bold text-white truncate">{{ session('usuario.nombre_completo') ?? session('usuario.correo') ?? 'Usuario' }}</p>
                     </div>
 
                     <a href="{{ url('/profile') }}" class="block px-4 py-2 text-xs text-[#9CA3AF] hover:text-white hover:bg-[#374151]/30 transition-colors uppercase tracking-widest font-bold">

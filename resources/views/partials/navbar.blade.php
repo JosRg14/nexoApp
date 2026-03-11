@@ -3,7 +3,7 @@
 
         <div class="flex items-center w-full md:w-auto gap-8">
             <div class="text-2xl font-bold tracking-widest uppercase text-white shrink-0">
-                NEXOAPP
+                <a href="{{ url('/') }}">NEXOAPP</a>
             </div>
         </div>
 
@@ -36,7 +36,10 @@
                             $inicial = strtoupper(substr($nombre_completo, 0, 1));
                         @endphp
 
-
+                        <!-- Saludo -->
+    <span class="text-sm font-bold text-[#F3F4F6] hidden md:block">
+        Hola, {{ $primer_nombre }}
+    </span>
 
 
                         <!-- Avatar con inicial -->

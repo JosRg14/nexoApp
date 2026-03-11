@@ -190,5 +190,11 @@ public function showClientRegister()
         return $usuario;
     }
 
+    public function logout()
+    {
+        session()->flush();
+        return redirect()->route('home');
+    }
+
 
 }

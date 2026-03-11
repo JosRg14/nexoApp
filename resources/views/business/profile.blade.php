@@ -1,7 +1,8 @@
-@php
-    
+@php 
     $correo = session('usuario.correo') ?? session('usuario');
-    $inicial = $correo ? strtoupper(substr($correo, 0, 1)) : '?';
+    $nombre = session('usuario.nombre') ?? session('usuario.nombre_completo');
+    $inicial = ($nombre ? substr($nombre, 0, 1) : ($correo ? substr($correo, 0, 1) : '?'));
+    $inicial = strtoupper($inicial);
 @endphp
 
 
@@ -13,6 +14,9 @@
     <title>NexoApp - Mi Negocio</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body class="h-full bg-[#1a1a1a] text-[#F3F4F6] font-sans antialiased flex flex-col">
 
@@ -23,21 +27,59 @@
         NexoApp
     </a>
 
-    <div class="flex items-center gap-4">
+    <div class="flex items-center gap-6">
 
-        <span class="text-xs uppercase tracking-widest text-[#9CA3AF] hidden md:block">
-            Hola, {{ session('usuario.primer_nombre') ?? session('usuario.correo') }}
-        </span>
+<div x-data="{ open: false }" class="relative">
 
-        <div class="h-9 w-9 rounded-full 
-                    bg-gradient-to-br from-[#374151] to-black 
-                    flex items-center justify-center 
-                    text-white font-bold text-sm 
-                    shadow-md">
-            {{ $inicial }}
-        </div>
+<button @click="open = !open"
+        @click.away="open = false"
+        class="flex items-center gap-3 focus:outline-none group">
 
-    </div>
+<span class="text-sm font-bold text-[#F3F4F6] hidden md:block">
+Hola, {{ session('usuario.primer_nombre') ?? session('usuario.correo') ?? 'Usuario' }}
+</span>
+
+<div class="h-9 w-9 rounded-full 
+bg-gradient-to-br from-[#374151] to-black 
+flex items-center justify-center 
+text-white font-bold text-sm shadow-md">
+{{ $inicial }}
+</div>
+
+<i class="fa-solid fa-chevron-down text-[10px] text-[#9CA3AF] group-hover:text-white"></i>
+
+</button>
+
+<div x-show="open"
+class="absolute right-0 mt-2 w-48 bg-[#1a1a1a] border border-[#374151] shadow-xl z-50 py-2">
+
+<div class="px-4 py-2 border-b border-[#374151]/50 mb-1">
+<p class="text-[10px] uppercase tracking-widest text-[#9CA3AF] mb-1">Usuario</p>
+<p class="text-xs font-bold text-white truncate">
+{{ session('usuario.nombre_completo') ?? session('usuario.correo') }}
+</p>
+</div>
+
+<a href="{{ url('/profile') }}"
+class="block px-4 py-2 text-xs text-[#9CA3AF] hover:text-white hover:bg-[#374151]/30 uppercase tracking-widest font-bold">
+
+<i class="fa-solid fa-user mr-2"></i> Mi Perfil
+</a>
+
+<form method="POST" action="/logout">
+@csrf
+<button type="submit"
+class="w-full text-left px-4 py-2 text-xs text-red-400 hover:text-red-300 hover:bg-[#374151]/30 uppercase tracking-widest font-bold">
+
+<i class="fa-solid fa-right-from-bracket mr-2"></i> Cerrar Sesión
+</button>
+</form>
+
+</div>
+
+</div>
+
+</div>
 
 </header>
 

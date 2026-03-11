@@ -104,7 +104,27 @@
                     <label class="block text-xs text-[#9CA3AF] uppercase tracking-widest mb-2">
                         Imagen del servicio
                     </label>
-                    <input type="file" name="imagen" accept="image/*" class="w-full text-xs text-[#9CA3AF]">
+                    <label for="imagen" class="flex flex-col items-center justify-center w-full h-32 border-2 border-[#374151] border-dashed rounded-lg cursor-pointer bg-[#1a1a1a] hover:bg-[#262626] hover:border-white transition-all group overflow-hidden">
+                        <div id="dropzone-content" class="flex flex-col items-center justify-center pt-5 pb-6">
+                            <i class="fa-solid fa-image text-2xl text-[#9CA3AF] mb-3 group-hover:text-white transition-colors"></i>
+                            <p class="mb-2 text-xs text-[#9CA3AF] font-bold group-hover:text-white uppercase tracking-widest">Subir imagen</p>
+                            <p class="text-[10px] text-[#9CA3AF]">PNG, JPG o JPEG (MÁX. 2MB)</p>
+                        </div>
+                        <input id="imagen" name="imagen" type="file" class="hidden" accept="image/png, image/jpeg, image/jpg" onchange="handleImagePreview(this, 'preview-container', 'preview-img')" />
+                    </label>
+                    
+                    <div id="preview-container" class="mt-4 hidden animate-fade-in">
+                        <p class="text-[10px] text-[#9CA3AF] uppercase tracking-widest mb-2 font-bold">Vista previa:</p>
+                        <img id="preview-img" class="w-full h-40 object-cover rounded border border-[#374151]" />
+                    </div>
+                    
+                    <p id="image-error" class="text-red-400 text-[10px] mt-2 hidden uppercase tracking-widest font-bold">
+                        <i class="fa-solid fa-circle-exclamation mr-1"></i> Archivo inválido. Solo se permiten imágenes PNG, JPG o JPEG.
+                    </p>
+                    
+                    <p class="text-[10px] text-[#9CA3AF] mt-2 uppercase tracking-widest">
+                        Formatos permitidos: PNG, JPG, JPEG
+                    </p>
                 </div>
 
                 {{-- PRECIO --}}
@@ -148,12 +168,26 @@
             <input type="hidden" name="id" id="edit_id">
             <div class="space-y-5">
                 <div>
-                    <label class="block text-xs text-[#9CA3AF] uppercase tracking-widest mb-2">Imagen actual</label>
-                    <img id="edit_imagen_preview" class="w-full h-40 object-cover rounded-lg mb-3 hidden border border-[#374151]" alt="Imagen del servicio">
-                </div>
-                <div>
-                    <label class="block text-xs text-[#9CA3AF] uppercase tracking-widest mb-1">Cambiar imagen</label>
-                    <input type="file" name="imagen" id="edit_imagen" accept="image/*" class="w-full text-xs text-[#9CA3AF]">
+                    <label class="block text-xs text-[#9CA3AF] uppercase tracking-widest mb-2">Imagen actual / Vista previa</label>
+                    <div class="relative">
+                        <img id="edit_imagen_preview" class="w-full h-40 object-cover rounded border border-[#374151] mb-3 hidden" alt="Imagen del servicio">
+                    </div>
+                    
+                    <label for="edit_imagen" class="flex flex-col items-center justify-center w-full h-24 border-2 border-[#374151] border-dashed rounded-lg cursor-pointer bg-[#1a1a1a] hover:bg-[#262626] hover:border-white transition-all group overflow-hidden">
+                        <div class="flex flex-col items-center justify-center pt-2 pb-2">
+                            <i class="fa-solid fa-cloud-arrow-up text-lg text-[#9CA3AF] mb-1 group-hover:text-white"></i>
+                            <p class="text-[10px] text-[#9CA3AF] font-bold group-hover:text-white uppercase">Cambiar imagen</p>
+                        </div>
+                        <input id="edit_imagen" name="imagen" type="file" class="hidden" accept="image/png, image/jpeg, image/jpg" onchange="handleImagePreview(this, 'edit_preview_wrapper', 'edit_imagen_preview', true)" />
+                    </label>
+
+                    <p id="edit-image-error" class="text-red-400 text-[10px] mt-2 hidden uppercase tracking-widest font-bold">
+                        <i class="fa-solid fa-circle-exclamation mr-1"></i> Archivo inválido.
+                    </p>
+
+                    <p class="text-[10px] text-[#9CA3AF] mt-2 uppercase tracking-widest">
+                        Formatos permitidos: PNG, JPG, JPEG
+                    </p>
                 </div>
                 <div>
                     <label class="block text-xs text-[#9CA3AF] uppercase tracking-widest mb-1">Nombre del servicio</label>
@@ -192,3 +226,35 @@
         </form>
     </div>
 </div>
+
+<script>
+    function handleImagePreview(input, containerId, imgId, isEdit = false) {
+        const errorId = isEdit ? 'edit-image-error' : 'image-error';
+        const errorElement = document.getElementById(errorId);
+        const container = document.getElementById(containerId);
+        const img = document.getElementById(imgId);
+        
+        if (input.files && input.files[0]) {
+            const file = input.files[0];
+            const validTypes = ['image/png', 'image/jpeg', 'image/jpg'];
+            
+            if (!validTypes.includes(file.type)) {
+                errorElement.classList.remove('hidden');
+                input.value = ''; // Clear input
+                if (!isEdit) container.classList.add('hidden');
+                return;
+            }
+            
+            errorElement.classList.add('hidden');
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                img.src = e.target.result;
+                img.classList.remove('hidden');
+                if (!isEdit) container.classList.remove('hidden');
+            };
+            
+            reader.readAsDataURL(file);
+        }
+    }
+</script>

@@ -59,7 +59,7 @@ class ServiceController extends Controller
         'descripcion' => 'nullable|string|max:255',
         'precio' => 'required|numeric|min:1|max:10000',
         'duracion' => 'required|integer|min:5|max:480',
-        'imagen' => 'nullable|image|max:2048'
+        'imagen' => 'nullable|image|mimes:png,jpg,jpeg|max:2048'
     ]);
 
     try {
@@ -93,7 +93,7 @@ public function update(Request $request, int $id)
         'descripcion' => 'nullable|string|max:255',
         'precio' => 'required|numeric|min:1|max:10000',
         'duracion' => 'required|integer|min:5|max:480',
-        'imagen' => 'nullable|image|max:2048'
+        'imagen' => 'nullable|image|mimes:png,jpg,jpeg|max:2048'
     ]);
 
     try {

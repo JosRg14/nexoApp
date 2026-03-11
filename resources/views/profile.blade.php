@@ -16,8 +16,8 @@
         <div class="md:flex">
             <!-- Left Side: Profile Side -->
             <div class="md:w-1/3 bg-[#1a1a1a] p-8 flex flex-col items-center border-r border-[#374151]">
-                <div class="w-32 h-32 rounded-full bg-gradient-to-br from-[#374151] to-black flex items-center justify-center text-white text-5xl font-bold shadow-2xl mb-6">
-                    {{ strtoupper(substr($usuario['nombre_completo'] ?? 'U', 0, 1)) }}
+                <div class="mb-6 shadow-2xl rounded-full">
+                    <x-profile-avatar size="large" />
                 </div>
                 <h2 class="text-xl font-bold text-white text-center mb-1">{{ $usuario['nombre_completo'] }}</h2>
                 <div class="px-3 py-1 bg-white/10 rounded-full">
