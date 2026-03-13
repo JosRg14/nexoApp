@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\BusinessProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\ServiceController;
 use App\Http\Controllers\AuthController;
@@ -16,15 +17,22 @@ Route::get('/business/view', function () {
 
 
 
-//** API Routes for business services management*/
+/** API Routes for business services management */
 Route::middleware('role:admin')
     ->prefix('business')
     ->name('business.')
     ->group(function () {
 
-        Route::get('/profile', [ServiceController::class, 'index'])
+        // PERFIL DEL NEGOCIO
+        Route::get('/profile', [BusinessProfileController::class, 'index'])
             ->name('profile');
 
+        // 🔴 ESTA ES LA QUE TE FALTABA
+        Route::post('/update', [BusinessProfileController::class, 'update'])
+            ->name('update');
+
+
+        // SERVICIOS
         Route::post('/services', [ServiceController::class, 'store'])
             ->name('services.store');
 
@@ -36,7 +44,9 @@ Route::middleware('role:admin')
 
 });
 
-//** Api routes for super */
+
+
+/** Api routes for super */
 Route::middleware('role:superusuario')
     ->prefix('dashboard')
     ->name('dashboard.')
@@ -47,34 +57,37 @@ Route::middleware('role:superusuario')
         })->name('index');
 
         Route::get('/promotions', function () {
-    return view('dashboard.promotions.index');
-})->name('promotions');
+            return view('dashboard.promotions.index');
+        })->name('promotions');
 
-Route::get('/notices', function () {
-    return view('dashboard.notices.index');
-})->name('notices');
+        Route::get('/notices', function () {
+            return view('dashboard.notices.index');
+        })->name('notices');
 
         Route::get('/businesses', function () {
             return view('dashboard.businesses.index');
         })->name('businesses');
+
 });
-//
+
+
 
 Route::get('/service/view', function () {
     return view('service.view');
 })->name('service.show');
 
+
+
 Route::get('/booking/availability', function () {
+
     Carbon\Carbon::setLocale('es');
-    
-    // Get requested date or default to now
+
     $year = request('year', now()->year);
     $month = request('month', now()->month);
-    
+
     $date = Carbon\Carbon::createFromDate($year, $month, 1);
     $now = Carbon\Carbon::now();
 
-    // Navigation
     $prevDate = $date->copy()->subMonth();
     $nextDate = $date->copy()->addMonth();
 
@@ -83,32 +96,47 @@ Route::get('/booking/availability', function () {
         'year' => $date->year,
         'month' => $date->month,
         'daysInMonth' => $date->daysInMonth,
-        'firstDayOfWeek' => $date->dayOfWeek, 
-        
-        // Date Limits
-        'now' => $now->startOfDay(), // Pass full Carbon object
+        'firstDayOfWeek' => $date->dayOfWeek,
+
+        'now' => $now->startOfDay(),
         'maxDate' => $now->copy()->addDays(30)->endOfDay(),
-        
-        // Navigation Links
-        'prevLink' => route('booking.availability', ['month' => $prevDate->month, 'year' => $prevDate->year]),
-        'nextLink' => route('booking.availability', ['month' => $nextDate->month, 'year' => $nextDate->year]),
+
+        'prevLink' => route('booking.availability', [
+            'month' => $prevDate->month,
+            'year' => $prevDate->year
+        ]),
+
+        'nextLink' => route('booking.availability', [
+            'month' => $nextDate->month,
+            'year' => $nextDate->year
+        ]),
     ]);
+
 })->name('booking.availability');
 
+
+
 Route::post('/proxy/login', [AuthController::class, 'login']);
+
+
 
 Route::get('/', function () {
     return view('home');
 })->name('home');
 
+
+
 Route::post('/logout', function () {
-    session()->flush();   // elimina todo
-    return redirect('/'); // vuelve a welcome
+    session()->flush();
+    return redirect('/');
 });
 
-Route::post('/proxy/register-client', [AuthController::class, 'registerCliente']);
 
+
+Route::post('/proxy/register-client', [AuthController::class, 'registerCliente']);
 Route::post('/proxy/register-admin', [AuthController::class, 'registerAdmin']);
+
+
 
 Route::middleware(['guest.session'])->group(function () {
 
@@ -119,6 +147,5 @@ Route::middleware(['guest.session'])->group(function () {
     Route::get('/register/business', [AuthController::class, 'showBusinessRegister'])->name('register.business');
 
     Route::get('/register/client', [AuthController::class, 'showClientRegister'])->name('register.client');
-
 
 });

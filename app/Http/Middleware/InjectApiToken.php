@@ -12,6 +12,7 @@ class InjectApiToken
      */
     public function handle($request, Closure $next)
     {
+        
     if (session()->has('auth_token')) {
     app(\App\Services\ExternalApi\HttpClient::class)
         ->setToken(session('auth_token'));

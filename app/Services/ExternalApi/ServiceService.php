@@ -38,4 +38,20 @@ public function delete(int $id): array
 {
     return $this->client->delete("/api/servicios/{$id}");
 }
+
+public function getByBusiness(): array
+{
+    return $this->client->get('/api/servicios');
+}
+
+public function getBusiness()
+{
+    return $this->client->get('/api/negocios/mi-negocio');
+}
+
+public function updateBusiness($data)
+{
+    return $this->client->put('/api/negocios/mi-negocio', $data);
+}
+
 }

@@ -33,10 +33,13 @@ public function showClientRegister()
 
     public function login(Request $request)
     {
+        
         $response = Http::post(config('services.api.url') . '/api/login', [
             'correo' => $request->email,
             'contrasena' => $request->password,
         ]);
+
+        
 
         if (!$response->successful()) {
             return response()->json([
@@ -58,6 +61,8 @@ public function showClientRegister()
             'auth_token' => $data['data']['token'],
             'rol' => $data['data']['rol'],
             'usuario' => $usuario,
+            'negocio' => $data['data']['usuario']['negocio'] ?? null
+            
         ]);
 
         return response()->json([
@@ -67,6 +72,8 @@ public function showClientRegister()
                 default => '/',
             }
         ]);
+
+        dd(session()->all());
     }
 
     public function registerCliente(Request $request)
