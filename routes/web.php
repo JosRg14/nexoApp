@@ -1,24 +1,44 @@
 <?php
 
-use App\Http\Controllers\BusinessProfileController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\BusinessProfileController;
 use App\Http\Controllers\Admin\ServiceController;
+use App\Http\Controllers\Admin\EmployeeController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProfileController;
-use App\Http\Middleware\RedirectIfAuthenticated;
+use Carbon\Carbon;
 
+/*
+|--------------------------------------------------------------------------
+| PERFIL USUARIO
+|--------------------------------------------------------------------------
+*/
 
 Route::get('/profile', [ProfileController::class, 'index'])->name('profile.show');
 
+
+/*
+|--------------------------------------------------------------------------
+| VISTAS PUBLICAS
+|--------------------------------------------------------------------------
+*/
 
 Route::get('/business/view', function () {
     return view('business.view');
 })->name('business.show');
 
+Route::get('/service/view', function () {
+    return view('service.view');
+})->name('service.show');
 
 
-/** API Routes for business services management */
-Route::middleware('role:admin')
+/*
+|--------------------------------------------------------------------------
+| PANEL ADMIN NEGOCIO
+|--------------------------------------------------------------------------
+*/
+
+Route::middleware(['auth.session','inject.api.token','role:admin'])
     ->prefix('business')
     ->name('business.')
     ->group(function () {
@@ -27,12 +47,16 @@ Route::middleware('role:admin')
         Route::get('/profile', [BusinessProfileController::class, 'index'])
             ->name('profile');
 
-        // 🔴 ESTA ES LA QUE TE FALTABA
         Route::post('/update', [BusinessProfileController::class, 'update'])
             ->name('update');
 
 
-        // SERVICIOS
+        /*
+        |--------------------------------------------------------------------------
+        | SERVICIOS
+        |--------------------------------------------------------------------------
+        */
+
         Route::post('/services', [ServiceController::class, 'store'])
             ->name('services.store');
 
@@ -42,11 +66,30 @@ Route::middleware('role:admin')
         Route::delete('/services/{id}', [ServiceController::class, 'destroy'])
             ->name('services.destroy');
 
+
+        /*
+        |--------------------------------------------------------------------------
+        | EMPLEADOS
+        |--------------------------------------------------------------------------
+        */
+
+        Route::post('/employees', [EmployeeController::class, 'store'])
+            ->name('employees.store');
+
+        Route::delete('/employees/{id}', [EmployeeController::class, 'destroy'])
+            ->name('employees.destroy');
+
+        Route::put('/employees/{id}',[EmployeeController::class,'update'])
+            ->name('employees.update');
 });
 
 
+/*
+|--------------------------------------------------------------------------
+| PANEL SUPERUSUARIO
+|--------------------------------------------------------------------------
+*/
 
-/** Api routes for super */
 Route::middleware('role:superusuario')
     ->prefix('dashboard')
     ->name('dashboard.')
@@ -71,22 +114,21 @@ Route::middleware('role:superusuario')
 });
 
 
-
-Route::get('/service/view', function () {
-    return view('service.view');
-})->name('service.show');
-
-
+/*
+|--------------------------------------------------------------------------
+| CALENDARIO DISPONIBILIDAD
+|--------------------------------------------------------------------------
+*/
 
 Route::get('/booking/availability', function () {
 
-    Carbon\Carbon::setLocale('es');
+    Carbon::setLocale('es');
 
     $year = request('year', now()->year);
     $month = request('month', now()->month);
 
-    $date = Carbon\Carbon::createFromDate($year, $month, 1);
-    $now = Carbon\Carbon::now();
+    $date = Carbon::createFromDate($year, $month, 1);
+    $now = Carbon::now();
 
     $prevDate = $date->copy()->subMonth();
     $nextDate = $date->copy()->addMonth();
@@ -115,16 +157,28 @@ Route::get('/booking/availability', function () {
 })->name('booking.availability');
 
 
+/*
+|--------------------------------------------------------------------------
+| AUTH PROXY
+|--------------------------------------------------------------------------
+*/
 
 Route::post('/proxy/login', [AuthController::class, 'login']);
 
+Route::post('/proxy/register-client', [AuthController::class, 'registerCliente']);
 
+Route::post('/proxy/register-admin', [AuthController::class, 'registerAdmin']);
+
+
+/*
+|--------------------------------------------------------------------------
+| HOME
+|--------------------------------------------------------------------------
+*/
 
 Route::get('/', function () {
     return view('home');
 })->name('home');
-
-
 
 Route::post('/logout', function () {
     session()->flush();
@@ -132,11 +186,11 @@ Route::post('/logout', function () {
 });
 
 
-
-Route::post('/proxy/register-client', [AuthController::class, 'registerCliente']);
-Route::post('/proxy/register-admin', [AuthController::class, 'registerAdmin']);
-
-
+/*
+|--------------------------------------------------------------------------
+| RUTAS SOLO PARA INVITADOS
+|--------------------------------------------------------------------------
+*/
 
 Route::middleware(['guest.session'])->group(function () {
 

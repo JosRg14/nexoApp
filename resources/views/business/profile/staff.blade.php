@@ -1,100 +1,284 @@
 <!-- TAB 4: PERSONAL -->
 <section id="tab-personnel" class="hidden animate-fade-in-up">
-    <div class="flex justify-between items-center mb-8">
-        <h2 class="text-xl font-bold uppercase tracking-wide text-white">Equipo de Trabajo</h2>
-        <button id="btn-add-employee" class="bg-white text-black px-4 py-2 text-xs font-bold uppercase tracking-widest hover:bg-gray-200 transition-colors rounded-sm">
-            + Agregar Empleado
-        </button>
-    </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <!-- Employee Card 1 -->
-        <div class="bg-[#262626] border border-[#374151]/50 p-6 flex items-center justify-between group hover:border-[#F3F4F6]/30 transition-colors duration-300">
-            <div class="flex items-center gap-4">
-                <div class="w-12 h-12 rounded-full bg-[#374151] flex items-center justify-center text-white font-bold text-lg border border-[#4B5563]">J</div>
-                <div>
-                    <h3 class="text-white font-bold text-sm">Juan Pérez</h3>
-                    <p class="text-[#9CA3AF] text-xs">Barbero Senior</p>
-                </div>
-            </div>
-            <div class="flex flex-col items-end gap-2">
-                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">Activo</span>
-                <div class="flex gap-2">
-                    <button class="text-[#9CA3AF] hover:text-white transition-colors">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
-                    </button>
-                    <button class="text-[#9CA3AF] hover:text-red-500 transition-colors">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                    </button>
-                </div>
-            </div>
-        </div>
+<div class="flex justify-between items-center mb-8">
+<h2 class="text-xl font-bold uppercase tracking-wide text-white">
+Equipo de Trabajo
+</h2>
 
-        <!-- Employee Card 2 -->
-        <div class="bg-[#262626] border border-[#374151]/50 p-6 flex items-center justify-between group hover:border-[#F3F4F6]/30 transition-colors duration-300">
-            <div class="flex items-center gap-4">
-                <div class="w-12 h-12 rounded-full bg-[#374151] flex items-center justify-center text-white font-bold text-lg border border-[#4B5563]">C</div>
-                <div>
-                    <h3 class="text-white font-bold text-sm">Carlos Ruiz</h3>
-                    <p class="text-[#9CA3AF] text-xs">Estilista</p>
-                </div>
-            </div>
-            <div class="flex flex-col items-end gap-2">
-                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-500/10 text-red-500 border border-red-500/20">Inactivo</span>
-                <div class="flex gap-2">
-                    <button class="text-[#9CA3AF] hover:text-white transition-colors">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
-                    </button>
-                    <button class="text-[#9CA3AF] hover:text-red-500 transition-colors">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
+<button
+onclick="toggleModal('modal-add-employee',true)"
+class="bg-white text-black px-4 py-2 text-xs font-bold uppercase tracking-widest hover:bg-gray-200 transition rounded-sm">
++ Agregar Empleado
+</button>
+</div>
+
+
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+@foreach($employees ?? [] as $emp)
+
+<div class="bg-[#262626] border border-[#374151]/50 p-6 flex items-center justify-between">
+
+<div class="flex items-center gap-4">
+
+<div class="w-12 h-12 rounded-full bg-[#374151] flex items-center justify-center text-white font-bold text-lg border border-[#4B5563]">
+{{ strtoupper(substr($emp['nombre'] ?? '',0,1)) }}
+</div>
+
+<div>
+
+<h3 class="text-white font-bold text-sm">
+{{ trim(($emp['nombre'] ?? '').' '.($emp['app_paterno'] ?? '').' '.($emp['app_materno'] ?? '')) }}
+</h3>
+
+<p class="text-[#9CA3AF] text-xs">
+{{ $emp['correo'] ?? '' }} • Comisión: {{ $emp['comision'] ?? '0' }}%
+</p>
+
+</div>
+</div>
+
+
+<div class="flex flex-col items-end gap-2">
+
+@if(strtolower($emp['estado'] ?? '') === 'activo')
+
+<span class="bg-emerald-500/10 text-emerald-500 px-2 py-0.5 text-xs border border-emerald-500/20">
+Activo
+</span>
+
+@else
+
+<span class="bg-red-500/10 text-red-500 px-2 py-0.5 text-xs border border-red-500/20">
+Inactivo
+</span>
+
+@endif
+
+
+<div class="flex gap-3">
+
+<button
+type="button"
+onclick='openEditEmployee(
+@json($emp["id_empleado"]),
+@json($emp["nombre"]),
+@json($emp["app_paterno"]),
+@json($emp["app_materno"]),
+@json($emp["correo"]),
+@json($emp["comision"]),
+@json($emp["estado"])
+)'
+class="text-blue-400 text-xs hover:text-blue-300">
+Editar
+</button>
+
+<form method="POST" action="{{ route('business.employees.destroy',$emp['id_empleado']) }}">
+@csrf
+@method('DELETE')
+
+<button
+type="submit"
+onclick="return confirm('¿Eliminar empleado?')"
+class="text-red-400 text-xs hover:text-red-300">
+Eliminar
+</button>
+
+</form>
+
+</div>
+
+</div>
+
+</div>
+
+@endforeach
+
+</div>
+
 </section>
 
-<!-- Modal Agregar Empleado -->
+
+<!-- MODAL CREAR EMPLEADO -->
+
 <div id="modal-add-employee" class="fixed inset-0 z-50 hidden">
-    <div class="absolute inset-0 bg-black/80 backdrop-blur-sm transition-opacity" onclick="toggleModal('modal-add-employee', false)"></div>
-    <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full max-w-md bg-[#1a1a1a] border border-[#374151] shadow-2xl rounded-sm p-8 animate-fade-in-up">
-        <div class="flex flex-col items-center mb-6">
-            <h3 class="text-xl font-bold uppercase tracking-wide text-white mb-4">Nuevo Empleado</h3>
-        </div>
-        <form class="space-y-6" onsubmit="event.preventDefault(); toggleModal('modal-add-employee', false);">
-            <div>
-                <h4 class="text-[#9CA3AF] text-xs uppercase tracking-widest mb-4">Información Personal</h4>
-                <div class="group/input relative mb-4">
-                    <input type="text" id="emp_name" class="peer w-full bg-transparent border-b border-[#374151] py-2 text-white placeholder-transparent focus:border-white focus:outline-none transition-colors" placeholder="Nombre Completo" />
-                    <label for="emp_name" class="absolute left-0 -top-3.5 text-xs text-[#9CA3AF] transition-all peer-placeholder-shown:text-base peer-placeholder-shown:text-[#9CA3AF] peer-placeholder-shown:top-2 peer-focus:-top-3.5 peer-focus:text-xs peer-focus:text-white">Nombre Completo</label>
-                </div>
-                <div class="group/input relative">
-                    <input type="tel" id="emp_phone" class="peer w-full bg-transparent border-b border-[#374151] py-2 text-white placeholder-transparent focus:border-white focus:outline-none transition-colors" placeholder="Teléfono" />
-                    <label for="emp_phone" class="absolute left-0 -top-3.5 text-xs text-[#9CA3AF] transition-all peer-placeholder-shown:text-base peer-placeholder-shown:text-[#9CA3AF] peer-placeholder-shown:top-2 peer-focus:-top-3.5 peer-focus:text-xs peer-focus:text-white">Teléfono</label>
-                </div>
-            </div>
-            <div>
-                <h4 class="text-[#9CA3AF] text-xs uppercase tracking-widest mb-4 mt-6">Detalles del Cargo</h4>
-                <div class="group/input relative mb-4">
-                    <input type="text" id="emp_role_text" class="peer w-full bg-transparent border-b border-[#374151] py-2 text-white placeholder-transparent focus:border-white focus:outline-none transition-colors" placeholder="Cargo (ej. Barbero)" />
-                    <label for="emp_role_text" class="absolute left-0 -top-3.5 text-xs text-[#9CA3AF] transition-all peer-placeholder-shown:text-base peer-placeholder-shown:text-[#9CA3AF] peer-placeholder-shown:top-2 peer-focus:-top-3.5 peer-focus:text-xs peer-focus:text-white">Cargo (ej. Barbero, Recepcionista)</label>
-                </div>
-                <div class="group/input relative mb-6">
-                    <input type="number" id="emp_commission" class="peer w-full bg-transparent border-b border-[#374151] py-2 text-white placeholder-transparent focus:border-white focus:outline-none transition-colors" placeholder="Comisión (%)" />
-                    <label for="emp_commission" class="absolute left-0 -top-3.5 text-xs text-[#9CA3AF] transition-all peer-placeholder-shown:text-base peer-placeholder-shown:text-[#9CA3AF] peer-placeholder-shown:top-2 peer-focus:-top-3.5 peer-focus:text-xs peer-focus:text-white">Comisión (%)</label>
-                </div>
-                <div class="bg-[#262626] p-4 rounded-sm flex items-center justify-between border border-[#374151]/50">
-                    <span class="text-white text-sm font-bold">Estado Activo</span>
-                    <label class="relative inline-flex items-center cursor-pointer">
-                        <input type="checkbox" checked class="sr-only peer">
-                        <div class="w-11 h-6 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
-                    </label>
-                </div>
-            </div>
-            <div class="pt-4">
-                <button type="submit" class="w-full bg-white text-black py-3 text-xs font-bold uppercase tracking-widest hover:bg-gray-200 transition-colors rounded-sm shadow-lg">Crear Empleado</button>
-                <button type="button" onclick="toggleModal('modal-add-employee', false)" class="w-full mt-2 text-[#9CA3AF] py-2 text-xs font-bold uppercase tracking-widest hover:text-white transition-colors">Cancelar</button>
-            </div>
-        </form>
-    </div>
+
+<div class="absolute inset-0 bg-black/80"
+onclick="toggleModal('modal-add-employee',false)">
 </div>
+
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#1a1a1a] border border-[#374151] p-8 w-full max-w-md">
+
+<h3 class="text-white font-bold mb-6">
+Nuevo Empleado
+</h3>
+
+<form method="POST" action="{{ route('business.employees.store') }}">
+@csrf
+
+<input
+type="text"
+name="nombre"
+placeholder="Nombre"
+id="edit_nombre"
+class="w-full mb-3 bg-transparent border-b border-gray-600 text-white">
+
+<input
+type="text"
+name="app_paterno"
+placeholder="Apellido paterno"
+class="w-full mb-3 bg-transparent border-b border-gray-600 text-white">
+
+<input
+type="text"
+name="app_materno"
+placeholder="Apellido materno"
+class="w-full mb-3 bg-transparent border-b border-gray-600 text-white">
+
+<input
+type="email"
+name="correo"
+placeholder="Correo"
+class="w-full mb-3 bg-transparent border-b border-gray-600 text-white">
+
+<input
+type="password"
+name="contrasena"
+placeholder="Contraseña"
+class="w-full mb-3 bg-transparent border-b border-gray-600 text-white">
+
+<input
+type="number"
+name="comision"
+placeholder="Comisión"
+class="w-full mb-3 bg-transparent border-b border-gray-600 text-white">
+
+<input type="hidden" name="estado" value="activo">
+
+<button
+class="w-full bg-white text-black py-2 mt-4">
+Crear Empleado
+</button>
+
+<button
+type="button"
+onclick="toggleModal('modal-add-employee',false)"
+class="w-full text-gray-400 mt-2">
+Cancelar
+</button>
+
+</form>
+
+</div>
+</div>
+
+
+
+<!-- MODAL EDITAR EMPLEADO -->
+
+<div id="modal-edit-employee" class="fixed inset-0 hidden z-50">
+
+<div class="absolute inset-0 bg-black/80"
+onclick="toggleModal('modal-edit-employee',false)">
+</div>
+
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#1a1a1a] p-8 border border-[#374151] w-full max-w-md">
+
+<h3 class="text-white font-bold mb-6">
+Editar empleado
+</h3>
+
+<form method="POST" id="editEmployeeForm">
+@csrf
+@method('PUT')
+
+<input type="hidden" id="edit_id">
+
+<input
+type="text"
+name="nombre"
+id="edit_nombre"
+placeholder="Nombre"
+class="w-full mb-3 bg-transparent border-b border-gray-600 text-white">
+
+<input
+type="text"
+name="app_paterno"
+id="edit_app_paterno"
+placeholder="Apellido paterno"
+class="w-full mb-3 bg-transparent border-b border-gray-600 text-white">
+
+<input
+type="text"
+name="app_materno"
+id="edit_app_materno"
+placeholder="Apellido materno"
+class="w-full mb-3 bg-transparent border-b border-gray-600 text-white">
+
+<input
+type="email"
+name="correo"
+id="edit_correo"
+placeholder="Correo"
+class="w-full mb-3 bg-transparent border-b border-gray-600 text-white">
+
+<input
+type="number"
+name="comision"
+id="edit_comision"
+placeholder="Comisión"
+class="w-full mb-3 bg-transparent border-b border-gray-600 text-white">
+
+<select
+name="estado"
+id="edit_estado"
+class="w-full mb-4 bg-[#262626] text-white border border-gray-600">
+
+<option value="activo">Activo</option>
+<option value="inactivo">Inactivo</option>
+
+</select>
+
+<button class="bg-white text-black px-4 py-2 w-full">
+Actualizar
+</button>
+
+</form>
+
+</div>
+</div>
+
+
+<script>
+
+window.openEditEmployee = function(
+id,
+nombre,
+app_paterno,
+app_materno,
+correo,
+comision,
+estado
+){
+    console.log({
+nombre,
+app_paterno,
+app_materno
+})
+
+document.getElementById("edit_nombre").value = nombre || ""
+document.getElementById("edit_app_paterno").value = app_paterno || ""
+document.getElementById("edit_app_materno").value = app_materno || ""
+document.getElementById("edit_correo").value = correo || ""
+document.getElementById("edit_comision").value = comision || ""
+document.getElementById("edit_estado").value = estado || "activo"
+
+document.getElementById("editEmployeeForm").action =
+"/business/employees/"+id
+
+toggleModal("modal-edit-employee",true)
+
+}
+
+</script>
