@@ -29,67 +29,48 @@
                 </tr>
             </thead>
             <tbody class="divide-y divide-[#374151]">
-                <!-- Row 1 -->
-                <tr class="hover:bg-[#1a1a1a]/50 transition-colors group">
-                    <td class="p-4">
-                        <div class="flex items-center gap-3">
-                            <div class="h-10 w-10 rounded bg-[#374151] flex items-center justify-center text-xs font-bold text-white">GC</div>
-                            <div>
-                                <p class="text-white font-bold text-sm">Gentlemen's Club</p>
-                                <p class="text-[#52525b] text-xs">Barbería • Premium</p>
-                            </div>
-                        </div>
-                    </td>
-                    <td class="p-4 text-sm text-[#D1D5DB]">Carlos M.</td>
-                    <td class="p-4">
-                        <span class="bg-emerald-500/10 text-emerald-500 px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wide border border-emerald-500/20">Activo</span>
-                    </td>
-                    <td class="p-4 text-sm text-white text-right font-mono">$3,450</td>
-                    <td class="p-4 text-right">
-                        <a href="{{ route('dashboard.businesses', 1) }}" class="text-[#9CA3AF] hover:text-white text-xs font-bold uppercase tracking-wider underline decoration-transparent hover:decoration-white transition-all">Ver Detalle</a>
-                    </td>
-                </tr>
-                <!-- Row 2 -->
-                <tr class="hover:bg-[#1a1a1a]/50 transition-colors group">
-                     <td class="p-4">
-                        <div class="flex items-center gap-3">
-                            <div class="h-10 w-10 rounded bg-[#374151] flex items-center justify-center text-xs font-bold text-white">UF</div>
-                            <div>
-                                <p class="text-white font-bold text-sm">Urban Fade</p>
-                                <p class="text-[#52525b] text-xs">Estilismo • Urbano</p>
-                            </div>
-                        </div>
-                    </td>
-                    <td class="p-4 text-sm text-[#D1D5DB]">Kevin J.</td>
-                    <td class="p-4">
-                        <span class="bg-yellow-500/10 text-yellow-500 px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wide border border-yellow-500/20">En Revisión</span>
-                    </td>
-                    <td class="p-4 text-sm text-white text-right font-mono">$0</td>
-                    <td class="p-4 text-right">
-                        <a href="{{ route('dashboard.businesses', 2) }}" class="text-[#9CA3AF] hover:text-white text-xs font-bold uppercase tracking-wider underline decoration-transparent hover:decoration-white transition-all">Ver Detalle</a>
-                    </td>
-                </tr>
-                 <!-- Row 3 -->
-                <tr class="hover:bg-[#1a1a1a]/50 transition-colors group">
-                     <td class="p-4">
-                        <div class="flex items-center gap-3">
-                            <div class="h-10 w-10 rounded bg-[#374151] flex items-center justify-center text-xs font-bold text-white">RB</div>
-                            <div>
-                                <p class="text-white font-bold text-sm">Razor & Blade</p>
-                                <p class="text-[#52525b] text-xs">Barbería • Clásica</p>
-                            </div>
-                        </div>
-                    </td>
-                    <td class="p-4 text-sm text-[#D1D5DB]">Daniel S.</td>
-                    <td class="p-4">
-                        <span class="bg-red-500/10 text-red-500 px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wide border border-red-500/20">Suspendido</span>
-                    </td>
-                    <td class="p-4 text-sm text-white text-right font-mono">$1,200</td>
-                    <td class="p-4 text-right">
-                        <a href="{{ route('dashboard.businesses', 3) }}" class="text-[#9CA3AF] hover:text-white text-xs font-bold uppercase tracking-wider underline decoration-transparent hover:decoration-white transition-all">Ver Detalle</a>
-                    </td>
-                </tr>
-            </tbody>
+    @foreach($businesses as $business)
+        @php
+            $status = strtolower($business['status']);
+            // Mapeo de estilos según tu diseño
+            $statusClasses = [
+                'activo' => 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20',
+                'en revisión' => 'bg-yellow-500/10 text-yellow-500 border border-yellow-500/20',
+                'pendiente' => 'bg-yellow-500/10 text-yellow-500 border border-yellow-500/20',
+                'suspendido' => 'bg-red-500/10 text-red-500 border border-red-500/20',
+            ];
+            
+            $isBlocked = ($status === 'suspendido' || $status === 'pendiente' || $status === 'en revisión');
+        @endphp
+
+        <tr class="hover:bg-[#1a1a1a]/50 transition-colors group {{ $isBlocked ? 'opacity-75' : '' }}">
+            <td class="p-4">
+                <div class="flex items-center gap-3">
+                    <div class="h-10 w-10 rounded bg-[#374151] flex items-center justify-center text-xs font-bold text-white">
+                        {{ strtoupper(substr($business['name'], 0, 2)) }}
+                    </div>
+                    <div>
+                        <p class="text-white font-bold text-sm">{{ $business['name'] }}</p>
+                        <p class="text-[#52525b] text-xs">{{ $business['category'] }}</p>
+                    </div>
+                </div>
+            </td>
+            <td class="p-4 text-sm text-[#D1D5DB]">{{ $business['owner'] }}</td>
+            <td class="p-4">
+                <span class="px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wide {{ $statusClasses[$status] ?? $statusClasses['activo'] }}">
+                    {{ $status }}
+                </span>
+            </td>
+            <td class="p-4 text-sm text-white text-right font-mono">${{ number_format($business['revenue'], 0, ',', '.') }}</td>
+            <td class="p-4 text-right">
+                    <a href="{{ route('dashboard.businesses.show', $business['id']) }}" 
+                       class="text-[#9CA3AF] hover:text-white text-xs font-bold uppercase tracking-wider underline decoration-transparent hover:decoration-white transition-all">
+                       {{ ($status === 'pendiente' || $status === 'en revisión') ? 'Revisar' : 'Gestionar' }}
+                    </a>
+            </td>
+        </tr>
+    @endforeach
+</tbody>
         </table>
     </div>
     

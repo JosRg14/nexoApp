@@ -72,6 +72,10 @@
             <nav class="flex-1 p-4 space-y-2">
                 <a href="{{ route('dashboard.index') }}" class="flex items-center gap-3 px-4 py-3 {{ request()->routeIs('dashboard.index') ? 'bg-[#374151] text-white' : 'text-[#9CA3AF] hover:bg-[#374151]/50 hover:text-white' }} rounded-md transition-colors">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2-2V16zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V16z"></path></svg>
+                    <span class="text-sm font-bold tracking-wide">Overview</span>
+                </a>
+                <a href="{{ route('dashboard.businesses') }}" class="flex items-center gap-3 px-4 py-3 {{ request()->routeIs('dashboard.businesses*') ? 'bg-[#374151] text-white' : 'text-[#9CA3AF] hover:bg-[#374151]/50 hover:text-white' }} rounded-md transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2-2V16zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V16z"></path></svg>
                     <span class="text-sm font-bold tracking-wide">Negocios</span>
                 </a>
                 <a href="{{ route('dashboard.promotions') }}" class="flex items-center gap-3 px-4 py-3 {{ request()->routeIs('dashboard.promotions*') ? 'bg-[#374151] text-white' : 'text-[#9CA3AF] hover:bg-[#374151]/50 hover:text-white' }} rounded-md transition-colors">

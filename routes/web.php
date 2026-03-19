@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\ServiceController;
 use App\Http\Controllers\Admin\EmployeeController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\DashboardController;
 use Carbon\Carbon;
 
 /*
@@ -90,27 +91,24 @@ Route::middleware(['auth.session','inject.api.token','role:admin'])
 |--------------------------------------------------------------------------
 */
 
-Route::middleware('role:superusuario')
+Route::middleware(['auth.session', 'inject.api.token', 'role:superusuario'])
     ->prefix('dashboard')
     ->name('dashboard.')
     ->group(function () {
 
-        Route::get('/', function () {
-            return view('dashboard.index');
-        })->name('index');
+        Route::get('/', [DashboardController::class, 'index'])->name('index');
 
-        Route::get('/promotions', function () {
-            return view('dashboard.promotions.index');
-        })->name('promotions');
+        Route::get('/promotions', [DashboardController::class, 'promotions'])->name('promotions');
 
-        Route::get('/notices', function () {
-            return view('dashboard.notices.index');
-        })->name('notices');
+        Route::get('/notices', [DashboardController::class, 'notices'])->name('notices');
 
-        Route::get('/businesses', function () {
-            return view('dashboard.businesses.index');
-        })->name('businesses');
+        Route::get('/businesses', [DashboardController::class, 'businesses'])->name('businesses');
 
+        Route::get('/businesses/{id}', [DashboardController::class, 'businessDetail'])->name('businesses.show');
+
+        Route::patch('/businesses/{id}/status', [DashboardController::class, 'updateBusinessStatus'])
+    ->name('businesses.updateStatus');
+        
 });
 
 

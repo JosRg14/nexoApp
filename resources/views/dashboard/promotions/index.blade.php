@@ -9,40 +9,30 @@
         
         <!-- Create Form -->
         <div class="bg-[#262626] border border-[#374151] rounded-sm p-6 shadow-lg h-fit">
-            <h2 class="text-lg font-bold uppercase tracking-widest text-white mb-6">Nueva Campaña</h2>
+            <h2 class="text-lg font-bold uppercase tracking-widest text-white mb-6">Nuevo Plan</h2>
             <form onsubmit="event.preventDefault(); alert('Campaña creada (simulación)');" class="space-y-6">
                 
                 <div>
-                    <label class="block text-xs uppercase tracking-widest text-[#9CA3AF] mb-2 font-bold">Título de la Promoción</label>
+                    <label class="block text-xs uppercase tracking-widest text-[#9CA3AF] mb-2 font-bold">Título del Plan</label>
                     <input type="text" class="w-full bg-[#1a1a1a] border border-[#374151] text-white p-3 text-sm focus:border-white focus:outline-none transition-colors" placeholder="Ej: Descuento de Verano">
                 </div>
 
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-xs uppercase tracking-widest text-[#9CA3AF] mb-2 font-bold">Descuento</label>
+                        <label class="block text-xs uppercase tracking-widest text-[#9CA3AF] mb-2 font-bold">Precio</label>
                         <input type="number" class="w-full bg-[#1a1a1a] border border-[#374151] text-white p-3 text-sm focus:border-white focus:outline-none transition-colors" placeholder="20%">
                     </div>
                     <div>
-                        <label class="block text-xs uppercase tracking-widest text-[#9CA3AF] mb-2 font-bold">Tipo</label>
-                        <select class="w-full bg-[#1a1a1a] border border-[#374151] text-white p-3 text-sm focus:border-white focus:outline-none transition-colors">
-                            <option>Porcentaje</option>
-                            <option>Monto Fijo</option>
-                        </select>
+                        <label class="block text-xs uppercase tracking-widest text-[#9CA3AF] mb-2 font-bold">Descripción</label>
+                        <textarea class="w-full bg-[#1a1a1a] border border-[#374151] text-white p-3 text-sm focus:border-white focus:outline-none transition-colors" placeholder="Detalles de la promoción..."></textarea>
+                        
                     </div>
                 </div>
 
-                <div>
-                    <label class="block text-xs uppercase tracking-widest text-[#9CA3AF] mb-2 font-bold">Segmentación</label>
-                    <div class="relative">
-                        <input type="text" class="w-full bg-[#1a1a1a] border border-[#374151] text-white p-3 pl-10 text-sm focus:border-white focus:outline-none transition-colors" placeholder="Buscar negocio">
-                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <svg class="h-4 w-4 text-[#9CA3AF]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                        </div>
-                    </div>
-                </div>
+           
 
                 <div>
-                    <label class="block text-xs uppercase tracking-widest text-[#9CA3AF] mb-2 font-bold">Vigencia</label>
+                    <label class="block text-xs uppercase tracking-widest text-[#9CA3AF] mb-2 font-bold">Duración</label>
                     <div class="flex gap-2">
                         <input type="date" class="w-full bg-[#1a1a1a] border border-[#374151] text-white p-3 text-sm uppercase">
                         <input type="date" class="w-full bg-[#1a1a1a] border border-[#374151] text-white p-3 text-sm uppercase">
@@ -50,14 +40,14 @@
                 </div>
 
                 <button type="submit" class="w-full py-4 bg-white text-black font-bold uppercase tracking-[0.2em] text-xs hover:bg-[#F3F4F6] transition-colors mt-4">
-                    Crear Campaña
+                    Crear Plan
                 </button>
             </form>
         </div>
 
         <!-- Active Promotions List -->
         <div class="lg:col-span-2 space-y-6">
-            <h2 class="text-lg font-bold uppercase tracking-widest text-white mb-6">Campañas Activas</h2>
+            <h2 class="text-lg font-bold uppercase tracking-widest text-white mb-6">Planes Activos</h2>
             
             <!-- Card 1 -->
             <div class="bg-[#262626] border border-[#374151] p-6 flex justify-between items-center group hover:border-[#F3F4F6] transition-colors">

@@ -1,108 +1,195 @@
 @extends('layouts.dashboard')
 
-@section('title', 'NexoApp - Detalle Negocio')
+@section('title', 'NexoApp - Detalle: ' . $business['nombre'])
 
 @section('content')
-    <!-- Header -->
     <div class="mb-8 border-b border-[#374151] pb-8">
-        <a href="{{ route('dashboard.businesses') }}" class="text-[#9CA3AF] hover:text-white text-xs uppercase tracking-widest mb-4 inline-block flex items-center gap-2">
-            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+        <a href="{{ route('dashboard.businesses') }}"
+            class="text-[#9CA3AF] hover:text-white text-xs uppercase tracking-widest mb-4 inline-block flex items-center gap-2 transition-colors">
+            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+            </svg>
             Volver a la lista
         </a>
-        
+
         <div class="flex justify-between items-start mt-4">
             <div class="flex gap-6">
-                <div class="h-24 w-24 bg-[#374151] rounded-sm flex items-center justify-center text-2xl font-bold text-white shadow-lg">GC</div>
+                <div
+                    class="h-24 w-24 bg-[#374151] rounded-sm flex items-center justify-center text-2xl font-bold text-white shadow-lg">
+                    {{ strtoupper(substr($business['nombre'], 0, 2)) }}
+                </div>
                 <div>
                     <div class="flex items-center gap-3 mb-2">
-                        <h1 class="text-3xl font-bold uppercase tracking-wide text-white">The Gentlemen's Club</h1>
-                        <span class="bg-emerald-500/10 text-emerald-500 px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wide border border-emerald-500/20">Activo</span>
+                        <h1 class="text-3xl font-bold uppercase tracking-wide text-white">{{ $business['nombre'] }}</h1>
+
+                        @php
+                            $status = strtolower($business['estado']);
+                            $statusClass =
+                                $status === 'activo'
+                                    ? 'text-emerald-500 border-emerald-500/20 bg-emerald-500/10'
+                                    : 'text-yellow-500 border-yellow-500/20 bg-yellow-500/10';
+                        @endphp
+
+                        <span
+                            class="{{ $statusClass }} px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wide border">
+                            {{ $status }}
+                        </span>
                     </div>
-                    <p class="text-[#9CA3AF] text-sm mb-4 max-w-xl">Corte clásico y afeitado tradicional con toalla caliente. Una experiencia de lujo atemporal ubicada en el corazón de la ciudad.</p>
-                    
+                    <p class="text-[#9CA3AF] text-sm mb-4 max-w-xl">
+                        Información administrativa del negocio registrado en NexoPlatform.
+                    </p>
+
                     <div class="flex gap-6 text-xs text-[#D1D5DB] tracking-wide">
-                        <span class="flex items-center gap-2"><svg class="w-4 h-4 text-[#9CA3AF]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg> Carlos Martinez</span>
-                        <span class="flex items-center gap-2"><svg class="w-4 h-4 text-[#9CA3AF]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg> carlos@example.com</span>
-                        <span class="flex items-center gap-2"><svg class="w-4 h-4 text-[#9CA3AF]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg> +52 555 123 4567</span>
+                        <span class="flex items-center gap-2"><svg class="w-4 h-4 text-[#9CA3AF]" fill="none"
+                                stroke="currentColor" viewBox="0 0 24 24">
+                                <path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                            </svg>
+                            {{ $business['propietario'] }}
+                        </span>
+                        <span class="flex items-center gap-2"><svg class="w-4 h-4 text-[#9CA3AF]" fill="none"
+                                stroke="currentColor" viewBox="0 0 24 24">
+                                <path
+                                    d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z">
+                                </path>
+                            </svg>
+                            Dueño del Negocio
+                        </span>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Dashboard Grid -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        
-        <!-- Main Info Column -->
+
         <div class="lg:col-span-2 space-y-6">
-            
-            <!-- Stats mocked -->
+
             <div class="grid grid-cols-3 gap-4">
                 <div class="bg-[#262626] border border-[#374151] p-4 rounded-sm text-center">
                     <p class="text-[10px] uppercase tracking-widest text-[#9CA3AF]">Citas Totales</p>
-                    <p class="text-2xl font-bold text-white mt-1">1,245</p>
+                    <p class="text-2xl font-bold text-white mt-1">
+                        {{ number_format($business['citas_total'] ?? 0, 0, ',', '.') }}</p>
                 </div>
                 <div class="bg-[#262626] border border-[#374151] p-4 rounded-sm text-center">
                     <p class="text-[10px] uppercase tracking-widest text-[#9CA3AF]">Valoración</p>
-                    <p class="text-2xl font-bold text-white mt-1">4.9 ★</p>
+                    <p class="text-2xl font-bold text-white mt-1">{{ $business['valoracion'] ?? 'N/A' }} ★</p>
                 </div>
                 <div class="bg-[#262626] border border-[#374151] p-4 rounded-sm text-center">
-                     <p class="text-[10px] uppercase tracking-widest text-[#9CA3AF]">Ingresos (Mes)</p>
-                    <p class="text-2xl font-bold text-emerald-500 mt-1">$3,450</p>
+                    <p class="text-[10px] uppercase tracking-widest text-[#9CA3AF]">Citas (Mes)</p>
+                    <p class="text-2xl font-bold text-emerald-500 mt-1">{{ $business['citas_mes'] ?? 0 }}</p>
                 </div>
             </div>
 
-            <!-- Services Block -->
             <div class="bg-[#262626] border border-[#374151] rounded-sm p-6">
-                <h3 class="text-sm font-bold uppercase tracking-widest text-white mb-4">Servicios Ofrecidos</h3>
+                <h3 class="text-sm font-bold uppercase tracking-widest text-white mb-4">Servicios Ofrecidos
+                    ({{ count($business['servicios'] ?? []) }})</h3>
                 <div class="space-y-3">
-                    <div class="flex justify-between items-center py-2 border-b border-[#374151]/50 last:border-0 last:pb-0">
-                        <span class="text-sm text-[#D1D5DB]">Corte Clásico</span>
-                        <span class="text-sm font-mono text-white">$250</span>
-                    </div>
-                    <div class="flex justify-between items-center py-2 border-b border-[#374151]/50 last:border-0 last:pb-0">
-                        <span class="text-sm text-[#D1D5DB]">Afeitado con Toalla</span>
-                        <span class="text-sm font-mono text-white">$200</span>
-                    </div>
-                    <div class="flex justify-between items-center py-2 border-b border-[#374151]/50 last:border-0 last:pb-0">
-                        <span class="text-sm text-[#D1D5DB]">Paquete Completo</span>
-                        <span class="text-sm font-mono text-white">$400</span>
-                    </div>
+                    @forelse($business['servicios'] ?? [] as $servicio)
+                        <div
+                            class="flex justify-between items-center py-2 border-b border-[#374151]/50 last:border-0 last:pb-0">
+                            <div>
+                                <span class="text-sm text-[#D1D5DB] block">{{ $servicio['nombre_servicio'] }}</span>
+                                <span class="text-[10px] text-[#52525b] uppercase tracking-tighter">
+                                    {{ $servicio['duracion_estimada'] }} MINUTOS
+                                </span>
+                            </div>
+                            <span
+                                class="text-sm font-mono text-white">${{ number_format($servicio['precio'], 0, ',', '.') }}</span>
+                        </div>
+                    @empty
+                        <p class="text-xs text-[#52525b] italic">Este negocio aún no ha registrado servicios.</p>
+                    @endforelse
+                </div>
+            </div>
+
+            <div class="bg-[#262626] border border-[#374151] rounded-sm p-6">
+                <h3 class="text-sm font-bold uppercase tracking-widest text-white mb-4">Equipo de Trabajo</h3>
+                <div class="grid grid-cols-2 gap-4">
+                    @forelse($business['empleados'] ?? [] as $empleado)
+                        <div class="flex items-center gap-3 p-3 bg-[#1a1a1a] border border-[#374151]">
+                            <div
+                                class="w-8 h-8 bg-blue-500/20 text-blue-500 flex items-center justify-center text-[10px] font-bold">
+                                {{ strtoupper(substr($empleado['nombre'], 0, 1)) }}
+                            </div>
+                            <span
+                                class="text-xs text-[#D1D5DB] uppercase tracking-wider font-bold">{{ $empleado['nombre'] }}</span>
+                        </div>
+                    @empty
+                        <p class="text-xs text-[#52525b] italic col-span-2">Sin empleados registrados.</p>
+                    @endforelse
                 </div>
             </div>
 
         </div>
 
-        <!-- Actions Column -->
         <div class="space-y-6">
-            <!-- Plan Management -->
             <div class="bg-[#262626] border border-[#374151] rounded-sm p-6 mb-6">
                 <h3 class="text-sm font-bold uppercase tracking-widest text-white mb-4">Plan & Suscripción</h3>
-                
+
                 <div class="relative w-full mb-4">
-                    <select class="block appearance-none w-full bg-[#1a1a1a] border border-[#374151] text-white py-3 px-4 pr-8 text-xs font-bold uppercase tracking-widest focus:outline-none focus:border-white transition-colors cursor-pointer">
-                        <option>Plan Activo</option>
-                        <option>Plan Inactivo (Vencido)</option>
+                    <select
+                        class="block appearance-none w-full bg-[#1a1a1a] border border-[#374151] text-white py-3 px-4 pr-8 text-xs font-bold uppercase tracking-widest focus:outline-none focus:border-white transition-colors cursor-pointer">
+                        <option selected>{{ $business['plan'] ?? 'SIN PLAN ASIGNADO' }}</option>
+                        <option>Plan Premium</option>
+                        <option>Plan Estándar</option>
                     </select>
                     <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-white">
-                        <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                        <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                            <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
+                        </svg>
                     </div>
                 </div>
 
-                <button class="w-full py-3 bg-emerald-500/10 border border-emerald-500/50 text-emerald-500 text-xs font-bold uppercase tracking-widest hover:bg-emerald-500 hover:text-white transition-all">
+                <button
+                    class="w-full py-3 bg-emerald-500/10 border border-emerald-500/50 text-emerald-500 text-xs font-bold uppercase tracking-widest hover:bg-emerald-500 hover:text-white transition-all">
                     Actualizar Plan
                 </button>
             </div>
 
-            <!-- Moderation Actions -->
             <div class="bg-[#262626] border border-[#374151] rounded-sm p-6">
                 <h3 class="text-sm font-bold uppercase tracking-widest text-white mb-4">Moderación</h3>
-                <p class="text-xs text-[#9CA3AF] mb-6">Gestiona el estado de este negocio en la plataforma.</p>
-                
+                <p class="text-xs text-[#9CA3AF] mb-6">Estado actual:
+                    <strong>{{ strtoupper($business['estado']) }}</strong>
+                </p>
+
                 <div class="space-y-3">
-                    <button class="w-full py-3 bg-red-500/10 border border-red-500/50 text-red-500 text-xs font-bold uppercase tracking-widest hover:bg-red-500 hover:text-white transition-all">
-                        Suspender Negocio
-                    </button>
+                    @php
+                        $currentStatus = $business['estado'] ?? 'pendiente';
+
+                        // Definimos qué estado enviar según el estado actual
+                        $nextStatus = $currentStatus === 'activo' ? 'suspendido' : 'activo';
+
+                        // Colores dinámicos para el botón
+                        $buttonClass =
+                            $currentStatus === 'activo'
+                                ? 'bg-red-500/10 text-red-500 border-red-500/20 hover:bg-red-500/20'
+                                : 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20 hover:bg-emerald-500/20';
+
+                        $buttonText = $currentStatus === 'activo' ? 'Suspender Negocio' : 'Activar Negocio';
+                    @endphp
+
+                    <form action="{{ route('dashboard.businesses.updateStatus', $business['id']) }}" method="POST">
+                        @csrf
+                        @method('PATCH')
+
+                        <input type="hidden" name="estado" value="{{ $nextStatus }}">
+
+                        <button type="submit"
+                            class="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-xl border {{ $buttonClass }} transition-all duration-200 font-medium">
+                            @if ($currentStatus === 'activo')
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            @else
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            @endif
+                            {{ $buttonText }}
+                        </button>
+                    </form>
                 </div>
             </div>
         </div>
