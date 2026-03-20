@@ -22,7 +22,7 @@ class BusinessService
     {
     $endpoint = "https://devlink-servidorapi.td60xq.easypanel.host/api/admin/negocios/{$id}/estado";
 
-    $response = Http::withToken(session('auth_token')) // <--- IMPORTANTE: 'auth_token', no 'api_token'
+    $response = Http::withToken(session('auth_token')) 
         ->asJson()
         ->withoutVerifying()
         ->patch($endpoint, [

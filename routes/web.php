@@ -1,12 +1,13 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\BusinessProfileController;
-use App\Http\Controllers\Admin\ServiceController;
 use App\Http\Controllers\Admin\EmployeeController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\BusinessProfileController;
+use App\Http\Controllers\Admin\BusinessController;
+use App\Http\Controllers\Admin\ServiceController;
+use Illuminate\Support\Facades\Route;
 use Carbon\Carbon;
 
 /*
@@ -107,13 +108,20 @@ Route::middleware(['auth.session', 'inject.api.token', 'role:superusuario'])
         Route::get('/businesses/{id}', [DashboardController::class, 'businessDetail'])->name('businesses.show');
 
         Route::patch('/businesses/{id}/status', [DashboardController::class, 'updateBusinessStatus'])
-    ->name('businesses.updateStatus');
-        
+        ->name('businesses.updateStatus');
+
+        Route::post('/notices', [DashboardController::class, 'storeNotice'])
+        ->name('notices.store');     
+
+        Route::get('/planes', [DashboardController::class, 'planes'])->name('planes.index');
+        Route::post('/planes', [DashboardController::class, 'storePlan'])->name('planes.store');
+
+        Route::get('/suscripciones/pendientes', [DashboardController::class, 'pendingSubscriptions'])->name('subscriptions.pending');
+        Route::post('/suscripciones/{id}/activar', [DashboardController::class, 'activateSubscription'])->name('subscriptions.activate');
 });
 
 
 /*
-|--------------------------------------------------------------------------
 | CALENDARIO DISPONIBILIDAD
 |--------------------------------------------------------------------------
 */
