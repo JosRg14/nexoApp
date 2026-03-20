@@ -2,6 +2,16 @@
 
 @section('title', 'NexoApp - Detalle: ' . $business['nombre'])
 
+@if ($errors->any())
+    <div class="bg-red-500 text-white p-4">
+        <ul>
+            @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+@endif
+
 @section('content')
     <div class="mb-8 border-b border-[#374151] pb-8">
         <a href="{{ route('dashboard.businesses') }}"
@@ -23,7 +33,12 @@
                         <h1 class="text-3xl font-bold uppercase tracking-wide text-white">{{ $business['nombre'] }}</h1>
 
                         @php
-                            $status = strtolower($business['estado']);
+                            // Normalización segura del estado
+                            $currentStatus = is_array($business['estado'])
+                                ? $business['estado']['nombre'] ?? 'pendiente'
+                                : $business['estado'] ?? 'pendiente';
+                            $status = strtolower($currentStatus);
+
                             $statusClass =
                                 $status === 'activo'
                                     ? 'text-emerald-500 border-emerald-500/20 bg-emerald-500/10'
@@ -40,14 +55,14 @@
                     </p>
 
                     <div class="flex gap-6 text-xs text-[#D1D5DB] tracking-wide">
-                        <span class="flex items-center gap-2"><svg class="w-4 h-4 text-[#9CA3AF]" fill="none"
-                                stroke="currentColor" viewBox="0 0 24 24">
+                        <span class="flex items-center gap-2">
+                            <svg class="w-4 h-4 text-[#9CA3AF]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
                             </svg>
-                            {{ $business['propietario'] }}
+                            {{ is_array($business['propietario']) ? $business['propietario']['name'] ?? 'Usuario' : $business['propietario'] }}
                         </span>
-                        <span class="flex items-center gap-2"><svg class="w-4 h-4 text-[#9CA3AF]" fill="none"
-                                stroke="currentColor" viewBox="0 0 24 24">
+                        <span class="flex items-center gap-2">
+                            <svg class="w-4 h-4 text-[#9CA3AF]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path
                                     d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z">
                                 </path>
@@ -61,9 +76,8 @@
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-
         <div class="lg:col-span-2 space-y-6">
-
+            {{-- Stats --}}
             <div class="grid grid-cols-3 gap-4">
                 <div class="bg-[#262626] border border-[#374151] p-4 rounded-sm text-center">
                     <p class="text-[10px] uppercase tracking-widest text-[#9CA3AF]">Citas Totales</p>
@@ -80,6 +94,7 @@
                 </div>
             </div>
 
+            {{-- Servicios --}}
             <div class="bg-[#262626] border border-[#374151] rounded-sm p-6">
                 <h3 class="text-sm font-bold uppercase tracking-widest text-white mb-4">Servicios Ofrecidos
                     ({{ count($business['servicios'] ?? []) }})</h3>
@@ -89,19 +104,20 @@
                             class="flex justify-between items-center py-2 border-b border-[#374151]/50 last:border-0 last:pb-0">
                             <div>
                                 <span class="text-sm text-[#D1D5DB] block">{{ $servicio['nombre_servicio'] }}</span>
-                                <span class="text-[10px] text-[#52525b] uppercase tracking-tighter">
-                                    {{ $servicio['duracion_estimada'] }} MINUTOS
-                                </span>
+                                <span
+                                    class="text-[10px] text-[#52525b] uppercase tracking-tighter">{{ $servicio['duracion_estimada'] }}
+                                    MINUTOS</span>
                             </div>
                             <span
                                 class="text-sm font-mono text-white">${{ number_format($servicio['precio'], 0, ',', '.') }}</span>
                         </div>
                     @empty
-                        <p class="text-xs text-[#52525b] italic">Este negocio aún no ha registrado servicios.</p>
+                        <p class="text-xs text-[#52525b] italic">Sin servicios registrados.</p>
                     @endforelse
                 </div>
             </div>
 
+            {{-- Equipo de Trabajo --}}
             <div class="bg-[#262626] border border-[#374151] rounded-sm p-6">
                 <h3 class="text-sm font-bold uppercase tracking-widest text-white mb-4">Equipo de Trabajo</h3>
                 <div class="grid grid-cols-2 gap-4">
@@ -119,42 +135,85 @@
                     @endforelse
                 </div>
             </div>
-
         </div>
 
         <div class="space-y-6">
-            <div class="bg-[#262626] border border-[#374151] rounded-sm p-6 mb-6">
+            {{-- Plan & Suscripción Dinámico --}}
+            <div class="bg-[#262626] border border-[#374151] rounded-sm p-6">
                 <h3 class="text-sm font-bold uppercase tracking-widest text-white mb-4">Plan & Suscripción</h3>
 
-                <div class="relative w-full mb-4">
-                    <select
-                        class="block appearance-none w-full bg-[#1a1a1a] border border-[#374151] text-white py-3 px-4 pr-8 text-xs font-bold uppercase tracking-widest focus:outline-none focus:border-white transition-colors cursor-pointer">
-                        <option selected>{{ $business['plan'] ?? 'SIN PLAN ASIGNADO' }}</option>
-                        <option>Plan Premium</option>
-                        <option>Plan Estándar</option>
-                    </select>
-                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-white">
-                        <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                            <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
-                        </svg>
-                    </div>
-                </div>
+                @forelse($subscriptions as $sub)
+                    <div
+                        class="mb-6 p-4 bg-[#1a1a1a] border-l-2 {{ $sub['vencida'] ? 'border-red-500' : 'border-emerald-500' }}">
+                        <div class="flex justify-between items-start mb-2">
+                            <span class="text-xs font-bold text-white uppercase tracking-tighter">Plan&nbsp;
+                                {{ $sub['plan'] }}</span>
+                            <span
+                                class="text-[10px] uppercase px-2 py-0.5 rounded {{ $sub['vencida'] ? 'bg-red-500/10 text-red-500' : 'bg-emerald-500/10 text-emerald-500' }}">
+                                {{ $sub['estado'] }}
+                            </span>
+                        </div>
 
-                <button
-                    class="w-full py-3 bg-emerald-500/10 border border-emerald-500/50 text-emerald-500 text-xs font-bold uppercase tracking-widest hover:bg-emerald-500 hover:text-white transition-all">
-                    Actualizar Plan
-                </button>
+                        <div class="space-y-1">
+                            <p class="text-[10px] text-[#9CA3AF] uppercase">Vencimiento:
+                                <span
+                                    class="text-white">{{ \Carbon\Carbon::parse($sub['fecha_vencimiento'])->format('d/m/Y') }}</span>
+                            </p>
+                            <p class="text-[10px] text-[#9CA3AF] uppercase">Costo:
+                                <span class="text-white">${{ number_format($sub['costo'], 0, ',', ',') }}</span>
+                            </p>
+                        </div>
+                    </div>
+                @empty
+                    <p class="text-xs text-[#52525b] italic mb-4">No hay suscripciones activas.</p>
+                @endforelse
+
+                {{-- Selector de Cambio de Plan --}}
+                {{-- Selector de Cambio de Plan --}}
+                <form action="{{ route('dashboard.plans.assign') }}" method="POST">
+                    @csrf
+                    <input type="hidden" name="negocio_id" value="{{ $business['id'] }}">
+
+                    <div class="relative w-full mb-4">
+                        <select name="suscripcion_id" required
+                            class="block appearance-none w-full bg-[#1a1a1a] border border-[#374151] text-white py-3 px-4 pr-8 text-xs font-bold uppercase tracking-widest focus:outline-none focus:border-white transition-colors cursor-pointer">
+                            <option value="" disabled selected>SELECCIONAR NUEVO PLAN</option>
+                            @foreach ($planesDisponibles as $plan)
+                                {{-- Opcional: Mostrar el costo también ayuda al admin --}}
+                                <option value="{{ $plan['id'] }}">
+                                    {{ strtoupper($plan['tipo']) }} - ${{ number_format($plan['costo'], 0, ',', ',') }}
+                                </option>
+                            @endforeach
+                        </select>
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-white">
+                            <svg class="fill-current h-4 w-4" viewBox="0 0 20 20">
+                                <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
+                            </svg>
+                        </div>
+                    </div>
+
+                    <button type="submit"
+                        class="w-full py-3 bg-emerald-500/10 border border-emerald-500/50 text-emerald-500 text-xs font-bold uppercase tracking-widest hover:bg-emerald-500 hover:text-white transition-all">
+                        Actualizar Plan
+                    </button>
+                </form>
             </div>
 
+            {{-- Moderación --}}
             <div class="bg-[#262626] border border-[#374151] rounded-sm p-6">
                 <h3 class="text-sm font-bold uppercase tracking-widest text-white mb-4">Moderación</h3>
                 <p class="text-xs text-[#9CA3AF] mb-6">Estado actual:
-                    <strong>{{ strtoupper($business['estado']) }}</strong>
+                    {{-- Protegemos el strtoupper por si 'estado' fuera array --}}
+                    <strong>{{ strtoupper(is_array($business['estado']) ? $business['estado']['nombre'] ?? 'pendiente' : $business['estado'] ?? 'pendiente') }}</strong>
                 </p>
 
                 <div class="space-y-3">
                     @php
-                        $currentStatus = $business['estado'] ?? 'pendiente';
+                        // Normalizamos el estado actual para la lógica interna
+                        $rawStatus = is_array($business['estado'])
+                            ? $business['estado']['nombre'] ?? 'pendiente'
+                            : $business['estado'] ?? 'pendiente';
+                        $currentStatus = strtolower($rawStatus);
 
                         // Definimos qué estado enviar según el estado actual
                         $nextStatus = $currentStatus === 'activo' ? 'suspendido' : 'activo';
@@ -193,6 +252,5 @@
                 </div>
             </div>
         </div>
-
     </div>
 @endsection

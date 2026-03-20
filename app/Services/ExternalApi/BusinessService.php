@@ -1,5 +1,7 @@
 <?php
+
 namespace App\Services\ExternalApi;
+
 use Illuminate\Support\Facades\Http;
 
 class BusinessService
@@ -13,27 +15,39 @@ class BusinessService
 
     public function find($id)
     {
-        // Cambiamos 'http' por 'client' y quitamos 'json()' 
+        // Cambiamos 'http' por 'client' y quitamos 'json()'
         // para que use TU lógica de HttpClient
         return $this->client->get("/api/admin/negocios/{$id}");
     }
 
     public function updateStatus($id, $status)
     {
-    $endpoint = "https://devlink-servidorapi.td60xq.easypanel.host/api/admin/negocios/{$id}/estado";
+        $endpoint = "https://devlink-servidorapi.td60xq.easypanel.host/api/admin/negocios/{$id}/estado";
 
-    $response = Http::withToken(session('auth_token')) 
-        ->asJson()
-        ->withoutVerifying()
-        ->patch($endpoint, [
-            'estado' => $status
-        ]);
+        $response = Http::withToken(session('auth_token'))
+            ->asJson()
+            ->withoutVerifying()
+            ->patch($endpoint, [
+                'estado' => $status,
+            ]);
 
-    return $response->json();
+        return $response->json();
     }
 
     public function list(array $filters = []): array
     {
         return $this->client->get('/api/admin/negocios', $filters);
+    }
+
+    public function getSubscriptions($id)
+    {
+        $response = Http::withToken(session('api_token'))
+            ->get("{$this->baseUrl}/admin/negocios/{$id}/suscripciones");
+
+        if ($response->failed()) {
+            throw new \RuntimeException('No se pudo obtener la información de suscripciones.');
+        }
+
+        return $response->json();
     }
 }

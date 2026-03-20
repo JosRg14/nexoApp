@@ -1,14 +1,13 @@
 <?php
 
 use App\Http\Controllers\Admin\EmployeeController;
-use App\Http\Controllers\AuthController;
-use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\BusinessProfileController;
-use App\Http\Controllers\Admin\BusinessController;
 use App\Http\Controllers\Admin\ServiceController;
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\BusinessProfileController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ProfileController;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -17,7 +16,6 @@ use Carbon\Carbon;
 */
 
 Route::get('/profile', [ProfileController::class, 'index'])->name('profile.show');
-
 
 /*
 |--------------------------------------------------------------------------
@@ -33,14 +31,13 @@ Route::get('/service/view', function () {
     return view('service.view');
 })->name('service.show');
 
-
 /*
 |--------------------------------------------------------------------------
 | PANEL ADMIN NEGOCIO
 |--------------------------------------------------------------------------
 */
 
-Route::middleware(['auth.session','inject.api.token','role:admin'])
+Route::middleware(['auth.session', 'inject.api.token', 'role:admin'])
     ->prefix('business')
     ->name('business.')
     ->group(function () {
@@ -51,7 +48,6 @@ Route::middleware(['auth.session','inject.api.token','role:admin'])
 
         Route::post('/update', [BusinessProfileController::class, 'update'])
             ->name('update');
-
 
         /*
         |--------------------------------------------------------------------------
@@ -68,7 +64,6 @@ Route::middleware(['auth.session','inject.api.token','role:admin'])
         Route::delete('/services/{id}', [ServiceController::class, 'destroy'])
             ->name('services.destroy');
 
-
         /*
         |--------------------------------------------------------------------------
         | EMPLEADOS
@@ -81,10 +76,9 @@ Route::middleware(['auth.session','inject.api.token','role:admin'])
         Route::delete('/employees/{id}', [EmployeeController::class, 'destroy'])
             ->name('employees.destroy');
 
-        Route::put('/employees/{id}',[EmployeeController::class,'update'])
+        Route::put('/employees/{id}', [EmployeeController::class, 'update'])
             ->name('employees.update');
-});
-
+    });
 
 /*
 |--------------------------------------------------------------------------
@@ -99,27 +93,43 @@ Route::middleware(['auth.session', 'inject.api.token', 'role:superusuario'])
 
         Route::get('/', [DashboardController::class, 'index'])->name('index');
 
-        Route::get('/promotions', [DashboardController::class, 'promotions'])->name('promotions');
+        // Negocios
+        Route::get('/businesses', [DashboardController::class, 'businesses'])->name('businesses');
+        Route::get('/businesses/{id}', [DashboardController::class, 'businessDetail'])->name('businesses.show');
+        // Si usas controladores tipo API o normales, añade esta línea:
+        Route::patch('/businesses/{id}/status', [App\Http\Controllers\DashboardController::class, 'updateStatus'])
+            ->name('businesses.updateStatus');
 
+        // Promociones y Avisos    
+        Route::get('/promotions', [DashboardController::class, 'promotions'])->name('promotions');
         Route::get('/notices', [DashboardController::class, 'notices'])->name('notices');
 
-        Route::get('/businesses', [DashboardController::class, 'businesses'])->name('businesses');
-
-        Route::get('/businesses/{id}', [DashboardController::class, 'businessDetail'])->name('businesses.show');
-
-        Route::patch('/businesses/{id}/status', [DashboardController::class, 'updateBusinessStatus'])
-        ->name('businesses.updateStatus');
-
-        Route::post('/notices', [DashboardController::class, 'storeNotice'])
-        ->name('notices.store');     
-
+        // Planes (CRUD)
         Route::get('/planes', [DashboardController::class, 'planes'])->name('planes.index');
         Route::post('/planes', [DashboardController::class, 'storePlan'])->name('planes.store');
+        Route::put('/planes/{id}', [DashboardController::class, 'updatePlan'])->name('planes.update');
+        Route::delete('/planes/{id}', [DashboardController::class, 'destroyPlan'])->name('planes.destroy');
 
-        Route::get('/suscripciones/pendientes', [DashboardController::class, 'pendingSubscriptions'])->name('subscriptions.pending');
-        Route::post('/suscripciones/{id}/activar', [DashboardController::class, 'activateSubscription'])->name('subscriptions.activate');
-});
+        // Avisos / Notificaciones
+        Route::get('/notices', [DashboardController::class, 'notices'])->name('notices');
+        Route::post('/notices', [DashboardController::class, 'storeNotice'])->name('notices.store');
 
+        // Ruta para asignar un plan a un negocio (si es necesario)
+        Route::post('/planes/asignar', [App\Http\Controllers\DashboardController::class, 'assignPlan'])
+        ->name('plans.assign');
+
+        // Suscripciones (Lógica de Pagos)
+        // Quitamos el prefijo 'dashboard/' de aquí porque el grupo principal ya lo pone
+        Route::prefix('suscripciones')->name('subscriptions.')->group(function () {
+            // Esta es para la lista general si la necesitas
+            Route::get('/pendientes', [DashboardController::class, 'pendingSubscriptions'])->name('pending');
+            // Rutas para la gestión de suscripciones (Activación y Rechazo)
+            Route::post('/{id}/activar', [DashboardController::class, 'activateSubscription'])->name('subscriptions.activate');
+            Route::post('/{id}/rechazar', [DashboardController::class, 'rejectSubscription'])->name('subscriptions.reject');
+            Route::post('/verificar-vencimientos', [DashboardController::class, 'verificarVencimientos'])->name('verificar');
+
+        });
+    });
 
 /*
 | CALENDARIO DISPONIBILIDAD
@@ -151,17 +161,16 @@ Route::get('/booking/availability', function () {
 
         'prevLink' => route('booking.availability', [
             'month' => $prevDate->month,
-            'year' => $prevDate->year
+            'year' => $prevDate->year,
         ]),
 
         'nextLink' => route('booking.availability', [
             'month' => $nextDate->month,
-            'year' => $nextDate->year
+            'year' => $nextDate->year,
         ]),
     ]);
 
 })->name('booking.availability');
-
 
 /*
 |--------------------------------------------------------------------------
@@ -175,7 +184,6 @@ Route::post('/proxy/register-client', [AuthController::class, 'registerCliente']
 
 Route::post('/proxy/register-admin', [AuthController::class, 'registerAdmin']);
 
-
 /*
 |--------------------------------------------------------------------------
 | HOME
@@ -188,9 +196,9 @@ Route::get('/', function () {
 
 Route::post('/logout', function () {
     session()->flush();
+
     return redirect('/');
 });
-
 
 /*
 |--------------------------------------------------------------------------
