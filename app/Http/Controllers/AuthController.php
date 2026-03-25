@@ -203,5 +203,37 @@ public function showClientRegister()
         return redirect()->route('home');
     }
 
+    public function googleCallback(Request $request)
+    {
+        $response = Http::withHeaders([
+            'Accept' => 'application/json'
+        ])->get(config('services.api.url') . '/auth/google/callback', [
+            'code' => $request->code,
+            'state' => $request->state,
+        ]);
+
+        if ($response->successful()) {
+            $data = $response->json();
+            
+            if ($data['success']) {
+                $usuario = $data['data']['usuario']; 
+                session([
+                    'auth_token' => $data['data']['token'],
+                    'rol' => $usuario['rol'],
+                    'usuario' => $usuario,
+                ]);
+
+                if ($usuario['rol'] === 'admin') {
+                    return redirect($data['data']['registro_pendiente'] ? '/completar-negocio' : '/admin/dashboard');
+                } else {
+                    return redirect('/');
+                }
+            }
+        }
+
+        $mensaje = $response->json()['message'] ?? 'Error al autenticar con Google';
+        return redirect('/register')->with('error', $mensaje);
+    }
+
 
 }

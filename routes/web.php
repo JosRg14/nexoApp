@@ -217,3 +217,11 @@ Route::middleware(['guest.session'])->group(function () {
     Route::get('/register/client', [AuthController::class, 'showClientRegister'])->name('register.client');
 
 });
+
+/*
+|-------------------------------------------------------------------------
+| RUTA DE CALLBACK GOOGLE
+|-------------------------------------------------------------------------
+*/
+
+Route::get('/auth/google/callback', [AuthController::class, 'googleCallback']);

@@ -21,12 +21,13 @@
                 <p class="text-[#9CA3AF] text-lg leading-relaxed max-w-2xl border-l border-[#374151] pl-6">
                     Conectamos necesidades con soluciones. Descubre una red exclusiva de servicios y negocios curados para ofrecerte la mejor experiencia en tu ciudad. Calidad, rapidez y estilo en un solo lugar.
                 </p>
-
+                @if(!session()->has('rol'))
                 <div class="pt-4">
                     <a href="/register" class="inline-block py-4 px-10 bg-[#1a1a1a] border border-[#F3F4F6] text-[#F3F4F6] text-sm font-bold uppercase tracking-[0.2em] hover:bg-[#F3F4F6] hover:text-[#1a1a1a] transition-all duration-300">
                         Empezar Ahora
                     </a>
                 </div>
+                @endif
             </div>
         </section>
 

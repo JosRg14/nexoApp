@@ -94,6 +94,18 @@
                         </button>
                     </div>
 
+                    <div class="flex items-center my-4">
+                        <div class="flex-grow border-t border-[#374151]"></div>
+                        <span class="px-4 text-[#9CA3AF] text-[10px] uppercase tracking-widest">O</span>
+                        <div class="flex-grow border-t border-[#374151]"></div>
+                    </div>
+
+                    <div>
+                        <button type="button" onclick="registrarClienteConGoogle()" class="w-full py-4 px-6 bg-transparent text-white font-bold tracking-widest uppercase text-sm border border-[#374151] transition-all duration-300 hover:bg-[#EA4335] hover:border-transparent flex items-center justify-center">
+                            <i class="fa-brands fa-google mr-3"></i> Continuar con Google
+                        </button>
+                    </div>
+
                 </form>
             </div>
         </div>
@@ -121,6 +133,11 @@
     </div>
 
 <script>
+
+function registrarClienteConGoogle() {
+    window.location.href = 'https://devlink-servidorapi.td60xq.easypanel.host/auth/google?rol=cliente';
+}
+
 document.getElementById('registerForm').addEventListener('submit', async function(e) {
     e.preventDefault();
 
