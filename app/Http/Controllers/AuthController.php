@@ -203,6 +203,17 @@ public function showClientRegister()
         return redirect()->route('home');
     }
 
+    public function redirectToGoogle(Request $request)
+    {
+        $rol = $request->query('rol', 'cliente');
+        if (!in_array($rol, ['admin', 'cliente'])) {
+            $rol = 'cliente';
+        }
+
+        return redirect(config('services.api.url') . '/auth/google?rol=' . $rol);
+    }
+
+
     public function googleCallback(Request $request)
     {
         $response = Http::withHeaders(['Accept' => 'application/json'])
@@ -224,25 +235,17 @@ public function showClientRegister()
             $rol = $data['usuario']['rol'];
             
             if ($rol === 'admin') {
-                return $data['registro_pendiente'] 
+                $necesitaCompletar = $data['necesita_completar_registro'] ?? false;
+
+                return $necesitaCompletar 
                     ? redirect('/completar-negocio') 
                     : redirect('/admin/dashboard');
             }
 
-            return redirect('/cliente/mis-citas');
+            return redirect('/');
         }
 
         return redirect('/login')->with('error', 'Error al sincronizar con Google');
-    }
-
-    public function redirectToGoogle(Request $request)
-    {
-        $rol = $request->query('rol', 'cliente');
-        if (!in_array($rol, ['admin', 'cliente'])) {
-            $rol = 'cliente';
-        }
-
-        return redirect(config('services.api.url') . '/auth/google?rol=' . $rol);
     }
 
 }
