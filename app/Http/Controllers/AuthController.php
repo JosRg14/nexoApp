@@ -199,8 +199,22 @@ public function showClientRegister()
 
     public function logout()
     {
+        $token = session('auth_token');
+
+        if ($token) {
+            try {
+                Http::withHeaders([
+                    'Accept' => 'application/json',
+                    'Authorization' => 'Bearer ' . $token,
+                ])->post(config('services.api.url') . '/api/logout');
+            } catch (\Exception $e) {
+                logger("Error al cerrar sesión en API: " . $e->getMessage());
+            }
+        }
+
         session()->flush();
-        return redirect()->route('home');
+
+        return redirect('/')->with('message', 'Sesión cerrada correctamente');
     }
 
     public function redirectToGoogle(Request $request)

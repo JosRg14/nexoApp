@@ -194,12 +194,8 @@ Route::get('/', function () {
     return view('home');
 })->name('home');
 
-Route::post('/logout', function () {
-    session()->flush();
-
-    return redirect('/');
-});
-
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+    
 /*
 |--------------------------------------------------------------------------
 | RUTAS SOLO PARA INVITADOS
