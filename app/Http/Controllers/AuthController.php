@@ -205,35 +205,44 @@ public function showClientRegister()
 
     public function googleCallback(Request $request)
     {
-        $response = Http::withHeaders([
-            'Accept' => 'application/json'
-        ])->get(config('services.api.url') . '/auth/google/callback', [
-            'code' => $request->code,
-            'state' => $request->state,
-        ]);
+        $response = Http::withHeaders(['Accept' => 'application/json'])
+            ->get("https://devlink-servidorapi.td60xq.easypanel.host/api/auth/google/callback", [
+                'code' => $request->code,
+                'state' => $request->state,
+            ]);
 
         if ($response->successful()) {
-            $data = $response->json();
-            
-            if ($data['success']) {
-                $usuario = $data['data']['usuario']; 
-                session([
-                    'auth_token' => $data['data']['token'],
-                    'rol' => $usuario['rol'],
-                    'usuario' => $usuario,
-                ]);
+            $resData = $response->json();
+            $data = $resData['data'];
 
-                if ($usuario['rol'] === 'admin') {
-                    return redirect($data['data']['registro_pendiente'] ? '/completar-negocio' : '/admin/dashboard');
-                } else {
-                    return redirect('/');
-                }
+            session([
+                'auth_token' => $data['token'],
+                'rol'        => $data['usuario']['rol'],
+                'usuario'    => $data['usuario'],
+            ]);
+
+            $rol = $data['usuario']['rol'];
+            
+            if ($rol === 'admin') {
+                return $data['registro_pendiente'] 
+                    ? redirect('/completar-negocio') 
+                    : redirect('/admin/dashboard');
             }
+
+            return redirect('/cliente/mis-citas');
         }
 
-        $mensaje = $response->json()['message'] ?? 'Error al autenticar con Google';
-        return redirect('/register')->with('error', $mensaje);
+        return redirect('/login')->with('error', 'Error al sincronizar con Google');
     }
 
+public function redirectToGoogle(Request $request)
+{
+    $rol = $request->query('rol', 'cliente');
+    if (!in_array($rol, ['admin', 'cliente'])) {
+        $rol = 'cliente';
+    }
+
+    return redirect("https://devlink-servidorapi.td60xq.easypanel.host/auth/google?rol=" . $rol);
+}
 
 }

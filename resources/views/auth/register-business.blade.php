@@ -126,7 +126,7 @@
 <script>
 
 function registrarAdminConGoogle() {
-  window.location.href = 'https://devlink-servidorapi.td60xq.easypanel.host/auth/google?rol=admin';
+    window.location.href = '/auth/google?rol=admin';
 }
 
 document.addEventListener('DOMContentLoaded', function () {

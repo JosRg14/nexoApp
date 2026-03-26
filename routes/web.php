@@ -224,4 +224,6 @@ Route::middleware(['guest.session'])->group(function () {
 |-------------------------------------------------------------------------
 */
 
+Route::get('/auth/google', [AuthController::class, 'redirectToGoogle']);
+
 Route::get('/auth/google/callback', [AuthController::class, 'googleCallback']);

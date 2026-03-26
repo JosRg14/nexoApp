@@ -135,7 +135,7 @@
 <script>
 
 function registrarClienteConGoogle() {
-    window.location.href = 'https://devlink-servidorapi.td60xq.easypanel.host/auth/google?rol=cliente';
+    window.location.href = '/auth/google?rol=cliente';
 }
 
 document.getElementById('registerForm').addEventListener('submit', async function(e) {
