@@ -227,7 +227,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     let currentIndex = 0;
     let autoPlayInterval;
-    const autoPlayDelay = 5000; // 5 segundos
+    const autoPlayDelay = 4000; // 4 segundos
     
     const track = document.querySelector('.service-carousel-track');
     const prevBtn = document.getElementById('prevService');
