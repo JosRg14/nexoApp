@@ -14,7 +14,7 @@ class HomeController extends Controller
     public function index()
     {
         // Consumir la API para obtener los negocios
-        $response = Http::timeout(10)->get(config('services.api.url') . '/api/negocios');
+        $response = Http::timeout(30)->get(config('services.api.url') . '/api/negocios');
         
         $negocios = [];
         

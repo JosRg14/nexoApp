@@ -9,6 +9,7 @@ use App\Http\Controllers\ProfileController;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\NegocioController;
 
 /*
 |--------------------------------------------------------------------------
@@ -32,6 +33,8 @@ Route::get('/service/view', function () {
     return view('service.view');
 })->name('service.show');
 
+//pagina publica de detalle de negocio
+Route::get('/negocio/{id}', [NegocioController::class, 'show'])->name('negocio.show');
 /*
 |--------------------------------------------------------------------------
 | PANEL ADMIN NEGOCIO
