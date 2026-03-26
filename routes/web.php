@@ -8,6 +8,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProfileController;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\HomeController;
 
 /*
 |--------------------------------------------------------------------------
@@ -190,9 +191,8 @@ Route::post('/proxy/register-admin', [AuthController::class, 'registerAdmin']);
 |--------------------------------------------------------------------------
 */
 
-Route::get('/', function () {
-    return view('home');
-})->name('home');
+
+Route::get('/', [HomeController::class, 'index'])->name('home');
 
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     

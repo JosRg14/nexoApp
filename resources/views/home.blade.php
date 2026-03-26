@@ -4,9 +4,6 @@
 
 @section('content')
 
-
-
-
     <!-- Main Content -->
     <main class="flex-grow">
         
@@ -37,7 +34,6 @@
             <!-- Filter Bar -->
             <div class="flex flex-wrap gap-4 mb-12 border-b border-[#374151] pb-6 items-center justify-between">
                 <div class="flex gap-4">
-                     <!-- Filter Pill -->
                     <button class="px-4 py-1.5 border border-[#374151] text-[#9CA3AF] text-[10px] uppercase tracking-widest hover:border-white hover:text-white transition-all">
                         Ordenar
                     </button>
@@ -49,7 +45,7 @@
                     </button>
                 </div>
                 <div class="text-[#374151] text-xs uppercase tracking-widest">
-                    Mostrando Resultados
+                    Mostrando {{ count($negocios) }} resultados
                 </div>
             </div>
 
@@ -61,57 +57,45 @@
                 </h2>
             </div>
 
-            <!-- Grid -->
+            <!-- Grid de Negocios desde API -->
+            @if(count($negocios) > 0)
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <!-- Barbershops Data -->
-                @php
-                    $barbershops = [
-                        [
-                            'name' => 'The Gentlemen\'s Club',
-                            'desc' => 'Corte clásico y afeitado tradicional con toalla caliente. Una experiencia de lujo atemporal.',
-                            'tag' => '4.9 ★'
-                        ],
-                        [
-                            'name' => 'Urban Fade Studio',
-                            'desc' => 'Especialistas en degradados, diseños urbanos y las últimas tendencias en estilismo masculino.',
-                            'tag' => 'NEW'
-                        ],
-                        [
-                            'name' => 'Razor & Blade',
-                            'desc' => 'Barbería ejecutiva de alto nivel. Servicio exclusivo bajo reserva para el hombre moderno.',
-                            'tag' => '5.0 ★'
-                        ],
-                        [
-                            'name' => 'Legacy Barbershop',
-                            'desc' => 'Heredando la tradición del buen corte. Ambiente clásico, música jazz y whiskey de cortesía.',
-                            'tag' => 'TOP'
-                        ]
-                    ];
-                @endphp
-
-                @foreach ($barbershops as $index => $shop)
-                <article onclick="window.location.href='{{ $index === 0 ? '/business/view' : '#' }}'" class="group relative flex flex-col bg-[#1a1a1a] border border-[#374151]/50 hover:border-[#F3F4F6]/50 transition-all duration-500 cursor-pointer">
+                @foreach ($negocios as $negocio)
+                <article onclick="window.location.href='/negocio/{{ $negocio['id_negocio'] ?? $negocio['id'] }}'" 
+                         class="group relative flex flex-col bg-[#1a1a1a] border border-[#374151]/50 hover:border-[#F3F4F6]/50 transition-all duration-500 cursor-pointer">
+                    
                     <!-- Image Area -->
                     <div class="aspect-[4/5] bg-[#0f0f0f] relative overflow-hidden">
+                        @if(isset($negocio['foto_perfil']) && $negocio['foto_perfil'])
+                            <img src="{{ $negocio['foto_perfil'] }}" 
+                                 alt="{{ $negocio['nombre'] }}"
+                                 class="w-full h-full object-cover">
+                        @else
+                            <div class="absolute inset-0 flex items-center justify-center opacity-20">
+                                <svg class="w-16 h-16 text-[#374151]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="0.5" d="M14.121 15.536c-1.171 1.952-3.07 1.952-4.242 0-1.172-1.953-1.172-5.119 0-7.072 1.171-1.952 3.07-1.952 4.242 0M8 10.5h4m-4 3h4m9-1.5a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                            </div>
+                        @endif
                         <div class="absolute inset-0 bg-transparent group-hover:bg-white/5 transition-colors duration-300"></div>
-                        <!-- Abstract Barber Icon/Placeholder -->
-                        <div class="absolute inset-0 flex items-center justify-center opacity-20">
-                            <!-- Simple scissors/razor abstract representation or just geometric -->
-                            <svg class="w-16 h-16 text-[#374151]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="0.5" d="M14.121 15.536c-1.171 1.952-3.07 1.952-4.242 0-1.172-1.953-1.172-5.119 0-7.072 1.171-1.952 3.07-1.952 4.242 0M8 10.5h4m-4 3h4m9-1.5a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                        </div>
                     </div>
                     
                     <!-- Content -->
                     <div class="p-6">
                         <div class="flex justify-between items-start mb-3">
                             <h3 class="text-white font-bold uppercase tracking-wide text-sm group-hover:text-[#9CA3AF] transition-colors">
-                                {{ $shop['name'] }}
+                                {{ $negocio['nombre'] }}
                             </h3>
-                            <span class="text-[10px] text-[#F3F4F6] bg-[#374151]/50 px-2 py-1 tracking-widest">{{ $shop['tag'] }}</span>
+                            <span class="text-[10px] text-[#F3F4F6] bg-[#374151]/50 px-2 py-1 tracking-widest">
+                                {{ isset($negocio['calificacion']) ? number_format($negocio['calificacion'], 1) . ' ★' : 'NUEVO' }}
+                            </span>
                         </div>
                         <p class="text-[#9CA3AF] text-xs leading-relaxed border-l border-[#374151] pl-3 py-1">
-                            {{ $shop['desc'] }}
+                            {{ $negocio['acerca_de'] ?? 'Descubre los mejores servicios en ' . $negocio['nombre'] }}
                         </p>
+                        <div class="mt-3 text-[10px] text-[#9CA3AF] uppercase tracking-wider">
+                            {{ ucfirst($negocio['tipo_negocio'] ?? 'Barbería') }}
+                        </div>
                     </div>
                     
                     <!-- Hover Action -->
@@ -120,8 +104,26 @@
                 @endforeach
             </div>
 
+            <!-- Contador de resultados al final -->
+            <div class="text-center mt-12 text-[#374151] text-xs uppercase tracking-widest">
+                Mostrando {{ count($negocios) }} negocios registrados
+            </div>
+
+            @else
+            <!-- Mensaje cuando no hay negocios -->
+            <div class="text-center py-20">
+                <div class="text-[#9CA3AF] text-lg mb-4">No hay negocios registrados aún</div>
+                <p class="text-[#374151] text-sm">Sé el primero en registrar tu negocio</p>
+                @if(!session()->has('rol'))
+                <a href="/register" class="inline-block mt-6 py-2 px-6 border border-[#F3F4F6] text-white text-sm hover:bg-white hover:text-black transition-colors">
+                    Registrar Negocio
+                </a>
+                @endif
+            </div>
+            @endif
+
         </section>
 
     </main>
 
-    @endsection
+@endsection
