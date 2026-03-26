@@ -206,7 +206,7 @@ public function showClientRegister()
     public function googleCallback(Request $request)
     {
         $response = Http::withHeaders(['Accept' => 'application/json'])
-            ->get("https://devlink-servidorapi.td60xq.easypanel.host/api/auth/google/callback", [
+            ->get(config('services.api.url') . '/auth/google/callback', [
                 'code' => $request->code,
                 'state' => $request->state,
             ]);
@@ -235,14 +235,14 @@ public function showClientRegister()
         return redirect('/login')->with('error', 'Error al sincronizar con Google');
     }
 
-public function redirectToGoogle(Request $request)
-{
-    $rol = $request->query('rol', 'cliente');
-    if (!in_array($rol, ['admin', 'cliente'])) {
-        $rol = 'cliente';
-    }
+    public function redirectToGoogle(Request $request)
+    {
+        $rol = $request->query('rol', 'cliente');
+        if (!in_array($rol, ['admin', 'cliente'])) {
+            $rol = 'cliente';
+        }
 
-    return redirect("https://devlink-servidorapi.td60xq.easypanel.host/auth/google?rol=" . $rol);
-}
+        return redirect(config('services.api.url') . 'auth/google?rol=' . $rol);
+    }
 
 }
