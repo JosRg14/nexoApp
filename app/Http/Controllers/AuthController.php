@@ -242,7 +242,7 @@ public function showClientRegister()
             $rol = 'cliente';
         }
 
-        return redirect(config('services.api.url') . 'auth/google?rol=' . $rol);
+        return redirect(config('services.api.url') . '/auth/google?rol=' . $rol);
     }
 
 }
