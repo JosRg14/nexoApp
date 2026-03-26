@@ -29,46 +29,52 @@ class BusinessProfileController extends Controller
 
         try {
 
-            // Obtener negocio
+            // Obtener negocio del admin autenticado
             $responseNegocio = $this->serviceService->getBusiness();
             $negocio = $responseNegocio['data'] ?? [];
 
-            // Obtener servicios
-            $responseServices = $this->serviceService->list();
+            // Obtener el ID del negocio
+            $negocioId = $negocio['id_negocio'] ?? null;
+
+            // Obtener servicios SOLO de este negocio
+            $params = [];
+            if ($negocioId) {
+                $params['negocio_id'] = $negocioId;
+            }
+            
+            $responseServices = $this->serviceService->list($params);
 
             $services = collect($responseServices['data'] ?? [])->map(function ($item) {
                 return [
-                    'id' => $item['id'] ?? null,
-                    'nombre' => $item['nombre'] ?? '',
+                    'id' => $item['id_servicio'] ?? $item['id'],
+                    'nombre' => $item['nombre_servicio'] ?? $item['nombre'],
                     'descripcion' => $item['descripcion'] ?? '',
                     'precio' => $item['precio'] ?? 0,
-                    'duracion' => $item['duracion'] ?? 0,
+                    'duracion' => $item['duracion_estimada'] ?? $item['duracion'] ?? 0,
                     'imagen' => isset($item['imagen'])
                         ? rtrim(config('services.api.url'), '/') . '/' . ltrim($item['imagen'], '/')
                         : null,
                 ];
             })->toArray();
 
-            // Obtener empleados
-            $responseEmployees = $this->employeeService->list();
+            // Obtener empleados SOLO de este negocio
+            $responseEmployees = $this->employeeService->list($params);
 
-            $employees = collect($responseEmployees['data'] ?? [])
-->map(function ($emp) {
-    return [
-        'id_empleado' => $emp['id_empleado'] ?? null,
-        'nombre' => $emp['nombre'] ?? '',
-        'app_paterno' => $emp['app_paterno'] ?? '',
-        'app_materno' => $emp['app_materno'] ?? '',
-        'correo' => $emp['correo'] ?? '',
-        'comision' => $emp['comision'] ?? 0,
-        'estado' => $emp['estado'] ?? 'activo'
-    ];
-})->toArray();
-
+            $employees = collect($responseEmployees['data'] ?? [])->map(function ($emp) {
+                return [
+                    'id_empleado' => $emp['id_empleado'] ?? null,
+                    'nombre' => $emp['nombre'] ?? '',
+                    'app_paterno' => $emp['app_paterno'] ?? '',
+                    'app_materno' => $emp['app_materno'] ?? '',
+                    'correo' => $emp['correo'] ?? '',
+                    'comision' => $emp['comision'] ?? 0,
+                    'estado' => $emp['estado'] ?? 'activo'
+                ];
+            })->toArray();
 
         } catch (\Exception $e) {
-
             $negocio = session('negocio');
+            \Log::error('Error en BusinessProfileController: ' . $e->getMessage());
         }
 
         return view('business.profile', [

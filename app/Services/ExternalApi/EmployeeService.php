@@ -11,9 +11,11 @@ class EmployeeService
         $this->client = $client;
     }
 
-    public function list()
+    public function list(array $params = [])
     {
-        return $this->client->get('/api/empleados');
+        $query = http_build_query($params);
+        $url = '/api/empleados' . ($query ? '?' . $query : '');
+        return $this->client->get($url);
     }
 
     public function create(array $data)
