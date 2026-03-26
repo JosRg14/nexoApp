@@ -238,8 +238,8 @@ public function showClientRegister()
                 $necesitaCompletar = $data['necesita_completar_registro'] ?? false;
 
                 return $necesitaCompletar 
-                    ? redirect('/completar-negocio') 
-                    : redirect('/admin/dashboard');
+                    ? redirect('/business/profile') 
+                    : redirect('/business/profile');
             }
 
             return redirect('/');
