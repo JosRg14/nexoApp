@@ -110,30 +110,241 @@
                 </div>
                 @endif
                 
-                <!-- Servicios -->
-                <div class="bg-[#262626] border border-[#374151] rounded-sm p-6">
-                    <h3 class="text-sm font-bold uppercase tracking-widest text-white mb-4 flex items-center gap-2">
-                        <i class="fas fa-cut"></i> Servicios Ofrecidos ({{ count($servicios) }})
-                    </h3>
-                    <div class="space-y-3">
-                        @forelse($servicios as $servicio)
-                        <div class="flex justify-between items-center py-2 border-b border-[#374151]/50 last:border-0 last:pb-0">
-                            <div>
-                                <span class="text-sm text-[#D1D5DB] block">{{ $servicio['nombre'] }}</span>
-                                <span class="text-[10px] text-[#52525b] uppercase tracking-tighter">
-                                    {{ $servicio['duracion'] ?? 30 }} MINUTOS
-                                </span>
-                                @if(isset($servicio['descripcion']) && $servicio['descripcion'])
-                                <p class="text-xs text-[#9CA3AF] mt-1">{{ $servicio['descripcion'] }}</p>
-                                @endif
+      <!-- Servicios - Carrusel Automático -->
+<div class="bg-[#262626] border border-[#374151] rounded-sm p-6">
+    <div class="flex justify-between items-center mb-6">
+        <h3 class="text-xl font-bold uppercase tracking-widest text-white flex items-center gap-3">
+            <i class="fas fa-cut text-2xl"></i> 
+            Nuestros Servicios
+            <span class="text-sm text-[#9CA3AF] font-normal">({{ count($servicios) }})</span>
+        </h3>
+        
+        <!-- Controles del carrusel -->
+        @if(count($servicios) > 1)
+        <div class="flex gap-2">
+            <button id="prevService" class="w-10 h-10 rounded-full bg-[#1a1a1a] border border-[#374151] text-white hover:bg-white hover:text-black transition-all duration-300 flex items-center justify-center">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <button id="nextService" class="w-10 h-10 rounded-full bg-[#1a1a1a] border border-[#374151] text-white hover:bg-white hover:text-black transition-all duration-300 flex items-center justify-center">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+        </div>
+        @endif
+    </div>
+    
+    @if(count($servicios) > 0)
+    <div class="relative overflow-hidden">
+        <!-- Indicadores de página -->
+        <div class="flex justify-center gap-2 mb-4">
+            @foreach($servicios as $index => $servicio)
+            <button class="service-dot w-2 h-2 rounded-full transition-all duration-300 {{ $index === 0 ? 'bg-white w-6' : 'bg-[#374151]' }}" data-index="{{ $index }}"></button>
+            @endforeach
+        </div>
+        
+        <!-- Carrusel -->
+        <div class="service-carousel-container overflow-hidden">
+            <div class="service-carousel-track flex transition-transform duration-500 ease-out" style="transform: translateX(0%)">
+                @foreach($servicios as $servicio)
+                <div class="service-slide flex-shrink-0 w-full px-2">
+                    <div class="bg-[#1a1a1a] rounded-xl overflow-hidden border border-[#374151] hover:border-[#F3F4F6] transition-all duration-300">
+                        <!-- Imagen destacada -->
+                        <div class="relative h-72 md:h-96 overflow-hidden bg-gradient-to-br from-gray-800 to-gray-900">
+                            @if(isset($servicio['imagen']) && $servicio['imagen'])
+                                <img src="{{ $servicio['imagen'] }}" 
+                                     alt="{{ $servicio['nombre'] }}"
+                                     class="service-image w-full h-full object-cover transition-transform duration-700 hover:scale-110">
+                            @else
+                                <div class="w-full h-full flex flex-col items-center justify-center text-gray-500">
+                                    <i class="fas fa-cut text-8xl mb-4 opacity-50"></i>
+                                    <span class="text-sm uppercase tracking-wider">Sin imagen</span>
+                                </div>
+                            @endif
+                            
+                            <!-- Badge de precio flotante -->
+                            <div class="absolute top-5 right-5 bg-black/80 backdrop-blur-sm px-4 py-2 rounded-full">
+                                <span class="text-yellow-500 font-bold text-xl">${{ number_format($servicio['precio'], 0, ',', '.') }}</span>
                             </div>
-                            <span class="text-sm font-mono text-white">${{ number_format($servicio['precio'], 0, ',', '.') }}</span>
+                            
+                            <!-- Badge de duración -->
+                            <div class="absolute bottom-5 left-5 bg-black/60 backdrop-blur-sm px-3 py-1.5 rounded-full">
+                                <span class="text-white text-sm flex items-center gap-2">
+                                    <i class="far fa-clock"></i> {{ $servicio['duracion'] ?? 30 }} minutos
+                                </span>
+                            </div>
                         </div>
-                        @empty
-                        <p class="text-xs text-[#52525b] italic">Sin servicios registrados.</p>
-                        @endforelse
+                        
+                        <!-- Contenido -->
+                        <div class="p-6">
+                            <h4 class="text-2xl font-bold text-white uppercase tracking-wide mb-3">
+                                {{ $servicio['nombre'] }}
+                            </h4>
+                            <p class="text-[#9CA3AF] text-base leading-relaxed mb-6">
+                                {{ $servicio['descripcion'] ?? 'Descripción no disponible' }}
+                            </p>
+                            
+                            <!-- Características adicionales (opcional) -->
+                            @if(isset($servicio['caracteristicas']) && count($servicio['caracteristicas']) > 0)
+                            <div class="flex flex-wrap gap-2 mb-6">
+                                @foreach($servicio['caracteristicas'] as $caract)
+                                <span class="text-xs text-[#9CA3AF] bg-[#374151]/30 px-3 py-1 rounded-full">
+                                    {{ $caract }}
+                                </span>
+                                @endforeach
+                            </div>
+                            @endif
+                            
+                            <!-- Botón de reserva -->
+                            <button onclick="agendarServicio({{ $servicio['id_servicio'] ?? $servicio['id'] }})" 
+                                    class="w-full py-3 bg-gradient-to-r from-yellow-500 to-yellow-600 text-black font-bold uppercase tracking-wider rounded-lg hover:from-yellow-400 hover:to-yellow-500 transition-all duration-300 flex items-center justify-center gap-2">
+                                <i class="fas fa-calendar-check"></i>
+                                Reservar este servicio
+                            </button>
+                        </div>
                     </div>
                 </div>
+                @endforeach
+            </div>
+        </div>
+    </div>
+    
+    <!-- Mensaje cuando no hay servicios -->
+    @else
+    <div class="text-center py-16">
+        <i class="fas fa-scissors text-6xl text-[#374151] mb-4"></i>
+        <p class="text-[#9CA3AF] text-lg">Próximamente nuevos servicios</p>
+        <p class="text-[#52525b] text-sm mt-2">No hay servicios disponibles en este momento</p>
+    </div>
+    @endif
+</div>
+
+<!-- JavaScript para el carrusel -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const servicios = @json($servicios);
+    const totalSlides = servicios.length;
+    
+    if (totalSlides <= 1) return;
+    
+    let currentIndex = 0;
+    let autoPlayInterval;
+    const autoPlayDelay = 5000; // 5 segundos
+    
+    const track = document.querySelector('.service-carousel-track');
+    const prevBtn = document.getElementById('prevService');
+    const nextBtn = document.getElementById('nextService');
+    const dots = document.querySelectorAll('.service-dot');
+    
+    function updateCarousel() {
+        // Mover el carrusel
+        const newPosition = -currentIndex * 100;
+        track.style.transform = `translateX(${newPosition}%)`;
+        
+        // Actualizar dots
+        dots.forEach((dot, index) => {
+            if (index === currentIndex) {
+                dot.classList.add('bg-white', 'w-6');
+                dot.classList.remove('bg-[#374151]', 'w-2');
+            } else {
+                dot.classList.add('bg-[#374151]', 'w-2');
+                dot.classList.remove('bg-white', 'w-6');
+            }
+        });
+    }
+    
+    function nextSlide() {
+        currentIndex = (currentIndex + 1) % totalSlides;
+        updateCarousel();
+        resetAutoPlay();
+    }
+    
+    function prevSlide() {
+        currentIndex = (currentIndex - 1 + totalSlides) % totalSlides;
+        updateCarousel();
+        resetAutoPlay();
+    }
+    
+    function resetAutoPlay() {
+        clearInterval(autoPlayInterval);
+        autoPlayInterval = setInterval(nextSlide, autoPlayDelay);
+    }
+    
+    // Eventos de botones
+    if (prevBtn) prevBtn.addEventListener('click', prevSlide);
+    if (nextBtn) nextBtn.addEventListener('click', nextSlide);
+    
+    // Eventos de dots
+    dots.forEach((dot, index) => {
+        dot.addEventListener('click', () => {
+            currentIndex = index;
+            updateCarousel();
+            resetAutoPlay();
+        });
+    });
+    
+    // Iniciar autoplay
+    resetAutoPlay();
+    
+    // Pausar autoplay al hacer hover sobre el carrusel
+    const carouselContainer = document.querySelector('.service-carousel-container');
+    if (carouselContainer) {
+        carouselContainer.addEventListener('mouseenter', () => {
+            clearInterval(autoPlayInterval);
+        });
+        
+        carouselContainer.addEventListener('mouseleave', () => {
+            autoPlayInterval = setInterval(nextSlide, autoPlayDelay);
+        });
+    }
+});
+
+function agendarServicio(servicioId) {
+    @if(session()->has('rol'))
+        window.location.href = '/booking/create?servicio=' + servicioId;
+    @else
+        if(confirm('Para reservar este servicio necesitas iniciar sesión. ¿Deseas continuar?')) {
+            window.location.href = '/login?redirect=/negocio/{{ $negocio['id_negocio'] }}&servicio=' + servicioId;
+        }
+    @endif
+}
+</script>
+
+<!-- Estilos adicionales para el carrusel -->
+<style>
+.service-carousel-container {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    border-radius: 0.75rem;
+}
+
+.service-carousel-track {
+    display: flex;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.service-slide {
+    flex: 0 0 100%;
+    max-width: 100%;
+}
+
+.service-image {
+    transition: transform 0.7s ease-out;
+}
+
+.service-slide:hover .service-image {
+    transform: scale(1.1);
+}
+
+.service-dot {
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.service-dot:hover {
+    background-color: white;
+    width: 1.5rem;
+}
+</style>
                 
                 <!-- Reseñas -->
                 <div class="bg-[#262626] border border-[#374151] rounded-sm p-6">
