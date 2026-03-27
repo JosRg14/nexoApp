@@ -70,10 +70,15 @@ class HttpClient
     // Public helpers (GET, POST, PUT, DELETE)
     // -----------------------------------------------------------------
     public function get(string $uri, array $query = []): array
-    {
-        // Query parameters are passed directly to the request method
-        return $this->handle($this->request('GET', $uri, $query));
+{
+    // Construir URL con query string si hay parámetros
+    $fullUri = $uri;
+    if (!empty($query)) {
+        $fullUri .= '?' . http_build_query($query);
     }
+    
+    return $this->handle($this->request('GET', $fullUri));
+}
 
     public function post(string $uri, array $data = []): array
     {

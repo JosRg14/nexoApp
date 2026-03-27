@@ -12,11 +12,9 @@ class EmployeeService
     }
 
     public function list(array $params = [])
-    {
-        $query = http_build_query($params);
-        $url = '/api/empleados' . ($query ? '?' . $query : '');
-        return $this->client->get($url);
-    }
+{
+    return $this->client->get('/api/empleados', $params);
+}
 
     public function create(array $data)
     {

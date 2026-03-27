@@ -11,12 +11,11 @@ class ServiceService
         $this->client = $client;
     }
 
-    public function list(array $params = []): array
-    {
-        $query = http_build_query($params);
-        $url = '/api/servicios' . ($query ? '?' . $query : '');
-        return $this->client->get($url);
-    }
+   public function list(array $params = []): array
+{
+    // Pasar los parámetros como segundo argumento del método get
+    return $this->client->get('/api/servicios', $params);
+}
 
     public function create(array $data): array
     {
