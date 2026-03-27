@@ -337,6 +337,9 @@
 
 <!-- JavaScript para selección de servicio y empleado -->
 <script>
+
+const negocioId = {{ $negocio['id_negocio'] ?? null }};
+console.log('Negocio ID:', negocioId);
 let servicioSeleccionadoId = null;
 let empleadoSeleccionadoId = null;
 let empleadoSeleccionadoNombre = null;
