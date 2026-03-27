@@ -33,7 +33,7 @@ class NegocioController extends Controller
             
             // Obtener horarios del negocio
             $ch = curl_init();
-            curl_setopt($ch, CURLOPT_URL, $apiBaseUrl . '/api/negocio/horarios');
+            curl_setopt($ch, CURLOPT_URL, $apiBaseUrl . '/api/negocios/' . $id . '/horarios');
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
             $response = curl_exec($ch);
