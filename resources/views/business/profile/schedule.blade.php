@@ -501,7 +501,7 @@ document.addEventListener('DOMContentLoaded', function() {
             });
             
             try {
-                const response = await fetch('/api-proxy/api/negocio/horario', {
+                const response = await fetch('/api-proxy/negocio/horario', {
                     method: 'POST',
                     headers: {
                         'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value,
@@ -531,7 +531,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Cargar horarios existentes al cargar la página
     async function cargarHorarios() {
         try {
-            const response = await fetch('/api-proxy/api/negocio/horarios', {
+            const response = await fetch('/api-proxy/negocio/horarios', {
                 headers: {
                     'Accept': 'application/json',
                     'X-Requested-With': 'XMLHttpRequest'
