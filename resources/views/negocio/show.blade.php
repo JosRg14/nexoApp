@@ -256,12 +256,20 @@
                 <h3 class="text-sm font-bold uppercase tracking-widest text-white mb-4 flex items-center gap-2">
                     <i class="fas fa-clock"></i> Horario de Atención
                 </h3>
-                @if(isset($negocio['horarios']) && count($negocio['horarios']) > 0)
+                @if(isset($horariosFormateados) && count($horariosFormateados) > 0)
                 <div class="space-y-2">
-                    @foreach($negocio['horarios'] as $horario)
+                    @foreach($horariosFormateados as $horario)
                     <div class="flex justify-between text-sm py-1 border-b border-[#374151]/50 last:border-0">
-                        <span class="text-[#9CA3AF]">{{ $horario['dia'] }}</span>
-                        <span class="text-white">{{ $horario['hora_apertura'] }} - {{ $horario['hora_cierre'] }}</span>
+                        <span class="text-[#9CA3AF] font-medium">{{ $horario['dia'] }}</span>
+                        <div class="text-right">
+                            @if($horario['abierto'])
+                                @foreach($horario['horarios'] as $bloque)
+                                    <span class="text-white block text-sm">{{ $bloque }}</span>
+                                @endforeach
+                            @else
+                                <span class="text-red-400">Cerrado</span>
+                            @endif
+                        </div>
                     </div>
                     @endforeach
                 </div>
