@@ -317,13 +317,10 @@
     </div>
 </section>
 
-<!-- Modal para configurar horario de empleado (igual que antes) -->
-<!-- ... mantener el mismo modal ... -->
-
 <!-- Modal para configurar horario de empleado -->
 <div id="modal-empleado-horario" class="fixed inset-0 hidden z-50">
     <div class="absolute inset-0 bg-black/80" onclick="cerrarModalHorarioEmpleado()"></div>
-    <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-[#1a1a1a] border border-[#374151] p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+    <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-[#1a1a1a] border border-[#374151] p-6 w-full max-w-3xl max-h-[90vh] overflow-y-auto">
         <div class="flex justify-between items-center mb-4">
             <h3 class="text-white font-bold uppercase flex items-center gap-2">
                 <i class="fas fa-user-clock"></i> Horario de <span id="empleado-nombre" class="text-yellow-500"></span>
@@ -334,7 +331,9 @@
         </div>
         
         <p class="text-[#9CA3AF] text-xs mb-4">
-            Configura los horarios de trabajo para este empleado. Los campos vacíos usarán el horario general del negocio.
+            Configura los horarios de trabajo para este empleado. 
+            <span class="text-yellow-500">✔ Marca "Usar horario propio"</span> para establecer un horario específico. 
+            Si no se marca, usará el horario general del negocio.
         </p>
         
         <form id="horario-empleado-form" class="space-y-3">
@@ -346,17 +345,22 @@
                 <div class="flex items-center gap-3 mb-2">
                     <input type="checkbox" id="emp_lunes_activo" class="empleado-checkbox w-4 h-4 accent-yellow-500">
                     <label class="text-white font-bold text-sm">Lunes</label>
-                    <span class="text-[10px] text-[#9CA3AF] ml-auto">Usar horario propio</span>
+                    <span class="text-[10px] text-yellow-500 ml-auto">
+                        <i class="fas fa-check-circle mr-1"></i> Usar horario propio
+                    </span>
                 </div>
                 <div id="emp_lunes_bloques" class="ml-6 space-y-2">
-                    <div class="flex gap-3 items-center">
+                    <div class="flex flex-wrap items-center gap-3">
                         <input type="time" id="emp_lunes_inicio" class="bg-[#262626] border border-[#374151] rounded px-3 py-1 text-white text-sm" value="09:00" disabled>
                         <span class="text-[#9CA3AF]">a</span>
                         <input type="time" id="emp_lunes_fin" class="bg-[#262626] border border-[#374151] rounded px-3 py-1 text-white text-sm" value="18:00" disabled>
+                        <button type="button" class="agregar-bloque-empleado text-xs text-[#9CA3AF] hover:text-yellow-500 transition-colors" data-dia="lunes">
+                            <i class="fas fa-plus-circle mr-1"></i> Agregar bloque
+                        </button>
                     </div>
-                    <button type="button" class="agregar-bloque-empleado text-xs text-[#9CA3AF] hover:text-yellow-500 transition-colors" data-dia="lunes">
-                        <i class="fas fa-plus-circle mr-1"></i> Agregar bloque
-                    </button>
+                </div>
+                <div id="emp_lunes_extra" class="ml-6 mt-2 text-[10px] text-[#52525b]">
+                    <i class="fas fa-info-circle"></i> Si no se marca, usará el horario del negocio
                 </div>
             </div>
             
@@ -365,17 +369,22 @@
                 <div class="flex items-center gap-3 mb-2">
                     <input type="checkbox" id="emp_martes_activo" class="empleado-checkbox w-4 h-4 accent-yellow-500">
                     <label class="text-white font-bold text-sm">Martes</label>
-                    <span class="text-[10px] text-[#9CA3AF] ml-auto">Usar horario propio</span>
+                    <span class="text-[10px] text-yellow-500 ml-auto">
+                        <i class="fas fa-check-circle mr-1"></i> Usar horario propio
+                    </span>
                 </div>
                 <div id="emp_martes_bloques" class="ml-6 space-y-2">
-                    <div class="flex gap-3 items-center">
+                    <div class="flex flex-wrap items-center gap-3">
                         <input type="time" id="emp_martes_inicio" class="bg-[#262626] border border-[#374151] rounded px-3 py-1 text-white text-sm" value="09:00" disabled>
                         <span class="text-[#9CA3AF]">a</span>
                         <input type="time" id="emp_martes_fin" class="bg-[#262626] border border-[#374151] rounded px-3 py-1 text-white text-sm" value="18:00" disabled>
+                        <button type="button" class="agregar-bloque-empleado text-xs text-[#9CA3AF] hover:text-yellow-500 transition-colors" data-dia="martes">
+                            <i class="fas fa-plus-circle mr-1"></i> Agregar bloque
+                        </button>
                     </div>
-                    <button type="button" class="agregar-bloque-empleado text-xs text-[#9CA3AF] hover:text-yellow-500 transition-colors" data-dia="martes">
-                        <i class="fas fa-plus-circle mr-1"></i> Agregar bloque
-                    </button>
+                </div>
+                <div class="ml-6 mt-2 text-[10px] text-[#52525b]">
+                    <i class="fas fa-info-circle"></i> Si no se marca, usará el horario del negocio
                 </div>
             </div>
             
@@ -384,17 +393,22 @@
                 <div class="flex items-center gap-3 mb-2">
                     <input type="checkbox" id="emp_miercoles_activo" class="empleado-checkbox w-4 h-4 accent-yellow-500">
                     <label class="text-white font-bold text-sm">Miércoles</label>
-                    <span class="text-[10px] text-[#9CA3AF] ml-auto">Usar horario propio</span>
+                    <span class="text-[10px] text-yellow-500 ml-auto">
+                        <i class="fas fa-check-circle mr-1"></i> Usar horario propio
+                    </span>
                 </div>
                 <div id="emp_miercoles_bloques" class="ml-6 space-y-2">
-                    <div class="flex gap-3 items-center">
+                    <div class="flex flex-wrap items-center gap-3">
                         <input type="time" id="emp_miercoles_inicio" class="bg-[#262626] border border-[#374151] rounded px-3 py-1 text-white text-sm" value="09:00" disabled>
                         <span class="text-[#9CA3AF]">a</span>
                         <input type="time" id="emp_miercoles_fin" class="bg-[#262626] border border-[#374151] rounded px-3 py-1 text-white text-sm" value="18:00" disabled>
+                        <button type="button" class="agregar-bloque-empleado text-xs text-[#9CA3AF] hover:text-yellow-500 transition-colors" data-dia="miercoles">
+                            <i class="fas fa-plus-circle mr-1"></i> Agregar bloque
+                        </button>
                     </div>
-                    <button type="button" class="agregar-bloque-empleado text-xs text-[#9CA3AF] hover:text-yellow-500 transition-colors" data-dia="miercoles">
-                        <i class="fas fa-plus-circle mr-1"></i> Agregar bloque
-                    </button>
+                </div>
+                <div class="ml-6 mt-2 text-[10px] text-[#52525b]">
+                    <i class="fas fa-info-circle"></i> Si no se marca, usará el horario del negocio
                 </div>
             </div>
             
@@ -403,17 +417,22 @@
                 <div class="flex items-center gap-3 mb-2">
                     <input type="checkbox" id="emp_jueves_activo" class="empleado-checkbox w-4 h-4 accent-yellow-500">
                     <label class="text-white font-bold text-sm">Jueves</label>
-                    <span class="text-[10px] text-[#9CA3AF] ml-auto">Usar horario propio</span>
+                    <span class="text-[10px] text-yellow-500 ml-auto">
+                        <i class="fas fa-check-circle mr-1"></i> Usar horario propio
+                    </span>
                 </div>
                 <div id="emp_jueves_bloques" class="ml-6 space-y-2">
-                    <div class="flex gap-3 items-center">
+                    <div class="flex flex-wrap items-center gap-3">
                         <input type="time" id="emp_jueves_inicio" class="bg-[#262626] border border-[#374151] rounded px-3 py-1 text-white text-sm" value="09:00" disabled>
                         <span class="text-[#9CA3AF]">a</span>
                         <input type="time" id="emp_jueves_fin" class="bg-[#262626] border border-[#374151] rounded px-3 py-1 text-white text-sm" value="18:00" disabled>
+                        <button type="button" class="agregar-bloque-empleado text-xs text-[#9CA3AF] hover:text-yellow-500 transition-colors" data-dia="jueves">
+                            <i class="fas fa-plus-circle mr-1"></i> Agregar bloque
+                        </button>
                     </div>
-                    <button type="button" class="agregar-bloque-empleado text-xs text-[#9CA3AF] hover:text-yellow-500 transition-colors" data-dia="jueves">
-                        <i class="fas fa-plus-circle mr-1"></i> Agregar bloque
-                    </button>
+                </div>
+                <div class="ml-6 mt-2 text-[10px] text-[#52525b]">
+                    <i class="fas fa-info-circle"></i> Si no se marca, usará el horario del negocio
                 </div>
             </div>
             
@@ -422,17 +441,22 @@
                 <div class="flex items-center gap-3 mb-2">
                     <input type="checkbox" id="emp_viernes_activo" class="empleado-checkbox w-4 h-4 accent-yellow-500">
                     <label class="text-white font-bold text-sm">Viernes</label>
-                    <span class="text-[10px] text-[#9CA3AF] ml-auto">Usar horario propio</span>
+                    <span class="text-[10px] text-yellow-500 ml-auto">
+                        <i class="fas fa-check-circle mr-1"></i> Usar horario propio
+                    </span>
                 </div>
                 <div id="emp_viernes_bloques" class="ml-6 space-y-2">
-                    <div class="flex gap-3 items-center">
+                    <div class="flex flex-wrap items-center gap-3">
                         <input type="time" id="emp_viernes_inicio" class="bg-[#262626] border border-[#374151] rounded px-3 py-1 text-white text-sm" value="09:00" disabled>
                         <span class="text-[#9CA3AF]">a</span>
                         <input type="time" id="emp_viernes_fin" class="bg-[#262626] border border-[#374151] rounded px-3 py-1 text-white text-sm" value="18:00" disabled>
+                        <button type="button" class="agregar-bloque-empleado text-xs text-[#9CA3AF] hover:text-yellow-500 transition-colors" data-dia="viernes">
+                            <i class="fas fa-plus-circle mr-1"></i> Agregar bloque
+                        </button>
                     </div>
-                    <button type="button" class="agregar-bloque-empleado text-xs text-[#9CA3AF] hover:text-yellow-500 transition-colors" data-dia="viernes">
-                        <i class="fas fa-plus-circle mr-1"></i> Agregar bloque
-                    </button>
+                </div>
+                <div class="ml-6 mt-2 text-[10px] text-[#52525b]">
+                    <i class="fas fa-info-circle"></i> Si no se marca, usará el horario del negocio
                 </div>
             </div>
             
@@ -441,17 +465,22 @@
                 <div class="flex items-center gap-3 mb-2">
                     <input type="checkbox" id="emp_sabado_activo" class="empleado-checkbox w-4 h-4 accent-yellow-500">
                     <label class="text-white font-bold text-sm">Sábado</label>
-                    <span class="text-[10px] text-[#9CA3AF] ml-auto">Usar horario propio</span>
+                    <span class="text-[10px] text-yellow-500 ml-auto">
+                        <i class="fas fa-check-circle mr-1"></i> Usar horario propio
+                    </span>
                 </div>
                 <div id="emp_sabado_bloques" class="ml-6 space-y-2">
-                    <div class="flex gap-3 items-center">
+                    <div class="flex flex-wrap items-center gap-3">
                         <input type="time" id="emp_sabado_inicio" class="bg-[#262626] border border-[#374151] rounded px-3 py-1 text-white text-sm" value="09:00" disabled>
                         <span class="text-[#9CA3AF]">a</span>
                         <input type="time" id="emp_sabado_fin" class="bg-[#262626] border border-[#374151] rounded px-3 py-1 text-white text-sm" value="14:00" disabled>
+                        <button type="button" class="agregar-bloque-empleado text-xs text-[#9CA3AF] hover:text-yellow-500 transition-colors" data-dia="sabado">
+                            <i class="fas fa-plus-circle mr-1"></i> Agregar bloque
+                        </button>
                     </div>
-                    <button type="button" class="agregar-bloque-empleado text-xs text-[#9CA3AF] hover:text-yellow-500 transition-colors" data-dia="sabado">
-                        <i class="fas fa-plus-circle mr-1"></i> Agregar bloque
-                    </button>
+                </div>
+                <div class="ml-6 mt-2 text-[10px] text-[#52525b]">
+                    <i class="fas fa-info-circle"></i> Si no se marca, usará el horario del negocio
                 </div>
             </div>
             
@@ -460,17 +489,22 @@
                 <div class="flex items-center gap-3 mb-2">
                     <input type="checkbox" id="emp_domingo_activo" class="empleado-checkbox w-4 h-4 accent-yellow-500">
                     <label class="text-white font-bold text-sm">Domingo</label>
-                    <span class="text-[10px] text-[#9CA3AF] ml-auto">Usar horario propio</span>
+                    <span class="text-[10px] text-yellow-500 ml-auto">
+                        <i class="fas fa-check-circle mr-1"></i> Usar horario propio
+                    </span>
                 </div>
                 <div id="emp_domingo_bloques" class="ml-6 space-y-2">
-                    <div class="flex gap-3 items-center">
+                    <div class="flex flex-wrap items-center gap-3">
                         <input type="time" id="emp_domingo_inicio" class="bg-[#262626] border border-[#374151] rounded px-3 py-1 text-white text-sm" value="09:00" disabled>
                         <span class="text-[#9CA3AF]">a</span>
                         <input type="time" id="emp_domingo_fin" class="bg-[#262626] border border-[#374151] rounded px-3 py-1 text-white text-sm" value="14:00" disabled>
+                        <button type="button" class="agregar-bloque-empleado text-xs text-[#9CA3AF] hover:text-yellow-500 transition-colors" data-dia="domingo">
+                            <i class="fas fa-plus-circle mr-1"></i> Agregar bloque
+                        </button>
                     </div>
-                    <button type="button" class="agregar-bloque-empleado text-xs text-[#9CA3AF] hover:text-yellow-500 transition-colors" data-dia="domingo">
-                        <i class="fas fa-plus-circle mr-1"></i> Agregar bloque
-                    </button>
+                </div>
+                <div class="ml-6 mt-2 text-[10px] text-[#52525b]">
+                    <i class="fas fa-info-circle"></i> Si no se marca, usará el horario del negocio
                 </div>
             </div>
             
@@ -518,11 +552,19 @@ async function cargarHorarioEmpleado(empleadoId) {
                 
                 if (checkbox) {
                     checkbox.checked = activo;
-                    inicio.disabled = !activo;
-                    fin.disabled = !activo;
+                    if (inicio && fin) {
+                        inicio.disabled = !activo;
+                        fin.disabled = !activo;
+                    }
                     
-                    if (horario.hora_inicio) inicio.value = horario.hora_inicio.substring(0, 5);
-                    if (horario.hora_fin) fin.value = horario.hora_fin.substring(0, 5);
+                    if (activo && horario.hora_inicio && horario.hora_fin) {
+                        inicio.value = horario.hora_inicio.substring(0, 5);
+                        fin.value = horario.hora_fin.substring(0, 5);
+                    } else {
+                        // Valores por defecto si no hay horario guardado
+                        inicio.value = '09:00';
+                        fin.value = dia === 'sabado' || dia === 'domingo' ? '14:00' : '18:00';
+                    }
                 }
             });
         }
@@ -559,14 +601,27 @@ document.getElementById('horario-empleado-form')?.addEventListener('submit', asy
         const inicio = document.getElementById(`emp_${dia}_inicio`);
         const fin = document.getElementById(`emp_${dia}_fin`);
         
-        horarios.push({
-            dia_semana: dia,
-            activo: checkbox?.checked || false,
-            hora_inicio: checkbox?.checked ? inicio.value : null,
-            hora_fin: checkbox?.checked ? fin.value : null,
-            hora_inicio_2: null,
-            hora_fin_2: null
-        });
+        // Si el checkbox está marcado, usamos horario propio
+        if (checkbox && checkbox.checked) {
+            horarios.push({
+                dia_semana: dia,
+                activo: true,
+                hora_inicio: inicio?.value || null,
+                hora_fin: fin?.value || null,
+                hora_inicio_2: null,
+                hora_fin_2: null
+            });
+        } else {
+            // No usar horario propio - la API lo manejará como null
+            horarios.push({
+                dia_semana: dia,
+                activo: false,
+                hora_inicio: null,
+                hora_fin: null,
+                hora_inicio_2: null,
+                hora_fin_2: null
+            });
+        }
     });
     
     showLoader();
@@ -585,7 +640,7 @@ document.getElementById('horario-empleado-form')?.addEventListener('submit', asy
         const data = await response.json();
         
         if (data.success) {
-            showToast('Horario guardado correctamente');
+            showToast('Horario del empleado guardado correctamente');
             cerrarModalHorarioEmpleado();
         } else {
             showToast(data.message || 'Error al guardar');
@@ -597,7 +652,6 @@ document.getElementById('horario-empleado-form')?.addEventListener('submit', asy
         hideLoader();
     }
 });
-
 // Función para agregar bloques en horario de empleado
 document.querySelectorAll('.agregar-bloque-empleado').forEach(btn => {
     btn.addEventListener('click', function() {
