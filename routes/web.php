@@ -245,3 +245,9 @@ Route::middleware(['guest.session'])->group(function () {
 Route::get('/auth/google', [AuthController::class, 'redirectToGoogle']);
 
 Route::get('/auth/google/callback', [AuthController::class, 'googleCallback']);
+
+// Rutas de citas
+Route::middleware(['auth.session', 'inject.api.token'])->group(function () {
+    Route::get('/booking/create', [CitaController::class, 'create'])->name('booking.create');
+    Route::get('/mis-citas', [CitaController::class, 'misCitas'])->name('mis-citas');
+});
