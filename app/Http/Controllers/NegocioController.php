@@ -40,6 +40,7 @@ class NegocioController extends Controller
             curl_close($ch);
             
             $horariosData = json_decode($response, true);
+            dd($horariosData);
             $horarios = [];
             
             if (isset($horariosData['success']) && $horariosData['success'] && isset($horariosData['data'])) {
