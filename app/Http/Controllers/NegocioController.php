@@ -65,7 +65,7 @@ class NegocioController extends Controller
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         $response = curl_exec($ch);
         curl_close($ch);
-        
+    
         $empleadosData = json_decode($response, true);
         $empleados = $empleadosData['data'] ?? [];
         
