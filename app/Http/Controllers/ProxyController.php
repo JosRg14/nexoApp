@@ -36,13 +36,12 @@ class ProxyController extends Controller
     protected function forwardRequest(Request $request, $endpoint, $token = null)
     {
         $path = ltrim($endpoint, '/');
-        if (str_starts_with($path, 'api/')) {
-            $url = rtrim(config('services.api.url'), '/') . '/' . $path;
-        } elseif (str_starts_with($path, 'storage/')) {
+        if (str_starts_with($path, 'storage/')) {
             $url = rtrim(config('services.api.url'), '/') . '/' . $path;
         } else {
-            $url = rtrim(config('services.api.url'), '/') . '/api/' . $path;
+            $url = rtrim(config('services.api.url'), '/') . '/api/' . ltrim(preg_replace('/^api\//', '', $path), '/');
         }
+
         
         // method() ya evalúa si la request vino con _method=PUT o _method=DELETE
         $method = strtolower($request->method());
@@ -58,8 +57,10 @@ class ProxyController extends Controller
         }
 
         $pendingRequest = Http::withHeaders($headers)
+            ->withOptions(['verify' => false])
             ->timeout(15)
             ->retry(2, 500);
+
 
         $hasFiles = !empty($request->allFiles());
 
@@ -83,6 +84,8 @@ class ProxyController extends Controller
                 }
             }
         }
+
+        Log::info("Proxy enviando a: " . $url);
 
         try {
             // Evitamos enviar los tokens de Laravel al backend
