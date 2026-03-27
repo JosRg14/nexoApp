@@ -276,7 +276,7 @@ document.getElementById('fecha').addEventListener('change', function() {
 async function cargarHorarios() {
     const fecha = document.getElementById('fecha').value;
     const empleadoId = empleadoSeleccionado?.id;
-    const duracion = servicioSeleccionado?.duracion;
+    const duracion = parseInt(servicioSeleccionado?.duracion, 10);
     
     if (!fecha || !empleadoId || !duracion) {
         console.log('Faltan datos:', { fecha, empleadoId, duracion });
