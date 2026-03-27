@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\NegocioController;
 use Iluminate\Http\Request;
+use App\Http\Controllers\CitaController;
 
 /*
 |--------------------------------------------------------------------------
