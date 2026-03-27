@@ -1,0 +1,123 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
+
+class ProxyController extends Controller
+{
+    /**
+     * Proxy Público sin protección de sesión
+     */
+    public function handlePublic(Request $request, $endpoint)
+    {
+        // En nuestro caso el prefijo 'public' podría o no ser parte de la URL real,
+        // asumo que lo agregaremos al endpoint como /api/{endpoint}.
+        return $this->forwardRequest($request, $endpoint, null);
+    }
+
+    /**
+     * Proxy Protegido (Requiere auth_token)
+     */
+    public function handle(Request $request, $endpoint)
+    {
+        if (!session()->has('auth_token')) {
+            return response()->json(['message' => 'Unauthenticated.'], 401);
+        }
+
+        return $this->forwardRequest($request, $endpoint, session('auth_token'));
+    }
+
+    /**
+     * Reenvío genérico de la petición.
+     */
+    protected function forwardRequest(Request $request, $endpoint, $token = null)
+    {
+        $path = ltrim($endpoint, '/');
+        if (str_starts_with($path, 'api/')) {
+            $url = rtrim(config('services.api.url'), '/') . '/' . $path;
+        } elseif (str_starts_with($path, 'storage/')) {
+            $url = rtrim(config('services.api.url'), '/') . '/' . $path;
+        } else {
+            $url = rtrim(config('services.api.url'), '/') . '/api/' . $path;
+        }
+        
+        // method() ya evalúa si la request vino con _method=PUT o _method=DELETE
+        $method = strtolower($request->method());
+
+        $headers = [
+            'Accept' => 'application/json',
+            'ngrok-skip-browser-warning' => 'true',
+            'User-Agent' => 'Mozilla/5.0',
+        ];
+
+        if ($token) {
+            $headers['Authorization'] = "Bearer {$token}";
+        }
+
+        $pendingRequest = Http::withHeaders($headers)
+            ->timeout(15)
+            ->retry(2, 500);
+
+        $hasFiles = !empty($request->allFiles());
+
+        // Manejo de Multipart/File attachments
+        if ($hasFiles) {
+            foreach ($request->allFiles() as $key => $file) {
+                if (is_array($file)) {
+                    foreach ($file as $index => $f) {
+                        $pendingRequest->attach(
+                            "{$key}[{$index}]",
+                            file_get_contents($f->getRealPath()),
+                            $f->getClientOriginalName()
+                        );
+                    }
+                } else {
+                    $pendingRequest->attach(
+                        $key,
+                        file_get_contents($file->getRealPath()),
+                        $file->getClientOriginalName()
+                    );
+                }
+            }
+        }
+
+        try {
+            // Evitamos enviar los tokens de Laravel al backend
+            $data = $request->except(['_token', '_method']);
+
+            if ($method === 'get' || $method === 'head') {
+                // En GET/HEAD, los datos viajan como query params
+                $response = $pendingRequest->$method($url, $request->query());
+            } else {
+                if (!$hasFiles) {
+                    $pendingRequest->asJson();
+                }
+                $response = $pendingRequest->$method($url, $data);
+            }
+
+            if ($response->status() >= 400) {
+                Log::warning('Proxy request error', [
+                    'url'      => $url,
+                    'method'   => strtoupper($method),
+                    'status'   => $response->status(),
+                    'response' => $response->body(),
+                ]);
+            }
+
+            // Devolver la respuesta transparente, útil para JSON y para Imágenes/Binarios
+            return response($response->body(), $response->status(), [
+                'Content-Type' => $response->header('Content-Type') ?? 'application/json'
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Proxy connection failure', [
+                'url'   => $url,
+                'error' => $e->getMessage()
+            ]);
+            return response()->json(['message' => 'Error interno conectando con el servicio.'], 500);
+        }
+    }
+}

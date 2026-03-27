@@ -191,6 +191,24 @@ Route::post('/proxy/register-admin', [AuthController::class, 'registerAdmin']);
 
 /*
 |--------------------------------------------------------------------------
+| UNIVERSAL PROXY (V2)
+|--------------------------------------------------------------------------
+*/
+
+// Proxy Público (sin sesión)
+Route::any('/api-proxy/public/{endpoint}', [\App\Http\Controllers\ProxyController::class, 'handlePublic'])
+    ->where('endpoint', '.*')
+    ->name('api.proxy.public');
+
+// Proxy Protegido (con sesión)
+Route::middleware(['auth.session'])->group(function () {
+    Route::any('/api-proxy/{endpoint}', [\App\Http\Controllers\ProxyController::class, 'handle'])
+        ->where('endpoint', '.*')
+        ->name('api.proxy.protected');
+});
+
+/*
+|--------------------------------------------------------------------------
 | HOME
 |--------------------------------------------------------------------------
 */

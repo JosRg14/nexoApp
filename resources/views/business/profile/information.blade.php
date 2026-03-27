@@ -267,7 +267,7 @@ Guardar Cambios
 <div class="w-32 h-32 rounded-full bg-[#262626] border-2 border-[#374151] mx-auto mb-6 flex items-center justify-center overflow-hidden">
 
 @if(isset($negocio['foto_perfil']))
-<img src="{{ config('services.api.url') . $negocio['foto_perfil']['url_imagen'] }}"
+<img src="{{ url('/api-proxy/public/' . ltrim($negocio['foto_perfil']['url_imagen'], '/')) }}"
 class="w-full h-full object-cover">
 @endif
 
