@@ -66,7 +66,7 @@
                 </div>
                 
                 @if(!session()->has('rol'))
-                <a href="/register" class="px-6 py-3 bg-white text-black font-bold rounded-lg hover:bg-gray-200 transition-colors text-sm uppercase tracking-wide flex items-center gap-2">
+                <a href="/register?negocio_id={{ $negocio['id_negocio'] }}" class="px-6 py-3 bg-white text-black font-bold rounded-lg hover:bg-gray-200 transition-colors text-sm uppercase tracking-wide flex items-center gap-2">
                     <i class="fas fa-calendar-alt"></i>
                     Agendar Cita
                 </a>
@@ -156,7 +156,7 @@
                             <p class="text-[#9CA3AF] text-xs leading-relaxed mt-2 line-clamp-2">
                                 {{ $servicio['descripcion'] ?? 'Descripción no disponible' }}
                             </p>
-                            <button class="mt-4 w-full py-2 bg-transparent border border-[#374151] text-white text-xs uppercase tracking-wider rounded hover:bg-yellow-500 hover:text-black hover:border-yellow-500 transition-all duration-300">
+                            <button onclick="seleccionarServicio({{ $servicio['id'] }})" class="mt-4 w-full py-2 bg-transparent border border-[#374151] text-white text-xs uppercase tracking-wider rounded hover:bg-yellow-500 hover:text-black hover:border-yellow-500 transition-all duration-300">
                                 Seleccionar servicio
                             </button>
                         </div>
@@ -379,14 +379,14 @@ function agendarConEmpleado() {
     
     let url = '';
     @if(session()->has('rol'))
-        url = '/booking/create?empleado=' + empleadoSeleccionadoId;
+        url = '/booking/create?negocio_id=' + negocioId + '&empleado=' + empleadoSeleccionadoId;
         if (servicioSeleccionadoId) {
             url += '&servicio=' + servicioSeleccionadoId;
         }
         window.location.href = url;
     @else
         if(confirm('Para agendar una cita necesitas iniciar sesión. ¿Deseas continuar?')) {
-            let redirectUrl = '/login?redirect=/negocio/{{ $negocio['id_negocio'] }}';
+            let redirectUrl = '/login?redirect=/negocio/' + negocioId;
             if (empleadoSeleccionadoId) {
                 redirectUrl += '&empleado=' + empleadoSeleccionadoId;
             }
@@ -405,11 +405,11 @@ function agendarServicio(servicioId) {
     } else {
         let url = '';
         @if(session()->has('rol'))
-            url = '/booking/create?servicio=' + servicioId;
+            url = '/booking/create?negocio_id=' + negocioId + '&servicio=' + servicioId;
             window.location.href = url;
         @else
             if(confirm('Para reservar este servicio necesitas iniciar sesión. ¿Deseas continuar?')) {
-                window.location.href = '/login?redirect=/negocio/{{ $negocio['id_negocio'] }}&servicio=' + servicioId;
+                window.location.href = '/login?redirect=/negocio/' + negocioId + '&servicio=' + servicioId;
             }
         @endif
     }

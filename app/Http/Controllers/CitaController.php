@@ -13,16 +13,32 @@ class CitaController extends Controller
         $servicioId = $request->get('servicio');
         $empleadoId = $request->get('empleado');
         
-        $apiBaseUrl = config('services.api.url');
+        // Si no hay negocio_id, intentar obtener del servicio o empleado
+        if (!$negocioId && $servicioId) {
+            // Obtener negocio_id del servicio
+            $response = Http::get(config('services.api.url') . '/api/servicios/' . $servicioId);
+            $servicio = $response->json('data');
+            $negocioId = $servicio['negocio_id'] ?? null;
+        }
+        
+        if (!$negocioId && $empleadoId) {
+            // Obtener negocio_id del empleado
+            $response = Http::get(config('services.api.url') . '/api/empleados/' . $empleadoId);
+            $empleado = $response->json('data');
+            $negocioId = $empleado['negocio_id'] ?? null;
+        }
+        
+        // Si aún no hay negocio_id, mostrar error
+        if (!$negocioId) {
+            abort(400, 'No se pudo identificar el negocio');
+        }
         
         // Obtener servicios del negocio
         $servicios = [];
         try {
             $response = Http::timeout(10)
                 ->withOptions(['verify' => false])
-                ->get($apiBaseUrl . '/api/servicios', [
-                    'negocio_id' => $negocioId
-                ]);
+                ->get($apiBaseUrl . '/api/servicios', ['negocio_id' => $negocioId]);
             if ($response->successful()) {
                 $servicios = $response->json('data') ?? [];
             }
@@ -35,9 +51,7 @@ class CitaController extends Controller
         try {
             $response = Http::timeout(10)
                 ->withOptions(['verify' => false])
-                ->get($apiBaseUrl . '/api/empleados', [
-                    'negocio_id' => $negocioId
-                ]);
+                ->get($apiBaseUrl . '/api/empleados', ['negocio_id' => $negocioId]);
             if ($response->successful()) {
                 $empleados = $response->json('data') ?? [];
             }
