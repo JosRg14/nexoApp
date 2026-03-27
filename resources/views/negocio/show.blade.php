@@ -78,7 +78,7 @@
     <!-- Contenido principal -->
     <div class="max-w-7xl mx-auto px-6 py-12">
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <!-- Columna izquierda -->
+            <!-- Columna izquierda - Servicios -->
             <div class="lg:col-span-2 space-y-6">
                 <!-- Stats Cards -->
                 <div class="grid grid-cols-3 gap-4">
@@ -110,241 +110,68 @@
                 </div>
                 @endif
                 
-      <!-- Servicios - Carrusel Automático -->
-<div class="bg-[#262626] border border-[#374151] rounded-sm p-6">
-    <div class="flex justify-between items-center mb-6">
-        <h3 class="text-xl font-bold uppercase tracking-widest text-white flex items-center gap-3">
-            <i class="fas fa-cut text-2xl"></i> 
-            Nuestros Servicios
-            <span class="text-sm text-[#9CA3AF] font-normal">({{ count($servicios) }})</span>
-        </h3>
-        
-        <!-- Controles del carrusel -->
-        @if(count($servicios) > 1)
-        <div class="flex gap-2">
-            <button id="prevService" class="w-10 h-10 rounded-full bg-[#1a1a1a] border border-[#374151] text-white hover:bg-white hover:text-black transition-all duration-300 flex items-center justify-center">
-                <i class="fas fa-chevron-left"></i>
-            </button>
-            <button id="nextService" class="w-10 h-10 rounded-full bg-[#1a1a1a] border border-[#374151] text-white hover:bg-white hover:text-black transition-all duration-300 flex items-center justify-center">
-                <i class="fas fa-chevron-right"></i>
-            </button>
-        </div>
-        @endif
-    </div>
-    
-    @if(count($servicios) > 0)
-    <div class="relative overflow-hidden">
-        <!-- Indicadores de página -->
-        <div class="flex justify-center gap-2 mb-4">
-            @foreach($servicios as $index => $servicio)
-            <button class="service-dot w-2 h-2 rounded-full transition-all duration-300 {{ $index === 0 ? 'bg-white w-6' : 'bg-[#374151]' }}" data-index="{{ $index }}"></button>
-            @endforeach
-        </div>
-        
-        <!-- Carrusel -->
-        <div class="service-carousel-container overflow-hidden">
-            <div class="service-carousel-track flex transition-transform duration-500 ease-out" style="transform: translateX(0%)">
-                @foreach($servicios as $servicio)
-                <div class="service-slide flex-shrink-0 w-full px-2">
-                    <div class="bg-[#1a1a1a] rounded-xl overflow-hidden border border-[#374151] hover:border-[#F3F4F6] transition-all duration-300">
-                        <!-- Imagen destacada -->
-                        <div class="relative h-72 md:h-96 overflow-hidden bg-gradient-to-br from-gray-800 to-gray-900">
-                            @if(isset($servicio['imagen']) && $servicio['imagen'])
-                                <img src="{{ $servicio['imagen'] }}" 
-                                     alt="{{ $servicio['nombre'] }}"
-                                     class="service-image w-full h-full object-cover transition-transform duration-700 hover:scale-110">
-                            @else
-                                <div class="w-full h-full flex flex-col items-center justify-center text-gray-500">
-                                    <i class="fas fa-cut text-8xl mb-4 opacity-50"></i>
-                                    <span class="text-sm uppercase tracking-wider">Sin imagen</span>
-                                </div>
-                            @endif
-                            
-                            <!-- Badge de precio flotante -->
-                            <div class="absolute top-5 right-5 bg-black/80 backdrop-blur-sm px-4 py-2 rounded-full">
-                                <span class="text-yellow-500 font-bold text-xl">${{ number_format($servicio['precio'], 0, ',', '.') }}</span>
-                            </div>
-                            
-                            <!-- Badge de duración -->
-                            <div class="absolute bottom-5 left-5 bg-black/60 backdrop-blur-sm px-3 py-1.5 rounded-full">
-                                <span class="text-white text-sm flex items-center gap-2">
-                                    <i class="far fa-clock"></i> {{ $servicio['duracion'] ?? 30 }} minutos
-                                </span>
-                            </div>
-                        </div>
-                        
-                        <!-- Contenido -->
-                        <div class="p-6">
-                            <h4 class="text-2xl font-bold text-white uppercase tracking-wide mb-3">
-                                {{ $servicio['nombre'] }}
-                            </h4>
-                            <p class="text-[#9CA3AF] text-base leading-relaxed mb-6">
-                                {{ $servicio['descripcion'] ?? 'Descripción no disponible' }}
-                            </p>
-                            
-                            <!-- Características adicionales (opcional) -->
-                            @if(isset($servicio['caracteristicas']) && count($servicio['caracteristicas']) > 0)
-                            <div class="flex flex-wrap gap-2 mb-6">
-                                @foreach($servicio['caracteristicas'] as $caract)
-                                <span class="text-xs text-[#9CA3AF] bg-[#374151]/30 px-3 py-1 rounded-full">
-                                    {{ $caract }}
-                                </span>
-                                @endforeach
-                            </div>
-                            @endif
-                            
-                            <!-- Botón de reserva -->
-                            <button onclick="agendarServicio({{ $servicio['id_servicio'] ?? $servicio['id'] }})" 
-                                    class="w-full py-3 bg-gradient-to-r from-yellow-500 to-yellow-600 text-black font-bold uppercase tracking-wider rounded-lg hover:from-yellow-400 hover:to-yellow-500 transition-all duration-300 flex items-center justify-center gap-2">
-                                <i class="fas fa-calendar-check"></i>
-                                Reservar este servicio
-                            </button>
-                        </div>
+                <!-- Servicios - Grid horizontal (3 por fila) -->
+                <div class="bg-[#262626] border border-[#374151] rounded-sm p-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-xl font-bold uppercase tracking-widest text-white flex items-center gap-3">
+                            <i class="fas fa-cut text-2xl"></i> 
+                            Nuestros Servicios
+                            <span class="text-sm text-[#9CA3AF] font-normal">({{ count($servicios) }})</span>
+                        </h3>
                     </div>
+                    
+                    @if(count($servicios) > 0)
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        @foreach($servicios as $servicio)
+                        <div class="group bg-[#1a1a1a] rounded-xl overflow-hidden border border-[#374151] hover:border-[#F3F4F6] transition-all duration-300 hover:shadow-xl hover:shadow-black/50 cursor-pointer" onclick="seleccionarServicio({{ $servicio['id'] }})">
+                            <!-- Imagen del servicio -->
+                            <div class="relative h-48 overflow-hidden bg-gradient-to-br from-gray-800 to-gray-900">
+                                @if(isset($servicio['imagen']) && $servicio['imagen'])
+                                    <img src="{{ $servicio['imagen'] }}" 
+                                         alt="{{ $servicio['nombre'] }}"
+                                         class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                                @else
+                                    <div class="w-full h-full flex flex-col items-center justify-center text-gray-500">
+                                        <i class="fas fa-cut text-5xl mb-3 opacity-50"></i>
+                                        <span class="text-xs uppercase tracking-wider">Sin imagen</span>
+                                    </div>
+                                @endif
+                                
+                                <!-- Badge de precio -->
+                                <div class="absolute top-3 right-3 bg-black/70 backdrop-blur-sm px-3 py-1 rounded-full">
+                                    <span class="text-yellow-500 font-bold">${{ number_format($servicio['precio'], 0, ',', '.') }}</span>
+                                </div>
+                                
+                                <!-- Badge de duración -->
+                                <div class="absolute bottom-3 left-3 bg-black/60 backdrop-blur-sm px-2 py-1 rounded-full">
+                                    <span class="text-white text-xs flex items-center gap-1">
+                                        <i class="far fa-clock"></i> {{ $servicio['duracion'] ?? 30 }} min
+                                    </span>
+                                </div>
+                            </div>
+                            
+                            <!-- Contenido -->
+                            <div class="p-4">
+                                <h4 class="text-lg font-bold text-white uppercase tracking-wide group-hover:text-[#9CA3AF] transition-colors">
+                                    {{ $servicio['nombre'] }}
+                                </h4>
+                                <p class="text-[#9CA3AF] text-xs leading-relaxed mt-2 line-clamp-2">
+                                    {{ $servicio['descripcion'] ?? 'Descripción no disponible' }}
+                                </p>
+                                <button class="mt-4 w-full py-2 bg-transparent border border-[#374151] text-white text-xs uppercase tracking-wider rounded hover:bg-yellow-500 hover:text-black hover:border-yellow-500 transition-all duration-300">
+                                    Seleccionar servicio
+                                </button>
+                            </div>
+                        </div>
+                        @endforeach
+                    </div>
+                    @else
+                    <div class="text-center py-12">
+                        <i class="fas fa-scissors text-5xl text-[#374151] mb-4"></i>
+                        <p class="text-[#9CA3AF]">No hay servicios disponibles aún.</p>
+                    </div>
+                    @endif
                 </div>
-                @endforeach
-            </div>
-        </div>
-    </div>
-    
-    <!-- Mensaje cuando no hay servicios -->
-    @else
-    <div class="text-center py-16">
-        <i class="fas fa-scissors text-6xl text-[#374151] mb-4"></i>
-        <p class="text-[#9CA3AF] text-lg">Próximamente nuevos servicios</p>
-        <p class="text-[#52525b] text-sm mt-2">No hay servicios disponibles en este momento</p>
-    </div>
-    @endif
-</div>
-
-<!-- JavaScript para el carrusel -->
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const servicios = @json($servicios);
-    const totalSlides = servicios.length;
-    
-    if (totalSlides <= 1) return;
-    
-    let currentIndex = 0;
-    let autoPlayInterval;
-    const autoPlayDelay = 4000; // 4 segundos
-    
-    const track = document.querySelector('.service-carousel-track');
-    const prevBtn = document.getElementById('prevService');
-    const nextBtn = document.getElementById('nextService');
-    const dots = document.querySelectorAll('.service-dot');
-    
-    function updateCarousel() {
-        // Mover el carrusel
-        const newPosition = -currentIndex * 100;
-        track.style.transform = `translateX(${newPosition}%)`;
-        
-        // Actualizar dots
-        dots.forEach((dot, index) => {
-            if (index === currentIndex) {
-                dot.classList.add('bg-white', 'w-6');
-                dot.classList.remove('bg-[#374151]', 'w-2');
-            } else {
-                dot.classList.add('bg-[#374151]', 'w-2');
-                dot.classList.remove('bg-white', 'w-6');
-            }
-        });
-    }
-    
-    function nextSlide() {
-        currentIndex = (currentIndex + 1) % totalSlides;
-        updateCarousel();
-        resetAutoPlay();
-    }
-    
-    function prevSlide() {
-        currentIndex = (currentIndex - 1 + totalSlides) % totalSlides;
-        updateCarousel();
-        resetAutoPlay();
-    }
-    
-    function resetAutoPlay() {
-        clearInterval(autoPlayInterval);
-        autoPlayInterval = setInterval(nextSlide, autoPlayDelay);
-    }
-    
-    // Eventos de botones
-    if (prevBtn) prevBtn.addEventListener('click', prevSlide);
-    if (nextBtn) nextBtn.addEventListener('click', nextSlide);
-    
-    // Eventos de dots
-    dots.forEach((dot, index) => {
-        dot.addEventListener('click', () => {
-            currentIndex = index;
-            updateCarousel();
-            resetAutoPlay();
-        });
-    });
-    
-    // Iniciar autoplay
-    resetAutoPlay();
-    
-    // Pausar autoplay al hacer hover sobre el carrusel
-    const carouselContainer = document.querySelector('.service-carousel-container');
-    if (carouselContainer) {
-        carouselContainer.addEventListener('mouseenter', () => {
-            clearInterval(autoPlayInterval);
-        });
-        
-        carouselContainer.addEventListener('mouseleave', () => {
-            autoPlayInterval = setInterval(nextSlide, autoPlayDelay);
-        });
-    }
-});
-
-function agendarServicio(servicioId) {
-    @if(session()->has('rol'))
-        window.location.href = '/booking/create?servicio=' + servicioId;
-    @else
-        if(confirm('Para reservar este servicio necesitas iniciar sesión. ¿Deseas continuar?')) {
-            window.location.href = '/login?redirect=/negocio/{{ $negocio['id_negocio'] }}&servicio=' + servicioId;
-        }
-    @endif
-}
-</script>
-
-<!-- Estilos adicionales para el carrusel -->
-<style>
-.service-carousel-container {
-    position: relative;
-    width: 100%;
-    overflow: hidden;
-    border-radius: 0.75rem;
-}
-
-.service-carousel-track {
-    display: flex;
-    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.service-slide {
-    flex: 0 0 100%;
-    max-width: 100%;
-}
-
-.service-image {
-    transition: transform 0.7s ease-out;
-}
-
-.service-slide:hover .service-image {
-    transform: scale(1.1);
-}
-
-.service-dot {
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.service-dot:hover {
-    background-color: white;
-    width: 1.5rem;
-}
-</style>
                 
                 <!-- Reseñas -->
                 <div class="bg-[#262626] border border-[#374151] rounded-sm p-6">
@@ -376,36 +203,58 @@ function agendarServicio(servicioId) {
                 </div>
             </div>
             
-            <!-- Columna derecha -->
+            <!-- Columna derecha - Empleados con selección para cita -->
             <div class="space-y-6">
-                <!-- Equipo de Trabajo -->
+                <!-- Equipo de Trabajo - Seleccionable -->
                 <div class="bg-[#262626] border border-[#374151] rounded-sm p-6">
                     <h3 class="text-sm font-bold uppercase tracking-widest text-white mb-4 flex items-center gap-2">
                         <i class="fas fa-users"></i> Nuestro Equipo ({{ count($empleados) }})
                     </h3>
                     <div class="space-y-3">
                         @forelse($empleados as $empleado)
-                        <div class="flex items-center gap-3 p-3 bg-[#1a1a1a] border border-[#374151]">
-                            <div class="w-8 h-8 bg-blue-500/20 text-blue-500 flex items-center justify-center text-[10px] font-bold rounded-full">
+                        <div class="flex items-center gap-3 p-3 bg-[#1a1a1a] border border-[#374151] rounded-lg hover:border-yellow-500 transition-all duration-300 cursor-pointer group" 
+                             onclick="seleccionarEmpleado({{ $empleado['id_empleado'] }}, '{{ $empleado['nombre'] }}')">
+                            <div class="w-10 h-10 bg-gradient-to-br from-yellow-500/20 to-yellow-600/20 text-yellow-500 flex items-center justify-center text-sm font-bold rounded-full">
                                 {{ strtoupper(substr($empleado['nombre'], 0, 1)) }}
                             </div>
-                            <div>
-                                <span class="text-xs text-[#D1D5DB] uppercase tracking-wider font-bold block">{{ $empleado['nombre'] }}</span>
+                            <div class="flex-1">
+                                <span class="text-sm text-[#D1D5DB] uppercase tracking-wider font-bold block group-hover:text-yellow-500 transition-colors">
+                                    {{ $empleado['nombre'] }} {{ $empleado['app_paterno'] ?? '' }}
+                                </span>
                                 @if(isset($empleado['especialidad']) && $empleado['especialidad'])
                                 <span class="text-[10px] text-[#52525b]">{{ $empleado['especialidad'] }}</span>
                                 @endif
                             </div>
                             @if(isset($empleado['calificacion']))
-                            <div class="ml-auto flex items-center gap-1 text-[10px] text-yellow-500">
+                            <div class="flex items-center gap-1 text-[10px] text-yellow-500">
                                 <i class="fas fa-star"></i>
                                 <span>{{ number_format($empleado['calificacion'], 1) }}</span>
                             </div>
                             @endif
+                            <div class="opacity-0 group-hover:opacity-100 transition-opacity">
+                                <i class="fas fa-chevron-right text-[#9CA3AF] text-xs"></i>
+                            </div>
                         </div>
                         @empty
                         <p class="text-xs text-[#52525b] italic">Sin empleados registrados.</p>
                         @endforelse
                     </div>
+                    
+                    <!-- Botón para agendar con empleado seleccionado -->
+                    @if(count($empleados) > 0)
+                    <div class="mt-6 pt-4 border-t border-[#374151]">
+                        <div id="empleadoSeleccionado" class="text-center hidden">
+                            <p class="text-xs text-[#9CA3AF] mb-2">Empleado seleccionado:</p>
+                            <p class="text-sm font-bold text-white mb-3" id="nombreEmpleadoSeleccionado"></p>
+                            <button id="btnAgendarConEmpleado" 
+                                    onclick="agendarConEmpleado()"
+                                    class="w-full py-2 bg-gradient-to-r from-yellow-500 to-yellow-600 text-black font-bold uppercase tracking-wider rounded-lg hover:from-yellow-400 hover:to-yellow-500 transition-all duration-300 flex items-center justify-center gap-2">
+                                <i class="fas fa-calendar-check"></i>
+                                Agendar cita con este empleado
+                            </button>
+                        </div>
+                    </div>
+                    @endif
                 </div>
                 
                 <!-- Horario -->
@@ -462,4 +311,94 @@ function agendarServicio(servicioId) {
         </div>
     </div>
 </div>
+
+<!-- JavaScript para selección de servicio y empleado -->
+<script>
+let servicioSeleccionadoId = null;
+let empleadoSeleccionadoId = null;
+let empleadoSeleccionadoNombre = null;
+
+function seleccionarServicio(servicioId) {
+    servicioSeleccionadoId = servicioId;
+    // Opcional: mostrar un toast o mensaje
+    console.log('Servicio seleccionado:', servicioId);
+    
+    // Puedes agregar un estilo visual al servicio seleccionado
+    document.querySelectorAll('[onclick^="seleccionarServicio"]').forEach(el => {
+        el.classList.remove('ring-2', 'ring-yellow-500');
+    });
+    event.currentTarget.classList.add('ring-2', 'ring-yellow-500');
+}
+
+function seleccionarEmpleado(id, nombre) {
+    empleadoSeleccionadoId = id;
+    empleadoSeleccionadoNombre = nombre;
+    
+    // Mostrar el botón de agendar
+    const divEmpleado = document.getElementById('empleadoSeleccionado');
+    const nombreSpan = document.getElementById('nombreEmpleadoSeleccionado');
+    
+    nombreSpan.textContent = nombre;
+    divEmpleado.classList.remove('hidden');
+    
+    // Remover estilo de otros empleados
+    document.querySelectorAll('[onclick^="seleccionarEmpleado"]').forEach(el => {
+        el.classList.remove('border-yellow-500', 'bg-yellow-500/10');
+    });
+    event.currentTarget.classList.add('border-yellow-500', 'bg-yellow-500/10');
+}
+
+function agendarConEmpleado() {
+    if (!empleadoSeleccionadoId) {
+        alert('Por favor selecciona un empleado primero');
+        return;
+    }
+    
+    let url = '';
+    @if(session()->has('rol'))
+        url = '/booking/create?empleado=' + empleadoSeleccionadoId;
+        if (servicioSeleccionadoId) {
+            url += '&servicio=' + servicioSeleccionadoId;
+        }
+        window.location.href = url;
+    @else
+        if(confirm('Para agendar una cita necesitas iniciar sesión. ¿Deseas continuar?')) {
+            let redirectUrl = '/login?redirect=/negocio/{{ $negocio['id_negocio'] }}';
+            if (empleadoSeleccionadoId) {
+                redirectUrl += '&empleado=' + empleadoSeleccionadoId;
+            }
+            if (servicioSeleccionadoId) {
+                redirectUrl += '&servicio=' + servicioSeleccionadoId;
+            }
+            window.location.href = redirectUrl;
+        }
+    @endif
+}
+
+function agendarServicio(servicioId) {
+    servicioSeleccionadoId = servicioId;
+    if (empleadoSeleccionadoId) {
+        agendarConEmpleado();
+    } else {
+        let url = '';
+        @if(session()->has('rol'))
+            url = '/booking/create?servicio=' + servicioId;
+            window.location.href = url;
+        @else
+            if(confirm('Para reservar este servicio necesitas iniciar sesión. ¿Deseas continuar?')) {
+                window.location.href = '/login?redirect=/negocio/{{ $negocio['id_negocio'] }}&servicio=' + servicioId;
+            }
+        @endif
+    }
+}
+</script>
+
+<style>
+.line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+</style>
 @endsection
