@@ -16,7 +16,7 @@
             </div>
             
             <p class="text-[#9CA3AF] text-xs mb-6">
-                Configura los horarios de atención para cada día de la semana. Los horarios se mostrarán en la página pública de tu negocio.
+                Configura los horarios de atención para cada día. Puedes establecer hasta dos bloques horarios (ej: mañana y tarde).
             </p>
             
             <form id="horario-form" class="space-y-4">
@@ -24,143 +24,199 @@
                 <input type="hidden" name="_method" value="PUT">
                 
                 <!-- Lunes -->
-                <div class="bg-[#1a1a1a] border border-[#374151] rounded-lg p-4">
-                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div class="bg-[#1a1a1a] border border-[#374151] rounded-lg p-4 hover:border-gray-500 transition-all">
+                    <div class="flex flex-wrap items-center gap-4 mb-3">
                         <div class="flex items-center gap-3">
-                            <input type="checkbox" id="lunes_abierto" name="horarios[0][abierto]" value="1" class="w-4 h-4 accent-yellow-500" data-day="lunes">
+                            <input type="checkbox" id="lunes_abierto" class="dia-checkbox w-4 h-4 accent-yellow-500" data-day="lunes">
                             <label for="lunes_abierto" class="text-white font-bold uppercase tracking-wider text-sm">Lunes</label>
                         </div>
-                        <div class="flex gap-3 items-center">
-                            <input type="time" id="lunes_apertura" name="horarios[0][hora_apertura]" 
+                        <button type="button" class="agregar-bloque text-xs text-[#9CA3AF] hover:text-yellow-500 transition-colors" data-day="lunes">
+                            <i class="fas fa-plus-circle mr-1"></i> Agregar bloque
+                        </button>
+                    </div>
+                    <div id="lunes-bloques" class="bloques-container space-y-3 ml-6">
+                        <div class="bloque-horario flex flex-wrap items-center gap-3">
+                            <input type="time" name="horarios[lunes][0][hora_apertura]" 
                                    class="bg-[#262626] border border-[#374151] rounded px-3 py-2 text-white text-sm focus:border-yellow-500 focus:outline-none"
                                    value="09:00" disabled>
-                            <span class="text-[#9CA3AF]">a</span>
-                            <input type="time" id="lunes_cierre" name="horarios[0][hora_cierre]" 
+                            <span class="text-[#9CA3AF] text-xs">a</span>
+                            <input type="time" name="horarios[lunes][0][hora_cierre]" 
                                    class="bg-[#262626] border border-[#374151] rounded px-3 py-2 text-white text-sm focus:border-yellow-500 focus:outline-none"
                                    value="18:00" disabled>
+                            <button type="button" class="eliminar-bloque text-red-500 hover:text-red-400 text-xs opacity-0 group-hover:opacity-100 transition-opacity" style="display: none;">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
                         </div>
                     </div>
-                    <input type="hidden" name="horarios[0][dia_semana]" value="lunes">
+                    <input type="hidden" name="horarios[lunes][dia_semana]" value="lunes">
                 </div>
                 
                 <!-- Martes -->
-                <div class="bg-[#1a1a1a] border border-[#374151] rounded-lg p-4">
-                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div class="bg-[#1a1a1a] border border-[#374151] rounded-lg p-4 hover:border-gray-500 transition-all">
+                    <div class="flex flex-wrap items-center gap-4 mb-3">
                         <div class="flex items-center gap-3">
-                            <input type="checkbox" id="martes_abierto" name="horarios[1][abierto]" value="1" class="w-4 h-4 accent-yellow-500" data-day="martes">
+                            <input type="checkbox" id="martes_abierto" class="dia-checkbox w-4 h-4 accent-yellow-500" data-day="martes">
                             <label for="martes_abierto" class="text-white font-bold uppercase tracking-wider text-sm">Martes</label>
                         </div>
-                        <div class="flex gap-3 items-center">
-                            <input type="time" id="martes_apertura" name="horarios[1][hora_apertura]" 
+                        <button type="button" class="agregar-bloque text-xs text-[#9CA3AF] hover:text-yellow-500 transition-colors" data-day="martes">
+                            <i class="fas fa-plus-circle mr-1"></i> Agregar bloque
+                        </button>
+                    </div>
+                    <div id="martes-bloques" class="bloques-container space-y-3 ml-6">
+                        <div class="bloque-horario flex flex-wrap items-center gap-3">
+                            <input type="time" name="horarios[martes][0][hora_apertura]" 
                                    class="bg-[#262626] border border-[#374151] rounded px-3 py-2 text-white text-sm focus:border-yellow-500 focus:outline-none"
                                    value="09:00" disabled>
-                            <span class="text-[#9CA3AF]">a</span>
-                            <input type="time" id="martes_cierre" name="horarios[1][hora_cierre]" 
+                            <span class="text-[#9CA3AF] text-xs">a</span>
+                            <input type="time" name="horarios[martes][0][hora_cierre]" 
                                    class="bg-[#262626] border border-[#374151] rounded px-3 py-2 text-white text-sm focus:border-yellow-500 focus:outline-none"
                                    value="18:00" disabled>
+                            <button type="button" class="eliminar-bloque text-red-500 hover:text-red-400 text-xs opacity-0 group-hover:opacity-100 transition-opacity" style="display: none;">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
                         </div>
                     </div>
-                    <input type="hidden" name="horarios[1][dia_semana]" value="martes">
+                    <input type="hidden" name="horarios[martes][dia_semana]" value="martes">
                 </div>
                 
                 <!-- Miércoles -->
-                <div class="bg-[#1a1a1a] border border-[#374151] rounded-lg p-4">
-                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div class="bg-[#1a1a1a] border border-[#374151] rounded-lg p-4 hover:border-gray-500 transition-all">
+                    <div class="flex flex-wrap items-center gap-4 mb-3">
                         <div class="flex items-center gap-3">
-                            <input type="checkbox" id="miercoles_abierto" name="horarios[2][abierto]" value="1" class="w-4 h-4 accent-yellow-500" data-day="miercoles">
+                            <input type="checkbox" id="miercoles_abierto" class="dia-checkbox w-4 h-4 accent-yellow-500" data-day="miercoles">
                             <label for="miercoles_abierto" class="text-white font-bold uppercase tracking-wider text-sm">Miércoles</label>
                         </div>
-                        <div class="flex gap-3 items-center">
-                            <input type="time" id="miercoles_apertura" name="horarios[2][hora_apertura]" 
+                        <button type="button" class="agregar-bloque text-xs text-[#9CA3AF] hover:text-yellow-500 transition-colors" data-day="miercoles">
+                            <i class="fas fa-plus-circle mr-1"></i> Agregar bloque
+                        </button>
+                    </div>
+                    <div id="miercoles-bloques" class="bloques-container space-y-3 ml-6">
+                        <div class="bloque-horario flex flex-wrap items-center gap-3">
+                            <input type="time" name="horarios[miercoles][0][hora_apertura]" 
                                    class="bg-[#262626] border border-[#374151] rounded px-3 py-2 text-white text-sm focus:border-yellow-500 focus:outline-none"
                                    value="09:00" disabled>
-                            <span class="text-[#9CA3AF]">a</span>
-                            <input type="time" id="miercoles_cierre" name="horarios[2][hora_cierre]" 
+                            <span class="text-[#9CA3AF] text-xs">a</span>
+                            <input type="time" name="horarios[miercoles][0][hora_cierre]" 
                                    class="bg-[#262626] border border-[#374151] rounded px-3 py-2 text-white text-sm focus:border-yellow-500 focus:outline-none"
                                    value="18:00" disabled>
+                            <button type="button" class="eliminar-bloque text-red-500 hover:text-red-400 text-xs opacity-0 group-hover:opacity-100 transition-opacity" style="display: none;">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
                         </div>
                     </div>
-                    <input type="hidden" name="horarios[2][dia_semana]" value="miercoles">
+                    <input type="hidden" name="horarios[miercoles][dia_semana]" value="miercoles">
                 </div>
                 
                 <!-- Jueves -->
-                <div class="bg-[#1a1a1a] border border-[#374151] rounded-lg p-4">
-                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div class="bg-[#1a1a1a] border border-[#374151] rounded-lg p-4 hover:border-gray-500 transition-all">
+                    <div class="flex flex-wrap items-center gap-4 mb-3">
                         <div class="flex items-center gap-3">
-                            <input type="checkbox" id="jueves_abierto" name="horarios[3][abierto]" value="1" class="w-4 h-4 accent-yellow-500" data-day="jueves">
+                            <input type="checkbox" id="jueves_abierto" class="dia-checkbox w-4 h-4 accent-yellow-500" data-day="jueves">
                             <label for="jueves_abierto" class="text-white font-bold uppercase tracking-wider text-sm">Jueves</label>
                         </div>
-                        <div class="flex gap-3 items-center">
-                            <input type="time" id="jueves_apertura" name="horarios[3][hora_apertura]" 
+                        <button type="button" class="agregar-bloque text-xs text-[#9CA3AF] hover:text-yellow-500 transition-colors" data-day="jueves">
+                            <i class="fas fa-plus-circle mr-1"></i> Agregar bloque
+                        </button>
+                    </div>
+                    <div id="jueves-bloques" class="bloques-container space-y-3 ml-6">
+                        <div class="bloque-horario flex flex-wrap items-center gap-3">
+                            <input type="time" name="horarios[jueves][0][hora_apertura]" 
                                    class="bg-[#262626] border border-[#374151] rounded px-3 py-2 text-white text-sm focus:border-yellow-500 focus:outline-none"
                                    value="09:00" disabled>
-                            <span class="text-[#9CA3AF]">a</span>
-                            <input type="time" id="jueves_cierre" name="horarios[3][hora_cierre]" 
+                            <span class="text-[#9CA3AF] text-xs">a</span>
+                            <input type="time" name="horarios[jueves][0][hora_cierre]" 
                                    class="bg-[#262626] border border-[#374151] rounded px-3 py-2 text-white text-sm focus:border-yellow-500 focus:outline-none"
                                    value="18:00" disabled>
+                            <button type="button" class="eliminar-bloque text-red-500 hover:text-red-400 text-xs opacity-0 group-hover:opacity-100 transition-opacity" style="display: none;">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
                         </div>
                     </div>
-                    <input type="hidden" name="horarios[3][dia_semana]" value="jueves">
+                    <input type="hidden" name="horarios[jueves][dia_semana]" value="jueves">
                 </div>
                 
                 <!-- Viernes -->
-                <div class="bg-[#1a1a1a] border border-[#374151] rounded-lg p-4">
-                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div class="bg-[#1a1a1a] border border-[#374151] rounded-lg p-4 hover:border-gray-500 transition-all">
+                    <div class="flex flex-wrap items-center gap-4 mb-3">
                         <div class="flex items-center gap-3">
-                            <input type="checkbox" id="viernes_abierto" name="horarios[4][abierto]" value="1" class="w-4 h-4 accent-yellow-500" data-day="viernes">
+                            <input type="checkbox" id="viernes_abierto" class="dia-checkbox w-4 h-4 accent-yellow-500" data-day="viernes">
                             <label for="viernes_abierto" class="text-white font-bold uppercase tracking-wider text-sm">Viernes</label>
                         </div>
-                        <div class="flex gap-3 items-center">
-                            <input type="time" id="viernes_apertura" name="horarios[4][hora_apertura]" 
+                        <button type="button" class="agregar-bloque text-xs text-[#9CA3AF] hover:text-yellow-500 transition-colors" data-day="viernes">
+                            <i class="fas fa-plus-circle mr-1"></i> Agregar bloque
+                        </button>
+                    </div>
+                    <div id="viernes-bloques" class="bloques-container space-y-3 ml-6">
+                        <div class="bloque-horario flex flex-wrap items-center gap-3">
+                            <input type="time" name="horarios[viernes][0][hora_apertura]" 
                                    class="bg-[#262626] border border-[#374151] rounded px-3 py-2 text-white text-sm focus:border-yellow-500 focus:outline-none"
                                    value="09:00" disabled>
-                            <span class="text-[#9CA3AF]">a</span>
-                            <input type="time" id="viernes_cierre" name="horarios[4][hora_cierre]" 
+                            <span class="text-[#9CA3AF] text-xs">a</span>
+                            <input type="time" name="horarios[viernes][0][hora_cierre]" 
                                    class="bg-[#262626] border border-[#374151] rounded px-3 py-2 text-white text-sm focus:border-yellow-500 focus:outline-none"
                                    value="18:00" disabled>
+                            <button type="button" class="eliminar-bloque text-red-500 hover:text-red-400 text-xs opacity-0 group-hover:opacity-100 transition-opacity" style="display: none;">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
                         </div>
                     </div>
-                    <input type="hidden" name="horarios[4][dia_semana]" value="viernes">
+                    <input type="hidden" name="horarios[viernes][dia_semana]" value="viernes">
                 </div>
                 
                 <!-- Sábado -->
-                <div class="bg-[#1a1a1a] border border-[#374151] rounded-lg p-4">
-                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div class="bg-[#1a1a1a] border border-[#374151] rounded-lg p-4 hover:border-gray-500 transition-all">
+                    <div class="flex flex-wrap items-center gap-4 mb-3">
                         <div class="flex items-center gap-3">
-                            <input type="checkbox" id="sabado_abierto" name="horarios[5][abierto]" value="1" class="w-4 h-4 accent-yellow-500" data-day="sabado">
+                            <input type="checkbox" id="sabado_abierto" class="dia-checkbox w-4 h-4 accent-yellow-500" data-day="sabado">
                             <label for="sabado_abierto" class="text-white font-bold uppercase tracking-wider text-sm">Sábado</label>
                         </div>
-                        <div class="flex gap-3 items-center">
-                            <input type="time" id="sabado_apertura" name="horarios[5][hora_apertura]" 
+                        <button type="button" class="agregar-bloque text-xs text-[#9CA3AF] hover:text-yellow-500 transition-colors" data-day="sabado">
+                            <i class="fas fa-plus-circle mr-1"></i> Agregar bloque
+                        </button>
+                    </div>
+                    <div id="sabado-bloques" class="bloques-container space-y-3 ml-6">
+                        <div class="bloque-horario flex flex-wrap items-center gap-3">
+                            <input type="time" name="horarios[sabado][0][hora_apertura]" 
                                    class="bg-[#262626] border border-[#374151] rounded px-3 py-2 text-white text-sm focus:border-yellow-500 focus:outline-none"
                                    value="09:00" disabled>
-                            <span class="text-[#9CA3AF]">a</span>
-                            <input type="time" id="sabado_cierre" name="horarios[5][hora_cierre]" 
+                            <span class="text-[#9CA3AF] text-xs">a</span>
+                            <input type="time" name="horarios[sabado][0][hora_cierre]" 
                                    class="bg-[#262626] border border-[#374151] rounded px-3 py-2 text-white text-sm focus:border-yellow-500 focus:outline-none"
                                    value="14:00" disabled>
+                            <button type="button" class="eliminar-bloque text-red-500 hover:text-red-400 text-xs opacity-0 group-hover:opacity-100 transition-opacity" style="display: none;">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
                         </div>
                     </div>
-                    <input type="hidden" name="horarios[5][dia_semana]" value="sabado">
+                    <input type="hidden" name="horarios[sabado][dia_semana]" value="sabado">
                 </div>
                 
                 <!-- Domingo -->
-                <div class="bg-[#1a1a1a] border border-[#374151] rounded-lg p-4">
-                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div class="bg-[#1a1a1a] border border-[#374151] rounded-lg p-4 hover:border-gray-500 transition-all">
+                    <div class="flex flex-wrap items-center gap-4 mb-3">
                         <div class="flex items-center gap-3">
-                            <input type="checkbox" id="domingo_abierto" name="horarios[6][abierto]" value="1" class="w-4 h-4 accent-yellow-500" data-day="domingo">
+                            <input type="checkbox" id="domingo_abierto" class="dia-checkbox w-4 h-4 accent-yellow-500" data-day="domingo">
                             <label for="domingo_abierto" class="text-white font-bold uppercase tracking-wider text-sm">Domingo</label>
                         </div>
-                        <div class="flex gap-3 items-center">
-                            <input type="time" id="domingo_apertura" name="horarios[6][hora_apertura]" 
+                        <button type="button" class="agregar-bloque text-xs text-[#9CA3AF] hover:text-yellow-500 transition-colors" data-day="domingo">
+                            <i class="fas fa-plus-circle mr-1"></i> Agregar bloque
+                        </button>
+                    </div>
+                    <div id="domingo-bloques" class="bloques-container space-y-3 ml-6">
+                        <div class="bloque-horario flex flex-wrap items-center gap-3">
+                            <input type="time" name="horarios[domingo][0][hora_apertura]" 
                                    class="bg-[#262626] border border-[#374151] rounded px-3 py-2 text-white text-sm focus:border-yellow-500 focus:outline-none"
                                    value="09:00" disabled>
-                            <span class="text-[#9CA3AF]">a</span>
-                            <input type="time" id="domingo_cierre" name="horarios[6][hora_cierre]" 
+                            <span class="text-[#9CA3AF] text-xs">a</span>
+                            <input type="time" name="horarios[domingo][0][hora_cierre]" 
                                    class="bg-[#262626] border border-[#374151] rounded px-3 py-2 text-white text-sm focus:border-yellow-500 focus:outline-none"
                                    value="14:00" disabled>
+                            <button type="button" class="eliminar-bloque text-red-500 hover:text-red-400 text-xs opacity-0 group-hover:opacity-100 transition-opacity" style="display: none;">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
                         </div>
                     </div>
-                    <input type="hidden" name="horarios[6][dia_semana]" value="domingo">
+                    <input type="hidden" name="horarios[domingo][dia_semana]" value="domingo">
                 </div>
                 
                 <button type="submit" 
@@ -211,7 +267,7 @@
                 
                 <div class="mt-4 pt-4 border-t border-[#374151]">
                     <p class="text-[10px] text-[#9CA3AF] uppercase tracking-widest">
-                        <i class="fas fa-info-circle mr-1"></i> Los días desactivados se mostrarán como "Cerrado"
+                        <i class="fas fa-info-circle mr-1"></i> Puedes agregar múltiples bloques horarios (ej: 9:00-13:00 y 16:00-20:00)
                     </p>
                 </div>
             </div>
@@ -220,36 +276,106 @@
 </section>
 
 <script>
-// Script para manejar los checkboxes y la vista previa
+// Script para manejar bloques horarios flexibles
 document.addEventListener('DOMContentLoaded', function() {
-    const dias = [
-        { index: 0, nombre: 'lunes', abierto: 'lunes_abierto', apertura: 'lunes_apertura', cierre: 'lunes_cierre' },
-        { index: 1, nombre: 'martes', abierto: 'martes_abierto', apertura: 'martes_apertura', cierre: 'martes_cierre' },
-        { index: 2, nombre: 'miercoles', abierto: 'miercoles_abierto', apertura: 'miercoles_apertura', cierre: 'miercoles_cierre' },
-        { index: 3, nombre: 'jueves', abierto: 'jueves_abierto', apertura: 'jueves_apertura', cierre: 'jueves_cierre' },
-        { index: 4, nombre: 'viernes', abierto: 'viernes_abierto', apertura: 'viernes_apertura', cierre: 'viernes_cierre' },
-        { index: 5, nombre: 'sabado', abierto: 'sabado_abierto', apertura: 'sabado_apertura', cierre: 'sabado_cierre' },
-        { index: 6, nombre: 'domingo', abierto: 'domingo_abierto', apertura: 'domingo_apertura', cierre: 'domingo_cierre' }
-    ];
+    const dias = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado', 'domingo'];
     
-    // Función para habilitar/deshabilitar inputs de tiempo
+    // Función para agregar un bloque horario
+    function agregarBloque(dia) {
+        const container = document.getElementById(`${dia}-bloques`);
+        const bloqueCount = container.querySelectorAll('.bloque-horario').length;
+        
+        const nuevoBloque = document.createElement('div');
+        nuevoBloque.className = 'bloque-horario flex flex-wrap items-center gap-3 group';
+        nuevoBloque.innerHTML = `
+            <input type="time" name="horarios[${dia}][${bloqueCount}][hora_apertura]" 
+                   class="bg-[#262626] border border-[#374151] rounded px-3 py-2 text-white text-sm focus:border-yellow-500 focus:outline-none"
+                   value="09:00">
+            <span class="text-[#9CA3AF] text-xs">a</span>
+            <input type="time" name="horarios[${dia}][${bloqueCount}][hora_cierre]" 
+                   class="bg-[#262626] border border-[#374151] rounded px-3 py-2 text-white text-sm focus:border-yellow-500 focus:outline-none"
+                   value="18:00">
+            <button type="button" class="eliminar-bloque text-red-500 hover:text-red-400 text-xs transition-opacity">
+                <i class="fas fa-trash-alt"></i> Eliminar
+            </button>
+        `;
+        
+        // Agregar evento para eliminar
+        const eliminarBtn = nuevoBloque.querySelector('.eliminar-bloque');
+        eliminarBtn.addEventListener('click', function() {
+            nuevoBloque.remove();
+            actualizarVistaPrevia();
+            // Reindexar los bloques
+            reindexarBloques(dia);
+        });
+        
+        container.appendChild(nuevoBloque);
+        
+        // Agregar eventos para actualizar vista previa
+        const inputs = nuevoBloque.querySelectorAll('input');
+        inputs.forEach(input => {
+            input.addEventListener('change', actualizarVistaPrevia);
+        });
+        
+        actualizarVistaPrevia();
+    }
+    
+    // Función para reindexar los bloques después de eliminar
+    function reindexarBloques(dia) {
+        const container = document.getElementById(`${dia}-bloques`);
+        const bloques = container.querySelectorAll('.bloque-horario');
+        
+        bloques.forEach((bloque, index) => {
+            const apertura = bloque.querySelector('input[name*="hora_apertura"]');
+            const cierre = bloque.querySelector('input[name*="hora_cierre"]');
+            
+            if (apertura) {
+                apertura.name = `horarios[${dia}][${index}][hora_apertura]`;
+            }
+            if (cierre) {
+                cierre.name = `horarios[${dia}][${index}][hora_cierre]`;
+            }
+        });
+    }
+    
+    // Configurar eventos para cada día
     dias.forEach(dia => {
-        const checkbox = document.getElementById(dia.abierto);
-        const apertura = document.getElementById(dia.apertura);
-        const cierre = document.getElementById(dia.cierre);
+        const checkbox = document.getElementById(`${dia}_abierto`);
+        const container = document.getElementById(`${dia}-bloques`);
         
         if (checkbox) {
             checkbox.addEventListener('change', function() {
-                apertura.disabled = !this.checked;
-                cierre.disabled = !this.checked;
-                // Actualizar el valor del checkbox para que envíe 1 si está checked
-                this.value = this.checked ? '1' : '0';
+                const inputs = container.querySelectorAll('input');
+                inputs.forEach(input => {
+                    input.disabled = !this.checked;
+                });
                 actualizarVistaPrevia();
             });
-            
-            apertura.addEventListener('change', actualizarVistaPrevia);
-            cierre.addEventListener('change', actualizarVistaPrevia);
         }
+        
+        // Botón agregar bloque
+        const agregarBtn = document.querySelector(`.agregar-bloque[data-day="${dia}"]`);
+        if (agregarBtn) {
+            agregarBtn.addEventListener('click', () => agregarBloque(dia));
+        }
+        
+        // Configurar eventos en inputs existentes
+        const bloques = container.querySelectorAll('.bloque-horario');
+        bloques.forEach(bloque => {
+            const eliminarBtn = bloque.querySelector('.eliminar-bloque');
+            if (eliminarBtn) {
+                eliminarBtn.addEventListener('click', function() {
+                    bloque.remove();
+                    actualizarVistaPrevia();
+                    reindexarBloques(dia);
+                });
+            }
+            
+            const inputs = bloque.querySelectorAll('input');
+            inputs.forEach(input => {
+                input.addEventListener('change', actualizarVistaPrevia);
+            });
+        });
     });
     
     // Actualizar vista previa
@@ -265,29 +391,43 @@ document.addEventListener('DOMContentLoaded', function() {
         };
         
         dias.forEach(dia => {
-            const checkbox = document.getElementById(dia.abierto);
-            const apertura = document.getElementById(dia.apertura);
-            const cierre = document.getElementById(dia.cierre);
+            const checkbox = document.getElementById(`${dia}_abierto`);
+            const container = document.getElementById(`${dia}-bloques`);
             
             const div = document.createElement('div');
             div.className = 'flex justify-between py-1 border-b border-[#374151]/50 last:border-0';
             
             const nombreDia = document.createElement('span');
             nombreDia.className = 'text-[#9CA3AF]';
-            nombreDia.textContent = nombreMap[dia.nombre];
+            nombreDia.textContent = nombreMap[dia];
             
-            const horario = document.createElement('span');
+            const horarioSpan = document.createElement('span');
+            horarioSpan.className = 'text-white';
             
-            if (checkbox && checkbox.checked && apertura && cierre && apertura.value && cierre.value) {
-                horario.textContent = `${apertura.value} - ${cierre.value}`;
-                horario.className = 'text-white';
+            if (checkbox && checkbox.checked) {
+                const bloques = container.querySelectorAll('.bloque-horario');
+                if (bloques.length > 0) {
+                    const horarios = [];
+                    bloques.forEach(bloque => {
+                        const apertura = bloque.querySelector('input[name*="hora_apertura"]');
+                        const cierre = bloque.querySelector('input[name*="hora_cierre"]');
+                        if (apertura && cierre && apertura.value && cierre.value) {
+                            horarios.push(`${apertura.value} - ${cierre.value}`);
+                        }
+                    });
+                    horarioSpan.textContent = horarios.join(' · ') || 'Cerrado';
+                    if (horarios.length === 0) horarioSpan.className = 'text-red-400';
+                } else {
+                    horarioSpan.textContent = 'Cerrado';
+                    horarioSpan.className = 'text-red-400';
+                }
             } else {
-                horario.textContent = 'Cerrado';
-                horario.className = 'text-red-400';
+                horarioSpan.textContent = 'Cerrado';
+                horarioSpan.className = 'text-red-400';
             }
             
             div.appendChild(nombreDia);
-            div.appendChild(horario);
+            div.appendChild(horarioSpan);
             vistaPrevia.appendChild(div);
         });
     }
@@ -304,20 +444,60 @@ document.addEventListener('DOMContentLoaded', function() {
             const horarios = [];
             
             dias.forEach(dia => {
-                const checkbox = document.getElementById(dia.abierto);
-                const apertura = document.getElementById(dia.apertura);
-                const cierre = document.getElementById(dia.cierre);
+                const checkbox = document.getElementById(`${dia}_abierto`);
+                const container = document.getElementById(`${dia}-bloques`);
+                const bloques = container.querySelectorAll('.bloque-horario');
                 
-                const esAbierto = checkbox && checkbox.checked;
-                
-                horarios.push({
-                    dia_semana: dia.nombre,
-                    abierto: esAbierto,
-                    hora_apertura: esAbierto && apertura ? apertura.value : null,
-                    hora_cierre: esAbierto && cierre ? cierre.value : null,
-                    hora_apertura_2: null,
-                    hora_cierre_2: null
-                });
+                if (checkbox && checkbox.checked && bloques.length > 0) {
+                    bloques.forEach((bloque, idx) => {
+                        const apertura = bloque.querySelector('input[name*="hora_apertura"]');
+                        const cierre = bloque.querySelector('input[name*="hora_cierre"]');
+                        
+                        if (apertura && cierre && apertura.value && cierre.value) {
+                            if (idx === 0) {
+                                horarios.push({
+                                    dia_semana: dia,
+                                    abierto: true,
+                                    hora_apertura: apertura.value,
+                                    hora_cierre: cierre.value,
+                                    hora_apertura_2: null,
+                                    hora_cierre_2: null
+                                });
+                            } else if (idx === 1) {
+                                // Segundo bloque va en los campos _2
+                                const existing = horarios.find(h => h.dia_semana === dia);
+                                if (existing) {
+                                    existing.hora_apertura_2 = apertura.value;
+                                    existing.hora_cierre_2 = cierre.value;
+                                } else {
+                                    horarios.push({
+                                        dia_semana: dia,
+                                        abierto: true,
+                                        hora_apertura: null,
+                                        hora_cierre: null,
+                                        hora_apertura_2: apertura.value,
+                                        hora_cierre_2: cierre.value
+                                    });
+                                }
+                            } else {
+                                // Para más de 2 bloques, los agregamos como bloques adicionales
+                                // La API solo soporta 2 bloques, así que mostramos advertencia
+                                if (idx >= 2) {
+                                    console.warn(`Se omitió el bloque ${idx + 1} de ${dia} - la API solo soporta 2 bloques horarios`);
+                                }
+                            }
+                        }
+                    });
+                } else {
+                    horarios.push({
+                        dia_semana: dia,
+                        abierto: false,
+                        hora_apertura: null,
+                        hora_cierre: null,
+                        hora_apertura_2: null,
+                        hora_cierre_2: null
+                    });
+                }
             });
             
             try {
@@ -362,24 +542,88 @@ document.addEventListener('DOMContentLoaded', function() {
             
             if (response.ok && data.success && data.data) {
                 data.data.forEach(horario => {
-                    const dia = dias.find(d => d.nombre === horario.dia_semana);
-                    if (dia) {
-                        const checkbox = document.getElementById(dia.abierto);
-                        const apertura = document.getElementById(dia.apertura);
-                        const cierre = document.getElementById(dia.cierre);
+                    const checkbox = document.getElementById(`${horario.dia_semana}_abierto`);
+                    const container = document.getElementById(`${horario.dia_semana}-bloques`);
+                    
+                    if (checkbox && container) {
+                        checkbox.checked = horario.abierto;
                         
-                        if (checkbox) {
-                            checkbox.checked = horario.abierto;
-                            checkbox.value = horario.abierto ? '1' : '0';
-                            apertura.disabled = !horario.abierto;
-                            cierre.disabled = !horario.abierto;
+                        // Limpiar bloques existentes
+                        container.innerHTML = '';
+                        
+                        if (horario.abierto) {
+                            // Primer bloque
+                            const bloque1 = document.createElement('div');
+                            bloque1.className = 'bloque-horario flex flex-wrap items-center gap-3 group';
+                            bloque1.innerHTML = `
+                                <input type="time" name="horarios[${horario.dia_semana}][0][hora_apertura]" 
+                                       class="bg-[#262626] border border-[#374151] rounded px-3 py-2 text-white text-sm focus:border-yellow-500 focus:outline-none"
+                                       value="${horario.hora_apertura || '09:00'}">
+                                <span class="text-[#9CA3AF] text-xs">a</span>
+                                <input type="time" name="horarios[${horario.dia_semana}][0][hora_cierre]" 
+                                       class="bg-[#262626] border border-[#374151] rounded px-3 py-2 text-white text-sm focus:border-yellow-500 focus:outline-none"
+                                       value="${horario.hora_cierre || '18:00'}">
+                                <button type="button" class="eliminar-bloque text-red-500 hover:text-red-400 text-xs transition-opacity">
+                                    <i class="fas fa-trash-alt"></i> Eliminar
+                                </button>
+                            `;
+                            container.appendChild(bloque1);
                             
-                            if (horario.hora_apertura) {
-                                apertura.value = horario.hora_apertura;
+                            // Segundo bloque si existe
+                            if (horario.hora_apertura_2 && horario.hora_cierre_2) {
+                                const bloque2 = document.createElement('div');
+                                bloque2.className = 'bloque-horario flex flex-wrap items-center gap-3 group';
+                                bloque2.innerHTML = `
+                                    <input type="time" name="horarios[${horario.dia_semana}][1][hora_apertura]" 
+                                           class="bg-[#262626] border border-[#374151] rounded px-3 py-2 text-white text-sm focus:border-yellow-500 focus:outline-none"
+                                           value="${horario.hora_apertura_2}">
+                                    <span class="text-[#9CA3AF] text-xs">a</span>
+                                    <input type="time" name="horarios[${horario.dia_semana}][1][hora_cierre]" 
+                                           class="bg-[#262626] border border-[#374151] rounded px-3 py-2 text-white text-sm focus:border-yellow-500 focus:outline-none"
+                                           value="${horario.hora_cierre_2}">
+                                    <button type="button" class="eliminar-bloque text-red-500 hover:text-red-400 text-xs transition-opacity">
+                                        <i class="fas fa-trash-alt"></i> Eliminar
+                                    </button>
+                                `;
+                                container.appendChild(bloque2);
                             }
-                            if (horario.hora_cierre) {
-                                cierre.value = horario.hora_cierre;
-                            }
+                            
+                            // Habilitar inputs
+                            container.querySelectorAll('input').forEach(input => {
+                                input.disabled = false;
+                            });
+                            
+                            // Agregar eventos a los nuevos inputs
+                            container.querySelectorAll('.bloque-horario').forEach(bloque => {
+                                const eliminarBtn = bloque.querySelector('.eliminar-bloque');
+                                if (eliminarBtn) {
+                                    eliminarBtn.addEventListener('click', function() {
+                                        bloque.remove();
+                                        reindexarBloques(horario.dia_semana);
+                                        actualizarVistaPrevia();
+                                    });
+                                }
+                                bloque.querySelectorAll('input').forEach(input => {
+                                    input.addEventListener('change', actualizarVistaPrevia);
+                                });
+                            });
+                        } else {
+                            // Día cerrado - agregar un bloque deshabilitado como placeholder
+                            const bloquePlaceholder = document.createElement('div');
+                            bloquePlaceholder.className = 'bloque-horario flex flex-wrap items-center gap-3';
+                            bloquePlaceholder.innerHTML = `
+                                <input type="time" name="horarios[${horario.dia_semana}][0][hora_apertura]" 
+                                       class="bg-[#262626] border border-[#374151] rounded px-3 py-2 text-white text-sm focus:border-yellow-500 focus:outline-none"
+                                       value="09:00" disabled>
+                                <span class="text-[#9CA3AF] text-xs">a</span>
+                                <input type="time" name="horarios[${horario.dia_semana}][0][hora_cierre]" 
+                                       class="bg-[#262626] border border-[#374151] rounded px-3 py-2 text-white text-sm focus:border-yellow-500 focus:outline-none"
+                                       value="18:00" disabled>
+                                <button type="button" class="eliminar-bloque text-red-500 hover:text-red-400 text-xs transition-opacity" style="display: none;">
+                                    <i class="fas fa-trash-alt"></i> Eliminar
+                                </button>
+                            `;
+                            container.appendChild(bloquePlaceholder);
                         }
                     }
                 });
@@ -395,41 +639,56 @@ document.addEventListener('DOMContentLoaded', function() {
 
 function resetHorario() {
     if (confirm('¿Deseas restablecer el horario a los valores predeterminados?')) {
-        const dias = [
-            { nombre: 'lunes', apertura: '09:00', cierre: '18:00', activo: true },
-            { nombre: 'martes', apertura: '09:00', cierre: '18:00', activo: true },
-            { nombre: 'miercoles', apertura: '09:00', cierre: '18:00', activo: true },
-            { nombre: 'jueves', apertura: '09:00', cierre: '18:00', activo: true },
-            { nombre: 'viernes', apertura: '09:00', cierre: '18:00', activo: true },
-            { nombre: 'sabado', apertura: '09:00', cierre: '14:00', activo: true },
-            { nombre: 'domingo', apertura: '09:00', cierre: '14:00', activo: true }
-        ];
-        
-        const idMap = {
-            'lunes': { abierto: 'lunes_abierto', apertura: 'lunes_apertura', cierre: 'lunes_cierre' },
-            'martes': { abierto: 'martes_abierto', apertura: 'martes_apertura', cierre: 'martes_cierre' },
-            'miercoles': { abierto: 'miercoles_abierto', apertura: 'miercoles_apertura', cierre: 'miercoles_cierre' },
-            'jueves': { abierto: 'jueves_abierto', apertura: 'jueves_apertura', cierre: 'jueves_cierre' },
-            'viernes': { abierto: 'viernes_abierto', apertura: 'viernes_apertura', cierre: 'viernes_cierre' },
-            'sabado': { abierto: 'sabado_abierto', apertura: 'sabado_apertura', cierre: 'sabado_cierre' },
-            'domingo': { abierto: 'domingo_abierto', apertura: 'domingo_apertura', cierre: 'domingo_cierre' }
-        };
+        const dias = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado', 'domingo'];
         
         dias.forEach(dia => {
-            const ids = idMap[dia.nombre];
-            if (ids) {
-                const checkbox = document.getElementById(ids.abierto);
-                const apertura = document.getElementById(ids.apertura);
-                const cierre = document.getElementById(ids.cierre);
+            const checkbox = document.getElementById(`${dia}_abierto`);
+            const container = document.getElementById(`${dia}-bloques`);
+            
+            if (checkbox && container) {
+                checkbox.checked = true;
                 
-                if (checkbox) {
-                    checkbox.checked = dia.activo;
-                    checkbox.value = dia.activo ? '1' : '0';
-                    apertura.disabled = !dia.activo;
-                    cierre.disabled = !dia.activo;
-                    apertura.value = dia.apertura;
-                    cierre.value = dia.cierre;
+                // Limpiar y crear un solo bloque
+                container.innerHTML = '';
+                
+                const bloque = document.createElement('div');
+                bloque.className = 'bloque-horario flex flex-wrap items-center gap-3 group';
+                
+                let apertura = '09:00';
+                let cierre = dia === 'sabado' || dia === 'domingo' ? '14:00' : '18:00';
+                
+                bloque.innerHTML = `
+                    <input type="time" name="horarios[${dia}][0][hora_apertura]" 
+                           class="bg-[#262626] border border-[#374151] rounded px-3 py-2 text-white text-sm focus:border-yellow-500 focus:outline-none"
+                           value="${apertura}">
+                    <span class="text-[#9CA3AF] text-xs">a</span>
+                    <input type="time" name="horarios[${dia}][0][hora_cierre]" 
+                           class="bg-[#262626] border border-[#374151] rounded px-3 py-2 text-white text-sm focus:border-yellow-500 focus:outline-none"
+                           value="${cierre}">
+                    <button type="button" class="eliminar-bloque text-red-500 hover:text-red-400 text-xs transition-opacity">
+                        <i class="fas fa-trash-alt"></i> Eliminar
+                    </button>
+                `;
+                
+                container.appendChild(bloque);
+                
+                // Habilitar inputs
+                container.querySelectorAll('input').forEach(input => {
+                    input.disabled = false;
+                });
+                
+                // Agregar eventos
+                const eliminarBtn = bloque.querySelector('.eliminar-bloque');
+                if (eliminarBtn) {
+                    eliminarBtn.addEventListener('click', function() {
+                        bloque.remove();
+                        reindexarBloques(dia);
+                        actualizarVistaPrevia();
+                    });
                 }
+                bloque.querySelectorAll('input').forEach(input => {
+                    input.addEventListener('change', actualizarVistaPrevia);
+                });
             }
         });
         
@@ -438,17 +697,25 @@ function resetHorario() {
     }
 }
 
-function actualizarVistaPrevia() {
-    const dias = [
-        { nombre: 'lunes', abierto: 'lunes_abierto', apertura: 'lunes_apertura', cierre: 'lunes_cierre' },
-        { nombre: 'martes', abierto: 'martes_abierto', apertura: 'martes_apertura', cierre: 'martes_cierre' },
-        { nombre: 'miercoles', abierto: 'miercoles_abierto', apertura: 'miercoles_apertura', cierre: 'miercoles_cierre' },
-        { nombre: 'jueves', abierto: 'jueves_abierto', apertura: 'jueves_apertura', cierre: 'jueves_cierre' },
-        { nombre: 'viernes', abierto: 'viernes_abierto', apertura: 'viernes_apertura', cierre: 'viernes_cierre' },
-        { nombre: 'sabado', abierto: 'sabado_abierto', apertura: 'sabado_apertura', cierre: 'sabado_cierre' },
-        { nombre: 'domingo', abierto: 'domingo_abierto', apertura: 'domingo_apertura', cierre: 'domingo_cierre' }
-    ];
+function reindexarBloques(dia) {
+    const container = document.getElementById(`${dia}-bloques`);
+    const bloques = container.querySelectorAll('.bloque-horario');
     
+    bloques.forEach((bloque, index) => {
+        const apertura = bloque.querySelector('input[name*="hora_apertura"]');
+        const cierre = bloque.querySelector('input[name*="hora_cierre"]');
+        
+        if (apertura) {
+            apertura.name = `horarios[${dia}][${index}][hora_apertura]`;
+        }
+        if (cierre) {
+            cierre.name = `horarios[${dia}][${index}][hora_cierre]`;
+        }
+    });
+}
+
+function actualizarVistaPrevia() {
+    const dias = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado', 'domingo'];
     const vistaPrevia = document.getElementById('vista-previa');
     if (!vistaPrevia) return;
     
@@ -460,29 +727,44 @@ function actualizarVistaPrevia() {
     };
     
     dias.forEach(dia => {
-        const checkbox = document.getElementById(dia.abierto);
-        const apertura = document.getElementById(dia.apertura);
-        const cierre = document.getElementById(dia.cierre);
+        const checkbox = document.getElementById(`${dia}_abierto`);
+        const container = document.getElementById(`${dia}-bloques`);
         
         const div = document.createElement('div');
         div.className = 'flex justify-between py-1 border-b border-[#374151]/50 last:border-0';
         
         const nombreDia = document.createElement('span');
         nombreDia.className = 'text-[#9CA3AF]';
-        nombreDia.textContent = nombreMap[dia.nombre];
+        nombreDia.textContent = nombreMap[dia];
         
-        const horario = document.createElement('span');
+        const horarioSpan = document.createElement('span');
         
-        if (checkbox && checkbox.checked && apertura && cierre && apertura.value && cierre.value) {
-            horario.textContent = `${apertura.value} - ${cierre.value}`;
-            horario.className = 'text-white';
+        if (checkbox && checkbox.checked && container) {
+            const bloques = container.querySelectorAll('.bloque-horario');
+            const horarios = [];
+            
+            bloques.forEach(bloque => {
+                const apertura = bloque.querySelector('input[name*="hora_apertura"]');
+                const cierre = bloque.querySelector('input[name*="hora_cierre"]');
+                if (apertura && cierre && apertura.value && cierre.value) {
+                    horarios.push(`${apertura.value} - ${cierre.value}`);
+                }
+            });
+            
+            if (horarios.length > 0) {
+                horarioSpan.textContent = horarios.join(' · ');
+                horarioSpan.className = 'text-white';
+            } else {
+                horarioSpan.textContent = 'Cerrado';
+                horarioSpan.className = 'text-red-400';
+            }
         } else {
-            horario.textContent = 'Cerrado';
-            horario.className = 'text-red-400';
+            horarioSpan.textContent = 'Cerrado';
+            horarioSpan.className = 'text-red-400';
         }
         
         div.appendChild(nombreDia);
-        div.appendChild(horario);
+        div.appendChild(horarioSpan);
         vistaPrevia.appendChild(div);
     });
 }
