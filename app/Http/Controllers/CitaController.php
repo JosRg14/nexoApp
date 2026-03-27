@@ -16,9 +16,12 @@ class CitaController extends Controller
                 abort(400, 'Se requiere un negocio para agendar cita');
             }
             
-            $proxyBaseUrl = url('/api-proxy');
+            \Log::info('=== CitaController@create ===', ['negocio_id' => $negocioId]);
             
-            // Obtener servicios del negocio
+            // Usar el proxy público para obtener los datos (no requiere autenticación)
+            $proxyBaseUrl = url('/api-proxy/public');
+            
+            // Obtener servicios del negocio (público)
             $servicios = [];
             try {
                 $response = Http::timeout(15)
@@ -27,18 +30,20 @@ class CitaController extends Controller
                         'negocio_id' => $negocioId
                     ]);
                 
+                \Log::info('Respuesta servicios - Status: ' . $response->status());
+                
                 if ($response->successful()) {
                     $data = $response->json();
                     $servicios = $data['data'] ?? [];
                     \Log::info('Servicios obtenidos: ' . count($servicios));
                 } else {
-                    \Log::error('Error servicios: ' . $response->status());
+                    \Log::error('Error servicios: ' . $response->body());
                 }
             } catch (\Exception $e) {
                 \Log::error('Error al obtener servicios: ' . $e->getMessage());
             }
             
-            // Obtener empleados del negocio
+            // Obtener empleados del negocio (público)
             $empleados = [];
             try {
                 $response = Http::timeout(15)
@@ -47,12 +52,14 @@ class CitaController extends Controller
                         'negocio_id' => $negocioId
                     ]);
                 
+                \Log::info('Respuesta empleados - Status: ' . $response->status());
+                
                 if ($response->successful()) {
                     $data = $response->json();
                     $empleados = $data['data'] ?? [];
                     \Log::info('Empleados obtenidos: ' . count($empleados));
                 } else {
-                    \Log::error('Error empleados: ' . $response->status());
+                    \Log::error('Error empleados: ' . $response->body());
                 }
             } catch (\Exception $e) {
                 \Log::error('Error al obtener empleados: ' . $e->getMessage());
@@ -62,7 +69,7 @@ class CitaController extends Controller
             
         } catch (\Exception $e) {
             \Log::error('Error en CitaController@create: ' . $e->getMessage());
-            abort(500, 'Error al cargar la página de reserva');
+            abort(500, 'Error al cargar la página de reserva: ' . $e->getMessage());
         }
     }
     
@@ -70,7 +77,7 @@ class CitaController extends Controller
     {
         try {
             $token = session('auth_token');
-            $apiBaseUrl = rtrim(config('services.api.url'), '/');
+            $apiBaseUrl = 'https://devlink-servidorapi.td60xq.easypanel.host';
             
             $citas = [];
             try {
