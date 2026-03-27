@@ -4,120 +4,151 @@
 
 @section('content')
 <div class="bg-[#1a1a1a] min-h-screen py-12">
-    <div class="max-w-4xl mx-auto px-6">
-        <!-- Header -->
-        <div class="mb-8">
-            <a href="{{ url()->previous() }}" class="text-[#9CA3AF] hover:text-white text-sm mb-4 inline-block">
-                ← Volver
+    <div class="max-w-5xl mx-auto px-6">
+        <!-- Header con botón volver -->
+        <div class="mb-8 border-b border-[#374151] pb-8">
+            <a href="{{ url()->previous() }}" 
+               class="text-[#9CA3AF] hover:text-white text-xs uppercase tracking-widest mb-4 inline-block flex items-center gap-2 transition-colors">
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                </svg>
+                Volver
             </a>
-            <h1 class="text-3xl font-bold uppercase tracking-wide text-white">Agendar Cita</h1>
-            <p class="text-[#9CA3AF] text-sm mt-2">Selecciona el servicio, empleado y horario</p>
+
+            <div class="flex justify-between items-start mt-4">
+                <div>
+                    <h1 class="text-3xl font-bold uppercase tracking-wide text-white">Agendar Cita</h1>
+                    <p class="text-[#9CA3AF] text-sm mt-2 max-w-xl">
+                        Selecciona el servicio, empleado y horario para tu cita.
+                    </p>
+                </div>
+            </div>
         </div>
 
-        <!-- Formulario -->
         <form id="cita-form" class="space-y-6">
             @csrf
             
             <!-- Paso 1: Servicio -->
-            <div class="bg-[#262626] border border-[#374151] rounded-lg p-6">
-                <h2 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
-                    <i class="fas fa-cut"></i> 1. Selecciona un servicio
-                </h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="servicios-container">
+            <div class="bg-[#262626] border border-[#374151] rounded-sm p-6">
+                <h3 class="text-sm font-bold uppercase tracking-widest text-white mb-4 flex items-center gap-2">
+                    <i class="fas fa-cut text-yellow-500"></i>
+                    1. Selecciona un servicio
+                </h3>
+                
+                @if(count($servicios) > 0)
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     @foreach($servicios as $servicio)
-                    <div class="servicio-card border border-[#374151] rounded-lg p-4 cursor-pointer hover:border-yellow-500 transition-all" 
+                    <div class="servicio-card border border-[#374151] rounded-sm p-4 cursor-pointer hover:border-yellow-500 transition-all {{ $servicioId == $servicio['id'] ? 'border-yellow-500 bg-yellow-500/10' : '' }}" 
                          data-id="{{ $servicio['id'] }}"
                          data-precio="{{ $servicio['precio'] }}"
                          data-duracion="{{ $servicio['duracion'] }}">
-                        <h3 class="font-bold text-white">{{ $servicio['nombre'] }}</h3>
-                        <p class="text-sm text-[#9CA3AF] mt-1">{{ $servicio['descripcion'] ?? 'Sin descripción' }}</p>
-                        <div class="flex justify-between items-center mt-3">
-                            <span class="text-yellow-500 font-bold">${{ number_format($servicio['precio'], 0) }}</span>
-                            <span class="text-xs text-[#9CA3AF]"><i class="far fa-clock"></i> {{ $servicio['duracion'] }} min</span>
+                        <div class="flex justify-between items-start mb-2">
+                            <h4 class="text-white font-bold uppercase tracking-wide text-sm">{{ $servicio['nombre'] }}</h4>
+                            <span class="text-yellow-500 font-bold text-sm">${{ number_format($servicio['precio'], 0, ',', '.') }}</span>
+                        </div>
+                        <p class="text-[#9CA3AF] text-xs leading-relaxed">
+                            {{ $servicio['descripcion'] ?? 'Sin descripción' }}
+                        </p>
+                        <div class="mt-2 flex items-center gap-2 text-[10px] text-[#9CA3AF] uppercase tracking-wider">
+                            <i class="far fa-clock"></i>
+                            <span>{{ $servicio['duracion'] }} minutos</span>
                         </div>
                     </div>
                     @endforeach
                 </div>
-                <input type="hidden" name="servicio_id" id="servicio_id">
+                @else
+                <p class="text-xs text-[#52525b] italic">No hay servicios disponibles para este negocio.</p>
+                @endif
+                <input type="hidden" name="servicio_id" id="servicio_id" value="{{ $servicioId }}">
             </div>
 
             <!-- Paso 2: Empleado -->
-            <div class="bg-[#262626] border border-[#374151] rounded-lg p-6">
-                <h2 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
-                    <i class="fas fa-users"></i> 2. Selecciona un empleado
-                </h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="empleados-container">
+            <div class="bg-[#262626] border border-[#374151] rounded-sm p-6">
+                <h3 class="text-sm font-bold uppercase tracking-widest text-white mb-4 flex items-center gap-2">
+                    <i class="fas fa-users text-yellow-500"></i>
+                    2. Selecciona un empleado
+                </h3>
+                
+                @if(count($empleados) > 0)
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     @foreach($empleados as $empleado)
-                    <div class="empleado-card border border-[#374151] rounded-lg p-4 cursor-pointer hover:border-yellow-500 transition-all"
+                    <div class="empleado-card border border-[#374151] rounded-sm p-4 cursor-pointer hover:border-yellow-500 transition-all {{ $empleadoId == $empleado['id_empleado'] ? 'border-yellow-500 bg-yellow-500/10' : '' }}"
                          data-id="{{ $empleado['id_empleado'] }}">
                         <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 bg-yellow-500/20 text-yellow-500 rounded-full flex items-center justify-center font-bold">
+                            <div class="w-10 h-10 bg-yellow-500/20 text-yellow-500 rounded-full flex items-center justify-center text-sm font-bold">
                                 {{ strtoupper(substr($empleado['nombre'], 0, 1)) }}
                             </div>
                             <div>
-                                <h3 class="font-bold text-white">{{ $empleado['nombre'] }}</h3>
-                                <p class="text-xs text-[#9CA3AF]">{{ $empleado['especialidad'] ?? 'Especialista' }}</p>
+                                <h4 class="text-white font-bold uppercase tracking-wide text-sm">{{ $empleado['nombre'] }}</h4>
+                                <p class="text-[#9CA3AF] text-[10px] uppercase tracking-wider">{{ $empleado['especialidad'] ?? 'Especialista' }}</p>
                             </div>
                         </div>
                     </div>
                     @endforeach
                 </div>
-                <input type="hidden" name="empleado_id" id="empleado_id">
+                @else
+                <p class="text-xs text-[#52525b] italic">No hay empleados disponibles para este negocio.</p>
+                @endif
+                <input type="hidden" name="empleado_id" id="empleado_id" value="{{ $empleadoId }}">
             </div>
 
             <!-- Paso 3: Fecha y Hora -->
-            <div class="bg-[#262626] border border-[#374151] rounded-lg p-6">
-                <h2 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
-                    <i class="fas fa-calendar-alt"></i> 3. Selecciona fecha y hora
-                </h2>
+            <div class="bg-[#262626] border border-[#374151] rounded-sm p-6">
+                <h3 class="text-sm font-bold uppercase tracking-widest text-white mb-4 flex items-center gap-2">
+                    <i class="fas fa-calendar-alt text-yellow-500"></i>
+                    3. Selecciona fecha y hora
+                </h3>
+                
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                        <label class="block text-sm text-[#9CA3AF] mb-2">Fecha</label>
+                        <label class="block text-xs text-[#9CA3AF] uppercase tracking-widest mb-2">Fecha</label>
                         <input type="date" id="fecha" name="fecha" 
                                min="{{ date('Y-m-d') }}"
-                               class="w-full bg-[#1a1a1a] border border-[#374151] rounded-lg px-4 py-2 text-white focus:border-yellow-500 focus:outline-none">
+                               class="w-full bg-[#1a1a1a] border border-[#374151] rounded-sm px-4 py-2 text-white focus:border-yellow-500 focus:outline-none transition-colors">
                     </div>
                     <div>
-                        <label class="block text-sm text-[#9CA3AF] mb-2">Hora</label>
+                        <label class="block text-xs text-[#9CA3AF] uppercase tracking-widest mb-2">Hora</label>
                         <select id="hora" name="hora_inicio" 
-                                class="w-full bg-[#1a1a1a] border border-[#374151] rounded-lg px-4 py-2 text-white focus:border-yellow-500 focus:outline-none" disabled>
+                                class="w-full bg-[#1a1a1a] border border-[#374151] rounded-sm px-4 py-2 text-white focus:border-yellow-500 focus:outline-none transition-colors" disabled>
                             <option value="">Primero selecciona fecha</option>
                         </select>
                     </div>
                 </div>
             </div>
 
-            <!-- Resumen -->
-            <div class="bg-[#262626] border border-[#374151] rounded-lg p-6">
-                <h2 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
-                    <i class="fas fa-receipt"></i> Resumen de cita
-                </h2>
-                <div class="space-y-2 text-sm">
-                    <div class="flex justify-between">
-                        <span class="text-[#9CA3AF]">Servicio:</span>
-                        <span id="resumen-servicio" class="text-white">-</span>
+            <!-- Resumen de cita -->
+            <div class="bg-[#262626] border border-[#374151] rounded-sm p-6">
+                <h3 class="text-sm font-bold uppercase tracking-widest text-white mb-4 flex items-center gap-2">
+                    <i class="fas fa-receipt text-yellow-500"></i>
+                    Resumen de cita
+                </h3>
+                
+                <div class="space-y-3">
+                    <div class="flex justify-between py-2 border-b border-[#374151]/50">
+                        <span class="text-[10px] uppercase tracking-widest text-[#9CA3AF]">Servicio</span>
+                        <span id="resumen-servicio" class="text-xs text-white font-medium">-</span>
                     </div>
-                    <div class="flex justify-between">
-                        <span class="text-[#9CA3AF]">Empleado:</span>
-                        <span id="resumen-empleado" class="text-white">-</span>
+                    <div class="flex justify-between py-2 border-b border-[#374151]/50">
+                        <span class="text-[10px] uppercase tracking-widest text-[#9CA3AF]">Empleado</span>
+                        <span id="resumen-empleado" class="text-xs text-white font-medium">-</span>
                     </div>
-                    <div class="flex justify-between">
-                        <span class="text-[#9CA3AF]">Fecha:</span>
-                        <span id="resumen-fecha" class="text-white">-</span>
+                    <div class="flex justify-between py-2 border-b border-[#374151]/50">
+                        <span class="text-[10px] uppercase tracking-widest text-[#9CA3AF]">Fecha</span>
+                        <span id="resumen-fecha" class="text-xs text-white font-medium">-</span>
                     </div>
-                    <div class="flex justify-between">
-                        <span class="text-[#9CA3AF]">Hora:</span>
-                        <span id="resumen-hora" class="text-white">-</span>
+                    <div class="flex justify-between py-2 border-b border-[#374151]/50">
+                        <span class="text-[10px] uppercase tracking-widest text-[#9CA3AF]">Hora</span>
+                        <span id="resumen-hora" class="text-xs text-white font-medium">-</span>
                     </div>
-                    <div class="flex justify-between pt-2 border-t border-[#374151] mt-2">
-                        <span class="font-bold text-white">Total:</span>
-                        <span id="resumen-total" class="font-bold text-yellow-500">$0</span>
+                    <div class="flex justify-between py-2 pt-3">
+                        <span class="text-xs font-bold text-white uppercase tracking-widest">Total</span>
+                        <span id="resumen-total" class="text-sm font-bold text-yellow-500">$0</span>
                     </div>
                 </div>
             </div>
 
             <button type="submit" 
-                    class="w-full py-4 bg-gradient-to-r from-yellow-500 to-yellow-600 text-black font-bold uppercase tracking-wider rounded-lg hover:from-yellow-400 hover:to-yellow-500 transition-all">
+                    class="w-full py-4 bg-[#1a1a1a] text-[#F3F4F6] font-bold tracking-widest uppercase text-sm border border-[#374151] transition-all duration-300 hover:bg-[#F3F4F6] hover:text-[#1a1a1a] mt-4">
                 Confirmar Cita
             </button>
         </form>
@@ -136,16 +167,15 @@ document.querySelectorAll('.servicio-card').forEach(card => {
         
         servicioSeleccionado = {
             id: this.dataset.id,
-            nombre: this.querySelector('h3').textContent,
+            nombre: this.querySelector('h4').textContent,
             precio: this.dataset.precio,
             duracion: this.dataset.duracion
         };
         
         document.getElementById('servicio_id').value = servicioSeleccionado.id;
         document.getElementById('resumen-servicio').textContent = servicioSeleccionado.nombre;
-        document.getElementById('resumen-total').textContent = '$' + servicioSeleccionado.precio;
+        document.getElementById('resumen-total').textContent = '$' + parseInt(servicioSeleccionado.precio).toLocaleString('es-CL');
         
-        // Cargar horarios disponibles si ya hay fecha y empleado
         if (document.getElementById('fecha').value && empleadoSeleccionado) {
             cargarHorariosDisponibles();
         }
@@ -160,13 +190,12 @@ document.querySelectorAll('.empleado-card').forEach(card => {
         
         empleadoSeleccionado = {
             id: this.dataset.id,
-            nombre: this.querySelector('h3').textContent
+            nombre: this.querySelector('h4').textContent
         };
         
         document.getElementById('empleado_id').value = empleadoSeleccionado.id;
         document.getElementById('resumen-empleado').textContent = empleadoSeleccionado.nombre;
         
-        // Cargar horarios disponibles si ya hay fecha y servicio
         if (document.getElementById('fecha').value && servicioSeleccionado) {
             cargarHorariosDisponibles();
         }
@@ -176,14 +205,19 @@ document.querySelectorAll('.empleado-card').forEach(card => {
 // Fecha seleccionada
 document.getElementById('fecha').addEventListener('change', function() {
     const fecha = this.value;
-    document.getElementById('resumen-fecha').textContent = fecha ? new Date(fecha).toLocaleDateString('es-MX') : '-';
+    if (fecha) {
+        const date = new Date(fecha);
+        document.getElementById('resumen-fecha').textContent = date.toLocaleDateString('es-CL');
+    } else {
+        document.getElementById('resumen-fecha').textContent = '-';
+    }
     
     if (fecha && servicioSeleccionado && empleadoSeleccionado) {
         cargarHorariosDisponibles();
     }
 });
 
-// Cargar horarios disponibles desde la API
+// Cargar horarios disponibles
 async function cargarHorariosDisponibles() {
     const fecha = document.getElementById('fecha').value;
     const empleadoId = empleadoSeleccionado?.id;

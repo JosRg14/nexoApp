@@ -8,59 +8,69 @@ use Illuminate\Support\Facades\Http;
 class CitaController extends Controller
 {
     public function create(Request $request)
-    {
+{
+    try {
+        \Log::info('=== CitaController@create ===');
+        
         $negocioId = $request->get('negocio_id');
         $servicioId = $request->get('servicio');
         $empleadoId = $request->get('empleado');
         
-        // Si no hay negocio_id, intentar obtener del servicio o empleado
-        if (!$negocioId && $servicioId) {
-            // Obtener negocio_id del servicio
-            $response = Http::get(config('services.api.url') . '/api/servicios/' . $servicioId);
-            $servicio = $response->json('data');
-            $negocioId = $servicio['negocio_id'] ?? null;
-        }
+        \Log::info('Parámetros:', [
+            'negocio_id' => $negocioId,
+            'servicio' => $servicioId,
+            'empleado' => $empleadoId
+        ]);
         
-        if (!$negocioId && $empleadoId) {
-            // Obtener negocio_id del empleado
-            $response = Http::get(config('services.api.url') . '/api/empleados/' . $empleadoId);
-            $empleado = $response->json('data');
-            $negocioId = $empleado['negocio_id'] ?? null;
-        }
+        // Usar el proxy local en lugar de la API directa
+        $proxyBaseUrl = url('/api-proxy');
         
-        // Si aún no hay negocio_id, mostrar error
-        if (!$negocioId) {
-            abort(400, 'No se pudo identificar el negocio');
-        }
-        
-        // Obtener servicios del negocio
+        // Obtener servicios del negocio usando el proxy
         $servicios = [];
         try {
             $response = Http::timeout(10)
                 ->withOptions(['verify' => false])
-                ->get($apiBaseUrl . '/api/servicios', ['negocio_id' => $negocioId]);
+                ->get($proxyBaseUrl . '/servicios', [
+                    'negocio_id' => $negocioId
+                ]);
             if ($response->successful()) {
                 $servicios = $response->json('data') ?? [];
+                \Log::info('Servicios obtenidos: ' . count($servicios));
+            } else {
+                \Log::warning('Error al obtener servicios: ' . $response->status());
+                \Log::warning('Respuesta: ' . $response->body());
             }
         } catch (\Exception $e) {
             \Log::error('Error al obtener servicios: ' . $e->getMessage());
         }
         
-        // Obtener empleados del negocio
+        // Obtener empleados del negocio usando el proxy
         $empleados = [];
         try {
             $response = Http::timeout(10)
                 ->withOptions(['verify' => false])
-                ->get($apiBaseUrl . '/api/empleados', ['negocio_id' => $negocioId]);
+                ->get($proxyBaseUrl . '/empleados', [
+                    'negocio_id' => $negocioId
+                ]);
             if ($response->successful()) {
                 $empleados = $response->json('data') ?? [];
+                \Log::info('Empleados obtenidos: ' . count($empleados));
+            } else {
+                \Log::warning('Error al obtener empleados: ' . $response->status());
+                \Log::warning('Respuesta: ' . $response->body());
             }
         } catch (\Exception $e) {
             \Log::error('Error al obtener empleados: ' . $e->getMessage());
         }
         
         return view('booking.create', compact('servicios', 'empleados', 'negocioId', 'servicioId', 'empleadoId'));
+        
+    } catch (\Exception $e) {
+        \Log::error('Error en CitaController@create: ' . $e->getMessage());
+        \Log::error('Stack trace: ' . $e->getTraceAsString());
+        abort(500, 'Error al cargar la página de reserva: ' . $e->getMessage());
     }
+}
     
     public function misCitas()
     {
