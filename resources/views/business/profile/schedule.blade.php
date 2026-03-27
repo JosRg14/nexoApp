@@ -443,207 +443,225 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Envío del formulario - VERSIÓN SIMPLIFICADA
-    const horarioForm = document.getElementById('horario-form');
-    if (horarioForm) {
-        horarioForm.addEventListener('submit', async function(e) {
-            e.preventDefault();
+    // Envío del formulario - CORREGIDO
+const horarioForm = document.getElementById('horario-form');
+if (horarioForm) {
+    horarioForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        showLoader();
+        
+        const horarios = [];
+        
+        for (const dia of dias) {
+            const checkbox = document.getElementById(`${dia}_abierto`);
+            const container = document.getElementById(`${dia}-bloques`);
+            const bloques = container.querySelectorAll('.bloque-horario');
             
-            showLoader();
-            
-            const horarios = [];
-            
-            for (const dia of dias) {
-                const checkbox = document.getElementById(`${dia}_abierto`);
-                const container = document.getElementById(`${dia}-bloques`);
-                const bloques = container.querySelectorAll('.bloque-horario');
+            if (checkbox && checkbox.checked) {
+                // Día abierto
+                const primerBloque = bloques[0];
+                const segundoBloque = bloques[1];
                 
-                if (checkbox && checkbox.checked) {
-                    // Día abierto
-                    const primerBloque = bloques[0];
-                    const segundoBloque = bloques[1];
+                if (primerBloque) {
+                    let apertura = primerBloque.querySelector('input[name*="hora_apertura"]');
+                    let cierre = primerBloque.querySelector('input[name*="hora_cierre"]');
                     
-                    if (primerBloque) {
-                        const apertura = primerBloque.querySelector('input[name*="hora_apertura"]');
-                        const cierre = primerBloque.querySelector('input[name*="hora_cierre"]');
+                    // 🔥 FORMATO CORRECTO: extraer solo HH:MM
+                    let horaApertura = apertura ? (apertura.value || '09:00') : '09:00';
+                    let horaCierre = cierre ? (cierre.value || '18:00') : '18:00';
+                    
+                    // Tomar solo los primeros 5 caracteres (HH:MM)
+                    horaApertura = horaApertura.substring(0, 5);
+                    horaCierre = horaCierre.substring(0, 5);
+                    
+                    const horarioBase = {
+                        dia_semana: dia,
+                        abierto: true,
+                        hora_apertura: horaApertura,
+                        hora_cierre: horaCierre,
+                        hora_apertura_2: null,
+                        hora_cierre_2: null
+                    };
+                    
+                    if (segundoBloque) {
+                        let apertura2 = segundoBloque.querySelector('input[name*="hora_apertura"]');
+                        let cierre2 = segundoBloque.querySelector('input[name*="hora_cierre"]');
                         
-                        const horaApertura = apertura ? (apertura.value || '09:00') : '09:00';
-                        const horaCierre = cierre ? (cierre.value || '18:00') : '18:00';
-                        
-                        const horarioBase = {
-                            dia_semana: dia,
-                            abierto: true,
-                            hora_apertura: horaApertura,
-                            hora_cierre: horaCierre,
-                            hora_apertura_2: null,
-                            hora_cierre_2: null
-                        };
-                        
-                        if (segundoBloque) {
-                            const apertura2 = segundoBloque.querySelector('input[name*="hora_apertura"]');
-                            const cierre2 = segundoBloque.querySelector('input[name*="hora_cierre"]');
+                        if (apertura2 && cierre2 && apertura2.value && cierre2.value) {
+                            let horaApertura2 = apertura2.value.substring(0, 5);
+                            let horaCierre2 = cierre2.value.substring(0, 5);
                             
-                            if (apertura2 && cierre2 && apertura2.value && cierre2.value) {
-                                horarioBase.hora_apertura_2 = apertura2.value;
-                                horarioBase.hora_cierre_2 = cierre2.value;
-                            }
+                            horarioBase.hora_apertura_2 = horaApertura2;
+                            horarioBase.hora_cierre_2 = horaCierre2;
                         }
-                        
-                        horarios.push(horarioBase);
-                    } else {
-                        horarios.push({
-                            dia_semana: dia,
-                            abierto: true,
-                            hora_apertura: '09:00',
-                            hora_cierre: '18:00',
-                            hora_apertura_2: null,
-                            hora_cierre_2: null
-                        });
                     }
+                    
+                    horarios.push(horarioBase);
                 } else {
-                    // Día cerrado
                     horarios.push({
                         dia_semana: dia,
-                        abierto: false,
-                        hora_apertura: null,
-                        hora_cierre: null,
+                        abierto: true,
+                        hora_apertura: '09:00',
+                        hora_cierre: '18:00',
                         hora_apertura_2: null,
                         hora_cierre_2: null
                     });
                 }
-            }
-            
-            console.log('Enviando horarios:', horarios);
-            
-            try {
-                const response = await fetch('/api-proxy/negocio/horario', {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value,
-                        'Content-Type': 'application/json',
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'Accept': 'application/json'
-                    },
-                    body: JSON.stringify({ horarios: horarios })
+            } else {
+                // Día cerrado
+                horarios.push({
+                    dia_semana: dia,
+                    abierto: false,
+                    hora_apertura: null,
+                    hora_cierre: null,
+                    hora_apertura_2: null,
+                    hora_cierre_2: null
                 });
-                
-                const data = await response.json();
-                console.log('Respuesta:', data);
-                
-                if (response.ok && data.success) {
-                    showToast('Horario guardado correctamente');
-                } else {
-                    showToast(data.message || 'Error al guardar el horario');
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                showToast('Error de conexión: ' + error.message);
-            } finally {
-                hideLoader();
             }
-        });
-    }
-    
-    // Cargar horarios existentes al cargar la página
-    async function cargarHorarios() {
+        }
+        
+        console.log('Enviando horarios (formato corregido):', horarios);
+        
         try {
-            const response = await fetch('/api-proxy/negocio/horarios', {
+            const response = await fetch('/api-proxy/negocio/horario', {
+                method: 'POST',
                 headers: {
-                    'Accept': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
+                    'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value,
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({ horarios: horarios })
             });
             
             const data = await response.json();
-            console.log('Horarios cargados:', data);
+            console.log('Respuesta:', data);
             
-            if (response.ok && data.success && data.data) {
-                data.data.forEach(horario => {
-                    const checkbox = document.getElementById(`${horario.dia_semana}_abierto`);
-                    const container = document.getElementById(`${horario.dia_semana}-bloques`);
+            if (response.ok && data.success) {
+                showToast('Horario guardado correctamente');
+                // Recargar los horarios para actualizar la vista
+                setTimeout(() => cargarHorarios(), 500);
+            } else {
+                showToast(data.message || 'Error al guardar el horario');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            showToast('Error de conexión: ' + error.message);
+        } finally {
+            hideLoader();
+        }
+    });
+}
+    
+    // Cargar horarios existentes al cargar la página
+    // Cargar horarios existentes al cargar la página - CORREGIDO
+async function cargarHorarios() {
+    try {
+        const response = await fetch('/api-proxy/negocio/horarios', {
+            headers: {
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        });
+        
+        const data = await response.json();
+        console.log('Horarios cargados:', data);
+        
+        if (response.ok && data.success && data.data) {
+            data.data.forEach(horario => {
+                const checkbox = document.getElementById(`${horario.dia_semana}_abierto`);
+                const container = document.getElementById(`${horario.dia_semana}-bloques`);
+                
+                if (checkbox && container) {
+                    checkbox.checked = horario.abierto;
+                    container.innerHTML = '';
                     
-                    if (checkbox && container) {
-                        checkbox.checked = horario.abierto;
-                        container.innerHTML = '';
+                    if (horario.abierto) {
+                        // Formatear horas correctamente (solo HH:MM)
+                        const horaApertura = horario.hora_apertura ? horario.hora_apertura.substring(0, 5) : '09:00';
+                        const horaCierre = horario.hora_cierre ? horario.hora_cierre.substring(0, 5) : '18:00';
                         
-                        if (horario.abierto) {
-                            // Primer bloque
-                            const bloque1 = document.createElement('div');
-                            bloque1.className = 'bloque-horario flex flex-wrap items-center gap-3 group';
-                            bloque1.innerHTML = `
-                                <input type="time" name="horarios[${horario.dia_semana}][0][hora_apertura]" 
+                        // Primer bloque
+                        const bloque1 = document.createElement('div');
+                        bloque1.className = 'bloque-horario flex flex-wrap items-center gap-3 group';
+                        bloque1.innerHTML = `
+                            <input type="time" name="horarios[${horario.dia_semana}][0][hora_apertura]" 
+                                   class="hora-input bg-[#262626] border border-[#374151] rounded px-3 py-2 text-white text-sm focus:border-yellow-500 focus:outline-none"
+                                   value="${horaApertura}">
+                            <span class="text-[#9CA3AF] text-xs">a</span>
+                            <input type="time" name="horarios[${horario.dia_semana}][0][hora_cierre]" 
+                                   class="hora-input bg-[#262626] border border-[#374151] rounded px-3 py-2 text-white text-sm focus:border-yellow-500 focus:outline-none"
+                                   value="${horaCierre}">
+                            <button type="button" class="eliminar-bloque text-red-500 hover:text-red-400 text-xs transition-opacity">
+                                <i class="fas fa-trash-alt"></i> Eliminar
+                            </button>
+                        `;
+                        container.appendChild(bloque1);
+                        
+                        // Segundo bloque si existe
+                        if (horario.hora_apertura_2 && horario.hora_cierre_2) {
+                            const horaApertura2 = horario.hora_apertura_2.substring(0, 5);
+                            const horaCierre2 = horario.hora_cierre_2.substring(0, 5);
+                            
+                            const bloque2 = document.createElement('div');
+                            bloque2.className = 'bloque-horario flex flex-wrap items-center gap-3 group';
+                            bloque2.innerHTML = `
+                                <input type="time" name="horarios[${horario.dia_semana}][1][hora_apertura]" 
                                        class="hora-input bg-[#262626] border border-[#374151] rounded px-3 py-2 text-white text-sm focus:border-yellow-500 focus:outline-none"
-                                       value="${horario.hora_apertura || '09:00'}">
+                                       value="${horaApertura2}">
                                 <span class="text-[#9CA3AF] text-xs">a</span>
-                                <input type="time" name="horarios[${horario.dia_semana}][0][hora_cierre]" 
+                                <input type="time" name="horarios[${horario.dia_semana}][1][hora_cierre]" 
                                        class="hora-input bg-[#262626] border border-[#374151] rounded px-3 py-2 text-white text-sm focus:border-yellow-500 focus:outline-none"
-                                       value="${horario.hora_cierre || '18:00'}">
+                                       value="${horaCierre2}">
                                 <button type="button" class="eliminar-bloque text-red-500 hover:text-red-400 text-xs transition-opacity">
                                     <i class="fas fa-trash-alt"></i> Eliminar
                                 </button>
                             `;
-                            container.appendChild(bloque1);
-                            
-                            // Segundo bloque si existe
-                            if (horario.hora_apertura_2 && horario.hora_cierre_2) {
-                                const bloque2 = document.createElement('div');
-                                bloque2.className = 'bloque-horario flex flex-wrap items-center gap-3 group';
-                                bloque2.innerHTML = `
-                                    <input type="time" name="horarios[${horario.dia_semana}][1][hora_apertura]" 
-                                           class="hora-input bg-[#262626] border border-[#374151] rounded px-3 py-2 text-white text-sm focus:border-yellow-500 focus:outline-none"
-                                           value="${horario.hora_apertura_2}">
-                                    <span class="text-[#9CA3AF] text-xs">a</span>
-                                    <input type="time" name="horarios[${horario.dia_semana}][1][hora_cierre]" 
-                                           class="hora-input bg-[#262626] border border-[#374151] rounded px-3 py-2 text-white text-sm focus:border-yellow-500 focus:outline-none"
-                                           value="${horario.hora_cierre_2}">
-                                    <button type="button" class="eliminar-bloque text-red-500 hover:text-red-400 text-xs transition-opacity">
-                                        <i class="fas fa-trash-alt"></i> Eliminar
-                                    </button>
-                                `;
-                                container.appendChild(bloque2);
-                            }
-                            
-                            container.querySelectorAll('input').forEach(input => {
-                                input.disabled = false;
-                            });
-                            
-                            // Agregar eventos
-                            container.querySelectorAll('.bloque-horario').forEach(bloque => {
-                                const eliminarBtn = bloque.querySelector('.eliminar-bloque');
-                                if (eliminarBtn) {
-                                    eliminarBtn.addEventListener('click', function() {
-                                        bloque.remove();
-                                        reindexarBloques(horario.dia_semana);
-                                        actualizarVistaPrevia();
-                                    });
-                                }
-                                bloque.querySelectorAll('input').forEach(input => {
-                                    input.addEventListener('change', actualizarVistaPrevia);
-                                });
-                            });
-                        } else {
-                            // Día cerrado - bloque placeholder deshabilitado
-                            const bloquePlaceholder = document.createElement('div');
-                            bloquePlaceholder.className = 'bloque-horario flex flex-wrap items-center gap-3';
-                            bloquePlaceholder.innerHTML = `
-                                <input type="time" name="horarios[${horario.dia_semana}][0][hora_apertura]" 
-                                       class="hora-input bg-[#262626] border border-[#374151] rounded px-3 py-2 text-white text-sm focus:border-yellow-500 focus:outline-none"
-                                       value="09:00" disabled>
-                                <span class="text-[#9CA3AF] text-xs">a</span>
-                                <input type="time" name="horarios[${horario.dia_semana}][0][hora_cierre]" 
-                                       class="hora-input bg-[#262626] border border-[#374151] rounded px-3 py-2 text-white text-sm focus:border-yellow-500 focus:outline-none"
-                                       value="18:00" disabled>
-                            `;
-                            container.appendChild(bloquePlaceholder);
+                            container.appendChild(bloque2);
                         }
+                        
+                        container.querySelectorAll('input').forEach(input => {
+                            input.disabled = false;
+                        });
+                        
+                        // Agregar eventos
+                        container.querySelectorAll('.bloque-horario').forEach(bloque => {
+                            const eliminarBtn = bloque.querySelector('.eliminar-bloque');
+                            if (eliminarBtn) {
+                                eliminarBtn.addEventListener('click', function() {
+                                    bloque.remove();
+                                    reindexarBloques(horario.dia_semana);
+                                    actualizarVistaPrevia();
+                                });
+                            }
+                            bloque.querySelectorAll('input').forEach(input => {
+                                input.addEventListener('change', actualizarVistaPrevia);
+                            });
+                        });
+                    } else {
+                        // Día cerrado - bloque placeholder deshabilitado
+                        const bloquePlaceholder = document.createElement('div');
+                        bloquePlaceholder.className = 'bloque-horario flex flex-wrap items-center gap-3';
+                        bloquePlaceholder.innerHTML = `
+                            <input type="time" name="horarios[${horario.dia_semana}][0][hora_apertura]" 
+                                   class="hora-input bg-[#262626] border border-[#374151] rounded px-3 py-2 text-white text-sm focus:border-yellow-500 focus:outline-none"
+                                   value="09:00" disabled>
+                            <span class="text-[#9CA3AF] text-xs">a</span>
+                            <input type="time" name="horarios[${horario.dia_semana}][0][hora_cierre]" 
+                                   class="hora-input bg-[#262626] border border-[#374151] rounded px-3 py-2 text-white text-sm focus:border-yellow-500 focus:outline-none"
+                                   value="18:00" disabled>
+                        `;
+                        container.appendChild(bloquePlaceholder);
                     }
-                });
-                actualizarVistaPrevia();
-            }
-        } catch (error) {
-            console.error('Error al cargar horarios:', error);
+                }
+            });
+            actualizarVistaPrevia();
         }
+    } catch (error) {
+        console.error('Error al cargar horarios:', error);
     }
+}
     
     cargarHorarios();
 });
