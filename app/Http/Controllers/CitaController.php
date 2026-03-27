@@ -18,48 +18,53 @@ class CitaController extends Controller
             
             \Log::info('=== CitaController@create ===', ['negocio_id' => $negocioId]);
             
-            // Usar el proxy público para obtener los datos (no requiere autenticación)
+            // Usar el proxy público correctamente
             $proxyBaseUrl = url('/api-proxy/public');
             
-            // Obtener servicios del negocio (público)
+            // Obtener servicios del negocio
             $servicios = [];
             try {
+                // Log de la URL que se va a llamar
+                $url = $proxyBaseUrl . '/servicios';
+                \Log::info('Llamando a proxy para servicios: ' . $url . '?negocio_id=' . $negocioId);
+                
                 $response = Http::timeout(15)
                     ->withOptions(['verify' => false])
-                    ->get($proxyBaseUrl . '/servicios', [
+                    ->get($url, [
                         'negocio_id' => $negocioId
                     ]);
                 
                 \Log::info('Respuesta servicios - Status: ' . $response->status());
+                \Log::info('Respuesta servicios - Body: ' . substr($response->body(), 0, 500));
                 
                 if ($response->successful()) {
                     $data = $response->json();
                     $servicios = $data['data'] ?? [];
                     \Log::info('Servicios obtenidos: ' . count($servicios));
-                } else {
-                    \Log::error('Error servicios: ' . $response->body());
                 }
             } catch (\Exception $e) {
                 \Log::error('Error al obtener servicios: ' . $e->getMessage());
             }
             
-            // Obtener empleados del negocio (público)
+            // Obtener empleados del negocio
             $empleados = [];
             try {
+                $url = $proxyBaseUrl . '/empleados';
+                \Log::info('Llamando a proxy para empleados: ' . $url . '?negocio_id=' . $negocioId);
+                
                 $response = Http::timeout(15)
                     ->withOptions(['verify' => false])
-                    ->get($proxyBaseUrl . '/empleados', [
+                    ->get($url, [
                         'negocio_id' => $negocioId
                     ]);
                 
                 \Log::info('Respuesta empleados - Status: ' . $response->status());
+                \Log::info('Respuesta empleados - Body: ' . substr($response->body(), 0, 500));
                 
                 if ($response->successful()) {
                     $data = $response->json();
                     $empleados = $data['data'] ?? [];
                     \Log::info('Empleados obtenidos: ' . count($empleados));
-                } else {
-                    \Log::error('Error empleados: ' . $response->body());
                 }
             } catch (\Exception $e) {
                 \Log::error('Error al obtener empleados: ' . $e->getMessage());
