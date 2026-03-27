@@ -76,141 +76,139 @@
     </div>
     
     <!-- Contenido principal -->
-    <div class="max-w-7xl mx-auto px-6 py-12">
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <!-- Columna izquierda - Servicios -->
-            <div class="lg:col-span-2 space-y-6">
-                <!-- Stats Cards -->
-                <div class="grid grid-cols-3 gap-4">
-                    <div class="bg-[#262626] border border-[#374151] p-4 rounded-sm text-center">
-                        <p class="text-[10px] uppercase tracking-widest text-[#9CA3AF]">Servicios</p>
-                        <p class="text-2xl font-bold text-white mt-1">{{ count($servicios) }}</p>
-                    </div>
-                    <div class="bg-[#262626] border border-[#374151] p-4 rounded-sm text-center">
-                        <p class="text-[10px] uppercase tracking-widest text-[#9CA3AF]">Empleados</p>
-                        <p class="text-2xl font-bold text-white mt-1">{{ count($empleados) }}</p>
-                    </div>
-                    <div class="bg-[#262626] border border-[#374151] p-4 rounded-sm text-center">
-                        <p class="text-[10px] uppercase tracking-widest text-[#9CA3AF]">Reseñas</p>
-                        <p class="text-2xl font-bold text-white mt-1">{{ count($resenas) }}</p>
-                    </div>
+<div class="max-w-7xl mx-auto px-6 py-12">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+        <!-- Columna izquierda - Servicios y Reseñas (ocupa 2/3) -->
+        <div class="lg:col-span-2 space-y-6">
+            <!-- Stats Cards -->
+            <div class="grid grid-cols-3 gap-4">
+                <div class="bg-[#262626] border border-[#374151] p-4 rounded-sm text-center">
+                    <p class="text-[10px] uppercase tracking-widest text-[#9CA3AF]">Servicios</p>
+                    <p class="text-2xl font-bold text-white mt-1">{{ count($servicios) }}</p>
                 </div>
-                
-                <!-- Redes Sociales -->
-                @if(isset($negocio['redes_sociales']) && $negocio['redes_sociales'])
-                <div class="bg-[#262626] border border-[#374151] rounded-sm p-6">
-                    <h3 class="text-sm font-bold uppercase tracking-widest text-white mb-4 flex items-center gap-2">
-                        <i class="fab fa-instagram"></i> Redes Sociales
-                    </h3>
-                    <a href="{{ $negocio['redes_sociales'] }}" target="_blank" 
-                       class="inline-flex items-center gap-2 px-4 py-2 bg-[#1a1a1a] border border-[#374151] text-[#9CA3AF] hover:text-white hover:border-white transition-all text-xs uppercase tracking-wider">
-                        <i class="fab fa-instagram"></i>
-                        {{ $negocio['redes_sociales'] }}
-                    </a>
+                <div class="bg-[#262626] border border-[#374151] p-4 rounded-sm text-center">
+                    <p class="text-[10px] uppercase tracking-widest text-[#9CA3AF]">Empleados</p>
+                    <p class="text-2xl font-bold text-white mt-1">{{ count($empleados) }}</p>
                 </div>
-                @endif
-                
-                <!-- Servicios - Grid horizontal (3 por fila) -->
-                <div class="bg-[#262626] border border-[#374151] rounded-sm p-6">
-                    <div class="flex justify-between items-center mb-6">
-                        <h3 class="text-xl font-bold uppercase tracking-widest text-white flex items-center gap-3">
-                            <i class="fas fa-cut text-2xl"></i> 
-                            Nuestros Servicios
-                            <span class="text-sm text-[#9CA3AF] font-normal">({{ count($servicios) }})</span>
-                        </h3>
-                    </div>
-                    
-                    @if(count($servicios) > 0)
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        @foreach($servicios as $servicio)
-                        <div class="group bg-[#1a1a1a] rounded-xl overflow-hidden border border-[#374151] hover:border-[#F3F4F6] transition-all duration-300 hover:shadow-xl hover:shadow-black/50 cursor-pointer" onclick="seleccionarServicio({{ $servicio['id'] }})">
-                            <!-- Imagen del servicio -->
-                            <div class="relative h-48 overflow-hidden bg-gradient-to-br from-gray-800 to-gray-900">
-                                @if(isset($servicio['imagen']) && $servicio['imagen'])
-                                    <img src="{{ $servicio['imagen'] }}" 
-                                         alt="{{ $servicio['nombre'] }}"
-                                         class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
-                                @else
-                                    <div class="w-full h-full flex flex-col items-center justify-center text-gray-500">
-                                        <i class="fas fa-cut text-5xl mb-3 opacity-50"></i>
-                                        <span class="text-xs uppercase tracking-wider">Sin imagen</span>
-                                    </div>
-                                @endif
-                                
-                                <!-- Badge de precio -->
-                                <div class="absolute top-3 right-3 bg-black/70 backdrop-blur-sm px-3 py-1 rounded-full">
-                                    <span class="text-yellow-500 font-bold">${{ number_format($servicio['precio'], 0, ',', '.') }}</span>
-                                </div>
-                                
-                                <!-- Badge de duración -->
-                                <div class="absolute bottom-3 left-3 bg-black/60 backdrop-blur-sm px-2 py-1 rounded-full">
-                                    <span class="text-white text-xs flex items-center gap-1">
-                                        <i class="far fa-clock"></i> {{ $servicio['duracion'] ?? 30 }} min
-                                    </span>
-                                </div>
-                            </div>
-                            
-                            <!-- Contenido -->
-                            <div class="p-4">
-                                <h4 class="text-lg font-bold text-white uppercase tracking-wide group-hover:text-[#9CA3AF] transition-colors">
-                                    {{ $servicio['nombre'] }}
-                                </h4>
-                                <p class="text-[#9CA3AF] text-xs leading-relaxed mt-2 line-clamp-2">
-                                    {{ $servicio['descripcion'] ?? 'Descripción no disponible' }}
-                                </p>
-                                <button class="mt-4 w-full py-2 bg-transparent border border-[#374151] text-white text-xs uppercase tracking-wider rounded hover:bg-yellow-500 hover:text-black hover:border-yellow-500 transition-all duration-300">
-                                    Seleccionar servicio
-                                </button>
-                            </div>
-                        </div>
-                        @endforeach
-                    </div>
-                    @else
-                    <div class="text-center py-12">
-                        <i class="fas fa-scissors text-5xl text-[#374151] mb-4"></i>
-                        <p class="text-[#9CA3AF]">No hay servicios disponibles aún.</p>
-                    </div>
-                    @endif
-                </div>
-                
-                <!-- Reseñas -->
-                <div class="bg-[#262626] border border-[#374151] rounded-sm p-6">
-                    <h3 class="text-sm font-bold uppercase tracking-widest text-white mb-4 flex items-center gap-2">
-                        <i class="fas fa-star"></i> Reseñas ({{ count($resenas) }})
-                    </h3>
-                    <div class="space-y-4">
-                        @forelse($resenas as $resena)
-                        <div class="border-b border-[#374151] pb-4 last:border-0 last:pb-0">
-                            <div class="flex items-center gap-2 mb-2">
-                                <div class="flex text-yellow-500">
-                                    @for($i = 1; $i <= 5; $i++)
-                                        @if($i <= $resena['calificacion'])
-                                            <i class="fas fa-star text-xs"></i>
-                                        @else
-                                            <i class="far fa-star text-xs"></i>
-                                        @endif
-                                    @endfor
-                                </div>
-                                <span class="text-xs text-[#9CA3AF]">{{ $resena['cliente']['nombre'] ?? 'Cliente' }}</span>
-                            </div>
-                            <p class="text-sm text-[#D1D5DB]">{{ $resena['comentario'] }}</p>
-                            <p class="text-[10px] text-[#52525b] mt-1">{{ \Carbon\Carbon::parse($resena['created_at'])->diffForHumans() }}</p>
-                        </div>
-                        @empty
-                        <p class="text-xs text-[#52525b] italic">No hay reseñas aún. ¡Sé el primero en calificar!</p>
-                        @endforelse
-                    </div>
+                <div class="bg-[#262626] border border-[#374151] p-4 rounded-sm text-center">
+                    <p class="text-[10px] uppercase tracking-widest text-[#9CA3AF]">Reseñas</p>
+                    <p class="text-2xl font-bold text-white mt-1">{{ count($resenas) }}</p>
                 </div>
             </div>
             
-            <!-- Columna derecha - Empleados con selección para cita -->
-            <div class="space-y-6">
+            <!-- Redes Sociales -->
+            @if(isset($negocio['redes_sociales']) && $negocio['redes_sociales'])
+            <div class="bg-[#262626] border border-[#374151] rounded-sm p-6">
+                <h3 class="text-sm font-bold uppercase tracking-widest text-white mb-4 flex items-center gap-2">
+                    <i class="fab fa-instagram"></i> Redes Sociales
+                </h3>
+                <a href="{{ $negocio['redes_sociales'] }}" target="_blank" 
+                   class="inline-flex items-center gap-2 px-4 py-2 bg-[#1a1a1a] border border-[#374151] text-[#9CA3AF] hover:text-white hover:border-white transition-all text-xs uppercase tracking-wider">
+                    <i class="fab fa-instagram"></i>
+                    {{ $negocio['redes_sociales'] }}
+                </a>
+            </div>
+            @endif
+            
+            <!-- Servicios - Grid horizontal (3 por fila) -->
+            <div class="bg-[#262626] border border-[#374151] rounded-sm p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-xl font-bold uppercase tracking-widest text-white flex items-center gap-3">
+                        <i class="fas fa-cut text-2xl"></i> 
+                        Nuestros Servicios
+                        <span class="text-sm text-[#9CA3AF] font-normal">({{ count($servicios) }})</span>
+                    </h3>
+                </div>
+                
+                @if(count($servicios) > 0)
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    @foreach($servicios as $servicio)
+                    <div class="group bg-[#1a1a1a] rounded-xl overflow-hidden border border-[#374151] hover:border-[#F3F4F6] transition-all duration-300 hover:shadow-xl hover:shadow-black/50 cursor-pointer" onclick="seleccionarServicio({{ $servicio['id'] }})">
+                        <!-- Imagen del servicio -->
+                        <div class="relative h-48 overflow-hidden bg-gradient-to-br from-gray-800 to-gray-900">
+                            @if(isset($servicio['imagen']) && $servicio['imagen'])
+                                <img src="{{ $servicio['imagen'] }}" 
+                                     alt="{{ $servicio['nombre'] }}"
+                                     class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                            @else
+                                <div class="w-full h-full flex flex-col items-center justify-center text-gray-500">
+                                    <i class="fas fa-cut text-5xl mb-3 opacity-50"></i>
+                                    <span class="text-xs uppercase tracking-wider">Sin imagen</span>
+                                </div>
+                            @endif
+                            
+                            <div class="absolute top-3 right-3 bg-black/70 backdrop-blur-sm px-3 py-1 rounded-full">
+                                <span class="text-yellow-500 font-bold">${{ number_format($servicio['precio'], 0, ',', '.') }}</span>
+                            </div>
+                            
+                            <div class="absolute bottom-3 left-3 bg-black/60 backdrop-blur-sm px-2 py-1 rounded-full">
+                                <span class="text-white text-xs flex items-center gap-1">
+                                    <i class="far fa-clock"></i> {{ $servicio['duracion'] ?? 30 }} min
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <div class="p-4">
+                            <h4 class="text-lg font-bold text-white uppercase tracking-wide group-hover:text-[#9CA3AF] transition-colors">
+                                {{ $servicio['nombre'] }}
+                            </h4>
+                            <p class="text-[#9CA3AF] text-xs leading-relaxed mt-2 line-clamp-2">
+                                {{ $servicio['descripcion'] ?? 'Descripción no disponible' }}
+                            </p>
+                            <button class="mt-4 w-full py-2 bg-transparent border border-[#374151] text-white text-xs uppercase tracking-wider rounded hover:bg-yellow-500 hover:text-black hover:border-yellow-500 transition-all duration-300">
+                                Seleccionar servicio
+                            </button>
+                        </div>
+                    </div>
+                    @endforeach
+                </div>
+                @else
+                <div class="text-center py-12">
+                    <i class="fas fa-scissors text-5xl text-[#374151] mb-4"></i>
+                    <p class="text-[#9CA3AF]">No hay servicios disponibles aún.</p>
+                </div>
+                @endif
+            </div>
+            
+            <!-- Reseñas -->
+            <div class="bg-[#262626] border border-[#374151] rounded-sm p-6">
+                <h3 class="text-sm font-bold uppercase tracking-widest text-white mb-4 flex items-center gap-2">
+                    <i class="fas fa-star"></i> Reseñas ({{ count($resenas) }})
+                </h3>
+                <div class="space-y-4">
+                    @forelse($resenas as $resena)
+                    <div class="border-b border-[#374151] pb-4 last:border-0 last:pb-0">
+                        <div class="flex items-center gap-2 mb-2">
+                            <div class="flex text-yellow-500">
+                                @for($i = 1; $i <= 5; $i++)
+                                    @if($i <= $resena['calificacion'])
+                                        <i class="fas fa-star text-xs"></i>
+                                    @else
+                                        <i class="far fa-star text-xs"></i>
+                                    @endif
+                                @endfor
+                            </div>
+                            <span class="text-xs text-[#9CA3AF]">{{ $resena['cliente']['nombre'] ?? 'Cliente' }}</span>
+                        </div>
+                        <p class="text-sm text-[#D1D5DB]">{{ $resena['comentario'] }}</p>
+                        <p class="text-[10px] text-[#52525b] mt-1">{{ \Carbon\Carbon::parse($resena['created_at'])->diffForHumans() }}</p>
+                    </div>
+                    @empty
+                    <p class="text-xs text-[#52525b] italic">No hay reseñas aún. ¡Sé el primero en calificar!</p>
+                    @endforelse
+                </div>
+            </div>
+        </div>
+        
+        <!-- Columna derecha - Sticky (se queda fija al hacer scroll) -->
+        <div class="lg:col-span-1">
+            <div class="sticky top-24 space-y-6">
                 <!-- Equipo de Trabajo - Seleccionable -->
                 <div class="bg-[#262626] border border-[#374151] rounded-sm p-6">
                     <h3 class="text-sm font-bold uppercase tracking-widest text-white mb-4 flex items-center gap-2">
                         <i class="fas fa-users"></i> Nuestro Equipo ({{ count($empleados) }})
                     </h3>
-                    <div class="space-y-3">
+                    <div class="space-y-3 max-h-[400px] overflow-y-auto custom-scroll">
                         @forelse($empleados as $empleado)
                         <div class="flex items-center gap-3 p-3 bg-[#1a1a1a] border border-[#374151] rounded-lg hover:border-yellow-500 transition-all duration-300 cursor-pointer group" 
                              onclick="seleccionarEmpleado({{ $empleado['id_empleado'] }}, '{{ $empleado['nombre'] }}')">
@@ -231,16 +229,12 @@
                                 <span>{{ number_format($empleado['calificacion'], 1) }}</span>
                             </div>
                             @endif
-                            <div class="opacity-0 group-hover:opacity-100 transition-opacity">
-                                <i class="fas fa-chevron-right text-[#9CA3AF] text-xs"></i>
-                            </div>
                         </div>
                         @empty
                         <p class="text-xs text-[#52525b] italic">Sin empleados registrados.</p>
                         @endforelse
                     </div>
                     
-                    <!-- Botón para agendar con empleado seleccionado -->
                     @if(count($empleados) > 0)
                     <div class="mt-6 pt-4 border-t border-[#374151]">
                         <div id="empleadoSeleccionado" class="text-center hidden">
@@ -310,6 +304,25 @@
             </div>
         </div>
     </div>
+</div>
+
+<!-- Scroll personalizado para empleados -->
+<style>
+.custom-scroll::-webkit-scrollbar {
+    width: 4px;
+}
+.custom-scroll::-webkit-scrollbar-track {
+    background: #374151;
+    border-radius: 10px;
+}
+.custom-scroll::-webkit-scrollbar-thumb {
+    background: #9CA3AF;
+    border-radius: 10px;
+}
+.custom-scroll::-webkit-scrollbar-thumb:hover {
+    background: #F3F4F6;
+}
+</style>
 </div>
 
 <!-- JavaScript para selección de servicio y empleado -->
