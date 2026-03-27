@@ -10,37 +10,29 @@ class CitaController extends Controller
     public function create(Request $request)
     {
         try {
-            \Log::info('=== CitaController@create ===');
-            
             $negocioId = $request->get('negocio_id');
-            $servicioId = $request->get('servicio');
-            $empleadoId = $request->get('empleado');
             
-            \Log::info('Parámetros recibidos:', [
-                'negocio_id' => $negocioId,
-                'servicio' => $servicioId,
-                'empleado' => $empleadoId
-            ]);
+            if (!$negocioId) {
+                abort(400, 'Se requiere un negocio para agendar cita');
+            }
             
-            // Usar el proxy local para evitar problemas de CORS
             $proxyBaseUrl = url('/api-proxy');
             
             // Obtener servicios del negocio
             $servicios = [];
             try {
-                $response = Http::timeout(10)
+                $response = Http::timeout(15)
                     ->withOptions(['verify' => false])
                     ->get($proxyBaseUrl . '/servicios', [
                         'negocio_id' => $negocioId
                     ]);
                 
-                \Log::info('Respuesta servicios - Status: ' . $response->status());
-                
                 if ($response->successful()) {
-                    $servicios = $response->json('data') ?? [];
+                    $data = $response->json();
+                    $servicios = $data['data'] ?? [];
                     \Log::info('Servicios obtenidos: ' . count($servicios));
                 } else {
-                    \Log::warning('Error al obtener servicios: ' . $response->body());
+                    \Log::error('Error servicios: ' . $response->status());
                 }
             } catch (\Exception $e) {
                 \Log::error('Error al obtener servicios: ' . $e->getMessage());
@@ -49,30 +41,28 @@ class CitaController extends Controller
             // Obtener empleados del negocio
             $empleados = [];
             try {
-                $response = Http::timeout(10)
+                $response = Http::timeout(15)
                     ->withOptions(['verify' => false])
                     ->get($proxyBaseUrl . '/empleados', [
                         'negocio_id' => $negocioId
                     ]);
                 
-                \Log::info('Respuesta empleados - Status: ' . $response->status());
-                
                 if ($response->successful()) {
-                    $empleados = $response->json('data') ?? [];
+                    $data = $response->json();
+                    $empleados = $data['data'] ?? [];
                     \Log::info('Empleados obtenidos: ' . count($empleados));
                 } else {
-                    \Log::warning('Error al obtener empleados: ' . $response->body());
+                    \Log::error('Error empleados: ' . $response->status());
                 }
             } catch (\Exception $e) {
                 \Log::error('Error al obtener empleados: ' . $e->getMessage());
             }
             
-            return view('booking.create', compact('servicios', 'empleados', 'negocioId', 'servicioId', 'empleadoId'));
+            return view('booking.create', compact('servicios', 'empleados', 'negocioId'));
             
         } catch (\Exception $e) {
             \Log::error('Error en CitaController@create: ' . $e->getMessage());
-            \Log::error('Stack trace: ' . $e->getTraceAsString());
-            abort(500, 'Error al cargar la página de reserva: ' . $e->getMessage());
+            abort(500, 'Error al cargar la página de reserva');
         }
     }
     
@@ -84,7 +74,7 @@ class CitaController extends Controller
             
             $citas = [];
             try {
-                $response = Http::timeout(10)
+                $response = Http::timeout(15)
                     ->withOptions(['verify' => false])
                     ->withHeaders(['Authorization' => 'Bearer ' . $token])
                     ->get($apiBaseUrl . '/api/citas/mis-citas');
