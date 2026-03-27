@@ -4,7 +4,7 @@
 
 @section('content')
 <div class="bg-[#1a1a1a] min-h-screen py-12">
-    <div class="max-w-5xl mx-auto px-6">
+    <div class="max-w-7xl mx-auto px-6">
         <!-- Header con botón volver -->
         <div class="mb-8 border-b border-[#374151] pb-8">
             <a href="{{ url()->previous() }}" 
@@ -25,70 +25,99 @@
             </div>
         </div>
 
-        <form id="cita-form" class="space-y-6">
+        @if(empty($servicios) && empty($empleados))
+        <div class="bg-red-500/20 border border-red-500 text-red-500 p-6 rounded-sm text-center">
+            <i class="fas fa-exclamation-triangle text-2xl mb-2 block"></i>
+            <p>No se pudieron cargar los servicios o empleados. Por favor intenta más tarde.</p>
+            <p class="text-xs mt-2 text-[#9CA3AF]">Negocio ID: {{ $negocioId ?? 'No definido' }}</p>
+        </div>
+        @else
+        <form id="cita-form" class="space-y-8">
             @csrf
             
-            <!-- Paso 1: Servicio -->
+            <!-- Paso 1: Servicios en Carrusel -->
             <div class="bg-[#262626] border border-[#374151] rounded-sm p-6">
-                <h3 class="text-sm font-bold uppercase tracking-widest text-white mb-4 flex items-center gap-2">
-                    <i class="fas fa-cut text-yellow-500"></i>
-                    1. Selecciona un servicio
-                </h3>
-                
-                @if(count($servicios) > 0)
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    @foreach($servicios as $servicio)
-                    <div class="servicio-card border border-[#374151] rounded-sm p-4 cursor-pointer hover:border-yellow-500 transition-all {{ $servicioId == $servicio['id'] ? 'border-yellow-500 bg-yellow-500/10' : '' }}" 
-                         data-id="{{ $servicio['id'] }}"
-                         data-precio="{{ $servicio['precio'] }}"
-                         data-duracion="{{ $servicio['duracion'] }}">
-                        <div class="flex justify-between items-start mb-2">
-                            <h4 class="text-white font-bold uppercase tracking-wide text-sm">{{ $servicio['nombre'] }}</h4>
-                            <span class="text-yellow-500 font-bold text-sm">${{ number_format($servicio['precio'], 0, ',', '.') }}</span>
-                        </div>
-                        <p class="text-[#9CA3AF] text-xs leading-relaxed">
-                            {{ $servicio['descripcion'] ?? 'Sin descripción' }}
-                        </p>
-                        <div class="mt-2 flex items-center gap-2 text-[10px] text-[#9CA3AF] uppercase tracking-wider">
-                            <i class="far fa-clock"></i>
-                            <span>{{ $servicio['duracion'] }} minutos</span>
-                        </div>
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-sm font-bold uppercase tracking-widest text-white flex items-center gap-2">
+                        <i class="fas fa-cut text-yellow-500"></i>
+                        1. Selecciona un servicio
+                        <span class="text-xs text-[#9CA3AF] font-normal">({{ count($servicios) }} disponibles)</span>
+                    </h3>
+                    
+                    @if(count($servicios) > 3)
+                    <div class="flex gap-2">
+                        <button type="button" id="prevServicio" class="w-8 h-8 rounded-full bg-[#1a1a1a] border border-[#374151] text-white hover:bg-white hover:text-black transition-all flex items-center justify-center">
+                            <i class="fas fa-chevron-left text-xs"></i>
+                        </button>
+                        <button type="button" id="nextServicio" class="w-8 h-8 rounded-full bg-[#1a1a1a] border border-[#374151] text-white hover:bg-white hover:text-black transition-all flex items-center justify-center">
+                            <i class="fas fa-chevron-right text-xs"></i>
+                        </button>
                     </div>
-                    @endforeach
+                    @endif
                 </div>
-                @else
-                <p class="text-xs text-[#52525b] italic">No hay servicios disponibles para este negocio.</p>
-                @endif
+                
+                <div class="relative overflow-hidden">
+                    <div id="serviciosCarousel" class="flex transition-transform duration-500 ease-out gap-4">
+                        @foreach($servicios as $index => $servicio)
+                        <div class="servicio-card flex-shrink-0 w-full md:w-[calc(33.333%-1rem)] cursor-pointer p-4 border border-[#374151] rounded-sm hover:border-yellow-500 transition-all {{ $servicioId == $servicio['id'] ? 'border-yellow-500 bg-yellow-500/10' : '' }}" 
+                             data-id="{{ $servicio['id'] }}"
+                             data-precio="{{ $servicio['precio'] }}"
+                             data-duracion="{{ $servicio['duracion'] }}">
+                            <div class="relative h-40 overflow-hidden rounded-sm bg-[#1a1a1a] mb-3">
+                                @if(isset($servicio['imagen']) && $servicio['imagen'])
+                                <img src="{{ $servicio['imagen'] }}" alt="{{ $servicio['nombre'] }}" class="w-full h-full object-cover">
+                                @else
+                                <div class="w-full h-full flex items-center justify-center">
+                                    <i class="fas fa-cut text-4xl text-[#374151]"></i>
+                                </div>
+                                @endif
+                                <div class="absolute top-2 right-2 bg-black/70 px-2 py-1 rounded-full">
+                                    <span class="text-yellow-500 font-bold text-xs">${{ number_format($servicio['precio'], 0, ',', '.') }}</span>
+                                </div>
+                            </div>
+                            <h4 class="text-white font-bold uppercase tracking-wide text-sm mb-1">{{ $servicio['nombre'] }}</h4>
+                            <p class="text-[#9CA3AF] text-xs leading-relaxed line-clamp-2">{{ $servicio['descripcion'] ?? 'Sin descripción' }}</p>
+                            <div class="mt-2 flex items-center gap-2 text-[10px] text-[#9CA3AF]">
+                                <i class="far fa-clock"></i>
+                                <span>{{ $servicio['duracion'] }} minutos</span>
+                            </div>
+                        </div>
+                        @endforeach
+                    </div>
+                </div>
                 <input type="hidden" name="servicio_id" id="servicio_id" value="{{ $servicioId }}">
             </div>
 
-            <!-- Paso 2: Empleado -->
+            <!-- Paso 2: Empleados en Grid -->
             <div class="bg-[#262626] border border-[#374151] rounded-sm p-6">
                 <h3 class="text-sm font-bold uppercase tracking-widest text-white mb-4 flex items-center gap-2">
                     <i class="fas fa-users text-yellow-500"></i>
                     2. Selecciona un empleado
+                    <span class="text-xs text-[#9CA3AF] font-normal">({{ count($empleados) }} disponibles)</span>
                 </h3>
                 
-                @if(count($empleados) > 0)
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     @foreach($empleados as $empleado)
                     <div class="empleado-card border border-[#374151] rounded-sm p-4 cursor-pointer hover:border-yellow-500 transition-all {{ $empleadoId == $empleado['id_empleado'] ? 'border-yellow-500 bg-yellow-500/10' : '' }}"
                          data-id="{{ $empleado['id_empleado'] }}">
                         <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 bg-yellow-500/20 text-yellow-500 rounded-full flex items-center justify-center text-sm font-bold">
+                            <div class="w-12 h-12 bg-yellow-500/20 text-yellow-500 rounded-full flex items-center justify-center text-lg font-bold">
                                 {{ strtoupper(substr($empleado['nombre'], 0, 1)) }}
                             </div>
                             <div>
                                 <h4 class="text-white font-bold uppercase tracking-wide text-sm">{{ $empleado['nombre'] }}</h4>
                                 <p class="text-[#9CA3AF] text-[10px] uppercase tracking-wider">{{ $empleado['especialidad'] ?? 'Especialista' }}</p>
+                                @if(isset($empleado['calificacion']))
+                                <div class="flex items-center gap-1 mt-1">
+                                    <i class="fas fa-star text-yellow-500 text-[8px]"></i>
+                                    <span class="text-[10px] text-white">{{ number_format($empleado['calificacion'], 1) }}</span>
+                                </div>
+                                @endif
                             </div>
                         </div>
                     </div>
                     @endforeach
                 </div>
-                @else
-                <p class="text-xs text-[#52525b] italic">No hay empleados disponibles para este negocio.</p>
-                @endif
                 <input type="hidden" name="empleado_id" id="empleado_id" value="{{ $empleadoId }}">
             </div>
 
@@ -123,27 +152,27 @@
                     Resumen de cita
                 </h3>
                 
-                <div class="space-y-3">
-                    <div class="flex justify-between py-2 border-b border-[#374151]/50">
-                        <span class="text-[10px] uppercase tracking-widest text-[#9CA3AF]">Servicio</span>
-                        <span id="resumen-servicio" class="text-xs text-white font-medium">-</span>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div>
+                        <p class="text-[10px] uppercase tracking-widest text-[#9CA3AF]">Servicio</p>
+                        <p id="resumen-servicio" class="text-sm text-white font-medium mt-1">-</p>
                     </div>
-                    <div class="flex justify-between py-2 border-b border-[#374151]/50">
-                        <span class="text-[10px] uppercase tracking-widest text-[#9CA3AF]">Empleado</span>
-                        <span id="resumen-empleado" class="text-xs text-white font-medium">-</span>
+                    <div>
+                        <p class="text-[10px] uppercase tracking-widest text-[#9CA3AF]">Empleado</p>
+                        <p id="resumen-empleado" class="text-sm text-white font-medium mt-1">-</p>
                     </div>
-                    <div class="flex justify-between py-2 border-b border-[#374151]/50">
-                        <span class="text-[10px] uppercase tracking-widest text-[#9CA3AF]">Fecha</span>
-                        <span id="resumen-fecha" class="text-xs text-white font-medium">-</span>
+                    <div>
+                        <p class="text-[10px] uppercase tracking-widest text-[#9CA3AF]">Fecha</p>
+                        <p id="resumen-fecha" class="text-sm text-white font-medium mt-1">-</p>
                     </div>
-                    <div class="flex justify-between py-2 border-b border-[#374151]/50">
-                        <span class="text-[10px] uppercase tracking-widest text-[#9CA3AF]">Hora</span>
-                        <span id="resumen-hora" class="text-xs text-white font-medium">-</span>
+                    <div>
+                        <p class="text-[10px] uppercase tracking-widest text-[#9CA3AF]">Hora</p>
+                        <p id="resumen-hora" class="text-sm text-white font-medium mt-1">-</p>
                     </div>
-                    <div class="flex justify-between py-2 pt-3">
-                        <span class="text-xs font-bold text-white uppercase tracking-widest">Total</span>
-                        <span id="resumen-total" class="text-sm font-bold text-yellow-500">$0</span>
-                    </div>
+                </div>
+                <div class="mt-4 pt-4 border-t border-[#374151] flex justify-between items-center">
+                    <span class="text-xs font-bold text-white uppercase tracking-widest">Total</span>
+                    <span id="resumen-total" class="text-xl font-bold text-yellow-500">$0</span>
                 </div>
             </div>
 
@@ -152,12 +181,50 @@
                 Confirmar Cita
             </button>
         </form>
+        @endif
     </div>
 </div>
+
+<style>
+.line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+</style>
 
 <script>
 let servicioSeleccionado = null;
 let empleadoSeleccionado = null;
+let currentServicioIndex = 0;
+const serviciosCards = document.querySelectorAll('.servicio-card');
+const serviciosContainer = document.getElementById('serviciosCarousel');
+const itemsPerPage = 3;
+const totalPages = Math.ceil(serviciosCards.length / itemsPerPage);
+
+function updateServiciosCarousel() {
+    if (!serviciosContainer) return;
+    const offset = -currentServicioIndex * (100 / itemsPerPage);
+    serviciosContainer.style.transform = `translateX(${offset}%)`;
+}
+
+function nextServicioPage() {
+    if (currentServicioIndex < totalPages - 1) {
+        currentServicioIndex++;
+        updateServiciosCarousel();
+    }
+}
+
+function prevServicioPage() {
+    if (currentServicioIndex > 0) {
+        currentServicioIndex--;
+        updateServiciosCarousel();
+    }
+}
+
+document.getElementById('prevServicio')?.addEventListener('click', prevServicioPage);
+document.getElementById('nextServicio')?.addEventListener('click', nextServicioPage);
 
 // Selección de servicio
 document.querySelectorAll('.servicio-card').forEach(card => {
