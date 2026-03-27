@@ -76,10 +76,11 @@
     </div>
     
     <!-- Contenido principal -->
+    <!-- Contenido principal -->
 <div class="max-w-7xl mx-auto px-6 py-12">
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-        <!-- Columna izquierda - Servicios y Reseñas (ocupa 2/3) -->
-        <div class="lg:col-span-2 space-y-6">
+    <div class="flex flex-col lg:flex-row gap-8 items-stretch">
+        <!-- Columna izquierda - Servicios (ocupa 2/3) -->
+        <div class="lg:w-2/3 space-y-6">
             <!-- Stats Cards -->
             <div class="grid grid-cols-3 gap-4">
                 <div class="bg-[#262626] border border-[#374151] p-4 rounded-sm text-center">
@@ -200,112 +201,109 @@
             </div>
         </div>
         
-        <!-- Columna derecha - Sticky (se queda fija al hacer scroll) -->
-        <div class="lg:col-span-1">
-            <div class="sticky top-24 space-y-6">
-                <!-- Equipo de Trabajo - Seleccionable -->
-                <div class="bg-[#262626] border border-[#374151] rounded-sm p-6">
-                    <h3 class="text-sm font-bold uppercase tracking-widest text-white mb-4 flex items-center gap-2">
-                        <i class="fas fa-users"></i> Nuestro Equipo ({{ count($empleados) }})
-                    </h3>
-                    <div class="space-y-3 max-h-[400px] overflow-y-auto custom-scroll">
-                        @forelse($empleados as $empleado)
-                        <div class="flex items-center gap-3 p-3 bg-[#1a1a1a] border border-[#374151] rounded-lg hover:border-yellow-500 transition-all duration-300 cursor-pointer group" 
-                             onclick="seleccionarEmpleado({{ $empleado['id_empleado'] }}, '{{ $empleado['nombre'] }}')">
-                            <div class="w-10 h-10 bg-gradient-to-br from-yellow-500/20 to-yellow-600/20 text-yellow-500 flex items-center justify-center text-sm font-bold rounded-full">
-                                {{ strtoupper(substr($empleado['nombre'], 0, 1)) }}
-                            </div>
-                            <div class="flex-1">
-                                <span class="text-sm text-[#D1D5DB] uppercase tracking-wider font-bold block group-hover:text-yellow-500 transition-colors">
-                                    {{ $empleado['nombre'] }} {{ $empleado['app_paterno'] ?? '' }}
-                                </span>
-                                @if(isset($empleado['especialidad']) && $empleado['especialidad'])
-                                <span class="text-[10px] text-[#52525b]">{{ $empleado['especialidad'] }}</span>
-                                @endif
-                            </div>
-                            @if(isset($empleado['calificacion']))
-                            <div class="flex items-center gap-1 text-[10px] text-yellow-500">
-                                <i class="fas fa-star"></i>
-                                <span>{{ number_format($empleado['calificacion'], 1) }}</span>
-                            </div>
+        <!-- Columna derecha - Se mueve con el scroll y llena el espacio -->
+        <div class="lg:w-1/3 flex flex-col gap-6">
+            <!-- Equipo de Trabajo - Seleccionable -->
+            <div class="bg-[#262626] border border-[#374151] rounded-sm p-6">
+                <h3 class="text-sm font-bold uppercase tracking-widest text-white mb-4 flex items-center gap-2">
+                    <i class="fas fa-users"></i> Nuestro Equipo ({{ count($empleados) }})
+                </h3>
+                <div class="space-y-3">
+                    @forelse($empleados as $empleado)
+                    <div class="flex items-center gap-3 p-3 bg-[#1a1a1a] border border-[#374151] rounded-lg hover:border-yellow-500 transition-all duration-300 cursor-pointer group" 
+                         onclick="seleccionarEmpleado({{ $empleado['id_empleado'] }}, '{{ $empleado['nombre'] }}')">
+                        <div class="w-10 h-10 bg-gradient-to-br from-yellow-500/20 to-yellow-600/20 text-yellow-500 flex items-center justify-center text-sm font-bold rounded-full">
+                            {{ strtoupper(substr($empleado['nombre'], 0, 1)) }}
+                        </div>
+                        <div class="flex-1">
+                            <span class="text-sm text-[#D1D5DB] uppercase tracking-wider font-bold block group-hover:text-yellow-500 transition-colors">
+                                {{ $empleado['nombre'] }} {{ $empleado['app_paterno'] ?? '' }}
+                            </span>
+                            @if(isset($empleado['especialidad']) && $empleado['especialidad'])
+                            <span class="text-[10px] text-[#52525b]">{{ $empleado['especialidad'] }}</span>
                             @endif
                         </div>
-                        @empty
-                        <p class="text-xs text-[#52525b] italic">Sin empleados registrados.</p>
-                        @endforelse
-                    </div>
-                    
-                    @if(count($empleados) > 0)
-                    <div class="mt-6 pt-4 border-t border-[#374151]">
-                        <div id="empleadoSeleccionado" class="text-center hidden">
-                            <p class="text-xs text-[#9CA3AF] mb-2">Empleado seleccionado:</p>
-                            <p class="text-sm font-bold text-white mb-3" id="nombreEmpleadoSeleccionado"></p>
-                            <button id="btnAgendarConEmpleado" 
-                                    onclick="agendarConEmpleado()"
-                                    class="w-full py-2 bg-gradient-to-r from-yellow-500 to-yellow-600 text-black font-bold uppercase tracking-wider rounded-lg hover:from-yellow-400 hover:to-yellow-500 transition-all duration-300 flex items-center justify-center gap-2">
-                                <i class="fas fa-calendar-check"></i>
-                                Agendar cita con este empleado
-                            </button>
+                        @if(isset($empleado['calificacion']))
+                        <div class="flex items-center gap-1 text-[10px] text-yellow-500">
+                            <i class="fas fa-star"></i>
+                            <span>{{ number_format($empleado['calificacion'], 1) }}</span>
                         </div>
+                        @endif
                     </div>
-                    @endif
+                    @empty
+                    <p class="text-xs text-[#52525b] italic">Sin empleados registrados.</p>
+                    @endforelse
                 </div>
                 
-                <!-- Horario -->
-                <div class="bg-[#262626] border border-[#374151] rounded-sm p-6">
-                    <h3 class="text-sm font-bold uppercase tracking-widest text-white mb-4 flex items-center gap-2">
-                        <i class="fas fa-clock"></i> Horario de Atención
-                    </h3>
-                    @if(isset($negocio['horarios']) && count($negocio['horarios']) > 0)
-                    <div class="space-y-2">
-                        @foreach($negocio['horarios'] as $horario)
-                        <div class="flex justify-between text-sm py-1 border-b border-[#374151]/50 last:border-0">
-                            <span class="text-[#9CA3AF]">{{ $horario['dia'] }}</span>
-                            <span class="text-white">{{ $horario['hora_apertura'] }} - {{ $horario['hora_cierre'] }}</span>
-                        </div>
-                        @endforeach
-                    </div>
-                    @else
-                    <p class="text-xs text-[#52525b] italic">Horario no disponible.</p>
-                    @endif
-                </div>
-                
-                <!-- Ubicación -->
-                @if(isset($negocio['direccion']))
-                <div class="bg-[#262626] border border-[#374151] rounded-sm p-6">
-                    <h3 class="text-sm font-bold uppercase tracking-widest text-white mb-4 flex items-center gap-2">
-                        <i class="fas fa-location-dot"></i> Ubicación
-                    </h3>
-                    <div class="space-y-1 text-sm">
-                        <p class="text-[#D1D5DB]">
-                            {{ $negocio['direccion']['calle'] ?? '' }} {{ $negocio['direccion']['numero'] ?? '' }}<br>
-                            {{ $negocio['direccion']['colonia'] ?? '' }}<br>
-                            {{ $negocio['direccion']['ciudad'] ?? '' }}, {{ $negocio['direccion']['estado'] ?? '' }}<br>
-                            <span class="text-[#9CA3AF]">CP: {{ $negocio['direccion']['codigo_postal'] ?? '' }}</span>
-                        </p>
-                    </div>
-                </div>
-                @endif
-                
-                <!-- Contacto -->
-                @if(isset($negocio['telefono']) && $negocio['telefono'])
-                <div class="bg-[#262626] border border-[#374151] rounded-sm p-6">
-                    <h3 class="text-sm font-bold uppercase tracking-widest text-white mb-4 flex items-center gap-2">
-                        <i class="fas fa-phone"></i> Contacto
-                    </h3>
-                    <div class="flex items-center gap-3">
-                        <a href="tel:{{ $negocio['telefono'] }}" 
-                           class="text-[#D1D5DB] hover:text-white transition-colors text-sm">
-                            {{ $negocio['telefono'] }}
-                        </a>
+                @if(count($empleados) > 0)
+                <div class="mt-6 pt-4 border-t border-[#374151]">
+                    <div id="empleadoSeleccionado" class="text-center hidden">
+                        <p class="text-xs text-[#9CA3AF] mb-2">Empleado seleccionado:</p>
+                        <p class="text-sm font-bold text-white mb-3" id="nombreEmpleadoSeleccionado"></p>
+                        <button id="btnAgendarConEmpleado" 
+                                onclick="agendarConEmpleado()"
+                                class="w-full py-2 bg-gradient-to-r from-yellow-500 to-yellow-600 text-black font-bold uppercase tracking-wider rounded-lg hover:from-yellow-400 hover:to-yellow-500 transition-all duration-300 flex items-center justify-center gap-2">
+                            <i class="fas fa-calendar-check"></i>
+                            Agendar cita con este empleado
+                        </button>
                     </div>
                 </div>
                 @endif
             </div>
+            
+            <!-- Horario -->
+            <div class="bg-[#262626] border border-[#374151] rounded-sm p-6">
+                <h3 class="text-sm font-bold uppercase tracking-widest text-white mb-4 flex items-center gap-2">
+                    <i class="fas fa-clock"></i> Horario de Atención
+                </h3>
+                @if(isset($negocio['horarios']) && count($negocio['horarios']) > 0)
+                <div class="space-y-2">
+                    @foreach($negocio['horarios'] as $horario)
+                    <div class="flex justify-between text-sm py-1 border-b border-[#374151]/50 last:border-0">
+                        <span class="text-[#9CA3AF]">{{ $horario['dia'] }}</span>
+                        <span class="text-white">{{ $horario['hora_apertura'] }} - {{ $horario['hora_cierre'] }}</span>
+                    </div>
+                    @endforeach
+                </div>
+                @else
+                <p class="text-xs text-[#52525b] italic">Horario no disponible.</p>
+                @endif
+            </div>
+            
+            <!-- Ubicación -->
+            @if(isset($negocio['direccion']))
+            <div class="bg-[#262626] border border-[#374151] rounded-sm p-6">
+                <h3 class="text-sm font-bold uppercase tracking-widest text-white mb-4 flex items-center gap-2">
+                    <i class="fas fa-location-dot"></i> Ubicación
+                </h3>
+                <div class="space-y-1 text-sm">
+                    <p class="text-[#D1D5DB]">
+                        {{ $negocio['direccion']['calle'] ?? '' }} {{ $negocio['direccion']['numero'] ?? '' }}<br>
+                        {{ $negocio['direccion']['colonia'] ?? '' }}<br>
+                        {{ $negocio['direccion']['ciudad'] ?? '' }}, {{ $negocio['direccion']['estado'] ?? '' }}<br>
+                        <span class="text-[#9CA3AF]">CP: {{ $negocio['direccion']['codigo_postal'] ?? '' }}</span>
+                    </p>
+                </div>
+            </div>
+            @endif
+            
+            <!-- Contacto -->
+            @if(isset($negocio['telefono']) && $negocio['telefono'])
+            <div class="bg-[#262626] border border-[#374151] rounded-sm p-6">
+                <h3 class="text-sm font-bold uppercase tracking-widest text-white mb-4 flex items-center gap-2">
+                    <i class="fas fa-phone"></i> Contacto
+                </h3>
+                <div class="flex items-center gap-3">
+                    <a href="tel:{{ $negocio['telefono'] }}" 
+                       class="text-[#D1D5DB] hover:text-white transition-colors text-sm">
+                        {{ $negocio['telefono'] }}
+                    </a>
+                </div>
+            </div>
+            @endif
         </div>
     </div>
 </div>
-
 <!-- Scroll personalizado para empleados -->
 <style>
 .custom-scroll::-webkit-scrollbar {
