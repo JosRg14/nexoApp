@@ -22,86 +22,31 @@ class BusinessProfileController extends Controller
 
     public function index()
 {
-    $services = [];
-    $employees = [];
-    $negocio = [];
-
-    try {
-        // Obtener negocio del admin autenticado
-        $responseNegocio = $this->serviceService->getBusiness();
-        $negocio = $responseNegocio['data'] ?? [];
-        
-        // LOG: Ver qué devuelve getBusiness()
-        \Log::info('=== BUSINESS PROFILE DEBUG ===');
-        \Log::info('getBusiness response:', $responseNegocio);
-
-        // Obtener el ID del negocio
-        $negocioId = $negocio['id_negocio'] ?? null;
-        
-        // LOG: Ver el ID del negocio
-        \Log::info('Negocio ID: ' . ($negocioId ?? 'NULL'));
-
-        // Obtener servicios SOLO de este negocio
-        $params = [];
-        if ($negocioId) {
-            $params['negocio_id'] = $negocioId;
-        }
-        
-        // LOG: Ver parámetros enviados
-        \Log::info('Parámetros para servicios: ', $params);
-        
-        $responseServices = $this->serviceService->list($params);
-        
-        // LOG: Ver respuesta completa
-        \Log::info('Respuesta servicios:', $responseServices);
-        
-        // LOG: Ver cuántos servicios vienen en data
-        \Log::info('Cantidad de servicios en data: ' . count($responseServices['data'] ?? []));
-
-        $services = collect($responseServices['data'] ?? [])->map(function ($item) {
-            return [
-                'id' => $item['id_servicio'] ?? $item['id'],
-                'nombre' => $item['nombre_servicio'] ?? $item['nombre'],
-                'descripcion' => $item['descripcion'] ?? '',
-                'precio' => $item['precio'] ?? 0,
-                'duracion' => $item['duracion_estimada'] ?? $item['duracion'] ?? 0,
-                'imagen' => isset($item['imagen'])
-                    ? rtrim(config('services.api.url'), '/') . '/' . ltrim($item['imagen'], '/')
-                    : null,
-            ];
-        })->toArray();
-        
-        \Log::info('Servicios procesados: ' . count($services));
-
-        // Obtener empleados SOLO de este negocio
-        $responseEmployees = $this->employeeService->list($params);
-        
-        \Log::info('Respuesta empleados:', $responseEmployees);
-
-        $employees = collect($responseEmployees['data'] ?? [])->map(function ($emp) {
-            return [
-                'id_empleado' => $emp['id_empleado'] ?? null,
-                'nombre' => $emp['nombre'] ?? '',
-                'app_paterno' => $emp['app_paterno'] ?? '',
-                'app_materno' => $emp['app_materno'] ?? '',
-                'correo' => $emp['correo'] ?? '',
-                'comision' => $emp['comision'] ?? 0,
-                'estado' => $emp['estado'] ?? 'activo'
-            ];
-        })->toArray();
-        
-        \Log::info('Empleados procesados: ' . count($employees));
-
-    } catch (\Exception $e) {
-        $negocio = session('negocio');
-        \Log::error('Error en BusinessProfileController: ' . $e->getMessage());
-        \Log::error('Stack trace: ' . $e->getTraceAsString());
-    }
-
+    // PRUEBA DIRECTA - SIN NINGUNA LÓGICA COMPLEJA
+    $token = session('auth_token');
+    
+    // Llamada directa a la API con cURL
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, 'https://devlink-servidorapi.td60xq.easypanel.host/api/servicios?negocio_id=2');
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        'Authorization: Bearer ' . $token,
+        'Accept: application/json'
+    ]);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+    
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+    
+    // Decodificar respuesta
+    $data = json_decode($response, true);
+    
+    // Enviar a la vista
     return view('business.profile', [
-        'negocio' => $negocio,
-        'services' => $services,
-        'employees' => $employees
+        'negocio' => ['nombre' => 'Mi Negocio', 'id_negocio' => 2],
+        'services' => $data['data'] ?? [],
+        'employees' => []
     ]);
 }
 
