@@ -276,30 +276,42 @@ document.getElementById('fecha').addEventListener('change', function() {
 async function cargarHorarios() {
     const fecha = document.getElementById('fecha').value;
     const empleadoId = empleadoSeleccionado?.id;
-    const servicioId = servicioSeleccionado?.id;
+    const duracion = servicioSeleccionado?.duracion;
     
-    if (!fecha || !empleadoId || !servicioId) return;
+    if (!fecha || !empleadoId || !duracion) {
+        console.log('Faltan datos:', { fecha, empleadoId, duracion });
+        return;
+    }
+    
+    const selectHora = document.getElementById('hora');
+    selectHora.innerHTML = '<option value="">Cargando horarios...</option>';
+    selectHora.disabled = true;
     
     try {
-        const response = await fetch(`/api-proxy/disponibilidad/empleado/${empleadoId}?fecha=${fecha}&servicio_id=${servicioId}`);
+        // Usar la API directa (pública) en lugar del proxy para disponibilidad
+        const response = await fetch(`https://devlink-servidorapi.td60xq.easypanel.host/api/disponibilidad/empleado/${empleadoId}?fecha=${fecha}&duracion=${duracion}`);
         const data = await response.json();
-        const selectHora = document.getElementById('hora');
+        
         selectHora.innerHTML = '<option value="">Selecciona una hora</option>';
         
-        if (data.success && data.data && data.data.length > 0) {
-            data.data.forEach(horario => {
+        console.log('Respuesta disponibilidad:', data);
+        
+        if (data.success && data.slots && data.slots.length > 0) {
+            data.slots.forEach(slot => {
                 const option = document.createElement('option');
-                option.value = horario;
-                option.textContent = horario;
+                option.value = slot.hora_inicio;
+                option.textContent = `${slot.hora_inicio} - ${slot.hora_fin}`;
                 selectHora.appendChild(option);
             });
             selectHora.disabled = false;
         } else {
-            selectHora.innerHTML = '<option value="">No hay horarios disponibles</option>';
+            selectHora.innerHTML = '<option value="">No hay horarios disponibles para este día</option>';
             selectHora.disabled = true;
         }
     } catch (error) {
-        console.error('Error:', error);
+        console.error('Error cargando horarios:', error);
+        selectHora.innerHTML = '<option value="">Error al cargar horarios</option>';
+        selectHora.disabled = true;
     }
 }
 
