@@ -5,8 +5,9 @@
 <!-- Left: Form -->
 <div class="space-y-8">
 
-<form method="POST" action="{{ route('business.update') }}" class="space-y-8">
+<form method="POST" action="{{ url('/api-proxy/api/negocios/mi-negocio') }}" data-redirect="{{ route('business.profile') }}" class="space-y-8">
 @csrf
+@method('PUT')
 
 <div class="space-y-6">
 

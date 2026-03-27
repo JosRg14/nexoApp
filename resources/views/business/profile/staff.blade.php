@@ -150,7 +150,7 @@ Editar
 
 
 
-<form method="POST" action="{{ route('business.employees.destroy',$emp['id_empleado']) }}">
+<form method="POST" action="{{ url('/api-proxy/api/empleados/'.$emp['id_empleado']) }}" data-redirect="{{ route('business.profile') }}">
 
 @csrf
 
@@ -230,7 +230,7 @@ Nuevo Empleado
 
 
 
-<form method="POST" action="{{ route('business.employees.store') }}">
+<form method="POST" action="{{ url('/api-proxy/api/admin/register/empleado') }}" data-redirect="{{ route('business.profile') }}">
 
 @csrf
 
@@ -556,8 +556,8 @@ document.getElementById("edit_estado").value = estado || "activo"
 
 
 document.getElementById("editEmployeeForm").action =
-
-"/business/employees/"+id
+"/api-proxy/api/empleados/"+id;
+document.getElementById("editEmployeeForm").setAttribute("data-redirect", "{{ route('business.profile') }}");
 
 
 

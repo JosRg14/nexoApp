@@ -76,7 +76,7 @@
                 </p>
             </div>
 
-            <form method="POST" action="{{ route('business.services.store') }}" enctype="multipart/form-data" class="space-y-6">
+            <form method="POST" action="{{ url('/api-proxy/api/servicios') }}" data-redirect="{{ route('business.profile') }}" enctype="multipart/form-data" class="space-y-6">
                 @csrf
                 {{-- NOMBRE --}}
                 <div class="group/input relative">
@@ -216,7 +216,7 @@
     <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-[#1a1a1a] border border-[#374151] p-8 w-full max-w-md">
         <h3 class="text-red-500 font-bold mb-4 uppercase">Confirmar eliminación</h3>
         <p class="text-white text-sm mb-6">¿Estás seguro que deseas eliminar <span id="deleteServiceName" class="font-bold"></span>?</p>
-        <form method="POST" id="deleteServiceForm">
+        <form method="POST" id="deleteServiceForm" data-custom-handler="true">
             @csrf
             @method('DELETE')
             <div class="flex gap-4">

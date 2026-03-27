@@ -179,13 +179,14 @@ if (imagen) {
 }
 
     document.getElementById('editServiceForm').action =
-        `/business/services/${id}`;
+        `/api-proxy/api/servicios/${id}`;
+    document.getElementById('editServiceForm').setAttribute('data-redirect', '{{ route("business.profile") }}');
 }
 
 function openDeleteModal(id, nombre) {
     document.getElementById('modal-delete-service').classList.remove('hidden');
     document.getElementById('deleteServiceName').innerText = nombre;
-    document.getElementById('deleteServiceForm').action = `/business/services/${id}`;
+    document.getElementById('deleteServiceForm').action = `/api-proxy/api/servicios/${id}`;
 }
 
 function closeDeleteModal() {
