@@ -251,7 +251,7 @@
                 @endif
             </div>
             
-            <!-- Horario -->
+           <!-- Horario -->
             <div class="bg-[#262626] border border-[#374151] rounded-sm p-6">
                 <h3 class="text-sm font-bold uppercase tracking-widest text-white mb-4 flex items-center gap-2">
                     <i class="fas fa-clock"></i> Horario de Atención
@@ -264,7 +264,11 @@
                         <div class="text-right">
                             @if($horario['abierto'])
                                 @foreach($horario['horarios'] as $bloque)
-                                    <span class="text-white block text-sm">{{ $bloque }}</span>
+                                    @if($bloque !== 'Cerrado')
+                                        <span class="text-white block text-sm">{{ $bloque }}</span>
+                                    @else
+                                        <span class="text-red-400">Cerrado</span>
+                                    @endif
                                 @endforeach
                             @else
                                 <span class="text-red-400">Cerrado</span>
