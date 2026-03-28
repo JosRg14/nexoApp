@@ -335,15 +335,20 @@ document.getElementById('cita-form').addEventListener('submit', async function(e
     
     showLoader();
     
+    //  Obtener el token CSRF correctamente
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || 
+                      document.querySelector('input[name="_token"]')?.value;
+    
     try {
         const response = await fetch('/api-proxy/citas', {
             method: 'POST',
             headers: {
-                'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value,
+                'X-CSRF-TOKEN': csrfToken,
                 'Content-Type': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest',
                 'Accept': 'application/json'
             },
+            credentials: 'same-origin', // 🔥 Importante para enviar cookies
             body: JSON.stringify({
                 servicio_id: servicioId,
                 empleado_id: empleadoId,
@@ -361,6 +366,7 @@ document.getElementById('cita-form').addEventListener('submit', async function(e
             alert(data.message || 'Error al agendar cita');
         }
     } catch (error) {
+        console.error('Error:', error);
         alert('Error de conexión');
     } finally {
         hideLoader();
