@@ -112,7 +112,7 @@
     </footer>
 
     <script>
-        function iniciarSesionConGoogle() {
+        function iniciarSesionConGoogle(rol) {
             window.location.href = '/auth/google?rol=' + rol;
         }
 
