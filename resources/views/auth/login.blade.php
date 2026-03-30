@@ -79,9 +79,17 @@
                     <div class="flex-grow border-t border-[#374151]"></div>
                 </div>
 
-                <div>
-                    <button type="button" onclick="iniciarSesionConGoogle()" class="w-full py-4 px-6 bg-transparent text-white font-bold tracking-widest uppercase text-sm border border-[#374151] transition-all duration-300 hover:bg-[#EA4335] hover:border-transparent flex items-center justify-center">
-                        <i class="fa-brands fa-google mr-3"></i> Continuar con Google
+                <div class="space-y-3">
+                    <button type="button" onclick="iniciarSesionConGoogle('cliente')" 
+                            class="w-full py-4 px-6 bg-transparent text-white font-bold tracking-widest uppercase text-sm border border-[#374151] transition-all duration-300 hover:bg-[#EA4335] hover:border-transparent flex items-center justify-center group">
+                        <i class="fa-brands fa-google mr-3 group-hover:animate-pulse"></i> 
+                        Continuar como Cliente
+                    </button>
+                    
+                    <button type="button" onclick="iniciarSesionConGoogle('admin')" 
+                            class="w-full py-4 px-6 bg-transparent text-white font-bold tracking-widest uppercase text-sm border border-[#374151] transition-all duration-300 hover:bg-[#EA4335] hover:border-transparent flex items-center justify-center group">
+                        <i class="fa-brands fa-google mr-3 group-hover:animate-pulse"></i> 
+                        Continuar como Negocio
                     </button>
                 </div>
 
@@ -105,7 +113,7 @@
 
     <script>
         function iniciarSesionConGoogle() {
-            window.location.href = '/auth/google?rol=cliente';
+            window.location.href = '/auth/google?rol=' + rol;
         }
 
         document.addEventListener('DOMContentLoaded', () => {
