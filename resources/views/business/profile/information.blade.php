@@ -1,14 +1,3 @@
-@php
-    \Log::info('Vista business/profile - negocio:', ['negocio' => $negocio]);
-    \Log::info('Tipo de negocio:', ['tipo' => gettype($negocio)]);
-    if (is_array($negocio)) {
-        foreach ($negocio as $key => $value) {
-            if (is_array($value)) {
-                \Log::info("Campo $key es array con keys: " . implode(', ', array_keys($value)));
-            }
-        }
-    }
-@endphp
 <!-- TAB 1: INFORMACIÓN -->
 <section id="tab-info" class="animate-fade-in-up">
 
@@ -303,7 +292,7 @@
             <div class="relative z-10 text-center">
                 <div class="w-32 h-32 rounded-full bg-[#262626] border-2 border-[#374151] mx-auto mb-6 flex items-center justify-center overflow-hidden">
                     @if(isset($negocio['foto_perfil']) && $negocio['foto_perfil'])
-                        <img src="{{ $negocio['foto_perfil'] }}" class="w-full h-full object-cover">
+                        <img src="{{ is_array($negocio['foto_perfil']) ? $negocio['foto_perfil']['url_imagen'] : $negocio['foto_perfil'] }}" class="w-full h-full object-cover">
                     @else
                         <i class="fas fa-store text-4xl text-[#9CA3AF]"></i>
                     @endif
