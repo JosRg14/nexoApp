@@ -248,14 +248,10 @@ public function showClientRegister()
 
             $rol = $data['usuario']['rol'];
             
-            if ($rol === 'admin') {
-                $necesitaCompletar = $data['necesita_completar_registro'] ?? false;
-
-                return $necesitaCompletar 
-                    ? redirect('/business/profile') 
-                    : redirect('/business/profile');
+            if ($rol === 'admin') {      
+                    return redirect()->route('business.profile');
+                
             }
-
             return redirect('/');
         }
 

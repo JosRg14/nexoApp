@@ -252,3 +252,10 @@ Route::middleware(['auth.session', 'inject.api.token'])->group(function () {
     Route::get('/booking/create', [CitaController::class, 'create'])->name('booking.create');
     Route::get('/mis-citas', [CitaController::class, 'misCitas'])->name('mis-citas');
 });
+
+// Rutas de completar registro de negocio
+Route::middleware(['auth.session'])->group(function () {
+    Route::get('/completar-negocio', function () {
+        return view('business.complete-registration');
+    })->name('business.complete');
+});
