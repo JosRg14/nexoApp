@@ -1,3 +1,14 @@
+@php
+    \Log::info('Vista business/profile - negocio:', ['negocio' => $negocio]);
+    \Log::info('Tipo de negocio:', ['tipo' => gettype($negocio)]);
+    if (is_array($negocio)) {
+        foreach ($negocio as $key => $value) {
+            if (is_array($value)) {
+                \Log::info("Campo $key es array con keys: " . implode(', ', array_keys($value)));
+            }
+        }
+    }
+@endphp
 <!-- TAB 1: INFORMACIÓN -->
 <section id="tab-info" class="animate-fade-in-up">
 
