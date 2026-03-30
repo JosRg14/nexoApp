@@ -4,7 +4,7 @@
 
 @section('content')
 
-<div class="bg-[#1a1a1a] min-h-screen py-<12">
+<div class="bg-[#1a1a1a] min-h-screen pt-24 py-12">
     <div class="max-w-6xl mx-auto px-6">
         <div class="mb-8">
             <h1 class="text-3xl font-bold uppercase tracking-wide text-white">Mis Citas</h1>
