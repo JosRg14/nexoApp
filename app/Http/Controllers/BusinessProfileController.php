@@ -31,24 +31,20 @@ class BusinessProfileController extends Controller
         $negocio = [];
 
         try {
-            // Obtener negocio usando HttpClient (ya tiene el token por el middleware)
+            // Obtener negocio usando HttpClient
             $responseNegocio = $this->httpClient->get('/api/negocios/mi-negocio');
             $negocio = $responseNegocio['data'] ?? [];
             
-            // Obtener ID del negocio
             $negocioId = $negocio['id_negocio'] ?? null;
             
             if ($negocioId) {
-                // Obtener servicios del negocio
+                // Obtener servicios y empleados solo si hay negocio
                 $responseServices = $this->httpClient->get('/api/servicios', ['negocio_id' => $negocioId]);
-                
                 $services = collect($responseServices['data'] ?? [])->map(function ($item) {
-                    // Completar URL de la imagen usando la configuración
                     $imagenUrl = null;
                     if (isset($item['imagen']) && $item['imagen']) {
                         $imagenUrl = rtrim(config('services.api.url'), '/') . $item['imagen'];
                     }
-                    
                     return [
                         'id' => $item['id'] ?? $item['id_servicio'],
                         'nombre' => $item['nombre'],
@@ -59,9 +55,7 @@ class BusinessProfileController extends Controller
                     ];
                 })->toArray();
 
-                // Obtener empleados del negocio
                 $responseEmployees = $this->httpClient->get('/api/empleados', ['negocio_id' => $negocioId]);
-
                 $employees = collect($responseEmployees['data'] ?? [])->map(function ($emp) {
                     return [
                         'id_empleado' => $emp['id_empleado'] ?? null,
@@ -76,8 +70,9 @@ class BusinessProfileController extends Controller
             }
 
         } catch (\Exception $e) {
-            $negocio = session('negocio');
-            \Log::error('Error en BusinessProfileController: ' . $e->getMessage());
+            // Si falla (porque no tiene negocio), simplemente dejamos $negocio vacío
+            $negocio = [];
+            \Log::info('Admin sin negocio registrado - mostrando formulario de registro');
         }
 
         return view('business.profile', [
