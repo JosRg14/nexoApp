@@ -229,33 +229,50 @@ public function showClientRegister()
 
 
     public function googleCallback(Request $request)
-    {
-        $response = Http::withHeaders(['Accept' => 'application/json'])
-            ->get(config('services.api.url') . '/auth/google/callback', [
-                'code' => $request->code,
-                'state' => $request->state,
-            ]);
+{
+    \Log::info('=== GOOGLE CALLBACK WEB ===');
+    \Log::info('Code:', ['code' => $request->code]);
+    \Log::info('State:', ['state' => $request->state]);
+    
+    $response = Http::withHeaders(['Accept' => 'application/json'])
+        ->get(config('services.api.url') . '/auth/google/callback', [
+            'code' => $request->code,
+            'state' => $request->state,
+        ]);
 
-        if ($response->successful()) {
-            $resData = $response->json();
-            $data = $resData['data'];
+    \Log::info('API Response Status:', ['status' => $response->status()]);
+    \Log::info('API Response Body:', ['body' => $response->body()]);
 
-            session([
-                'auth_token' => $data['token'],
-                'rol'        => $data['usuario']['rol'],
-                'usuario'    => $data['usuario'],
-            ]);
+    if ($response->successful()) {
+        $resData = $response->json();
+        $data = $resData['data'];
+        
+        \Log::info('Data recibido:', ['data' => $data]);
 
-            $rol = $data['usuario']['rol'];
-            
-            if ($rol === 'admin') {      
-                    return redirect()->route('business.profile');
-                
-            }
-            return redirect('/');
+        session([
+            'auth_token' => $data['token'],
+            'rol'        => $data['usuario']['rol'],
+            'usuario'    => $data['usuario'],
+        ]);
+
+        \Log::info('Sesión guardada:', [
+            'token' => session('auth_token'),
+            'rol' => session('rol'),
+            'usuario' => session('usuario')
+        ]);
+
+        $rol = $data['usuario']['rol'];
+        
+        if ($rol === 'admin') {      
+            \Log::info('Admin autenticado, redirigiendo a business.profile');
+            return redirect()->route('business.profile');
         }
-
-        return redirect('/login')->with('error', 'Error al sincronizar con Google');
+        
+        return redirect('/');
     }
+
+    \Log::error('Error en callback Google:', ['response' => $response->body()]);
+    return redirect('/login')->with('error', 'Error al sincronizar con Google');
+}
 
 }
