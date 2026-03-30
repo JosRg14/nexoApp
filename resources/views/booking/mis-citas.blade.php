@@ -3,6 +3,14 @@
 @section('title', 'Mis Citas')
 
 @section('content')
+<!-- Agrega esto al inicio de la vista, después de @section('content') -->
+<div class="bg-gray-800 p-4 mb-4 rounded text-white">
+    <h3 class="font-bold">Debug:</h3>
+    <p>Total citas: {{ count($citas) }}</p>
+    <pre class="text-xs text-green-400 overflow-auto max-h-40">
+        {{ json_encode($citas, JSON_PRETTY_PRINT) }}
+    </pre>
+</div>
 <div class="bg-[#1a1a1a] min-h-screen py-12">
     <div class="max-w-6xl mx-auto px-6">
         <div class="mb-8">

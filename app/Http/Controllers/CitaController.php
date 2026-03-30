@@ -60,8 +60,18 @@ class CitaController extends Controller
             
             try {
                 $response = $this->httpClient->get('/api/citas/mis-citas');
+                
+                // 🔥 LOG para ver qué está devolviendo
+                \Log::info('Respuesta mis-citas:', $response);
+                
                 $citas = $response['data'] ?? [];
                 \Log::info('Citas obtenidas: ' . count($citas));
+                
+                // Si hay datos, loguear la primera
+                if (count($citas) > 0) {
+                    \Log::info('Primera cita:', $citas[0]);
+                }
+                
             } catch (\Exception $e) {
                 \Log::error('Error al obtener citas: ' . $e->getMessage());
             }
