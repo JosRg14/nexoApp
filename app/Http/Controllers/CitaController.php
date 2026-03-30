@@ -54,33 +54,28 @@ class CitaController extends Controller
     }
     
     public function misCitas()
-    {
+{
+    try {
+        \Log::info('=== WEB: misCitas ===');
+        \Log::info('Session usuario:', session('usuario'));
+        \Log::info('Session rol:', session('rol'));
+        
+        $citas = [];
+        
         try {
-            $citas = [];
-            
-            try {
-                $response = $this->httpClient->get('/api/citas/mis-citas');
-                
-                // 🔥 LOG para ver qué está devolviendo
-                \Log::info('Respuesta mis-citas:', $response);
-                
-                $citas = $response['data'] ?? [];
-                \Log::info('Citas obtenidas: ' . count($citas));
-                
-                // Si hay datos, loguear la primera
-                if (count($citas) > 0) {
-                    \Log::info('Primera cita:', $citas[0]);
-                }
-                
-            } catch (\Exception $e) {
-                \Log::error('Error al obtener citas: ' . $e->getMessage());
-            }
-            
-            return view('booking.mis-citas', compact('citas'));
+            $response = $this->httpClient->get('/api/citas/mis-citas');
+            \Log::info('Respuesta API:', $response);
+            $citas = $response['data'] ?? [];
             
         } catch (\Exception $e) {
-            \Log::error('Error en CitaController@misCitas: ' . $e->getMessage());
-            return view('booking.mis-citas', ['citas' => []]);
+            \Log::error('Error al obtener citas: ' . $e->getMessage());
         }
+        
+        return view('booking.mis-citas', compact('citas'));
+        
+    } catch (\Exception $e) {
+        \Log::error('Error en CitaController@misCitas: ' . $e->getMessage());
+        return view('booking.mis-citas', ['citas' => []]);
     }
+}
 }
