@@ -3,27 +3,26 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Http;
+use App\Services\ExternalApi\HttpClient;
 
 class NegocioController extends Controller
 {
+    protected HttpClient $httpClient;
+
+    public function __construct(HttpClient $httpClient)
+    {
+        $this->httpClient = $httpClient;
+    }
+
     public function show($id)
     {
         try {
-            $apiBaseUrl = 'https://devlink-servidorapi.td60xq.easypanel.host';
-            
             // Obtener datos del negocio
-            $ch = curl_init();
-            curl_setopt($ch, CURLOPT_URL, $apiBaseUrl . '/api/negocios/' . $id);
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-            $response = curl_exec($ch);
-            curl_close($ch);
-            
-            $negocioData = json_decode($response, true);
-            $negocio = $negocioData['data'] ?? [];
+            $response = $this->httpClient->getPublic('/api/negocios/' . $id);
+            $negocio = $response['data'] ?? [];
             
             // Completar URLs de imágenes del negocio
+            $apiBaseUrl = rtrim(config('services.api.url'), '/');
             if (isset($negocio['foto_perfil']) && $negocio['foto_perfil']) {
                 $negocio['foto_perfil'] = $apiBaseUrl . $negocio['foto_perfil'];
             }
@@ -32,58 +31,19 @@ class NegocioController extends Controller
             }
             
             // Obtener horarios del negocio
-            $ch = curl_init();
-            curl_setopt($ch, CURLOPT_URL, $apiBaseUrl . '/api/negocios/' . $id . '/horarios');
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-            $response = curl_exec($ch);
-            curl_close($ch);
-            
-            $horariosData = json_decode($response, true);
+            $horariosResponse = $this->httpClient->getPublic('/api/negocios/' . $id . '/horarios');
             $horarios = [];
             
-            if (isset($horariosData['success']) && $horariosData['success'] && isset($horariosData['data'])) {
-                $horarios = $horariosData['data'];
+            if (isset($horariosResponse['success']) && $horariosResponse['success'] && isset($horariosResponse['data'])) {
+                $horarios = $horariosResponse['data'];
             }
             
             // Formatear horarios para la vista
-            $horariosFormateados = [];
-            $diasMap = [
-                'lunes' => 'Lunes', 
-                'martes' => 'Martes', 
-                'miercoles' => 'Miércoles',
-                'jueves' => 'Jueves', 
-                'viernes' => 'Viernes', 
-                'sabado' => 'Sábado', 
-                'domingo' => 'Domingo'
-            ];
-            
-            foreach ($horarios as $horario) {
-                $dia = $horario['dia_semana'];
-                $horariosFormateados[] = [
-                    'dia' => $diasMap[$dia] ?? ucfirst($dia),
-                    'abierto' => $horario['abierto'],
-                    'horarios' => $this->formatearHorarioBloques($horario)
-                ];
-            }
-            
-            // Ordenar horarios según el orden de los días
-            $ordenDias = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
-            usort($horariosFormateados, function($a, $b) use ($ordenDias) {
-                return array_search($a['dia'], $ordenDias) - array_search($b['dia'], $ordenDias);
-            });
+            $horariosFormateados = $this->formatearHorarios($horarios);
             
             // Obtener servicios
-            $ch = curl_init();
-            curl_setopt($ch, CURLOPT_URL, $apiBaseUrl . '/api/servicios?negocio_id=' . $id);
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-            $response = curl_exec($ch);
-            curl_close($ch);
-            
-            $serviciosData = json_decode($response, true);
-            $servicios = collect($serviciosData['data'] ?? [])->map(function ($servicio) use ($apiBaseUrl) {
-                // Completar URL de la imagen
+            $serviciosResponse = $this->httpClient->getPublic('/api/servicios', ['negocio_id' => $id]);
+            $servicios = collect($serviciosResponse['data'] ?? [])->map(function ($servicio) use ($apiBaseUrl) {
                 $imagenUrl = null;
                 if (isset($servicio['imagen']) && $servicio['imagen']) {
                     $imagenUrl = $apiBaseUrl . $servicio['imagen'];
@@ -101,18 +61,17 @@ class NegocioController extends Controller
             })->toArray();
             
             // Obtener empleados
-            $ch = curl_init();
-            curl_setopt($ch, CURLOPT_URL, $apiBaseUrl . '/api/empleados?negocio_id=' . $id);
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-            $response = curl_exec($ch);
-            curl_close($ch);
-        
-            $empleadosData = json_decode($response, true);
-            $empleados = $empleadosData['data'] ?? [];
+            $empleadosResponse = $this->httpClient->getPublic('/api/empleados', ['negocio_id' => $id]);
+            $empleados = $empleadosResponse['data'] ?? [];
             
-            // Obtener reseñas
+            // Obtener reseñas (endpoint público)
             $resenas = [];
+            try {
+                $resenasResponse = $this->httpClient->getPublic('/api/negocios/' . $id . '/resenas');
+                $resenas = $resenasResponse['data'] ?? [];
+            } catch (\Exception $e) {
+                // Si no hay reseñas, continuar con array vacío
+            }
             
             return view('negocio.show', compact('negocio', 'servicios', 'empleados', 'resenas', 'horariosFormateados'));
             
@@ -120,6 +79,40 @@ class NegocioController extends Controller
             \Log::error('Error en NegocioController: ' . $e->getMessage());
             abort(404, 'Error al cargar el negocio');
         }
+    }
+    
+    /**
+     * Formatear los horarios para la vista
+     */
+    private function formatearHorarios($horarios)
+    {
+        $horariosFormateados = [];
+        $diasMap = [
+            'lunes' => 'Lunes', 
+            'martes' => 'Martes', 
+            'miercoles' => 'Miércoles',
+            'jueves' => 'Jueves', 
+            'viernes' => 'Viernes', 
+            'sabado' => 'Sábado', 
+            'domingo' => 'Domingo'
+        ];
+        
+        foreach ($horarios as $horario) {
+            $dia = $horario['dia_semana'];
+            $horariosFormateados[] = [
+                'dia' => $diasMap[$dia] ?? ucfirst($dia),
+                'abierto' => $horario['abierto'],
+                'horarios' => $this->formatearHorarioBloques($horario)
+            ];
+        }
+        
+        // Ordenar horarios según el orden de los días
+        $ordenDias = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+        usort($horariosFormateados, function($a, $b) use ($ordenDias) {
+            return array_search($a['dia'], $ordenDias) - array_search($b['dia'], $ordenDias);
+        });
+        
+        return $horariosFormateados;
     }
     
     /**
@@ -134,14 +127,14 @@ class NegocioController extends Controller
         $bloques = [];
         
         // Primer bloque
-        if ($horario['hora_apertura'] && $horario['hora_cierre']) {
+        if (!empty($horario['hora_apertura']) && !empty($horario['hora_cierre'])) {
             $apertura = substr($horario['hora_apertura'], 0, 5);
             $cierre = substr($horario['hora_cierre'], 0, 5);
             $bloques[] = "$apertura - $cierre";
         }
         
         // Segundo bloque
-        if ($horario['hora_apertura_2'] && $horario['hora_cierre_2']) {
+        if (!empty($horario['hora_apertura_2']) && !empty($horario['hora_cierre_2'])) {
             $apertura2 = substr($horario['hora_apertura_2'], 0, 5);
             $cierre2 = substr($horario['hora_cierre_2'], 0, 5);
             $bloques[] = "$apertura2 - $cierre2";

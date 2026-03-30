@@ -2,32 +2,46 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\ExternalApi\BusinessService;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Http;
+use App\Services\ExternalApi\HttpClient;
 
 class HomeController extends Controller
 {
+    protected HttpClient $httpClient;
+
+    public function __construct(HttpClient $httpClient)
+    {
+        $this->httpClient = $httpClient;
+    }
+
     /**
      * Mostrar la página de inicio con los negocios
      */
     public function index()
     {
-        // Consumir la API para obtener los negocios
-        $response = Http::timeout(30)->get(config('services.api.url') . '/api/negocios');
-        
-        $negocios = [];
-        
-        if ($response->successful()) {
-            $negocios = $response->json('data') ?? [];
+        try {
+            // Obtener negocios públicos usando HttpClient
+            $response = $this->httpClient->getPublic('/api/negocios');
+            $negocios = $response['data'] ?? [];
+            
+            // Completar URLs de imágenes
+            $apiBaseUrl = rtrim(config('services.api.url'), '/');
+            foreach ($negocios as &$negocio) {
+                if (isset($negocio['foto_perfil']) && $negocio['foto_perfil']) {
+                    $negocio['foto_perfil'] = $apiBaseUrl . $negocio['foto_perfil'];
+                }
+            }
+            
+        } catch (\Exception $e) {
+            \Log::error('Error en HomeController: ' . $e->getMessage());
+            $negocios = [];
         }
         
-        // Si la API no devuelve datos, mostrar array vacío
         return view('home', compact('negocios'));
     }
     
     /**
      * Mostrar página de inicio con datos estáticos (fallback)
+     * Útil cuando la API no está disponible
      */
     public function indexFallback()
     {
@@ -40,7 +54,30 @@ class HomeController extends Controller
                 'foto_perfil' => null,
                 'tipo_negocio' => 'barberia'
             ],
-            // ... más negocios de ejemplo
+            [
+                'id' => 2,
+                'nombre' => 'Urban Fade Studio',
+                'descripcion' => 'Especialistas en degradados y diseños urbanos.',
+                'calificacion' => 4.8,
+                'foto_perfil' => null,
+                'tipo_negocio' => 'barberia'
+            ],
+            [
+                'id' => 3,
+                'nombre' => 'Razor & Blade',
+                'descripcion' => 'Barbería ejecutiva de alto nivel.',
+                'calificacion' => 5.0,
+                'foto_perfil' => null,
+                'tipo_negocio' => 'barberia'
+            ],
+            [
+                'id' => 4,
+                'nombre' => 'Legacy Barbershop',
+                'descripcion' => 'Heredando la tradición del buen corte.',
+                'calificacion' => 4.9,
+                'foto_perfil' => null,
+                'tipo_negocio' => 'barberia'
+            ],
         ];
         
         return view('home', compact('negocios'));

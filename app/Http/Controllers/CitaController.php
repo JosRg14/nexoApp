@@ -3,10 +3,17 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Http;
+use App\Services\ExternalApi\HttpClient;
 
 class CitaController extends Controller
 {
+    protected HttpClient $httpClient;
+
+    public function __construct(HttpClient $httpClient)
+    {
+        $this->httpClient = $httpClient;
+    }
+
     public function create(Request $request)
     {
         try {
@@ -18,51 +25,22 @@ class CitaController extends Controller
             
             \Log::info('=== CitaController@create ===', ['negocio_id' => $negocioId]);
             
-            // LLAMAR DIRECTAMENTE A LA API EXTERNA, NO AL PROXY
-            $apiBaseUrl = 'https://devlink-servidorapi.td60xq.easypanel.host';
-            
-            // Obtener servicios del negocio
+            // Obtener servicios del negocio usando HttpClient
             $servicios = [];
             try {
-                $response = Http::timeout(15)
-                    ->withOptions(['verify' => false])
-                    ->get($apiBaseUrl . '/api/servicios', [
-                        'negocio_id' => $negocioId
-                    ]);
-                
-                \Log::info('Respuesta servicios - Status: ' . $response->status());
-                
-                if ($response->successful()) {
-                    $data = $response->json();
-                    $servicios = $data['data'] ?? [];
-                    \Log::info('Servicios obtenidos: ' . count($servicios));
-                } else {
-                    \Log::error('Error servicios - Status: ' . $response->status());
-                    \Log::error('Respuesta: ' . $response->body());
-                }
+                $response = $this->httpClient->get('/api/servicios', ['negocio_id' => $negocioId]);
+                $servicios = $response['data'] ?? [];
+                \Log::info('Servicios obtenidos: ' . count($servicios));
             } catch (\Exception $e) {
                 \Log::error('Error al obtener servicios: ' . $e->getMessage());
             }
             
-            // Obtener empleados del negocio
+            // Obtener empleados del negocio usando HttpClient
             $empleados = [];
             try {
-                $response = Http::timeout(15)
-                    ->withOptions(['verify' => false])
-                    ->get($apiBaseUrl . '/api/empleados', [
-                        'negocio_id' => $negocioId
-                    ]);
-                
-                \Log::info('Respuesta empleados - Status: ' . $response->status());
-                
-                if ($response->successful()) {
-                    $data = $response->json();
-                    $empleados = $data['data'] ?? [];
-                    \Log::info('Empleados obtenidos: ' . count($empleados));
-                } else {
-                    \Log::error('Error empleados - Status: ' . $response->status());
-                    \Log::error('Respuesta: ' . $response->body());
-                }
+                $response = $this->httpClient->get('/api/empleados', ['negocio_id' => $negocioId]);
+                $empleados = $response['data'] ?? [];
+                \Log::info('Empleados obtenidos: ' . count($empleados));
             } catch (\Exception $e) {
                 \Log::error('Error al obtener empleados: ' . $e->getMessage());
             }
@@ -78,19 +56,12 @@ class CitaController extends Controller
     public function misCitas()
     {
         try {
-            $token = session('auth_token');
-            $apiBaseUrl = 'https://devlink-servidorapi.td60xq.easypanel.host';
-            
             $citas = [];
+            
             try {
-                $response = Http::timeout(15)
-                    ->withOptions(['verify' => false])
-                    ->withHeaders(['Authorization' => 'Bearer ' . $token])
-                    ->get($apiBaseUrl . '/api/citas/mis-citas');
-                
-                if ($response->successful()) {
-                    $citas = $response->json('data') ?? [];
-                }
+                $response = $this->httpClient->get('/api/citas/mis-citas');
+                $citas = $response['data'] ?? [];
+                \Log::info('Citas obtenidas: ' . count($citas));
             } catch (\Exception $e) {
                 \Log::error('Error al obtener citas: ' . $e->getMessage());
             }
@@ -99,7 +70,7 @@ class CitaController extends Controller
             
         } catch (\Exception $e) {
             \Log::error('Error en CitaController@misCitas: ' . $e->getMessage());
-            abort(500, 'Error al cargar tus citas');
+            return view('booking.mis-citas', ['citas' => []]);
         }
     }
 }
