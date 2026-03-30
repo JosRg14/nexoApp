@@ -32,49 +32,64 @@ public function showClientRegister()
 }
 
     public function login(Request $request)
-    {
-        
-        $response = Http::post(config('services.api.url') . '/api/login', [
-            'correo' => $request->email,
-            'contrasena' => $request->password,
-        ]);
+{
+    \Log::info('=== LOGIN NORMAL ===');
+    \Log::info('Correo:', ['correo' => $request->email]);
+    
+    $response = Http::post(config('services.api.url') . '/api/login', [
+        'correo' => $request->email,
+        'contrasena' => $request->password,
+    ]);
 
-        
+    \Log::info('API Response:', [
+        'status' => $response->status(),
+        'body' => $response->body()
+    ]);
 
-        if (!$response->successful()) {
-            return response()->json([
-                'message' => 'Credenciales incorrectas'
-            ], 401);
-        }
-
-        $data = $response->json();
-
-        if (!isset($data['data']['token']) || !isset($data['data']['rol'])) {
-            return response()->json([
-                'message' => 'Respuesta inesperada del servidor'
-            ], 500);
-        }
-
-        $usuario = $this->formatUserData($data['data']['usuario']);
-
-        session([
-            'auth_token' => $data['data']['token'],
-            'rol' => $data['data']['rol'],
-            'usuario' => $usuario,
-            'negocio' => $data['data']['usuario']['negocio'] ?? null
-            
-        ]);
-
+    if (!$response->successful()) {
         return response()->json([
-            'redirect' => match ($data['data']['rol']) {
-                'superusuario' => route('dashboard.index'),
-                'admin' => route('business.profile'),
-                default => '/',
-            }
-        ]);
-
-        dd(session()->all());
+            'message' => 'Credenciales incorrectas'
+        ], 401);
     }
+
+    $data = $response->json();
+
+    if (!isset($data['data']['token']) || !isset($data['data']['rol'])) {
+        return response()->json([
+            'message' => 'Respuesta inesperada del servidor'
+        ], 500);
+    }
+
+    $usuario = $this->formatUserData($data['data']['usuario']);
+
+    \Log::info('Datos a guardar en sesión:', [
+        'token' => $data['data']['token'],
+        'rol' => $data['data']['rol'],
+        'usuario' => $usuario,
+        'negocio' => $data['data']['usuario']['negocio'] ?? null
+    ]);
+
+    session([
+        'auth_token' => $data['data']['token'],
+        'rol' => $data['data']['rol'],
+        'usuario' => $usuario,
+        'negocio' => $data['data']['usuario']['negocio'] ?? null
+    ]);
+
+    \Log::info('Sesión después de guardar:', [
+        'session_token' => session('auth_token'),
+        'session_rol' => session('rol'),
+        'session_usuario' => session('usuario')
+    ]);
+
+    return response()->json([
+        'redirect' => match ($data['data']['rol']) {
+            'superusuario' => route('dashboard.index'),
+            'admin' => route('business.profile'),
+            default => '/',
+        }
+    ]);
+}
 
     public function registerCliente(Request $request)
     {
