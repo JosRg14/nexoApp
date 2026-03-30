@@ -63,7 +63,7 @@ class CitaController extends Controller
         $citas = [];
         
         try {
-            $response = $this->httpClient->get('/api/citas/mis-citas');
+            $response = $this->httpClient->get('/api/citas/miscitas');
             \Log::info('Respuesta API:', $response);
             $citas = $response['data'] ?? [];
             
