@@ -164,7 +164,6 @@
         <h3 id="editModalTitle" class="text-white font-bold mb-6 uppercase">Editar Servicio</h3>
         <form method="POST" id="editServiceForm" data-redirect="{{ route('business.profile') }}" enctype="multipart/form-data" data-custom-handler="true">
             @csrf
-            @method('PUT')
             <input type="hidden" name="id" id="edit_id">
             <div class="space-y-5">
                 <div>
@@ -218,7 +217,6 @@
         <p class="text-white text-sm mb-6">¿Estás seguro que deseas eliminar <span id="deleteServiceName" class="font-bold"></span>?</p>
         <form method="POST" id="deleteServiceForm" data-custom-handler="true">
             @csrf
-            @method('DELETE')
             <div class="flex gap-4">
                 <button type="button" onclick="closeDeleteModal()" class="w-1/2 py-2 border border-[#374151] text-white text-xs uppercase">Cancelar</button>
                 <button type="submit" class="w-1/2 py-2 bg-red-600 text-white text-xs uppercase font-bold hover:bg-red-700">Eliminar</button>
@@ -231,15 +229,6 @@
     // --- INTERCEPTOR PARA AGREGAR SERVICIOS ---
     document.addEventListener('submit', async function(e) {
         const form = e.target;
-        
-        // ============================================
-        // IGNORAR COMPLETAMENTE formularios de edición y eliminación
-        // ============================================
-        if (form.id === 'editServiceForm' || form.id === 'deleteServiceForm') {
-            console.log('✅ Formulario ' + form.id + ' - NO interceptado, se envía normalmente');
-            // No hacer e.preventDefault(), dejar que Laravel lo maneje
-            return true;
-        }
         
         // ============================================
         // SOLO para el formulario de agregar servicio
@@ -260,15 +249,7 @@
             if (fileInput && !fileInput.files.length) {
                 formData.delete('imagen');
             }
-            
-            // Asegurar que _method está presente
-            if (!formData.has('_method')) {
-                const methodInput = form.querySelector('input[name="_method"]');
-                if (methodInput && methodInput.value) {
-                    formData.append('_method', methodInput.value);
-                }
-            }
-
+          
             try {
                 const response = await fetch(action, {
                     method: 'POST',
@@ -312,7 +293,8 @@
         }
     });
 
-    function openEditModal(id, nombre, descripcion, precio, duracion, imagen) {
+    function openEditModal(id, nombre, descripcion, precio, duracion, imagen) 
+    {
         console.log('📝 Abriendo modal de edición para servicio ID:', id);
         
         // Setear valores en los campos
@@ -322,13 +304,16 @@
         document.getElementById('edit_precio').value = precio;
         document.getElementById('edit_duracion').value = duracion;
         
-        // Configurar la acción del formulario
+       //CAMBIO IMPORTANTE: Usar el proxy API en lugar de la ruta directa
         const form = document.getElementById('editServiceForm');
-        form.action = '/business/services/' + id;
+        // ANTES: form.action = '/business/services/' + id;
+        // AHORA: Usar el proxy API con POST
+        form.action = '/api-proxy/api/servicios/' + id;
         
-        console.log('📝 Action del formulario de edición:', form.action);
+        console.log('📝 Action del formulario de edición (proxy):', form.action);
         console.log('📝 El formulario tiene data-custom-handler:', form.getAttribute('data-custom-handler'));
         
+        // Resto del código igual...
         // Manejar la imagen
         const previewImg = document.getElementById('edit_imagen_preview');
         if (imagen && imagen !== 'null' && imagen !== '') {
@@ -364,11 +349,25 @@
         }
     }
 
-    function openDeleteModal(id, nombre) {
+    function openDeleteModal(id, nombre) 
+    {
         console.log('🗑️ Abriendo modal de eliminación para servicio ID:', id);
         document.getElementById('deleteServiceName').innerText = nombre;
         const form = document.getElementById('deleteServiceForm');
-        form.action = '/business/services/' + id;
+        // Usar el proxy API para eliminar
+        form.action = '/api-proxy/api/servicios/' + id;
+        
+        // Agregar método DELETE como campo oculto
+        // Primero eliminar si existe
+        let methodInput = form.querySelector('input[name="_method"]');
+        if (!methodInput) {
+            methodInput = document.createElement('input');
+            methodInput.type = 'hidden';
+            methodInput.name = '_method';
+            form.appendChild(methodInput);
+        }
+        methodInput.value = 'DELETE';
+        
         console.log('🗑️ Action del formulario de eliminación:', form.action);
         document.getElementById('modal-delete-service').classList.remove('hidden');
     }
