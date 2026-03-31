@@ -191,7 +191,7 @@
                 </div>
                 <div>
                     <label class="block text-xs text-[#9CA3AF] uppercase tracking-widest mb-1">Nombre del servicio</label>
-                    <input type="text" name="nombre" id="edit_nombre" maxlength="100" required class="w-full bg-transparent border-b border-[#374151] py-2 text-white focus:border-white outline-none">
+                    <input type="text" name="nombre_servicio" id="edit_nombre" maxlength="100" required class="w-full bg-transparent border-b border-[#374151] py-2 text-white focus:border-white outline-none">
                 </div>
                 <div>
                     <label class="block text-xs text-[#9CA3AF] uppercase tracking-widest mb-1">Descripción</label>
@@ -203,7 +203,7 @@
                 </div>
                 <div>
                     <label class="block text-xs text-[#9CA3AF] uppercase tracking-widest mb-1">Duración (minutos)</label>
-                    <input type="number" name="duracion" id="edit_duracion" min="5" max="480" required class="w-full bg-transparent border-b border-[#374151] py-2 text-white focus:border-white outline-none">
+                    <input type="number" name="duracion_estimada" id="edit_duracion" min="5" max="480" required class="w-full bg-transparent border-b border-[#374151] py-2 text-white focus:border-white outline-none">
                 </div>
             </div>
             <button class="mt-6 w-full bg-white text-black py-2 uppercase text-xs font-bold">Guardar Cambios</button>
