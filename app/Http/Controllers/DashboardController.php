@@ -149,7 +149,6 @@ class DashboardController extends Controller
             // Llamamos al servicio para traer un solo negocio
             $response = $this->businessService->find($id);
 
-            dd($response);
             if (! $response['success']) {
                 return redirect()->route('dashboard.businesses')->with('api_error', 'Negocio no encontrado');
             }

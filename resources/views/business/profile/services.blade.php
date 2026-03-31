@@ -76,11 +76,11 @@
                 </p>
             </div>
 
-            <form method="POST" action="{{ route('business.services.store') }}" enctype="multipart/form-data" class="space-y-6">
+            <form method="POST" action="{{ url('/api-proxy/api/servicios') }}" data-redirect="{{ route('business.profile') }}" enctype="multipart/form-data" class="space-y-6">
                 @csrf
                 {{-- NOMBRE --}}
                 <div class="group/input relative">
-                    <input type="text" name="nombre" value="{{ old('nombre') }}" maxlength="100" required class="peer w-full bg-transparent border-b border-[#374151] py-3 text-white focus:border-white focus:outline-none transition-colors placeholder-transparent" placeholder="Nombre del servicio" />
+                    <input type="text" name="nombre_servicio" value="{{ old('nombre') }}" maxlength="100" required class="peer w-full bg-transparent border-b border-[#374151] py-3 text-white focus:border-white focus:outline-none transition-colors placeholder-transparent" placeholder="Nombre del servicio" />
                     <label class="absolute left-0 -top-3.5 text-[#9CA3AF] text-xs transition-all peer-placeholder-shown:text-base peer-placeholder-shown:top-3 peer-focus:-top-3.5 peer-focus:text-xs peer-focus:text-white">
                         Nombre del servicio
                     </label>
@@ -140,7 +140,7 @@
 
                 {{-- DURACIÓN --}}
                 <div class="group/input relative">
-                    <input type="number" name="duracion" value="{{ old('duracion') }}" min="5" max="480" required class="peer w-full bg-transparent border-b border-[#374151] py-3 text-white focus:border-white focus:outline-none transition-colors placeholder-transparent" placeholder="Duración (Minutos)" />
+                    <input type="number" name="duracion_estimada" value="{{ old('duracion') }}" min="5" max="480" required class="peer w-full bg-transparent border-b border-[#374151] py-3 text-white focus:border-white focus:outline-none transition-colors placeholder-transparent" placeholder="Duración (Minutos)" />
                     <label class="absolute left-0 -top-3.5 text-[#9CA3AF] text-xs transition-all peer-placeholder-shown:text-base peer-placeholder-shown:top-3 peer-focus:-top-3.5 peer-focus:text-xs peer-focus:text-white">
                         Duración (Minutos)
                     </label>
@@ -162,7 +162,7 @@
     <div class="absolute inset-0 bg-black/80" onclick="closeEditModal()"></div>
     <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-[#1a1a1a] border border-[#374151] p-8 w-full max-w-md">
         <h3 id="editModalTitle" class="text-white font-bold mb-6 uppercase">Editar Servicio</h3>
-        <form method="POST" id="editServiceForm" enctype="multipart/form-data">
+        <form method="POST" id="editServiceForm" data-redirect="{{ route('business.profile') }}" enctype="multipart/form-data">
             @csrf
             @method('PUT')
             <input type="hidden" name="id" id="edit_id">
@@ -216,7 +216,7 @@
     <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-[#1a1a1a] border border-[#374151] p-8 w-full max-w-md">
         <h3 class="text-red-500 font-bold mb-4 uppercase">Confirmar eliminación</h3>
         <p class="text-white text-sm mb-6">¿Estás seguro que deseas eliminar <span id="deleteServiceName" class="font-bold"></span>?</p>
-        <form method="POST" id="deleteServiceForm">
+        <form method="POST" id="deleteServiceForm" data-custom-handler="true">
             @csrf
             @method('DELETE')
             <div class="flex gap-4">
@@ -228,6 +228,51 @@
 </div>
 
 <script>
+
+    // --- INTERCEPTOR PARA AGREGAR Y EDITAR SERVICIOS ---
+    document.addEventListener('submit', async function(e) {
+        const form = e.target;
+        const action = form.getAttribute('action') || '';
+
+        // Solo interceptamos si el form va al proxy y NO es el de eliminar (que ya tiene su lógica)
+        if (action.includes('/api-proxy/') && !form.hasAttribute('data-custom-handler')) {
+            e.preventDefault(); // Detenemos el envío normal
+            
+            showLoader();
+
+            const formData = new FormData(form);
+            const redirectUrl = form.getAttribute('data-redirect') || window.location.href;
+
+            try {
+                const response = await fetch(action, {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value
+                    },
+                    body: formData // FormData maneja automáticamente archivos (enctype)
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showToast(data.message || "¡Operación exitosa!");
+                    // Esperamos un segundo para que el usuario vea el brindis y redirigimos
+                    setTimeout(() => {
+                        window.location.href = redirectUrl;
+                    }, 1000);
+                } else {
+                    hideLoader();
+                    alert(data.message || "Error al procesar la solicitud");
+                }
+            } catch (error) {
+                hideLoader();
+                console.error("Error:", error);
+                alert("Error de conexión con el servidor");
+            }
+        }
+    });
+
     function handleImagePreview(input, containerId, imgId, isEdit = false) {
         const errorId = isEdit ? 'edit-image-error' : 'image-error';
         const errorElement = document.getElementById(errorId);

@@ -27,6 +27,12 @@
                     </a>
                 @endif
 
+                 @if(session('rol') === 'cliente')
+                    <a href="{{ route('mis-citas') }}"
+                       class="text-xs uppercase tracking-widest text-[#9CA3AF] hover:text-white transition-colors">
+                        Mis Citas
+                    </a>
+                @endif
 
                 <div x-data="{ open: false }" class="relative">
                     <button @click="open = !open" @click.away="open = false" class="flex items-center gap-3 focus:outline-none group">
@@ -37,9 +43,9 @@
                         @endphp
 
                         <!-- Saludo -->
-    <span class="text-sm font-bold text-[#F3F4F6] hidden md:block">
-        Hola, {{ $primer_nombre }}
-    </span>
+                        <span class="text-sm font-bold text-[#F3F4F6] hidden md:block">
+                            Hola, {{ $primer_nombre }}
+                        </span>
 
 
                         <!-- Avatar con inicial -->
@@ -64,6 +70,13 @@
                             <p class="text-[10px] uppercase tracking-widest text-[#9CA3AF] mb-1">Usuario</p>
                             <p class="text-xs font-bold text-white truncate">{{ $nombre_completo }}</p>
                         </div>
+
+                         @if(session('rol') === 'cliente')
+                        <a href="{{ route('mis-citas') }}" class="block px-4 py-2 text-xs text-[#9CA3AF] hover:text-white hover:bg-[#374151]/30 transition-colors uppercase tracking-widest font-bold">
+                            <i class="fa-solid fa-calendar-alt mr-2 w-4"></i> Mis Citas
+                        </a>
+                        @endif
+
 
                         <a href="{{ url('/profile') }}" class="block px-4 py-2 text-xs text-[#9CA3AF] hover:text-white hover:bg-[#374151]/30 transition-colors uppercase tracking-widest font-bold">
                             <i class="fa-solid fa-user mr-2 w-4"></i> Mi Perfil

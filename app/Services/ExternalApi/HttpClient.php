@@ -28,51 +28,56 @@ class HttpClient
 
     /** Build the request with common headers */
     protected function request(string $method, string $uri, array $payload = []): Response
-{
-    $headers = [
-        'Accept' => 'application/json',
-        'ngrok-skip-browser-warning' => 'true', // 🔥 evita bloqueo ngrok
-        'User-Agent' => 'Mozilla/5.0', // 🔥 evita empty reply
-    ];
+    {
+        $headers = [
+            'Accept' => 'application/json',
+            'ngrok-skip-browser-warning' => 'true', // 🔥 evita bloqueo ngrok
+            'User-Agent' => 'Mozilla/5.0', // 🔥 evita empty reply
+        ];
 
-    if ($this->token) {
-        $headers['Authorization'] = "Bearer {$this->token}";
-    }
-
-    $url = rtrim($this->baseUrl, '/') . '/' . ltrim($uri, '/');
-
-    $request = Http::withHeaders($headers)
-        ->timeout($this->timeout)
-        ->retry(2, 500); // 🔥 reintenta si ngrok corta conexión
-
-    try {
-
-        if ($method === 'GET') {
-            return $request->get($url, $payload);
+        if ($this->token) {
+            $headers['Authorization'] = "Bearer {$this->token}";
         }
 
-        return $request->send($method, $url, [
-            'json' => $payload,
-        ]);
+        $url = rtrim($this->baseUrl, '/') . '/' . ltrim($uri, '/');
 
-    } catch (\Exception $e) {
+        $request = Http::withHeaders($headers)
+            ->timeout($this->timeout)
+            ->retry(2, 500); // 🔥 reintenta si ngrok corta conexión
 
-        Log::error('External API connection failed', [
-            'url' => $url,
-            'error' => $e->getMessage(),
-        ]);
+        try {
 
-        throw new RuntimeException('No se pudo conectar con el servidor externo.');
+            if ($method === 'GET') {
+                return $request->get($url, $payload);
+            }
+
+            return $request->send($method, $url, [
+                'json' => $payload,
+            ]);
+
+        } catch (\Exception $e) {
+
+            Log::error('External API connection failed', [
+                'url' => $url,
+                'error' => $e->getMessage(),
+            ]);
+
+            throw new RuntimeException('No se pudo conectar con el servidor externo.');
+        }
     }
-}
 
     // -----------------------------------------------------------------
     // Public helpers (GET, POST, PUT, DELETE)
     // -----------------------------------------------------------------
     public function get(string $uri, array $query = []): array
     {
-        // Query parameters are passed directly to the request method
-        return $this->handle($this->request('GET', $uri, $query));
+        // Construir URL con query string si hay parámetros
+        $fullUri = $uri;
+        if (!empty($query)) {
+            $fullUri .= '?' . http_build_query($query);
+        }
+        
+        return $this->handle($this->request('GET', $fullUri));
     }
 
     public function post(string $uri, array $data = []): array
@@ -91,105 +96,105 @@ class HttpClient
     }
 
     public function postMultipart(string $uri, array $data = []): array
-{
-    $headers = [
-        'Accept' => 'application/json',
-        'ngrok-skip-browser-warning' => 'true',
-        'User-Agent' => 'Mozilla/5.0',
-    ];
+    {
+        $headers = [
+            'Accept' => 'application/json',
+            'ngrok-skip-browser-warning' => 'true',
+            'User-Agent' => 'Mozilla/5.0',
+        ];
 
-    if ($this->token) {
-        $headers['Authorization'] = "Bearer {$this->token}";
-    }
-
-    $url = rtrim($this->baseUrl, '/') . '/' . ltrim($uri, '/');
-
-    $request = Http::withHeaders($headers)
-        ->timeout($this->timeout)
-        ->retry(2, 500);
-
-    // 🔥 preparar multipart
-    foreach ($data as $key => $value) {
-
-        if ($value instanceof \Illuminate\Http\UploadedFile) {
-
-            $request = $request->attach(
-                $key,
-                file_get_contents($value->getRealPath()),
-                $value->getClientOriginalName()
-            );
-
-            unset($data[$key]);
+        if ($this->token) {
+            $headers['Authorization'] = "Bearer {$this->token}";
         }
-    }
 
-    try {
+        $url = rtrim($this->baseUrl, '/') . '/' . ltrim($uri, '/');
 
-        $response = $request->post($url, $data);
+        $request = Http::withHeaders($headers)
+            ->timeout($this->timeout)
+            ->retry(2, 500);
 
-    } catch (\Exception $e) {
+        // 🔥 preparar multipart
+        foreach ($data as $key => $value) {
 
-        Log::error('External API connection failed', [
-            'url' => $url,
-            'error' => $e->getMessage(),
-        ]);
+            if ($value instanceof \Illuminate\Http\UploadedFile) {
 
-        throw new RuntimeException('No se pudo conectar con el servidor externo.');
-    }
+                $request = $request->attach(
+                    $key,
+                    file_get_contents($value->getRealPath()),
+                    $value->getClientOriginalName()
+                );
 
-    return $this->handle($response);
-}
-
-public function putMultipart(string $uri, array $data = []): array
-{
-    $headers = [
-        'Accept' => 'application/json',
-        'ngrok-skip-browser-warning' => 'true',
-        'User-Agent' => 'Mozilla/5.0',
-    ];
-
-    if ($this->token) {
-        $headers['Authorization'] = "Bearer {$this->token}";
-    }
-
-    $url = rtrim($this->baseUrl, '/') . '/' . ltrim($uri, '/');
-
-    $request = Http::withHeaders($headers)
-        ->timeout($this->timeout)
-        ->retry(2, 500);
-
-    foreach ($data as $key => $value) {
-
-        if ($value instanceof \Illuminate\Http\UploadedFile) {
-
-            $request = $request->attach(
-                $key,
-                file_get_contents($value->getRealPath()),
-                $value->getClientOriginalName()
-            );
-
-            unset($data[$key]);
+                unset($data[$key]);
+            }
         }
+
+        try {
+
+            $response = $request->post($url, $data);
+
+        } catch (\Exception $e) {
+
+            Log::error('External API connection failed', [
+                'url' => $url,
+                'error' => $e->getMessage(),
+            ]);
+
+            throw new RuntimeException('No se pudo conectar con el servidor externo.');
+        }
+
+        return $this->handle($response);
     }
 
-    try {
+    public function putMultipart(string $uri, array $data = []): array
+    {
+        $headers = [
+            'Accept' => 'application/json',
+            'ngrok-skip-browser-warning' => 'true',
+            'User-Agent' => 'Mozilla/5.0',
+        ];
 
-        $data['_method'] = 'PUT';
+        if ($this->token) {
+            $headers['Authorization'] = "Bearer {$this->token}";
+        }
 
-$response = $request->post($url, $data);
+        $url = rtrim($this->baseUrl, '/') . '/' . ltrim($uri, '/');
 
-    } catch (\Exception $e) {
+        $request = Http::withHeaders($headers)
+            ->timeout($this->timeout)
+            ->retry(2, 500);
 
-        Log::error('External API connection failed', [
-            'url' => $url,
-            'error' => $e->getMessage(),
-        ]);
+        foreach ($data as $key => $value) {
 
-        throw new RuntimeException('No se pudo conectar con el servidor externo.');
+            if ($value instanceof \Illuminate\Http\UploadedFile) {
+
+                $request = $request->attach(
+                    $key,
+                    file_get_contents($value->getRealPath()),
+                    $value->getClientOriginalName()
+                );
+
+                unset($data[$key]);
+            }
+        }
+
+        try {
+
+            $data['_method'] = 'PUT';
+
+    $response = $request->post($url, $data);
+
+        } catch (\Exception $e) {
+
+            Log::error('External API connection failed', [
+                'url' => $url,
+                'error' => $e->getMessage(),
+            ]);
+
+            throw new RuntimeException('No se pudo conectar con el servidor externo.');
+        }
+
+        return $this->handle($response);
     }
-
-    return $this->handle($response);
-}
 
     /** Uniform error handling */
     protected function handle(Response $response): array
@@ -206,6 +211,27 @@ $response = $request->post($url, $data);
 
         $message = $response->json('message') ?? 'External service error';
         throw new RuntimeException($message, $response->status());
+    }
+
+    public function getPublic(string $uri, array $query = []): array
+    {
+        $fullUri = $uri;
+        if (!empty($query)) {
+            $fullUri .= '?' . http_build_query($query);
+        }
+        
+        $url = rtrim($this->baseUrl, '/') . '/' . ltrim($fullUri, '/');
+        
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, ['Accept: application/json']);
+        
+        $response = curl_exec($ch);
+        curl_close($ch);
+        
+        return json_decode($response, true) ?? [];
     }
 }
 ?>

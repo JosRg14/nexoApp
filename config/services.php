@@ -37,11 +37,8 @@ return [
     ],
 
     'api' => [
-    'url' => env('API_URL'),
+    'url' => env('API_URL', 'https://devlink-servidorapi.td60xq.easypanel.host'),
 ],
-
-
-
 
 
 ];

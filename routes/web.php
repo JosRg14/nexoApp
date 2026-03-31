@@ -8,7 +8,14 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProfileController;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Route;
+<<<<<<< HEAD
 use App\Http\Controllers\RegistrarController;
+=======
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\NegocioController;
+use Iluminate\Http\Request;
+use App\Http\Controllers\CitaController;
+>>>>>>> a93f5e42b010014d7c581557fabd58e464d130de
 
 /*
 |--------------------------------------------------------------------------
@@ -32,7 +39,12 @@ Route::get('/service/view', function () {
     return view('service.view');
 })->name('service.show');
 
+<<<<<<< HEAD
 
+=======
+//pagina publica de detalle de negocio
+Route::get('/negocio/{id}', [NegocioController::class, 'show'])->name('negocio.show');
+>>>>>>> a93f5e42b010014d7c581557fabd58e464d130de
 /*
 |--------------------------------------------------------------------------
 | RUTAS PROTEGIDAS POR ESTADO DE NEGOCIO
@@ -174,20 +186,41 @@ Route::post('/proxy/register-admin', [AuthController::class, 'registerAdmin']);
 
 /*
 |--------------------------------------------------------------------------
+| UNIVERSAL PROXY (V2)
+|--------------------------------------------------------------------------
+*/
+
+// Proxy Público (sin sesión)
+Route::any('/api-proxy/public/{endpoint}', [\App\Http\Controllers\ProxyController::class, 'handlePublic'])
+    ->where('endpoint', '.*')
+    ->name('api.proxy.public');
+
+// Proxy Protegido (con sesión)
+Route::middleware(['auth.session'])->group(function () {
+    Route::any('/api-proxy/{endpoint}', [\App\Http\Controllers\ProxyController::class, 'handle'])
+        ->where('endpoint', '.*')
+        ->name('api.proxy.protected');
+});
+
+/*
+|--------------------------------------------------------------------------
 | HOME
 |--------------------------------------------------------------------------
 */
 
-Route::get('/', function () {
-    return view('home');
-})->name('home');
 
+<<<<<<< HEAD
 Route::post('/logout', function () {
     session()->flush();
 
     return redirect('/');
 })->name('logout');
+=======
+Route::get('/', [HomeController::class, 'index'])->name('home');
+>>>>>>> a93f5e42b010014d7c581557fabd58e464d130de
 
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+    
 /*
 |--------------------------------------------------------------------------
 | RUTAS SOLO PARA INVITADOS
@@ -207,6 +240,7 @@ Route::middleware(['guest.session'])->group(function () {
 
 });
 
+<<<<<<< HEAD
 
 /*
 |--------------------------------------------------------------------------
@@ -214,3 +248,27 @@ Route::middleware(['guest.session'])->group(function () {
 |--------------------------------------------------------------------------
 */
 
+=======
+/*
+|-------------------------------------------------------------------------
+| RUTA DE CALLBACK GOOGLE
+|-------------------------------------------------------------------------
+*/
+
+Route::get('/auth/google', [AuthController::class, 'redirectToGoogle']);
+
+Route::get('/auth/google/callback', [AuthController::class, 'googleCallback']);
+
+// Rutas de citas
+Route::middleware(['auth.session', 'inject.api.token'])->group(function () {
+    Route::get('/booking/create', [CitaController::class, 'create'])->name('booking.create');
+    Route::get('/mis-citas', [CitaController::class, 'misCitas'])->name('mis-citas');
+});
+
+// Rutas de completar registro de negocio
+Route::middleware(['auth.session'])->group(function () {
+    Route::get('/completar-negocio', function () {
+        return view('business.complete-registration');
+    })->name('business.complete');
+});
+>>>>>>> a93f5e42b010014d7c581557fabd58e464d130de

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="h-full">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="min-h-screen">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -8,13 +8,11 @@
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
-<body class="h-full bg-[#1a1a1a] text-[#F3F4F6] font-sans antialiased flex flex-col relative overflow-hidden">
+<body class="min-h-screen bg-[#1a1a1a] text-[#F3F4F6] font-sans antialiased flex flex-col relative overflow-x-hidden">
 
-    <!-- Background Elements -->
     <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMSIgY3k9IjEiIHI9IjEiIGZpbGw9IiMzNzQxNTEiIGZpbGwtb3BhY2l0eT0iMC4xIi8+PC9zdmc+')] opacity-20 z-0"></div>
-    <div class="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-black/50 via-transparent to-black/50 z-0 pointer-events-none"></div>
+    <div class="absolute inset-0 bg-gradient-to-b from-black/50 via-transparent to-black/50 z-0 pointer-events-none"></div>
 
-    <!-- Navbar Minimalista -->
     <header class="w-full py-6 px-8 flex justify-between items-center relative z-10">
         <a href="{{ url('/') }}" class="text-xl tracking-widest font-bold uppercase text-white hover:text-white/80 transition-colors">
             NexoApp
@@ -25,13 +23,10 @@
         </a>
     </header>
 
-    <!-- Main Content -->
-    <main class="flex-grow flex flex-col justify-center items-center px-4 relative z-10">
+    <main class="flex-grow flex flex-col justify-center items-center px-4 py-8 relative z-10">
         
-        <!-- Centered Card -->
         <div class="w-full max-w-md bg-[#1a1a1a] border border-[#374151] p-8 md:p-12 shadow-2xl animate-fade-in-up">
             
-            <!-- Card Header -->
             <div class="mb-10 text-center">
                 <a href="/register" class="inline-flex items-center text-[10px] tracking-widest uppercase text-[#9CA3AF] hover:text-white mb-6 transition-colors font-bold">
                     <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
@@ -45,7 +40,6 @@
                 </p>
             </div>
 
-            <!-- Login Form -->
             <form class="space-y-8" id="loginForm">
                 
                 <div class="space-y-6">
@@ -79,6 +73,26 @@
                     Iniciar Sesión
                 </button>
 
+                <div class="flex items-center my-4">
+                    <div class="flex-grow border-t border-[#374151]"></div>
+                    <span class="px-4 text-[#9CA3AF] text-[10px] uppercase tracking-widest">O</span>
+                    <div class="flex-grow border-t border-[#374151]"></div>
+                </div>
+
+                <div class="space-y-3">
+                    <button type="button" onclick="iniciarSesionConGoogle('cliente')" 
+                            class="w-full py-4 px-6 bg-transparent text-white font-bold tracking-widest uppercase text-sm border border-[#374151] transition-all duration-300 hover:bg-[#EA4335] hover:border-transparent flex items-center justify-center group">
+                        <i class="fa-brands fa-google mr-3 group-hover:animate-pulse"></i> 
+                        Continuar como Cliente
+                    </button>
+                    
+                    <button type="button" onclick="iniciarSesionConGoogle('admin')" 
+                            class="w-full py-4 px-6 bg-transparent text-white font-bold tracking-widest uppercase text-sm border border-[#374151] transition-all duration-300 hover:bg-[#EA4335] hover:border-transparent flex items-center justify-center group">
+                        <i class="fa-brands fa-google mr-3 group-hover:animate-pulse"></i> 
+                        Continuar como Negocio
+                    </button>
+                </div>
+
                 <div class="text-center pt-4">
                     <p class="text-[#9CA3AF] text-xs">
                         ¿Aún no tienes cuenta? 
@@ -93,12 +107,15 @@
         
     </main>
 
-    <!-- Footer -->
     <footer class="w-full py-6 text-center relative z-10">
         <p class="text-[#374151] text-[10px] tracking-widest uppercase">© 2026 NexoApp Inc.</p>
     </footer>
 
     <script>
+        function iniciarSesionConGoogle(rol) {
+            window.location.href = '/auth/google?rol=' + rol;
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             const savedEmail = localStorage.getItem('remembered_email');
             if (savedEmail) {
@@ -128,19 +145,14 @@
             loginBtn.disabled = true;
             loginBtn.textContent = 'Procesando...';
 
-
             try {
                 const response = await window.axios.post('/proxy/login', {
                     email: email,
                     password: password
                 });
 
-                // If API returns token/user, persist locally
-                if (response.data && response.data.token) {
-                    }
-
                 if (response.data && response.data.redirect) {
-                window.location.href = response.data.redirect;
+                    window.location.href = response.data.redirect;
                 }
 
             } catch (error) {

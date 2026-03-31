@@ -86,6 +86,18 @@
 
                 <!-- STEP 2: Business Info -->
 
+                <div class="flex items-center my-4">
+                        <div class="flex-grow border-t border-[#374151]"></div>
+                        <span class="px-4 text-[#9CA3AF] text-[10px] uppercase tracking-widest">O</span>
+                        <div class="flex-grow border-t border-[#374151]"></div>
+                    </div>
+
+                    <div>
+                        <button type="button" onclick="registrarAdminConGoogle()" class="w-full py-4 px-6 bg-transparent text-white font-bold tracking-widest uppercase text-sm border border-[#374151] transition-all duration-300 hover:bg-[#EA4335] hover:border-transparent flex items-center justify-center">
+                            <i class="fa-brands fa-google mr-3"></i> Continuar con Google
+                        </button>
+                    </div>
+
 
             </form>
         </div>
@@ -112,6 +124,11 @@
 
     <!-- Script for Wizard Logic -->
 <script>
+
+function registrarAdminConGoogle() {
+    window.location.href = '/auth/google?rol=admin';
+}
+
 document.addEventListener('DOMContentLoaded', function () {
 
     console.log("SCRIPT FUNCIONANDO");

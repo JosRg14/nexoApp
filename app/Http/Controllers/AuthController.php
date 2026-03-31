@@ -32,49 +32,64 @@ public function showClientRegister()
 }
 
     public function login(Request $request)
-    {
-        
-        $response = Http::post(config('services.api.url') . '/api/login', [
-            'correo' => $request->email,
-            'contrasena' => $request->password,
-        ]);
+{
+    \Log::info('=== LOGIN NORMAL ===');
+    \Log::info('Correo:', ['correo' => $request->email]);
+    
+    $response = Http::post(config('services.api.url') . '/api/login', [
+        'correo' => $request->email,
+        'contrasena' => $request->password,
+    ]);
 
-        
+    \Log::info('API Response:', [
+        'status' => $response->status(),
+        'body' => $response->body()
+    ]);
 
-        if (!$response->successful()) {
-            return response()->json([
-                'message' => 'Credenciales incorrectas'
-            ], 401);
-        }
-
-        $data = $response->json();
-
-        if (!isset($data['data']['token']) || !isset($data['data']['rol'])) {
-            return response()->json([
-                'message' => 'Respuesta inesperada del servidor'
-            ], 500);
-        }
-
-        $usuario = $this->formatUserData($data['data']['usuario']);
-
-        session([
-            'auth_token' => $data['data']['token'],
-            'rol' => $data['data']['rol'],
-            'usuario' => $usuario,
-            'negocio' => $data['data']['usuario']['negocio'] ?? null
-            
-        ]);
-
+    if (!$response->successful()) {
         return response()->json([
-            'redirect' => match ($data['data']['rol']) {
-                'superusuario' => route('dashboard.index'),
-                'admin' => route('business.profile'),
-                default => '/',
-            }
-        ]);
-
-        dd(session()->all());
+            'message' => 'Credenciales incorrectas'
+        ], 401);
     }
+
+    $data = $response->json();
+
+    if (!isset($data['data']['token']) || !isset($data['data']['rol'])) {
+        return response()->json([
+            'message' => 'Respuesta inesperada del servidor'
+        ], 500);
+    }
+
+    $usuario = $this->formatUserData($data['data']['usuario']);
+
+    \Log::info('Datos a guardar en sesión:', [
+        'token' => $data['data']['token'],
+        'rol' => $data['data']['rol'],
+        'usuario' => $usuario,
+        'negocio' => $data['data']['usuario']['negocio'] ?? null
+    ]);
+
+    session([
+        'auth_token' => $data['data']['token'],
+        'rol' => $data['data']['rol'],
+        'usuario' => $usuario,
+        'negocio' => $data['data']['usuario']['negocio'] ?? null
+    ]);
+
+    \Log::info('Sesión después de guardar:', [
+        'session_token' => session('auth_token'),
+        'session_rol' => session('rol'),
+        'session_usuario' => session('usuario')
+    ]);
+
+    return response()->json([
+        'redirect' => match ($data['data']['rol']) {
+            'superusuario' => route('dashboard.index'),
+            'admin' => route('business.profile'),
+            default => '/',
+        }
+    ]);
+}
 
     public function registerCliente(Request $request)
     {
@@ -199,9 +214,80 @@ public function showClientRegister()
 
     public function logout()
     {
+        $token = session('auth_token');
+
+        if ($token) {
+            try {
+                Http::withHeaders([
+                    'Accept' => 'application/json',
+                    'Authorization' => 'Bearer ' . $token,
+                ])->post(config('services.api.url') . '/api/logout');
+            } catch (\Exception $e) {
+                logger("Error al cerrar sesión en API: " . $e->getMessage());
+            }
+        }
+
         session()->flush();
-        return redirect()->route('home');
+
+        return redirect('/')->with('message', 'Sesión cerrada correctamente');
     }
 
+    public function redirectToGoogle(Request $request)
+    {
+        $rol = $request->query('rol', 'cliente');
+        if (!in_array($rol, ['admin', 'cliente'])) {
+            $rol = 'cliente';
+        }
+
+        return redirect(config('services.api.url') . '/auth/google?rol=' . $rol);
+    }
+
+
+    public function googleCallback(Request $request)
+{
+    \Log::info('=== GOOGLE CALLBACK WEB ===');
+    \Log::info('Code:', ['code' => $request->code]);
+    \Log::info('State:', ['state' => $request->state]);
+    
+    $response = Http::withHeaders(['Accept' => 'application/json'])
+        ->get(config('services.api.url') . '/auth/google/callback', [
+            'code' => $request->code,
+            'state' => $request->state,
+        ]);
+
+    \Log::info('API Response Status:', ['status' => $response->status()]);
+    \Log::info('API Response Body:', ['body' => $response->body()]);
+
+    if ($response->successful()) {
+        $resData = $response->json();
+        $data = $resData['data'];
+        
+        \Log::info('Data recibido:', ['data' => $data]);
+
+        session([
+            'auth_token' => $data['token'],
+            'rol'        => $data['usuario']['rol'],
+            'usuario'    => $data['usuario'],
+        ]);
+
+        \Log::info('Sesión guardada:', [
+            'token' => session('auth_token'),
+            'rol' => session('rol'),
+            'usuario' => session('usuario')
+        ]);
+
+        $rol = $data['usuario']['rol'];
+        
+        if ($rol === 'admin') {      
+            \Log::info('Admin autenticado, redirigiendo a business.profile');
+            return redirect()->route('business.profile');
+        }
+        
+        return redirect('/');
+    }
+
+    \Log::error('Error en callback Google:', ['response' => $response->body()]);
+    return redirect('/login')->with('error', 'Error al sincronizar con Google');
+}
 
 }
