@@ -228,7 +228,6 @@
 </div>
 
 <script>
-
     // --- INTERCEPTOR PARA AGREGAR Y EDITAR SERVICIOS ---
     document.addEventListener('submit', async function(e) {
         const form = e.target;
