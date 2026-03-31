@@ -8,6 +8,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProfileController;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\RegistrarController;
 
 /*
 |--------------------------------------------------------------------------
@@ -31,54 +32,41 @@ Route::get('/service/view', function () {
     return view('service.view');
 })->name('service.show');
 
+
 /*
 |--------------------------------------------------------------------------
-| PANEL ADMIN NEGOCIO
+| RUTAS PROTEGIDAS POR ESTADO DE NEGOCIO
 |--------------------------------------------------------------------------
 */
+Route::middleware(['auth.session', 'inject.api.token', 'check.business'])->group(function () {
 
-Route::middleware(['auth.session', 'inject.api.token', 'role:admin'])
-    ->prefix('business')
-    ->name('business.')
-    ->group(function () {
+    // 1. Rutas de transición (Registro y Espera)
+    Route::get('/completar-negocio', [RegistrarController::class, 'showRegistroNegocio'])->name('registro.negocio.paso2');
+    Route::post('/completar-negocio', [RegistrarController::class, 'storeNegocio'])->name('registro.negocio.save');
+    Route::get('/registro/espera', [RegistrarController::class, 'showEsperandoValidacion'])->name('registro.negocio.espera');
 
-        // PERFIL DEL NEGOCIO
-        Route::get('/profile', [BusinessProfileController::class, 'index'])
-            ->name('profile');
+    // 2. Panel de Admin (Solo entran si el middleware CheckBusinessSuscripcion los deja pasar)
+    Route::middleware(['role:admin'])
+        ->prefix('business')
+        ->name('business.')
+        ->group(function () {
+            Route::get('/profile', [BusinessProfileController::class, 'index'])->name('profile');
+            Route::post('/update', [BusinessProfileController::class, 'update'])->name('update');
+            
+            // Servicios
+        Route::post('/services', [ServiceController::class, 'store'])->name('services.store');
+        Route::put('/services/{id}', [ServiceController::class, 'update'])->name('services.update');
+        Route::delete('/services/{id}', [ServiceController::class, 'destroy'])->name('services.destroy');
 
-        Route::post('/update', [BusinessProfileController::class, 'update'])
-            ->name('update');
-
-        /*
-        |--------------------------------------------------------------------------
-        | SERVICIOS
-        |--------------------------------------------------------------------------
-        */
-
-        Route::post('/services', [ServiceController::class, 'store'])
-            ->name('services.store');
-
-        Route::put('/services/{id}', [ServiceController::class, 'update'])
-            ->name('services.update');
-
-        Route::delete('/services/{id}', [ServiceController::class, 'destroy'])
-            ->name('services.destroy');
-
-        /*
-        |--------------------------------------------------------------------------
-        | EMPLEADOS
-        |--------------------------------------------------------------------------
-        */
-
-        Route::post('/employees', [EmployeeController::class, 'store'])
-            ->name('employees.store');
-
-        Route::delete('/employees/{id}', [EmployeeController::class, 'destroy'])
-            ->name('employees.destroy');
-
-        Route::put('/employees/{id}', [EmployeeController::class, 'update'])
-            ->name('employees.update');
+        // Empleados
+        Route::post('/employees', [EmployeeController::class, 'store'])->name('employees.store');
+        Route::put('/employees/{id}', [EmployeeController::class, 'update'])->name('employees.update');
+        Route::delete('/employees/{id}', [EmployeeController::class, 'destroy'])->name('employees.destroy');
     });
+});
+
+
+
 
 /*
 |--------------------------------------------------------------------------
@@ -100,7 +88,7 @@ Route::middleware(['auth.session', 'inject.api.token', 'role:superusuario'])
         Route::patch('/businesses/{id}/status', [App\Http\Controllers\DashboardController::class, 'updateStatus'])
             ->name('businesses.updateStatus');
 
-        // Promociones y Avisos    
+        // Promociones y Avisos
         Route::get('/promotions', [DashboardController::class, 'promotions'])->name('promotions');
         Route::get('/notices', [DashboardController::class, 'notices'])->name('notices');
 
@@ -116,7 +104,7 @@ Route::middleware(['auth.session', 'inject.api.token', 'role:superusuario'])
 
         // Ruta para asignar un plan a un negocio (si es necesario)
         Route::post('/planes/asignar', [App\Http\Controllers\DashboardController::class, 'assignPlan'])
-        ->name('plans.assign');
+            ->name('plans.assign');
 
         // Suscripciones (Lógica de Pagos)
         // Quitamos el prefijo 'dashboard/' de aquí porque el grupo principal ya lo pone
@@ -198,7 +186,7 @@ Route::post('/logout', function () {
     session()->flush();
 
     return redirect('/');
-});
+})->name('logout');
 
 /*
 |--------------------------------------------------------------------------
@@ -210,6 +198,7 @@ Route::middleware(['guest.session'])->group(function () {
 
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 
+    
     Route::get('/register', [AuthController::class, 'showRoleSelection'])->name('register');
 
     Route::get('/register/business', [AuthController::class, 'showBusinessRegister'])->name('register.business');
@@ -217,3 +206,11 @@ Route::middleware(['guest.session'])->group(function () {
     Route::get('/register/client', [AuthController::class, 'showClientRegister'])->name('register.client');
 
 });
+
+
+/*
+|--------------------------------------------------------------------------
+| RUTAS DE TRANSICIÓN (1.5 y 1.6)
+|--------------------------------------------------------------------------
+*/
+

@@ -5,6 +5,7 @@ use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use App\Http\Middleware\RedirectIfAuthenticated;
 use App\Http\Middleware\InjectApiToken;
+use App\Http\Middleware\CheckBusinessSuscripcion; // 1. Importamos el nuevo middleware
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -19,15 +20,15 @@ return Application::configure(basePath: dirname(__DIR__))
             'inject.api.token' => InjectApiToken::class,
             'role' => \App\Http\Middleware\RoleMiddleware::class,
             'guest.session' => RedirectIfAuthenticated::class,
+            'check.business' => CheckBusinessSuscripcion::class, // 2. Registramos el alias aquí
         ]);
 
-        // 👇 ESTA ES LA PARTE QUE FALTA
         $middleware->web(append: [
             InjectApiToken::class,
+            // Aquí NO pongas 'check.business' globalmente porque causaría un bucle infinito en el Login
         ]);
 
     })
-
     ->withExceptions(function (Exceptions $exceptions): void {
         //
     })->create();

@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\ExternalApi\ServiceService;
 use App\Services\ExternalApi\EmployeeService;
+use App\Services\ExternalApi\ServiceService;
 use Illuminate\Http\Request;
 
 class BusinessProfileController extends Controller
 {
-
     protected ServiceService $serviceService;
+
     protected EmployeeService $employeeService;
 
     public function __construct(
@@ -44,7 +44,7 @@ class BusinessProfileController extends Controller
                     'precio' => $item['precio'] ?? 0,
                     'duracion' => $item['duracion'] ?? 0,
                     'imagen' => isset($item['imagen'])
-                        ? rtrim(config('services.api.url'), '/') . '/' . ltrim($item['imagen'], '/')
+                        ? rtrim(config('services.api.url'), '/').'/'.ltrim($item['imagen'], '/')
                         : null,
                 ];
             })->toArray();
@@ -53,18 +53,17 @@ class BusinessProfileController extends Controller
             $responseEmployees = $this->employeeService->list();
 
             $employees = collect($responseEmployees['data'] ?? [])
-->map(function ($emp) {
-    return [
-        'id_empleado' => $emp['id_empleado'] ?? null,
-        'nombre' => $emp['nombre'] ?? '',
-        'app_paterno' => $emp['app_paterno'] ?? '',
-        'app_materno' => $emp['app_materno'] ?? '',
-        'correo' => $emp['correo'] ?? '',
-        'comision' => $emp['comision'] ?? 0,
-        'estado' => $emp['estado'] ?? 'activo'
-    ];
-})->toArray();
-
+                ->map(function ($emp) {
+                    return [
+                        'id_empleado' => $emp['id_empleado'] ?? null,
+                        'nombre' => $emp['nombre'] ?? '',
+                        'app_paterno' => $emp['app_paterno'] ?? '',
+                        'app_materno' => $emp['app_materno'] ?? '',
+                        'correo' => $emp['correo'] ?? '',
+                        'comision' => $emp['comision'] ?? 0,
+                        'estado' => $emp['estado'] ?? 'activo',
+                    ];
+                })->toArray();
 
         } catch (\Exception $e) {
 
@@ -74,38 +73,46 @@ class BusinessProfileController extends Controller
         return view('business.profile', [
             'negocio' => $negocio,
             'services' => $services,
-            'employees' => $employees
+            'employees' => $employees,
         ]);
 
     }
 
+    
     public function update(Request $request)
-    {
-        try {
+{
+    try {
+        // 1. Recolectamos TODOS los campos, incluyendo los de la dirección
+        // Es vital que estos nombres coincidan con los 'name' de tus inputs en el Blade
+        $data = $request->only([
+            'nombre',
+            'tipo_negocio',
+            'telefono',
+            'redes_sociales',
+            'rfc',
+            'acerca_de',
+            'calle',          // Agregado
+            'numero',         // Agregado
+            'colonia',        // Agregado
+            'ciudad',         // Agregado
+            'estado',         // Agregado
+            'codigo_postal'   // Agregado
+        ]);
 
-            $data = $request->only([
-                'nombre',
-                'tipo_negocio',
-                'telefono',
-                'redes_sociales',
-                'rfc',
-                'acerca_de',
-                'direccion',
-                'foto_perfil',
-                'banner',
-                'fotos_galeria'
-            ]);
+        // 2. Enviar a la API a través del servicio
+        // Ahora $data lleva la dirección "plana", que es lo que tu API espera
+        $this->serviceService->updateBusiness($data);
 
-            // enviar datos a la API
-            $this->serviceService->updateBusiness($data);
+        return redirect()
+            ->route('business.profile')
+            ->with('success', 'Negocio y domicilio actualizados correctamente');
 
-            return redirect()
-                ->route('business.profile')
-                ->with('success', 'Negocio actualizado correctamente');
+    } catch (\Exception $e) {
+        \Log::error('Error actualizando negocio: ' . $e->getMessage());
 
-        } catch (\Exception $e) {
-
-            return back()->with('error', 'Error al actualizar el negocio');
-        }
+        return back()
+            ->withInput() // Esto mantiene lo que el usuario escribió si hay un error
+            ->with('error', 'Error al actualizar el negocio: ' . $e->getMessage());
     }
+}
 }
