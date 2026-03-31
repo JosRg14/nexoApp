@@ -8,14 +8,11 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProfileController;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Route;
-<<<<<<< HEAD
 use App\Http\Controllers\RegistrarController;
-=======
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\NegocioController;
-use Iluminate\Http\Request;
+use Illuminate\Http\Request;
 use App\Http\Controllers\CitaController;
->>>>>>> a93f5e42b010014d7c581557fabd58e464d130de
 
 /*
 |--------------------------------------------------------------------------
@@ -39,12 +36,9 @@ Route::get('/service/view', function () {
     return view('service.view');
 })->name('service.show');
 
-<<<<<<< HEAD
-
-=======
 //pagina publica de detalle de negocio
 Route::get('/negocio/{id}', [NegocioController::class, 'show'])->name('negocio.show');
->>>>>>> a93f5e42b010014d7c581557fabd58e464d130de
+
 /*
 |--------------------------------------------------------------------------
 | RUTAS PROTEGIDAS POR ESTADO DE NEGOCIO
@@ -76,9 +70,6 @@ Route::middleware(['auth.session', 'inject.api.token', 'check.business'])->group
         Route::delete('/employees/{id}', [EmployeeController::class, 'destroy'])->name('employees.destroy');
     });
 });
-
-
-
 
 /*
 |--------------------------------------------------------------------------
@@ -208,16 +199,7 @@ Route::middleware(['auth.session'])->group(function () {
 |--------------------------------------------------------------------------
 */
 
-
-<<<<<<< HEAD
-Route::post('/logout', function () {
-    session()->flush();
-
-    return redirect('/');
-})->name('logout');
-=======
 Route::get('/', [HomeController::class, 'index'])->name('home');
->>>>>>> a93f5e42b010014d7c581557fabd58e464d130de
 
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     
@@ -240,15 +222,6 @@ Route::middleware(['guest.session'])->group(function () {
 
 });
 
-<<<<<<< HEAD
-
-/*
-|--------------------------------------------------------------------------
-| RUTAS DE TRANSICIÓN (1.5 y 1.6)
-|--------------------------------------------------------------------------
-*/
-
-=======
 /*
 |-------------------------------------------------------------------------
 | RUTA DE CALLBACK GOOGLE
@@ -271,4 +244,3 @@ Route::middleware(['auth.session'])->group(function () {
         return view('business.complete-registration');
     })->name('business.complete');
 });
->>>>>>> a93f5e42b010014d7c581557fabd58e464d130de
