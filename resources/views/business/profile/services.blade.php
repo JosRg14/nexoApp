@@ -233,8 +233,13 @@
         const form = e.target;
         const action = form.getAttribute('action') || '';
 
-        // Solo interceptamos si el form va al proxy y NO es el de eliminar (que ya tiene su lógica)
-        if (action.includes('/api-proxy/') && !form.hasAttribute('data-custom-handler')) {
+        // VERIFICACIÓN CORREGIDA: Solo interceptar si:
+        // 1. El action contiene '/api-proxy/'
+        // 2. NO tiene el atributo data-custom-handler (o está presente pero con valor "false")
+        const hasCustomHandler = form.hasAttribute('data-custom-handler') && 
+                                 form.getAttribute('data-custom-handler') !== 'false';
+        
+        if (action.includes('/api-proxy/') && !hasCustomHandler) {
             e.preventDefault(); // Detenemos el envío normal
             
             showLoader();
@@ -242,13 +247,13 @@
             const formData = new FormData(form);
             const redirectUrl = form.getAttribute('data-redirect') || window.location.href;
 
-            //  Si no hay archivo en el campo imagen, lo eliminamos del FormData
+            // Si no hay archivo en el campo imagen, lo eliminamos del FormData
             const fileInput = form.querySelector('input[name="imagen"]');
             if (fileInput && !fileInput.files.length) {
                 formData.delete('imagen');
             }
             
-            //Asegurar que _method está presente
+            // Asegurar que _method está presente
             if (!formData.has('_method')) {
                 const methodInput = form.querySelector('input[name="_method"]');
                 if (methodInput && methodInput.value) {
@@ -277,13 +282,14 @@
                 } else {
                     hideLoader();
                     if (data.errors) {
-                    let errorMsg = "Errores de validación:\n";
-                    for (const [field, errors] of Object.entries(data.errors)) {
-                        errorMsg += `${field}: ${errors.join(', ')}\n`;
+                        let errorMsg = "Errores de validación:\n";
+                        for (const [field, errors] of Object.entries(data.errors)) {
+                            errorMsg += `${field}: ${errors.join(', ')}\n`;
+                        }
+                        alert(errorMsg);
+                    } else {
+                        alert(data.message || "Error al procesar la solicitud.");
                     }
-                    alert(errorMsg);
-                }else {
-                    alert(data.message || "Error al procesar la solicitud.");
                 }
             } catch (error) {
                 hideLoader();
@@ -291,6 +297,8 @@
                 alert("Error de conexión con el servidor");
             }
         }
+        // Si hasCustomHandler es true, el formulario se enviará normalmente
+        // y Laravel manejará la redirección y los errores
     });
 
     function handleImagePreview(input, containerId, imgId, isEdit = false) {
