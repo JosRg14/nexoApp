@@ -30,48 +30,45 @@ class BusinessProfileController extends Controller
         $negocio = [];
 
         try {
-            // 1. Obtener los datos del negocio actual
+            // 1. Obtener los datos del negocio actual (esto ya está bien)
             $responseNegocio = $this->httpClient->get('/api/negocios/mi-negocio');
             $negocio = $responseNegocio['data'] ?? [];
             
-            $negocioId = $negocio['id_negocio'] ?? null;
-            
-            if ($negocioId) {
-                // 2. Obtener servicios filtrados por el ID del negocio
-                $responseServices = $this->httpClient->get('/api/servicios', ['negocio_id' => $negocioId]);
-                $services = collect($responseServices['data'] ?? [])->map(function ($item) {
-                    $imagenUrl = null;
-                    if (isset($item['imagen']) && $item['imagen']) {
-                        $imagenUrl = rtrim(config('services.api.url'), '/') . '/' . ltrim($item['imagen'], '/');
-                    }
-                    return [
-                        'id' => $item['id'] ?? ($item['id_servicio'] ?? null),
-                        'nombre' => $item['nombre'] ?? '',
-                        'descripcion' => $item['descripcion'] ?? '',
-                        'precio' => $item['precio'] ?? 0,
-                        'duracion' => $item['duracion'] ?? 0,
-                        'imagen' => $imagenUrl,
-                    ];
-                })->toArray();
+            // 2. Obtener servicios del negocio autenticado (sin pasar negocio_id)
+            // El TenantScope de la API filtrará automáticamente
+            $responseServices = $this->httpClient->get('/api/servicios');
+            $services = collect($responseServices['data'] ?? [])->map(function ($item) {
+                $imagenUrl = null;
+                if (isset($item['imagen']) && $item['imagen']) {
+                    $imagenUrl = rtrim(config('services.api.url'), '/') . '/' . ltrim($item['imagen'], '/');
+                }
+                return [
+                    'id' => $item['id'] ?? ($item['id_servicio'] ?? null),
+                    'nombre' => $item['nombre'] ?? '',
+                    'descripcion' => $item['descripcion'] ?? '',
+                    'precio' => $item['precio'] ?? 0,
+                    'duracion' => $item['duracion'] ?? 0,
+                    'imagen' => $imagenUrl,
+                ];
+            })->toArray();
 
-                // 3. Obtener empleados filtrados por el ID del negocio
-                $responseEmployees = $this->httpClient->get('/api/empleados', ['negocio_id' => $negocioId]);
-                $employees = collect($responseEmployees['data'] ?? [])->map(function ($emp) {
-                    return [
-                        'id_empleado' => $emp['id_empleado'] ?? null,
-                        'nombre' => $emp['nombre'] ?? '',
-                        'app_paterno' => $emp['app_paterno'] ?? '',
-                        'app_materno' => $emp['app_materno'] ?? '',
-                        'correo' => $emp['correo'] ?? '',
-                        'comision' => $emp['comision'] ?? 0,
-                        'estado' => $emp['estado'] ?? 'activo',
-                    ];
-                })->toArray();
-            }
+            // 3. Obtener empleados del negocio autenticado (sin pasar negocio_id)
+            $responseEmployees = $this->httpClient->get('/api/empleados');
+            $employees = collect($responseEmployees['data'] ?? [])->map(function ($emp) {
+                return [
+                    'id_empleado' => $emp['id_empleado'] ?? null,
+                    'nombre' => $emp['nombre'] ?? '',
+                    'app_paterno' => $emp['app_paterno'] ?? '',
+                    'app_materno' => $emp['app_materno'] ?? '',
+                    'correo' => $emp['correo'] ?? '',
+                    'comision' => $emp['comision'] ?? 0,
+                    'estado' => $emp['estado'] ?? 'activo',
+                ];
+            })->toArray();
 
         } catch (\Exception $e) {
             $negocio = [];
-            \Log::info('Admin sin negocio registrado o error en API: ' . $e->getMessage());
+            \Log::info('Error en BusinessProfileController: ' . $e->getMessage());
         }
 
         return view('business.profile', [
