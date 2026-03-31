@@ -228,29 +228,29 @@
 </div>
 
 <script>
-    // --- INTERCEPTOR PARA AGREGAR Y EDITAR SERVICIOS ---
+    // --- INTERCEPTOR PARA AGREGAR SERVICIOS ---
     document.addEventListener('submit', async function(e) {
         const form = e.target;
-        const action = form.getAttribute('action') || '';
-
-        // VERIFICACIÓN: Solo interceptar si:
-        // 1. El action contiene '/api-proxy/'
-        // 2. NO tiene el atributo data-custom-handler (o está presente pero con valor "false")
-        const hasCustomHandler = form.hasAttribute('data-custom-handler') && 
-                                 form.getAttribute('data-custom-handler') === 'true';
         
-        // IMPORTANTE: Si tiene custom handler, NO interceptar
-        if (hasCustomHandler) {
-            console.log('Formulario con custom handler - NO interceptado');
-            return; // Dejar que el formulario se envíe normalmente
+        // ============================================
+        // IGNORAR COMPLETAMENTE formularios de edición y eliminación
+        // ============================================
+        if (form.id === 'editServiceForm' || form.id === 'deleteServiceForm') {
+            console.log('✅ Formulario ' + form.id + ' - NO interceptado, se envía normalmente');
+            // No hacer e.preventDefault(), dejar que Laravel lo maneje
+            return true;
         }
         
-        // Solo interceptar si va al proxy
+        // ============================================
+        // SOLO para el formulario de agregar servicio
+        // ============================================
+        const action = form.getAttribute('action') || '';
+        
         if (action.includes('/api-proxy/')) {
-            console.log('Interceptando formulario:', action);
-            e.preventDefault(); // Detenemos el envío normal
+            console.log('🔄 Interceptando formulario de AGREGAR servicio');
+            e.preventDefault();
             
-            showLoader();
+            if (typeof showLoader === 'function') showLoader();
 
             const formData = new FormData(form);
             const redirectUrl = form.getAttribute('data-redirect') || window.location.href;
@@ -281,42 +281,39 @@
 
                 const data = await response.json();
                 
-                console.log('Respuesta del servidor:', data);
+                console.log('Respuesta:', data);
 
                 if (response.ok) {
-                    // Éxito - mostrar mensaje y redirigir
-                    if (data.message) {
-                        showToast(data.message);
+                    if (typeof showToast === 'function') {
+                        showToast(data.message || "¡Servicio agregado exitosamente!");
+                    } else {
+                        alert(data.message || "¡Servicio agregado exitosamente!");
                     }
-                    // Redirigir después de un breve delay
                     setTimeout(() => {
                         window.location.href = redirectUrl;
                     }, 1000);
                 } else {
-                    // Error - mostrar mensajes de error
-                    hideLoader();
+                    if (typeof hideLoader === 'function') hideLoader();
                     if (data.errors) {
                         let errorMsg = "Errores de validación:\n";
                         for (const [field, errors] of Object.entries(data.errors)) {
                             errorMsg += `${field}: ${errors.join(', ')}\n`;
                         }
                         alert(errorMsg);
-                    } else if (data.message) {
-                        alert(data.message);
                     } else {
-                        alert("Error al procesar la solicitud.");
+                        alert(data.message || "Error al procesar la solicitud.");
                     }
                 }
             } catch (error) {
-                hideLoader();
-                console.error("Error en la petición:", error);
+                if (typeof hideLoader === 'function') hideLoader();
+                console.error("Error:", error);
                 alert("Error de conexión con el servidor");
             }
         }
     });
 
     function openEditModal(id, nombre, descripcion, precio, duracion, imagen) {
-        console.log('Abriendo modal para servicio ID:', id);
+        console.log('📝 Abriendo modal de edición para servicio ID:', id);
         
         // Setear valores en los campos
         document.getElementById('edit_id').value = id;
@@ -325,12 +322,12 @@
         document.getElementById('edit_precio').value = precio;
         document.getElementById('edit_duracion').value = duracion;
         
-        // IMPORTANTE: Aquí debemos asegurar que el action NO use el proxy
+        // Configurar la acción del formulario
         const form = document.getElementById('editServiceForm');
-        // Usar la ruta directa de Laravel, NO el proxy
         form.action = '/business/services/' + id;
         
-        console.log('Action del formulario de edición:', form.action);
+        console.log('📝 Action del formulario de edición:', form.action);
+        console.log('📝 El formulario tiene data-custom-handler:', form.getAttribute('data-custom-handler'));
         
         // Manejar la imagen
         const previewImg = document.getElementById('edit_imagen_preview');
@@ -368,9 +365,11 @@
     }
 
     function openDeleteModal(id, nombre) {
+        console.log('🗑️ Abriendo modal de eliminación para servicio ID:', id);
         document.getElementById('deleteServiceName').innerText = nombre;
         const form = document.getElementById('deleteServiceForm');
         form.action = '/business/services/' + id;
+        console.log('🗑️ Action del formulario de eliminación:', form.action);
         document.getElementById('modal-delete-service').classList.remove('hidden');
     }
 
@@ -389,7 +388,7 @@
             const validTypes = ['image/png', 'image/jpeg', 'image/jpg'];
             
             if (!validTypes.includes(file.type)) {
-                errorElement.classList.remove('hidden');
+                if (errorElement) errorElement.classList.remove('hidden');
                 input.value = '';
                 if (!isEdit && container) container.classList.add('hidden');
                 return;
