@@ -36,7 +36,7 @@ class BusinessProfileController extends Controller
             
             // 2. Obtener servicios del negocio autenticado (sin pasar negocio_id)
             // El TenantScope de la API filtrará automáticamente
-            $responseServices = $this->httpClient->get('/api/servicios');
+            $responseServices = $this->httpClient->get('/api/mis-servicios');
             $services = collect($responseServices['data'] ?? [])->map(function ($item) {
                 $imagenUrl = null;
                 if (isset($item['imagen']) && $item['imagen']) {
@@ -53,7 +53,7 @@ class BusinessProfileController extends Controller
             })->toArray();
 
             // 3. Obtener empleados del negocio autenticado (sin pasar negocio_id)
-            $responseEmployees = $this->httpClient->get('/api/empleados');
+            $responseEmployees = $this->httpClient->get('/api/mis-empleados');
             $employees = collect($responseEmployees['data'] ?? [])->map(function ($emp) {
                 return [
                     'id_empleado' => $emp['id_empleado'] ?? null,
