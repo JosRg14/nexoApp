@@ -162,7 +162,7 @@
     <div class="absolute inset-0 bg-black/80" onclick="closeEditModal()"></div>
     <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-[#1a1a1a] border border-[#374151] p-8 w-full max-w-md">
         <h3 id="editModalTitle" class="text-white font-bold mb-6 uppercase">Editar Servicio</h3>
-        <form method="POST" id="editServiceForm" data-redirect="{{ route('business.profile') }}" enctype="multipart/form-data">
+        <form method="POST" id="editServiceForm" data-redirect="{{ route('business.profile') }}" enctype="multipart/form-data" data-custom-handler="true">
             @csrf
             @method('PUT')
             <input type="hidden" name="id" id="edit_id">
