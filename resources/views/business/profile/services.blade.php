@@ -233,13 +233,21 @@
         const form = e.target;
         const action = form.getAttribute('action') || '';
 
-        // VERIFICACIÓN CORREGIDA: Solo interceptar si:
+        // VERIFICACIÓN: Solo interceptar si:
         // 1. El action contiene '/api-proxy/'
         // 2. NO tiene el atributo data-custom-handler (o está presente pero con valor "false")
         const hasCustomHandler = form.hasAttribute('data-custom-handler') && 
-                                 form.getAttribute('data-custom-handler') !== 'false';
+                                 form.getAttribute('data-custom-handler') === 'true';
         
-        if (action.includes('/api-proxy/') && !hasCustomHandler) {
+        // IMPORTANTE: Si tiene custom handler, NO interceptar
+        if (hasCustomHandler) {
+            console.log('Formulario con custom handler - NO interceptado');
+            return; // Dejar que el formulario se envíe normalmente
+        }
+        
+        // Solo interceptar si va al proxy
+        if (action.includes('/api-proxy/')) {
+            console.log('Interceptando formulario:', action);
             e.preventDefault(); // Detenemos el envío normal
             
             showLoader();
@@ -268,18 +276,24 @@
                         'Accept': 'application/json',
                         'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value
                     },
-                    body: formData // FormData maneja automáticamente archivos (enctype)
+                    body: formData
                 });
 
                 const data = await response.json();
+                
+                console.log('Respuesta del servidor:', data);
 
                 if (response.ok) {
-                    showToast(data.message || "¡Operación exitosa!");
-                    // Esperamos un segundo para que el usuario vea el brindis y redirigimos
+                    // Éxito - mostrar mensaje y redirigir
+                    if (data.message) {
+                        showToast(data.message);
+                    }
+                    // Redirigir después de un breve delay
                     setTimeout(() => {
                         window.location.href = redirectUrl;
                     }, 1000);
                 } else {
+                    // Error - mostrar mensajes de error
                     hideLoader();
                     if (data.errors) {
                         let errorMsg = "Errores de validación:\n";
@@ -287,19 +301,82 @@
                             errorMsg += `${field}: ${errors.join(', ')}\n`;
                         }
                         alert(errorMsg);
+                    } else if (data.message) {
+                        alert(data.message);
                     } else {
-                        alert(data.message || "Error al procesar la solicitud.");
+                        alert("Error al procesar la solicitud.");
                     }
                 }
             } catch (error) {
                 hideLoader();
-                console.error("Error:", error);
+                console.error("Error en la petición:", error);
                 alert("Error de conexión con el servidor");
             }
         }
-        // Si hasCustomHandler es true, el formulario se enviará normalmente
-        // y Laravel manejará la redirección y los errores
     });
+
+    function openEditModal(id, nombre, descripcion, precio, duracion, imagen) {
+        console.log('Abriendo modal para servicio ID:', id);
+        
+        // Setear valores en los campos
+        document.getElementById('edit_id').value = id;
+        document.getElementById('edit_nombre').value = nombre;
+        document.getElementById('edit_descripcion').value = descripcion;
+        document.getElementById('edit_precio').value = precio;
+        document.getElementById('edit_duracion').value = duracion;
+        
+        // IMPORTANTE: Aquí debemos asegurar que el action NO use el proxy
+        const form = document.getElementById('editServiceForm');
+        // Usar la ruta directa de Laravel, NO el proxy
+        form.action = '/business/services/' + id;
+        
+        console.log('Action del formulario de edición:', form.action);
+        
+        // Manejar la imagen
+        const previewImg = document.getElementById('edit_imagen_preview');
+        if (imagen && imagen !== 'null' && imagen !== '') {
+            previewImg.src = imagen + '?v=' + Date.now();
+            previewImg.classList.remove('hidden');
+        } else {
+            previewImg.classList.add('hidden');
+        }
+        
+        // Limpiar el campo de archivo
+        const fileInput = document.getElementById('edit_imagen');
+        if (fileInput) {
+            fileInput.value = '';
+        }
+        
+        // Limpiar mensajes de error
+        const errorElement = document.getElementById('edit-image-error');
+        if (errorElement) {
+            errorElement.classList.add('hidden');
+        }
+        
+        // Mostrar el modal
+        const modal = document.getElementById('modal-edit-service');
+        if (modal) {
+            modal.classList.remove('hidden');
+        }
+    }
+
+    function closeEditModal() {
+        const modal = document.getElementById('modal-edit-service');
+        if (modal) {
+            modal.classList.add('hidden');
+        }
+    }
+
+    function openDeleteModal(id, nombre) {
+        document.getElementById('deleteServiceName').innerText = nombre;
+        const form = document.getElementById('deleteServiceForm');
+        form.action = '/business/services/' + id;
+        document.getElementById('modal-delete-service').classList.remove('hidden');
+    }
+
+    function closeDeleteModal() {
+        document.getElementById('modal-delete-service').classList.add('hidden');
+    }
 
     function handleImagePreview(input, containerId, imgId, isEdit = false) {
         const errorId = isEdit ? 'edit-image-error' : 'image-error';
@@ -313,18 +390,18 @@
             
             if (!validTypes.includes(file.type)) {
                 errorElement.classList.remove('hidden');
-                input.value = ''; // Clear input
-                if (!isEdit) container.classList.add('hidden');
+                input.value = '';
+                if (!isEdit && container) container.classList.add('hidden');
                 return;
             }
             
-            errorElement.classList.add('hidden');
+            if (errorElement) errorElement.classList.add('hidden');
             const reader = new FileReader();
             
             reader.onload = function(e) {
                 img.src = e.target.result;
                 img.classList.remove('hidden');
-                if (!isEdit) container.classList.remove('hidden');
+                if (!isEdit && container) container.classList.remove('hidden');
             };
             
             reader.readAsDataURL(file);
