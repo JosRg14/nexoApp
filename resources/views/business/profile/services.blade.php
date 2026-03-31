@@ -243,6 +243,20 @@
             const formData = new FormData(form);
             const redirectUrl = form.getAttribute('data-redirect') || window.location.href;
 
+            //  Si no hay archivo en el campo imagen, lo eliminamos del FormData
+            const fileInput = form.querySelector('input[name="imagen"]');
+            if (fileInput && !fileInput.files.length) {
+                formData.delete('imagen');
+            }
+            
+            //Asegurar que _method está presente
+            if (!formData.has('_method')) {
+                const methodInput = form.querySelector('input[name="_method"]');
+                if (methodInput && methodInput.value) {
+                    formData.append('_method', methodInput.value);
+                }
+            }
+
             try {
                 const response = await fetch(action, {
                     method: 'POST',
@@ -263,7 +277,14 @@
                     }, 1000);
                 } else {
                     hideLoader();
-                    alert(data.message || "Error al procesar la solicitud");
+                    if (data.errors) {
+                    let errorMsg = "Errores de validación:\n";
+                    for (const [field, errors] of Object.entries(data.errors)) {
+                        errorMsg += `${field}: ${errors.join(', ')}\n`;
+                    }
+                    alert(errorMsg);
+                }else {
+                    alert(data.message || "Error al procesar la solicitud.");
                 }
             } catch (error) {
                 hideLoader();
