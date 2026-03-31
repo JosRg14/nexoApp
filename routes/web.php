@@ -44,13 +44,16 @@ Route::get('/negocio/{id}', [NegocioController::class, 'show'])->name('negocio.s
 | RUTAS PROTEGIDAS POR ESTADO DE NEGOCIO
 |--------------------------------------------------------------------------
 */
-Route::middleware(['auth.session', 'inject.api.token', 'check.business'])->group(function () {
-
-    // 1. Rutas de transición (Registro y Espera)
+Route::middleware(['auth.session', 'inject.api.token'])->group(function () {
+ // 1. Rutas de transición (Registro y Espera)
     Route::get('/completar-negocio', [RegistrarController::class, 'showRegistroNegocio'])->name('registro.negocio.paso2');
     Route::post('/completar-negocio', [RegistrarController::class, 'storeNegocio'])->name('registro.negocio.save');
     Route::get('/registro/espera', [RegistrarController::class, 'showEsperandoValidacion'])->name('registro.negocio.espera');
+});
 
+Route::middleware(['auth.session', 'inject.api.token', 'check.business'])->group(function () {
+
+   
     // 2. Panel de Admin (Solo entran si el middleware CheckBusinessSuscripcion los deja pasar)
     Route::middleware(['role:admin'])
         ->prefix('business')
@@ -238,9 +241,10 @@ Route::middleware(['auth.session', 'inject.api.token'])->group(function () {
     Route::get('/mis-citas', [CitaController::class, 'misCitas'])->name('mis-citas');
 });
 
-// Rutas de completar registro de negocio
+/*Rutas de completar registro de negocio
 Route::middleware(['auth.session'])->group(function () {
     Route::get('/completar-negocio', function () {
         return view('business.profile.onboarding-negocio');
     })->name('business.complete');
 });
+*/
