@@ -29,7 +29,7 @@
         @else
         <form id="cita-form" class="space-y-8">
             @csrf
-            
+             <input type="hidden" name="negocio_id" id="negocio_id" value="{{ $negocioId ?? '' }}">
             <!-- Servicios en Carrusel -->
             <div class="bg-[#262626] border border-[#374151] rounded-sm p-6">
                 <div class="flex justify-between items-center mb-6">
@@ -288,8 +288,8 @@ async function cargarHorarios() {
     selectHora.disabled = true;
     
     try {
-        // Usar la API directa (pública) en lugar del proxy para disponibilidad
-        const response = await fetch(`https://devlink-servidorapi.td60xq.easypanel.host/api/disponibilidad/empleado/${empleadoId}?fecha=${fecha}&duracion=${duracion}`);
+        // ✅ CAMBIADO: Usar el proxy en lugar de la API directa
+        const response = await fetch(`/api-proxy/disponibilidad/empleado/${empleadoId}?fecha=${fecha}&duracion=${duracion}`);
         const data = await response.json();
         
         selectHora.innerHTML = '<option value="">Selecciona una hora</option>';
@@ -327,6 +327,7 @@ document.getElementById('cita-form').addEventListener('submit', async function(e
     const empleadoId = document.getElementById('empleado_id').value;
     const fecha = document.getElementById('fecha').value;
     const hora = document.getElementById('hora').value;
+    const negocioId = document.getElementById('negocio_id').value;
     
     if (!servicioId || !empleadoId || !fecha || !hora) {
         alert('Por favor completa todos los campos');
@@ -353,7 +354,8 @@ document.getElementById('cita-form').addEventListener('submit', async function(e
                 servicio_id: servicioId,
                 empleado_id: empleadoId,
                 fecha: fecha,
-                hora_inicio: hora
+                hora_inicio: hora,
+                negocio_id: negocioId
             })
         });
         

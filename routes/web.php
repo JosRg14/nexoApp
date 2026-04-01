@@ -241,6 +241,12 @@ Route::middleware(['auth.session', 'inject.api.token'])->group(function () {
     Route::get('/mis-citas', [CitaController::class, 'misCitas'])->name('mis-citas');
 });
 
+// Ruta para disponibilidad de empleado (proxy)
+Route::get('/api-proxy/disponibilidad/empleado/{id}', function($id, Request $request) {
+    $httpClient = app(App\Services\ExternalApi\HttpClient::class);
+    return $httpClient->get('/api/disponibilidad/empleado/' . $id, $request->all());
+});
+
 /*Rutas de completar registro de negocio
 Route::middleware(['auth.session'])->group(function () {
     Route::get('/completar-negocio', function () {
