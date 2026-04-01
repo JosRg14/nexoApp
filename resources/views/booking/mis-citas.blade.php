@@ -93,7 +93,12 @@ async function cancelarCita(citaId) {
             body: JSON.stringify({ motivo: motivo })
         });
         
-        const data = await response.json();
+        let data = {};
+        try {
+            data = await response.json();
+        } catch(e) {
+            data = { message: 'Error procesando respuesta del servidor' };
+        }
         
         if (response.ok && data.success !== false) {
             showToast('Cita cancelada correctamente', 'success');

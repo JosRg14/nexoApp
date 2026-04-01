@@ -323,9 +323,14 @@ document.getElementById('cita-form').addEventListener('submit', async function(e
             })
         });
         
-        const data = await response.json();
+        let data = {};
+        try {
+            data = await response.json();
+        } catch(e) {
+            data = { message: 'Error procesando respuesta del servidor' };
+        }
         
-        if (response.ok && data.success) {
+        if (response.ok && data.success !== false) {
             showToast(data.message || 'Cita agendada correctamente', 'success');
             window.location.href = '/mis-citas';
         } else {

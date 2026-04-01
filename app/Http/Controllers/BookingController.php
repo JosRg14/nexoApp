@@ -105,7 +105,15 @@ class BookingController extends Controller
             return response()->json($response, 201);
         } catch (\Exception $e) {
             Log::error('Error al crear cita: ' . $e->getMessage());
-            return response()->json(['success' => false, 'message' => 'Error al crear la cita'], 500);
+            
+            $statusCode = $e->getCode() && is_numeric($e->getCode()) && $e->getCode() >= 400 && $e->getCode() < 600 
+                ? $e->getCode() 
+                : 500;
+                
+            return response()->json([
+                'success' => false, 
+                'message' => $e->getMessage() ?: 'Error al crear la cita'
+            ], $statusCode);
         }
     }
     
@@ -145,7 +153,15 @@ class BookingController extends Controller
             return response()->json($response);
         } catch (\Exception $e) {
             Log::error('Error al cancelar cita: ' . $e->getMessage());
-            return response()->json(['success' => false, 'message' => 'Error al cancelar la cita'], 500);
+            
+            $statusCode = $e->getCode() && is_numeric($e->getCode()) && $e->getCode() >= 400 && $e->getCode() < 600 
+                ? $e->getCode() 
+                : 500;
+                
+            return response()->json([
+                'success' => false, 
+                'message' => $e->getMessage() ?: 'Error al cancelar la cita'
+            ], $statusCode);
         }
     }
 }

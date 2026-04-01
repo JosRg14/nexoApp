@@ -89,6 +89,11 @@ class HttpClient
         return $this->handle($this->request('DELETE', $uri, $data));
     }
 
+    public function patch(string $uri, array $data = []): array
+    {
+        return $this->handle($this->request('PATCH', $uri, $data));
+    }
+
     public function postMultipart(string $uri, array $data = []): array
     {
         $headers = [
