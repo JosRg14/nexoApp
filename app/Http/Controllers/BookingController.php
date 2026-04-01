@@ -139,11 +139,15 @@ class BookingController extends Controller
     public function cancelarCita(Request $request, $citaId)
     {
         $validated = $request->validate([
-            'motivo' => 'nullable|string|max:500'
+            'motivo' => 'nullable|string|max:500',
+            'negocio_id' => 'required|integer'
         ]);
 
         try {
-            $data = [];
+            $data = [
+                'negocio_id' => $validated['negocio_id']
+            ];
+            
             if (!empty($validated['motivo'])) {
                 $data['motivo'] = $validated['motivo'];
             }

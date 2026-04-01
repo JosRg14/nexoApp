@@ -52,7 +52,7 @@
                 
                 @if(!in_array($cita['estado'], ['completada', 'cancelada', 'no_asistio']))
                 <div class="mt-4 pt-4 border-t border-[#374151]">
-                    <button onclick="cancelarCita({{ $cita['id'] ?? $cita['id_cita'] }})" 
+                    <button onclick="cancelarCita({{ $cita['id'] ?? $cita['id_cita'] }}, {{ $cita['negocio_id'] ?? ($cita['negocio']['id'] ?? 'null') }})" 
                             class="w-full py-2 text-red-400 border border-red-500/30 rounded-lg hover:bg-red-500/10 transition-all text-sm">
                         Cancelar cita
                     </button>
@@ -72,25 +72,37 @@
 </div>
 
 <script>
-async function cancelarCita(citaId) {
+async function cancelarCita(citaId, negocioId) {
     const motivo = prompt('¿Desea ingresar un motivo de cancelación? (Opcional)');
     if (motivo === null) return; // Se canceló el prompt
     
-    const confirmacion = await confirmCustom('¿Estás seguro de cancelar esta cita?');
-    if (!confirmacion.isConfirmed) return;
+    let isConfirmed = false;
+    if (typeof confirmCustom === 'function') {
+        const confirmacion = await confirmCustom('¿Estás seguro de cancelar esta cita?');
+        isConfirmed = confirmacion.isConfirmed;
+    } else {
+        isConfirmed = confirm('¿Estás seguro de cancelar esta cita?');
+    }
+    
+    if (!isConfirmed) return;
     
     showLoader();
     
     try {
+        const payload = { motivo: motivo };
+        if (negocioId && negocioId !== 'null') {
+            payload.negocio_id = negocioId;
+        }
+
         const response = await fetch(`/api-proxy/citas/${citaId}/cancelar`, {
             method: 'POST', // Usamos POST en el BFF
             headers: {
-                'X-CSRF-TOKEN': document.querySelector('input[name="_token"]')?.value || '{{ csrf_token() }}',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || document.querySelector('input[name="_token"]')?.value || '{{ csrf_token() }}',
                 'Content-Type': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest',
                 'Accept': 'application/json'
             },
-            body: JSON.stringify({ motivo: motivo })
+            body: JSON.stringify(payload)
         });
         
         let data = {};
