@@ -95,45 +95,48 @@ async function cancelarCita(citaId, negocioId) {
         }
 
         const response = await fetch(`/api-proxy/citas/${citaId}/cancelar`, {
-            method: 'POST', // Usamos POST en el BFF
+            method: 'PATCH', // <-- Cambiado a PATCH para que coincida con tu API
             headers: {
                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || document.querySelector('input[name="_token"]')?.value || '{{ csrf_token() }}',
                 'Content-Type': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest',
                 'Accept': 'application/json'
             },
             body: JSON.stringify(payload)
         });
         
-        let data = {};
-        try {
-            data = await response.json();
-        } catch(e) {
-            data = { message: 'Error procesando respuesta del servidor' };
-        }
+        let data = await response.json();
         
         if (response.ok && data.success !== false) {
             showToast('Cita cancelada correctamente', 'success');
-            setTimeout(() => location.reload(), 1500); // Recarga para actualizar listado y estados
+            setTimeout(() => location.reload(), 1500); 
         } else {
+            // Si la API devuelve un error (ej. 403 o 400), lo capturamos aquí
             showToast(data.message || 'Error al cancelar la cita', 'error');
         }
     } catch (error) {
         console.error('Error:', error);
-        showToast('Error de conexión', 'error');
+        showToast('Error de conexión con el servidor', 'error');
     } finally {
         hideLoader();
     }
 }
 
 function showLoader() {
+
     const loader = document.getElementById('global-loader');
+
     if (loader) loader.classList.remove('hidden');
+
 }
 
+
+
 function hideLoader() {
+
     const loader = document.getElementById('global-loader');
+
     if (loader) loader.classList.add('hidden');
+
 }
 </script>
 @endsection
