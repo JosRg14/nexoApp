@@ -8,115 +8,169 @@
     <main class="flex-grow">
         
         <!-- Hero Section -->
-        <section class="max-w-7xl mx-auto px-6 py-20 md:py-32">
-            <div class="max-w-3xl space-y-8 animate-fade-in-up">
-                <h1 class="text-5xl md:text-7xl font-bold uppercase tracking-wide text-white leading-tight">
-                    Bienvenido a <br/>
-                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-white to-[#374151]">Nexo App!</span>
-                </h1>
-                
-                <p class="text-[#9CA3AF] text-lg leading-relaxed max-w-2xl border-l border-[#374151] pl-6">
-                    Conectamos necesidades con soluciones. Descubre una red exclusiva de servicios y negocios curados para ofrecerte la mejor experiencia en tu ciudad. Calidad, rapidez y estilo en un solo lugar.
-                </p>
-                @if(!session()->has('rol'))
-                <div class="pt-4">
-                    <a href="/register" class="inline-block py-4 px-10 bg-[#1a1a1a] border border-[#F3F4F6] text-[#F3F4F6] text-sm font-bold uppercase tracking-[0.2em] hover:bg-[#F3F4F6] hover:text-[#1a1a1a] transition-all duration-300">
-                        Empezar Ahora
-                    </a>
+        @if(session('rol') === 'cliente' && session()->has('usuario'))
+            <!-- Hero para Cliente Autenticado -->
+            <section class="max-w-7xl mx-auto px-6 py-20 md:py-32">
+                <div class="max-w-3xl space-y-8 animate-fade-in-up">
+                    <h1 class="text-5xl md:text-7xl font-bold uppercase tracking-wide text-white leading-tight">
+                        Hola, <br/>
+                        <span class="text-yellow-500">{{ explode(' ', session('usuario')['nombre'])[0] }}!</span>
+                    </h1>
+                    
+                    <p class="text-[#9CA3AF] text-lg leading-relaxed max-w-2xl border-l border-yellow-500/50 pl-6">
+                        Explora los mejores negocios cerca de ti. Encuentra servicios exclusivos, reserva en segundos y disfruta de la mejor calidad.
+                    </p>
+                    
+                    <div class="pt-4">
+                        <a href="/mis-citas" class="inline-block py-4 px-10 bg-yellow-500 text-[#1a1a1a] text-sm font-bold uppercase tracking-[0.2em] hover:bg-yellow-400 hover:shadow-lg hover:shadow-yellow-500/20 transition-all duration-300 transform hover:-translate-y-1 rounded-sm">
+                            Ver Mis Citas
+                        </a>
+                    </div>
                 </div>
-                @endif
-            </div>
-        </section>
+            </section>
+        @else
+            <!-- Hero Público -->
+            <section class="max-w-7xl mx-auto px-6 py-20 md:py-32">
+                <div class="max-w-3xl space-y-8 animate-fade-in-up">
+                    <h1 class="text-5xl md:text-7xl font-bold uppercase tracking-wide text-white leading-tight">
+                        Bienvenido a <br/>
+                        <span class="text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-yellow-600">Nexo App!</span>
+                    </h1>
+                    
+                    <p class="text-[#9CA3AF] text-lg leading-relaxed max-w-2xl border-l border-[#374151] pl-6">
+                        Conectamos necesidades con soluciones. Descubre una red exclusiva de servicios y negocios curados para ofrecerte la mejor experiencia en tu ciudad. Calidad, rapidez y estilo en un solo lugar.
+                    </p>
+                    
+                    @if(!session()->has('rol'))
+                    <div class="pt-4">
+                        <a href="/register" class="inline-block py-4 px-10 bg-[#1a1a1a] border border-yellow-500 text-yellow-500 text-sm font-bold uppercase tracking-[0.2em] hover:bg-yellow-500 hover:text-[#1a1a1a] hover:shadow-[0_0_20px_rgba(234,179,8,0.3)] transition-all duration-300 rounded-sm">
+                            Empezar Ahora
+                        </a>
+                    </div>
+                    @endif
+                </div>
+            </section>
+        @endif
 
         <!-- Filters & Grid -->
         <section class="max-w-7xl mx-auto px-6 pb-24">
             
             <!-- Filter Bar -->
-            <div class="flex flex-wrap gap-4 mb-12 border-b border-[#374151] pb-6 items-center justify-between">
+            <div class="flex flex-wrap gap-4 mb-12 border-b border-[#374151] pb-6 items-center justify-between animate-fade-in-up" style="animation-delay: 200ms;">
                 <div class="flex gap-4">
-                    <button class="px-4 py-1.5 border border-[#374151] text-[#9CA3AF] text-[10px] uppercase tracking-widest hover:border-white hover:text-white transition-all">
+                    <button class="px-4 py-1.5 border border-[#374151] text-[#9CA3AF] text-[10px] uppercase tracking-widest hover:border-yellow-500 hover:text-yellow-500 rounded-sm transition-all">
                         Ordenar
                     </button>
-                    <button class="px-4 py-1.5 border border-[#374151] text-[#9CA3AF] text-[10px] uppercase tracking-widest hover:border-white hover:text-white transition-all">
+                    <button class="px-4 py-1.5 border border-[#374151] text-[#9CA3AF] text-[10px] uppercase tracking-widest hover:border-yellow-500 hover:text-yellow-500 rounded-sm transition-all">
                         Categoría
                     </button>
-                    <button class="px-4 py-1.5 border border-[#374151] text-[#9CA3AF] text-[10px] uppercase tracking-widest hover:border-white hover:text-white transition-all">
+                    <button class="px-4 py-1.5 border border-[#374151] text-[#9CA3AF] text-[10px] uppercase tracking-widest hover:border-yellow-500 hover:text-yellow-500 rounded-sm transition-all">
                         Precio
                     </button>
                 </div>
-                <div class="text-[#374151] text-xs uppercase tracking-widest">
-                    Mostrando {{ count($negocios) }} resultados
+                <div class="text-[#9CA3AF] text-xs uppercase tracking-widest">
+                    Mostrando <span class="text-white">{{ count($negocios) }}</span> resultados
                 </div>
             </div>
 
             <!-- Trends Title -->
-            <div class="mb-10">
+            <div class="mb-10 animate-fade-in-up" style="animation-delay: 300ms;">
                 <h2 class="text-2xl font-bold uppercase tracking-widest text-white flex items-center gap-4">
-                    Tendencias
-                    <span class="h-px w-20 bg-[#374151]"></span>
+                    Destacados
+                    <span class="h-px w-full max-w-[100px] bg-gradient-to-r from-yellow-500/50 to-transparent"></span>
                 </h2>
             </div>
 
             <!-- Grid de Negocios desde API -->
             @if(count($negocios) > 0)
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                @foreach ($negocios as $negocio)
-                <article onclick="window.location.href='/negocio/{{ $negocio['id_negocio'] ?? $negocio['id'] }}'" 
-                         class="group relative flex flex-col bg-[#1a1a1a] border border-[#374151]/50 hover:border-[#F3F4F6]/50 transition-all duration-500 cursor-pointer">
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                @foreach ($negocios as $index => $negocio)
+                
+                <article class="group relative bg-[#262626] rounded-xl overflow-hidden border border-[#374151] hover:border-yellow-500/50 transition-all duration-500 hover:-translate-y-1 hover:shadow-2xl hover:shadow-yellow-500/10 cursor-pointer animate-fade-in-up block"
+                         onclick="window.location.href='/negocio/{{ $negocio['id_negocio'] ?? $negocio['id'] }}'"
+                         style="animation-delay: {{ 300 + ($index * 100) }}ms;">
                     
-                    <!-- Image Area -->
-                    <div class="aspect-[4/5] bg-[#0f0f0f] relative overflow-hidden">
+                    <!-- Imagen con overlay -->
+                    <div class="relative aspect-[4/5] overflow-hidden">
                         @if(isset($negocio['foto_perfil']) && $negocio['foto_perfil'])
-                            <img src="{{ $negocio['foto_perfil'] }}" 
+                            <img src="{{ Str::startsWith($negocio['foto_perfil'], 'http') ? $negocio['foto_perfil'] : config('services.api.url') . '/' . ltrim($negocio['foto_perfil'], '/') }}" 
                                  alt="{{ $negocio['nombre'] }}"
-                                 class="w-full h-full object-cover">
+                                 class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
                         @else
-                            <div class="absolute inset-0 flex items-center justify-center opacity-20">
+                            <div class="w-full h-full bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center group-hover:scale-110 transition-transform duration-700">
                                 <svg class="w-16 h-16 text-[#374151]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="0.5" d="M14.121 15.536c-1.171 1.952-3.07 1.952-4.242 0-1.172-1.953-1.172-5.119 0-7.072 1.171-1.952 3.07-1.952 4.242 0M8 10.5h4m-4 3h4m9-1.5a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="0.5" d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"></path>
                                 </svg>
                             </div>
                         @endif
-                        <div class="absolute inset-0 bg-transparent group-hover:bg-white/5 transition-colors duration-300"></div>
-                    </div>
-                    
-                    <!-- Content -->
-                    <div class="p-6">
-                        <div class="flex justify-between items-start mb-3">
-                            <h3 class="text-white font-bold uppercase tracking-wide text-sm group-hover:text-[#9CA3AF] transition-colors">
-                                {{ $negocio['nombre'] }}
-                            </h3>
-                            <span class="text-[10px] text-[#F3F4F6] bg-[#374151]/50 px-2 py-1 tracking-widest">
-                                {{ isset($negocio['calificacion']) ? number_format($negocio['calificacion'], 1) . ' ★' : 'NUEVO' }}
+                        <div class="absolute inset-0 bg-gradient-to-t from-[#1a1a1a] via-[#1a1a1a]/40 to-transparent opacity-90 group-hover:opacity-80 transition-opacity duration-300"></div>
+                        
+                        <!-- Badge calificación -->
+                        <div class="absolute top-3 right-3 bg-black/60 backdrop-blur-sm px-2.5 py-1 rounded-full border border-white/10 shadow-lg">
+                            <span class="text-yellow-500 text-xs font-bold flex items-center gap-1">
+                                @if(isset($negocio['calificacion']))
+                                    <i class="fas fa-star text-[10px]"></i>
+                                    {{ number_format($negocio['calificacion'], 1) }}
+                                @else
+                                    <i class="fas fa-star text-[10px]"></i>
+                                    NUEVO
+                                @endif
                             </span>
                         </div>
-                        <p class="text-[#9CA3AF] text-xs leading-relaxed border-l border-[#374151] pl-3 py-1">
-                            {{ $negocio['acerca_de'] ?? 'Descubre los mejores servicios en ' . $negocio['nombre'] }}
-                        </p>
-                        <div class="mt-3 text-[10px] text-[#9CA3AF] uppercase tracking-wider">
-                            {{ ucfirst($negocio['tipo_negocio'] ?? 'Barbería') }}
+                        
+                        <!-- Badge tipo de negocio -->
+                        <div class="absolute bottom-4 left-4 bg-yellow-500/20 backdrop-blur-sm px-3 py-1.5 rounded-full border border-yellow-500/30">
+                            <span class="text-yellow-500 text-[10px] font-bold uppercase tracking-wider">
+                                {{ ucfirst($negocio['tipo_negocio'] ?? 'Servicios') }}
+                            </span>
                         </div>
                     </div>
                     
-                    <!-- Hover Action -->
-                    <div class="absolute bottom-0 left-0 w-full h-1 bg-[#F3F4F6] transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
+                    <!-- Contenido -->
+                    <div class="p-5">
+                        <h3 class="text-white font-bold text-base uppercase tracking-wide group-hover:text-yellow-500 transition-colors line-clamp-1">
+                            {{ $negocio['nombre'] }}
+                        </h3>
+                        
+                        <p class="text-[#9CA3AF] text-xs mt-2 line-clamp-2 leading-relaxed h-8">
+                            {{ $negocio['acerca_de'] ?? 'Descubre los mejores servicios en ' . $negocio['nombre'] }}
+                        </p>
+                        
+                        <!-- Ubicación -->
+                        <div class="flex items-center gap-1.5 mt-4 text-[10px] text-[#9CA3AF] uppercase tracking-wider bg-[#1a1a1a] rounded px-2 py-1.5 w-max">
+                            <svg class="w-3.5 h-3.5 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                            </svg>
+                            <span class="truncate max-w-[150px]">{{ $negocio['direccion']['ciudad'] ?? $negocio['ciudad'] ?? 'Ubicación no especificada' }}</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Barra inferior animada -->
+                    <div class="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-yellow-400 to-yellow-600 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
                 </article>
+
                 @endforeach
             </div>
 
             <!-- Contador de resultados al final -->
-            <div class="text-center mt-12 text-[#374151] text-xs uppercase tracking-widest">
-                Mostrando {{ count($negocios) }} negocios registrados
+            <div class="text-center mt-12 text-[#9CA3AF] text-xs uppercase tracking-widest animate-fade-in-up" style="animation-delay: 500ms;">
+                Mostrando <span class="text-white">{{ count($negocios) }}</span> negocios registrados
             </div>
 
             @else
             <!-- Mensaje cuando no hay negocios -->
-            <div class="text-center py-20">
-                <div class="text-[#9CA3AF] text-lg mb-4">No hay negocios registrados aún</div>
-                <p class="text-[#374151] text-sm">Sé el primero en registrar tu negocio</p>
+            <div class="text-center py-20 animate-fade-in-up">
+                <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-[#262626] border border-[#374151] text-yellow-500 mb-6">
+                    <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                    </svg>
+                </div>
+                <div class="text-white text-xl uppercase tracking-wide font-bold mb-2">No hay negocios aquí</div>
+                <p class="text-[#9CA3AF] text-sm">Aún no hemos registrado negocios en nuestra plataforma.</p>
                 @if(!session()->has('rol'))
-                <a href="/register" class="inline-block mt-6 py-2 px-6 border border-[#F3F4F6] text-white text-sm hover:bg-white hover:text-black transition-colors">
-                    Registrar Negocio
+                <a href="/register" class="inline-block mt-8 py-3 px-8 bg-yellow-500 text-[#1a1a1a] font-bold text-xs uppercase tracking-[0.2em] rounded-sm hover:bg-yellow-400 transition-colors shadow-lg shadow-yellow-500/20">
+                    Registrar el Primer Negocio
                 </a>
                 @endif
             </div>
