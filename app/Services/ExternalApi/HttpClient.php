@@ -71,13 +71,7 @@ class HttpClient
     // -----------------------------------------------------------------
     public function get(string $uri, array $query = []): array
     {
-        // Construir URL con query string si hay parámetros
-        $fullUri = $uri;
-        if (!empty($query)) {
-            $fullUri .= '?' . http_build_query($query);
-        }
-        
-        return $this->handle($this->request('GET', $fullUri));
+        return $this->handle($this->request('GET', $uri, $query));
     }
 
     public function post(string $uri, array $data = []): array
