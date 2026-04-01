@@ -67,19 +67,34 @@ class ProxyController extends Controller
         // Manejo de Multipart/File attachments
         if ($hasFiles) {
             foreach ($request->allFiles() as $key => $file) {
-                if (is_array($file)) {
-                    foreach ($file as $index => $f) {
-                        $pendingRequest->attach(
-                            "{$key}[{$index}]",
-                            file_get_contents($f->getRealPath()),
-                            $f->getClientOriginalName()
-                        );
+                $files = is_array($file) ? $file : [$file];
+
+                foreach ($files as $index => $f) {
+                    $realPath = $f->getRealPath();
+
+                    Log::info('Procesando archivo:', [
+                        'key'      => $key,
+                        'name'     => $f->getClientOriginalName(),
+                        'size'     => $f->getSize(),
+                        'mime'     => $f->getMimeType(),
+                        'realPath' => $realPath,
+                        'is_file'  => is_file($realPath),
+                        'is_dir'   => is_dir($realPath),
+                        'exists'   => file_exists($realPath),
+                    ]);
+
+                    // Sólo adjuntar si la ruta apunta a un archivo real (no a un directorio)
+                    if (!is_file($realPath)) {
+                        Log::error("Archivo inválido omitido: '{$key}' → {$realPath} (no es un archivo)");
+                        continue;
                     }
-                } else {
-                    $pendingRequest->attach(
-                        $key,
-                        file_get_contents($file->getRealPath()),
-                        $file->getClientOriginalName()
+
+                    $fieldName = is_array($file) ? "{$key}[{$index}]" : $key;
+                    $pendingRequest = $pendingRequest->attach(
+                        $fieldName,
+                        file_get_contents($realPath),
+                        $f->getClientOriginalName(),
+                        ['Content-Type' => $f->getMimeType()]
                     );
                 }
             }
@@ -92,8 +107,10 @@ class ProxyController extends Controller
         ]);
 
         try {
-            // Evitamos enviar los tokens de Laravel al backend
-            $data = $request->except(['_token', '_method']);
+            // Excluir tokens de Laravel Y los objetos UploadedFile del body de texto
+            // (los archivos ya fueron adjuntados vía ->attach() arriba)
+            $fileKeys = array_keys($request->allFiles());
+            $data = $request->except(array_merge(['_token', '_method'], $fileKeys));
 
             if ($method === 'get' || $method === 'head') {
                 // En GET/HEAD, los datos viajan como query params
