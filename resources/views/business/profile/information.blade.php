@@ -420,25 +420,44 @@ if (registroForm) {
             const formData = new FormData(this);
             const action = this.getAttribute('action');
             const redirectUrl = this.getAttribute('data-redirect');
-            
-            // Clean up empty file inputs to avoid sending empty file boundaries
+            const csrfToken = document.querySelector('input[name="_token"]')?.value;
+            const authToken = '{{ session("auth_token") }}';
+
+            // Limpiar campos de archivo vacíos para no enviar límites multipart vacíos
             const fileInputs = this.querySelectorAll('input[type="file"]');
             fileInputs.forEach(input => {
-                if (!input.files.length) {
+                if (!input.files || !input.files.length) {
                     formData.delete(input.name);
                 }
             });
+
+            // === DEBUG ===
+            console.log('=== DEBUG ENVÍO NEGOCIO ===');
+            console.log('URL:', action);
+            console.log('Auth token existe:', !!authToken);
+            console.log('CSRF token existe:', !!csrfToken);
+            for (let [key, value] of formData.entries()) {
+                if (value instanceof File) {
+                    console.log(`  ${key}: [ARCHIVO] "${value.name}" (${value.size} bytes, ${value.type})`);
+                } else {
+                    console.log(`  ${key}: ${value}`);
+                }
+            }
+            console.log('=== FIN DEBUG ===');
             
             try {
                 const response = await fetch(action, {
-                    method: 'POST', // always POST from frontend when using FormData, _method=PUT handles it
+                    method: 'POST', // siempre POST; _method=PUT en el FormData maneja el spoofing
                     headers: {
                         'Accept': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value
+                        'X-CSRF-TOKEN': csrfToken,
+                        'Authorization': 'Bearer ' + authToken,
                     },
                     body: formData
                 });
                 
+                console.log('Respuesta HTTP status:', response.status);
+
                 let data = {};
                 try {
                     data = await response.json();
@@ -446,28 +465,29 @@ if (registroForm) {
                     data = { message: 'Error procesando respuesta del servidor' };
                 }
                 
+                console.log('Respuesta completa:', data);
+
                 if (response.ok) {
                     if (typeof showToast === 'function') {
-                        showToast(data.message || 'Se ha actualizado la información del negocio', 'success');
+                        showToast(data.message || 'Información del negocio actualizada', 'success');
                     }
                     setTimeout(() => {
                         window.location.href = redirectUrl || window.location.href;
-                    }, 1000);
+                    }, 1200);
                 } else {
                     if (data.errors) {
-                        let errorMsg = "Errores de validación:\n";
-                        for (const [field, errors] of Object.entries(data.errors)) {
-                            errorMsg += `${field}: ${errors.join(', ')}\n`;
-                        }
-                        if (typeof showToast === 'function') showToast(errorMsg, "error");
+                        const msgs = Object.entries(data.errors)
+                            .map(([f, errs]) => `${f}: ${errs.join(', ')}`)
+                            .join('\n');
+                        if (typeof showToast === 'function') showToast(msgs, 'error');
                     } else {
-                        if (typeof showToast === 'function') showToast(data.message || 'Error al actualizar', 'error');
+                        if (typeof showToast === 'function') showToast(data.message || 'Error al actualizar el negocio', 'error');
                     }
+                    if (typeof hideLoader === 'function') hideLoader();
                 }
             } catch (error) {
-                console.error('Error:', error);
+                console.error('Error de red:', error);
                 if (typeof showToast === 'function') showToast('Error de conexión con el servidor', 'error');
-            } finally {
                 if (typeof hideLoader === 'function') hideLoader();
             }
         });

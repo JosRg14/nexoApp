@@ -85,7 +85,11 @@ class ProxyController extends Controller
             }
         }
 
-        Log::info("Proxy enviando a: " . $url);
+        Log::info("Proxy enviando a: {$url}", [
+            'method'   => strtoupper($method),
+            'hasFiles' => $hasFiles,
+            'fields'   => array_keys($request->except(['_token', '_method'])),
+        ]);
 
         try {
             // Evitamos enviar los tokens de Laravel al backend
@@ -94,10 +98,16 @@ class ProxyController extends Controller
             if ($method === 'get' || $method === 'head') {
                 // En GET/HEAD, los datos viajan como query params
                 $response = $pendingRequest->$method($url, $request->query());
-            } else {
-                if (!$hasFiles) {
-                    $pendingRequest->asJson();
+            } elseif ($hasFiles) {
+                // ⚠️ CRÍTICO: Cuando hay archivos, NUNCA usar PUT/PATCH directamente.
+                // Guzzle los enviaría como JSON y perdería todos los adjuntos.
+                // Solución: POST + _method spoofing (igual que HttpClient::putMultipart)
+                if ($method === 'put' || $method === 'patch') {
+                    $data['_method'] = strtoupper($method);
                 }
+                $response = $pendingRequest->post($url, $data);
+            } else {
+                $pendingRequest->asJson();
                 $response = $pendingRequest->$method($url, $data);
             }
 
