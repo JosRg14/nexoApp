@@ -28,7 +28,7 @@
                 @endif
 
                  @if(session('rol') === 'cliente')
-                    <a href="{{ route('mis-citas') }}"
+                    <a href="{{ route('booking.mis-citas') }}"
                        class="text-xs uppercase tracking-widest text-[#9CA3AF] hover:text-white transition-colors">
                         Mis Citas
                     </a>
@@ -72,7 +72,7 @@
                         </div>
 
                          @if(session('rol') === 'cliente')
-                        <a href="{{ route('mis-citas') }}" class="block px-4 py-2 text-xs text-[#9CA3AF] hover:text-white hover:bg-[#374151]/30 transition-colors uppercase tracking-widest font-bold">
+                        <a href="{{ route('booking.mis-citas') }}" class="block px-4 py-2 text-xs text-[#9CA3AF] hover:text-white hover:bg-[#374151]/30 transition-colors uppercase tracking-widest font-bold">
                             <i class="fa-solid fa-calendar-alt mr-2 w-4"></i> Mis Citas
                         </a>
                         @endif

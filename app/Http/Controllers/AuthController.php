@@ -95,6 +95,7 @@ public function showClientRegister()
         'redirect' => match ($data['data']['rol']) {
             'superusuario' => route('dashboard.index'),
             'admin' => route('business.profile'),
+            'cliente' => route('booking.mis-citas'),
             default => '/',
         }
     ]);
@@ -290,6 +291,9 @@ public function showClientRegister()
         if ($rol === 'admin') {      
             \Log::info('Admin autenticado, redirigiendo a business.profile');
             return redirect()->route('business.profile');
+        } elseif ($rol === 'cliente') {
+            \Log::info('Cliente autenticado, redirigiendo a mis citas');
+            return redirect()->route('booking.mis-citas');
         }
         
         return redirect('/');
