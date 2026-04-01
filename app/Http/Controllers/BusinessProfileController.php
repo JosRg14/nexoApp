@@ -28,6 +28,13 @@ class BusinessProfileController extends Controller
         $services = [];
         $employees = [];
         $negocio = [];
+        $finanzas = [
+            'ingresos_hoy' => ['total' => 0, 'variacion' => 0],
+            'citas_hoy' => ['total' => 0, 'confirmadas' => 0, 'en_proceso' => 0, 'variacion' => 0],
+            'ingresos_mes' => ['total' => 0, 'variacion' => 0],
+            'ingresos_semanales' => ['dias' => [], 'ingresos' => []],
+            'servicios_top' => []
+        ];
 
         try {
             // 1. Obtener los datos del negocio actual (esto ya está bien)
@@ -66,6 +73,26 @@ class BusinessProfileController extends Controller
                 ];
             })->toArray();
 
+            // 4. Obtener finanzas
+            try {
+                $resHoy = $this->httpClient->get('/api/finanzas/ingresos-hoy');
+                $finanzas['ingresos_hoy'] = $resHoy['data'] ?? $resHoy['ingresos_hoy'] ?? $resHoy;
+                
+                $resCitas = $this->httpClient->get('/api/finanzas/citas-hoy');
+                $finanzas['citas_hoy'] = $resCitas['data'] ?? $resCitas['citas_hoy'] ?? $resCitas;
+                
+                $resMes = $this->httpClient->get('/api/finanzas/ingresos-mes');
+                $finanzas['ingresos_mes'] = $resMes['data'] ?? $resMes['ingresos_mes'] ?? $resMes;
+                
+                $resSem = $this->httpClient->get('/api/finanzas/ingresos-semanales');
+                $finanzas['ingresos_semanales'] = $resSem['data'] ?? $resSem['ingresos_semanales'] ?? $resSem;
+                
+                $resTop = $this->httpClient->get('/api/finanzas/servicios-top', ['limite' => 5]);
+                $finanzas['servicios_top'] = $resTop['data'] ?? $resTop['servicios_top'] ?? $resTop;
+            } catch (\Exception $e) {
+                \Log::warning('No se pudieron cargar las finanzas: ' . $e->getMessage());
+            }
+
         } catch (\Exception $e) {
             $negocio = [];
             \Log::info('Error en BusinessProfileController: ' . $e->getMessage());
@@ -75,6 +102,7 @@ class BusinessProfileController extends Controller
             'negocio' => $negocio,
             'services' => $services,
             'employees' => $employees,
+            'finanzas' => $finanzas,
         ]);
     }
 

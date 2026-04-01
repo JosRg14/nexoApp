@@ -12,12 +12,20 @@
                     <div class="w-10 h-10 flex items-center justify-center text-emerald-500">
                         <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                     </div>
-                    <span class="text-xs font-bold text-white flex items-center gap-1">
-                        +12% <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path></svg>
+                    @php $varHoy = $finanzas['ingresos_hoy']['variacion'] ?? 0; @endphp
+                    <span class="text-xs font-bold flex items-center gap-1 {{ $varHoy >= 0 ? 'text-emerald-500' : 'text-red-500' }}">
+                        {{ $varHoy > 0 ? '+' : '' }}{{ $varHoy }}% 
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            @if($varHoy >= 0)
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path>
+                            @else
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+                            @endif
+                        </svg>
                     </span>
                 </div>
                 <div>
-                    <div class="text-3xl font-bold text-white tracking-tight mb-1">$150.00</div>
+                    <div class="text-3xl font-bold text-white tracking-tight mb-1">${{ number_format($finanzas['ingresos_hoy']['total'] ?? 0, 2) }}</div>
                     <div class="text-[#9CA3AF] text-xs uppercase tracking-wider">Ingresos Hoy</div>
                 </div>
             </div>
@@ -28,12 +36,20 @@
                     <div class="w-10 h-10 flex items-center justify-center text-blue-500">
                         <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                     </div>
-                    <span class="text-xs font-bold text-red-500 flex items-center gap-1">
-                        -5% <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
+                    @php $varCitas = $finanzas['citas_hoy']['variacion'] ?? 0; @endphp
+                    <span class="text-xs font-bold flex items-center gap-1 {{ $varCitas >= 0 ? 'text-emerald-500' : 'text-red-500' }}">
+                        {{ $varCitas > 0 ? '+' : '' }}{{ $varCitas }}% 
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            @if($varCitas >= 0)
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path>
+                            @else
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+                            @endif
+                        </svg>
                     </span>
                 </div>
                 <div>
-                    <div class="text-3xl font-bold text-white tracking-tight mb-1">12</div>
+                    <div class="text-3xl font-bold text-white tracking-tight mb-1">{{ $finanzas['citas_hoy']['total'] ?? 0 }}</div>
                     <div class="text-[#9CA3AF] text-xs uppercase tracking-wider">Citas Hoy</div>
                 </div>
             </div>
@@ -44,12 +60,20 @@
                     <div class="w-10 h-10 flex items-center justify-center">
                         <svg class="w-8 h-8" fill="none" stroke="#A855F7" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
                     </div>
-                    <span class="text-xs font-bold text-white flex items-center gap-1">
-                        +8% <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path></svg>
+                    @php $varMes = $finanzas['ingresos_mes']['variacion'] ?? 0; @endphp
+                    <span class="text-xs font-bold flex items-center gap-1 {{ $varMes >= 0 ? 'text-emerald-500' : 'text-red-500' }}">
+                        {{ $varMes > 0 ? '+' : '' }}{{ $varMes }}% 
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            @if($varMes >= 0)
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path>
+                            @else
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+                            @endif
+                        </svg>
                     </span>
                 </div>
                 <div>
-                    <div class="text-3xl font-bold text-white tracking-tight mb-1">$4,250</div>
+                    <div class="text-3xl font-bold text-white tracking-tight mb-1">${{ number_format($finanzas['ingresos_mes']['total'] ?? 0, 2) }}</div>
                     <div class="text-[#9CA3AF] text-xs uppercase tracking-wider">Ingresos Mes</div>
                 </div>
             </div>
@@ -62,7 +86,6 @@
             <h2 class="text-xl font-bold uppercase tracking-wide text-white">Ingresos Semanales</h2>
             <select class="bg-[#262626] text-white text-xs uppercase tracking-wider border border-[#374151] px-3 py-1 outline-none focus:border-white transition-colors">
                 <option>Esta Semana</option>
-                <option>Semana Pasada</option>
             </select>
         </div>
         <div class="relative h-64 w-full">
@@ -75,28 +98,87 @@
         <h2 class="text-xl font-bold uppercase tracking-wide text-white mb-6">Servicios Top</h2>
         
         <div class="space-y-6">
-            <!-- Service 1 -->
+            @forelse($finanzas['servicios_top'] ?? [] as $index => $servicio)
             <div class="flex items-center justify-between gap-4">
-                <span class="text-white font-bold text-sm w-32 shrink-0">Corte Clásico</span>
-            </div>
-
-            <!-- Service 2 -->
-            <div class="flex items-center justify-between gap-4">
-                <span class="text-white font-bold text-sm w-32 shrink-0">Barba Premium</span>
+                <span class="text-white font-bold text-sm w-32 shrink-0 truncate">{{ $servicio['nombre'] ?? 'Desconocido' }}</span>
                 <div class="flex-1 rounded-full overflow-hidden" style="height: 8px; background-color: #333333;">
-                    <div class="h-full rounded-full" style="width: 45%; background-color: #ffffff;"></div>
+                    <div class="h-full rounded-full" style="width: {{ $servicio['porcentaje'] ?? 0 }}%; background-color: #ffffff;"></div>
                 </div>
-                <span class="text-[#9CA3AF] text-sm w-8 text-right">28</span>
+                <span class="text-[#9CA3AF] text-sm w-8 text-right">{{ $servicio['total_citas'] ?? 0 }}</span>
             </div>
-
-            <!-- Service 3 -->
-            <div class="flex items-center justify-between gap-4">
-                <span class="text-white font-bold text-sm w-32 shrink-0">Corte + Barba</span>
-                <div class="flex-1 rounded-full overflow-hidden" style="height: 8px; background-color: #333333;">
-                    <div class="h-full rounded-full" style="width: 25%; background-color: #ffffff;"></div>
-                </div>
-                <span class="text-[#9CA3AF] text-sm w-8 text-right">15</span>
-            </div>
+            @empty
+            <div class="text-[#9CA3AF] text-sm">No hay datos suficientes para mostrar top de servicios.</div>
+            @endforelse
         </div>
     </div>
 </section>
+
+<!-- Chart.js Support for finances tab -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const ctx = document.getElementById('weeklyIncomeChart');
+        if(ctx) {
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: {!! json_encode($finanzas['ingresos_semanales']['dias'] ?? []) !!},
+                    datasets: [{
+                        label: 'Ingresos',
+                        data: {!! json_encode($finanzas['ingresos_semanales']['ingresos'] ?? []) !!},
+                        backgroundColor: '#ffffff',
+                        borderRadius: 4,
+                        barThickness: 30,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed.y !== null) {
+                                        label += new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(context.parsed.y);
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: '#374151',
+                                drawBorder: false,
+                            },
+                            ticks: {
+                                color: '#9CA3AF',
+                                callback: function(value, index, values) {
+                                    return '$' + value;
+                                }
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false,
+                                drawBorder: false,
+                            },
+                            ticks: {
+                                color: '#9CA3AF'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    });
+</script>
