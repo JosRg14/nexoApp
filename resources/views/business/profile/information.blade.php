@@ -176,7 +176,7 @@
 @else
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-16">
         <div class="space-y-8">
-            <form method="POST" action="{{ url('/api-proxy/api/negocios/mi-negocio') }}" data-redirect="{{ route('business.profile') }}" class="space-y-8" enctype="multipart/form-data">
+            <form method="POST" id="editNegocioForm" action="{{ url('/api-proxy/api/negocios/mi-negocio') }}" data-redirect="{{ route('business.profile') }}" class="space-y-8" enctype="multipart/form-data" data-custom-handler="true">
                 @csrf
                 @method('PUT')
                 
@@ -407,4 +407,69 @@ if (registroForm) {
             reader.readAsDataURL(e.target.files[0]);
         }
     });
+</script>
+
+<script>
+    const editNegocioForm = document.getElementById('editNegocioForm');
+    if (editNegocioForm) {
+        editNegocioForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            if (typeof showLoader === 'function') showLoader();
+            
+            const formData = new FormData(this);
+            const action = this.getAttribute('action');
+            const redirectUrl = this.getAttribute('data-redirect');
+            
+            // Clean up empty file inputs to avoid sending empty file boundaries
+            const fileInputs = this.querySelectorAll('input[type="file"]');
+            fileInputs.forEach(input => {
+                if (!input.files.length) {
+                    formData.delete(input.name);
+                }
+            });
+            
+            try {
+                const response = await fetch(action, {
+                    method: 'POST', // always POST from frontend when using FormData, _method=PUT handles it
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value
+                    },
+                    body: formData
+                });
+                
+                let data = {};
+                try {
+                    data = await response.json();
+                } catch (err) {
+                    data = { message: 'Error procesando respuesta del servidor' };
+                }
+                
+                if (response.ok) {
+                    if (typeof showToast === 'function') {
+                        showToast(data.message || 'Se ha actualizado la información del negocio', 'success');
+                    }
+                    setTimeout(() => {
+                        window.location.href = redirectUrl || window.location.href;
+                    }, 1000);
+                } else {
+                    if (data.errors) {
+                        let errorMsg = "Errores de validación:\n";
+                        for (const [field, errors] of Object.entries(data.errors)) {
+                            errorMsg += `${field}: ${errors.join(', ')}\n`;
+                        }
+                        if (typeof showToast === 'function') showToast(errorMsg, "error");
+                    } else {
+                        if (typeof showToast === 'function') showToast(data.message || 'Error al actualizar', 'error');
+                    }
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                if (typeof showToast === 'function') showToast('Error de conexión con el servidor', 'error');
+            } finally {
+                if (typeof hideLoader === 'function') hideLoader();
+            }
+        });
+    }
 </script>
