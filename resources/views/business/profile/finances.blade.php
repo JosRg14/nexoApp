@@ -119,7 +119,12 @@
     document.addEventListener('DOMContentLoaded', function() {
         const ctx = document.getElementById('weeklyIncomeChart');
         if(ctx) {
-            new Chart(ctx, {
+            // Check if instance already exists and destroy it
+            if (window.weeklyIncomeChartInstance) {
+                window.weeklyIncomeChartInstance.destroy();
+            }
+            
+            window.weeklyIncomeChartInstance = new Chart(ctx, {
                 type: 'bar',
                 data: {
                     labels: {!! json_encode($finanzas['ingresos_semanales']['dias'] ?? []) !!},
