@@ -66,10 +66,10 @@
                 </div>
                 
                 <!-- ÚNICO BOTÓN: Agendar Cita -->
-                <a href="/booking/create?negocio_id={{ $negocio['id_negocio'] }}" 
-                   class="px-6 py-3 bg-white text-black font-bold rounded-lg hover:bg-gray-200 transition-colors text-sm uppercase tracking-wide flex items-center gap-2">
-                    <i class="fas fa-calendar-alt"></i>
-                    Agendar Cita
+               <a href="/agendar-cita?negocio_id={{ $negocio['id_negocio'] }}" 
+                    class="px-6 py-3 bg-white text-black font-bold rounded-lg hover:bg-gray-200 transition-colors text-sm uppercase tracking-wide flex items-center gap-2">
+                        <i class="fas fa-calendar-alt"></i>
+                        Agendar Cita
                 </a>
             </div>
         </div>
