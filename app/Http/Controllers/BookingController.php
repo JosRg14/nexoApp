@@ -123,10 +123,16 @@ class BookingController extends Controller
     public function misCitas()
     {
         try {
+            $hasToken = session()->has('auth_token');
+            Log::info('BookingController@misCitas - Verificando token antes de petición', [
+                'has_token' => $hasToken, 
+                'token_length' => $hasToken ? strlen(session('auth_token')) : 0
+            ]);
+
             $response = $this->httpClient->get('/api/citas/miscitas');
             $citas = $response['data'] ?? [];
         } catch (\Exception $e) {
-            Log::error('Error al obtener citas: ' . $e->getMessage());
+            Log::error('Error al obtener citas en misCitas: ' . $e->getMessage());
             $citas = [];
         }
         
@@ -140,12 +146,37 @@ class BookingController extends Controller
     {
         $validated = $request->validate([
             'motivo' => 'nullable|string|max:500',
-            'negocio_id' => 'required|integer'
+            'negocio_id' => 'nullable|integer'
         ]);
+
+        $negocioId = $validated['negocio_id'] ?? null;
+
+        // Si no se proporcionó negocio_id desde el frontend, intentamos recuperar la cita de la API externa para extraerlo
+        if (!$negocioId) {
+            try {
+                $citaResponse = $this->httpClient->get("/api/citas/{$citaId}");
+                $negocioId = $citaResponse['data']['negocio_id'] ?? $citaResponse['data']['negocio']['id'] ?? null;
+            } catch (\Exception $e) {
+                Log::warning('BookingController@cancelarCita - No se pudo pre-cargar la cita para obtener su negocio_id: ' . $e->getMessage());
+            }
+        }
+
+        Log::info('BookingController@cancelarCita - payload info', [
+            'cita_id' => $citaId,
+            'negocio_id_enviado' => $negocioId,
+            'motivo_enviado' => $validated['motivo'] ?? 'ninguno'
+        ]);
+
+        if (!$negocioId) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No se pudo obtener el ID del negocio correspondiente para cancelar la cita.'
+            ], 400);
+        }
 
         try {
             $data = [
-                'negocio_id' => $validated['negocio_id']
+                'negocio_id' => $negocioId
             ];
             
             if (!empty($validated['motivo'])) {
