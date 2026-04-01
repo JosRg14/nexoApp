@@ -226,25 +226,24 @@ Route::get('/auth/google/callback', [AuthController::class, 'googleCallback']);
 |--------------------------------------------------------------------------
 */
 
-// Rutas para agendar citas (protegidas con autenticación)
+// Rutas para booking (protegidas con auth + token API)
 Route::middleware(['auth.session', 'inject.api.token'])->group(function () {
-    // Página para agendar cita
+
+    // Vistas
     Route::get('/agendar-cita', [BookingController::class, 'create'])->name('booking.create');
-    
-    // Mis citas del cliente
     Route::get('/mis-citas', [BookingController::class, 'misCitas'])->name('booking.mis-citas');
-});
 
-// Rutas AJAX (proxy) para booking
-Route::middleware(['auth.session', 'inject.api.token'])->prefix('api-proxy')->group(function () {
-    // Disponibilidad de empleado
-    Route::get('/disponibilidad/empleado/{id}', [BookingController::class, 'disponibilidad']);
-    
-    // Crear cita
-    Route::post('/citas', [BookingController::class, 'store']);
+    // Rutas AJAX / proxy hacia la API externa
+    Route::prefix('api-proxy')->group(function () {
+        // Disponibilidad de empleado
+        Route::get('/disponibilidad/empleado/{id}', [BookingController::class, 'disponibilidad']);
 
-    // Cancelar cita
-    Route::post('/citas/{id}/cancelar', [BookingController::class, 'cancelarCita']);
+        // Crear cita
+        Route::post('/citas', [BookingController::class, 'store']);
+
+        // Cancelar cita — acepta tanto POST (formulario) como PATCH (fetch JS)
+        Route::match(['POST', 'PATCH'], '/citas/{id}/cancelar', [BookingController::class, 'cancelarCita']);
+    });
 });
 
 /*Rutas de completar registro de negocio
