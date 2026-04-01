@@ -13,8 +13,6 @@ class ProxyController extends Controller
      */
     public function handlePublic(Request $request, $endpoint)
     {
-        // En nuestro caso el prefijo 'public' podría o no ser parte de la URL real,
-        // asumo que lo agregaremos al endpoint como /api/{endpoint}.
         return $this->forwardRequest($request, $endpoint, null);
     }
 
@@ -35,6 +33,7 @@ class ProxyController extends Controller
      */
     protected function forwardRequest(Request $request, $endpoint, $token = null)
     {
+        // --- Construir URL destino ---
         $path = ltrim($endpoint, '/');
         if (str_starts_with($path, 'storage/')) {
             $url = rtrim(config('services.api.url'), '/') . '/' . $path;
@@ -42,94 +41,111 @@ class ProxyController extends Controller
             $url = rtrim(config('services.api.url'), '/') . '/api/' . ltrim(preg_replace('/^api\//', '', $path), '/');
         }
 
-        
-        // method() ya evalúa si la request vino con _method=PUT o _method=DELETE
+        // El método puede haber sido spoofado con _method (PUT, PATCH, DELETE)
         $method = strtolower($request->method());
 
+        // --- Headers base ---
         $headers = [
-            'Accept' => 'application/json',
+            'Accept'                     => 'application/json',
             'ngrok-skip-browser-warning' => 'true',
-            'User-Agent' => 'Mozilla/5.0',
+            'User-Agent'                 => 'Mozilla/5.0',
         ];
 
         if ($token) {
             $headers['Authorization'] = "Bearer {$token}";
         }
 
-        $pendingRequest = Http::withHeaders($headers)
-            ->withOptions(['verify' => false])
-            ->timeout(15)
-            ->retry(2, 500);
+        // --- Detectar archivos ---
+        $hasFiles = count($request->allFiles()) > 0;
 
-
-        $hasFiles = !empty($request->allFiles());
-
-        // Manejo de Multipart/File attachments
-        if ($hasFiles) {
-            foreach ($request->allFiles() as $key => $file) {
-                $files = is_array($file) ? $file : [$file];
-
-                foreach ($files as $index => $f) {
-                    $realPath = $f->getRealPath();
-
-                    Log::info('Procesando archivo:', [
-                        'key'      => $key,
-                        'name'     => $f->getClientOriginalName(),
-                        'size'     => $f->getSize(),
-                        'mime'     => $f->getMimeType(),
-                        'realPath' => $realPath,
-                        'is_file'  => is_file($realPath),
-                        'is_dir'   => is_dir($realPath),
-                        'exists'   => file_exists($realPath),
-                    ]);
-
-                    // Sólo adjuntar si la ruta apunta a un archivo real (no a un directorio)
-                    if (!is_file($realPath)) {
-                        Log::error("Archivo inválido omitido: '{$key}' → {$realPath} (no es un archivo)");
-                        continue;
-                    }
-
-                    $fieldName = is_array($file) ? "{$key}[{$index}]" : $key;
-                    $pendingRequest = $pendingRequest->attach(
-                        $fieldName,
-                        file_get_contents($realPath),
-                        $f->getClientOriginalName(),
-                        ['Content-Type' => $f->getMimeType()]
-                    );
-                }
-            }
-        }
-
-        Log::info("Proxy enviando a: {$url}", [
+        Log::info("Proxy → {$url}", [
             'method'   => strtoupper($method),
             'hasFiles' => $hasFiles,
             'fields'   => array_keys($request->except(['_token', '_method'])),
         ]);
 
         try {
-            // Excluir tokens de Laravel Y los objetos UploadedFile del body de texto
-            // (los archivos ya fueron adjuntados vía ->attach() arriba)
-            $fileKeys = array_keys($request->allFiles());
-            $data = $request->except(array_merge(['_token', '_method'], $fileKeys));
+            // ============================================================
+            // RUTA A: Con archivos → multipart
+            // ============================================================
+            if ($hasFiles) {
 
-            if ($method === 'get' || $method === 'head') {
-                // En GET/HEAD, los datos viajan como query params
-                $response = $pendingRequest->$method($url, $request->query());
-            } elseif ($hasFiles) {
-                // ⚠️ CRÍTICO: Cuando hay archivos, NUNCA usar PUT/PATCH directamente.
-                // Guzzle los enviaría como JSON y perdería todos los adjuntos.
-                // Solución: POST + _method spoofing (igual que HttpClient::putMultipart)
-                if ($method === 'put' || $method === 'patch') {
-                    $data['_method'] = strtoupper($method);
+                // Guzzle no puede mezclar ->attach() con HTTP PUT/PATCH real.
+                // Solución: convertir a POST + _method spoofing en el body.
+                $sendMethod = in_array($method, ['put', 'patch']) ? 'post' : $method;
+
+                // Datos de texto: excluir tokens Y claves de archivo
+                // (los archivos van por ->attach(), no en el body)
+                $fileKeys = array_keys($request->allFiles());
+                $textData = $request->except(array_merge(['_token', '_method'], $fileKeys));
+
+                if ($sendMethod !== $method) {
+                    $textData['_method'] = strtoupper($method);
                 }
-                $response = $pendingRequest->post($url, $data);
+
+                // Construir request base
+                $pendingRequest = Http::withHeaders($headers)
+                    ->withOptions(['verify' => false])
+                    ->timeout(30);
+
+                // Adjuntar cada archivo con fopen (evita cargar en memoria)
+                foreach ($request->allFiles() as $key => $file) {
+                    $items = is_array($file) ? $file : [$file];
+
+                    foreach ($items as $index => $f) {
+                        /** @var \Illuminate\Http\UploadedFile $f */
+                        if (!($f instanceof \Illuminate\Http\UploadedFile) || !$f->isValid()) {
+                            Log::warning('Proxy: archivo omitido (inválido)', [
+                                'key'   => $key,
+                                'error' => $f instanceof \Illuminate\Http\UploadedFile
+                                    ? $f->getErrorMessage()
+                                    : 'no es UploadedFile',
+                            ]);
+                            continue;
+                        }
+
+                        $realPath  = $f->getRealPath();
+                        $fieldName = is_array($file) ? "{$key}[{$index}]" : $key;
+
+                        Log::info('Proxy: adjuntando archivo', [
+                            'field'   => $fieldName,
+                            'name'    => $f->getClientOriginalName(),
+                            'size'    => $f->getSize(),
+                            'mime'    => $f->getMimeType(),
+                            'is_file' => is_file($realPath),
+                        ]);
+
+                        $pendingRequest = $pendingRequest->attach(
+                            $fieldName,
+                            fopen($realPath, 'r'),
+                            $f->getClientOriginalName(),
+                            ['Content-Type' => $f->getMimeType()]
+                        );
+                    }
+                }
+
+                $response = $pendingRequest->{$sendMethod}($url, $textData);
+
+            // ============================================================
+            // RUTA B: Sin archivos → JSON o query params
+            // ============================================================
             } else {
-                $pendingRequest->asJson();
-                $response = $pendingRequest->$method($url, $data);
+                $data = $request->except(['_token', '_method']);
+
+                $pendingRequest = Http::withHeaders($headers)
+                    ->withOptions(['verify' => false])
+                    ->timeout(15)
+                    ->retry(2, 500);
+
+                if ($method === 'get' || $method === 'head') {
+                    $response = $pendingRequest->{$method}($url, $request->query());
+                } else {
+                    $response = $pendingRequest->asJson()->{$method}($url, $data);
+                }
             }
 
             if ($response->status() >= 400) {
-                Log::warning('Proxy request error', [
+                Log::warning('Proxy: respuesta de error', [
                     'url'      => $url,
                     'method'   => strtoupper($method),
                     'status'   => $response->status(),
@@ -137,15 +153,15 @@ class ProxyController extends Controller
                 ]);
             }
 
-            // Devolver la respuesta transparente, útil para JSON y para Imágenes/Binarios
+            // Respuesta transparente (JSON, imágenes, binarios, etc.)
             return response($response->body(), $response->status(), [
-                'Content-Type' => $response->header('Content-Type') ?? 'application/json'
+                'Content-Type' => $response->header('Content-Type') ?? 'application/json',
             ]);
 
         } catch (\Exception $e) {
-            Log::error('Proxy connection failure', [
+            Log::error('Proxy: fallo de conexión', [
                 'url'   => $url,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ]);
             return response()->json(['message' => 'Error interno conectando con el servicio.'], 500);
         }
