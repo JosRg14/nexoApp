@@ -91,6 +91,16 @@ class BookingController extends Controller
         ]);
         
         try {
+            // Verificar si el cliente tiene citas activas primero
+            $checkCitas = $this->httpClient->get('/api/clientes/me/citas-activas');
+            if (isset($checkCitas['data']['tiene_citas_activas']) && $checkCitas['data']['tiene_citas_activas']) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Ya tienes una cita activa. No puedes agendar otra hasta que sea completada o cancelada.'
+                ], 409);
+            }
+
+            // Proceder con la creación si no tiene citas activas
             $response = $this->httpClient->post('/api/citas', $validated);
             return response()->json($response, 201);
         } catch (\Exception $e) {
@@ -113,5 +123,29 @@ class BookingController extends Controller
         }
         
         return view('booking.mis-citas', compact('citas'));
+    }
+
+    /**
+     * Cancelar cita
+     */
+    public function cancelarCita(Request $request, $citaId)
+    {
+        $validated = $request->validate([
+            'motivo' => 'nullable|string|max:500'
+        ]);
+
+        try {
+            $data = [];
+            if (!empty($validated['motivo'])) {
+                $data['motivo'] = $validated['motivo'];
+            }
+
+            // Llamamos a la API con el método PATCH
+            $response = $this->httpClient->patch("/api/citas/{$citaId}/cancelar", $data);
+            return response()->json($response);
+        } catch (\Exception $e) {
+            Log::error('Error al cancelar cita: ' . $e->getMessage());
+            return response()->json(['success' => false, 'message' => 'Error al cancelar la cita'], 500);
+        }
     }
 }

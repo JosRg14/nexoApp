@@ -258,6 +258,9 @@ Route::middleware(['auth.session', 'inject.api.token'])->prefix('api-proxy')->gr
     
     // Crear cita
     Route::post('/citas', [BookingController::class, 'store']);
+
+    // Cancelar cita
+    Route::post('/citas/{id}/cancelar', [BookingController::class, 'cancelarCita']);
 });
 
 /*Rutas de completar registro de negocio

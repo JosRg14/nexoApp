@@ -22,10 +22,12 @@
                     </div>
                     <span class="px-2 py-1 text-xs rounded-full 
                         {{ $cita['estado'] === 'pendiente' ? 'bg-yellow-500/20 text-yellow-500' : '' }}
-                        {{ $cita['estado'] === 'confirmada' ? 'bg-emerald-500/20 text-emerald-500' : '' }}
-                        {{ $cita['estado'] === 'completada' ? 'bg-blue-500/20 text-blue-500' : '' }}
-                        {{ $cita['estado'] === 'cancelada' ? 'bg-red-500/20 text-red-500' : '' }}">
-                        {{ ucfirst($cita['estado']) }}
+                        {{ $cita['estado'] === 'confirmada' ? 'bg-blue-500/20 text-blue-500' : '' }}
+                        {{ $cita['estado'] === 'en_proceso' ? 'bg-orange-500/20 text-orange-500' : '' }}
+                        {{ $cita['estado'] === 'completada' ? 'bg-emerald-500/20 text-emerald-500' : '' }}
+                        {{ $cita['estado'] === 'cancelada' ? 'bg-gray-500/20 text-gray-400' : '' }}
+                        {{ $cita['estado'] === 'no_asistio' ? 'bg-red-500/20 text-red-500' : '' }}">
+                        {{ ucfirst(str_replace('_', ' ', $cita['estado'])) }}
                     </span>
                 </div>
                 
@@ -36,7 +38,7 @@
                     </div>
                     <div class="flex items-center gap-2 text-[#9CA3AF]">
                         <i class="fas fa-clock w-4"></i>
-                        <span>{{ substr($cita['hora_inicio'], 0, 5) }} - {{ substr($cita['hora_fin'], 0, 5) }}</span>
+                        <span>{{ substr($cita['hora_inicio'], 0, 5) }}</span>
                     </div>
                     <div class="flex items-center gap-2 text-[#9CA3AF]">
                         <i class="fas fa-user w-4"></i>
@@ -44,13 +46,13 @@
                     </div>
                     <div class="flex items-center gap-2 text-yellow-500">
                         <i class="fas fa-dollar-sign w-4"></i>
-                        <span>${{ number_format($cita['servicio']['precio'] ?? 0, 0) }}</span>
+                        <span>${{ number_format($cita['servicio']['precio'] ?? 0, 2) }}</span>
                     </div>
                 </div>
                 
-                @if($cita['estado'] === 'pendiente')
+                @if(!in_array($cita['estado'], ['completada', 'cancelada', 'no_asistio']))
                 <div class="mt-4 pt-4 border-t border-[#374151]">
-                    <button onclick="cancelarCita({{ $cita['id_cita'] }})" 
+                    <button onclick="cancelarCita({{ $cita['id'] ?? $cita['id_cita'] }})" 
                             class="w-full py-2 text-red-400 border border-red-500/30 rounded-lg hover:bg-red-500/10 transition-all text-sm">
                         Cancelar cita
                     </button>
@@ -71,27 +73,30 @@
 
 <script>
 async function cancelarCita(citaId) {
+    const motivo = prompt('¿Desea ingresar un motivo de cancelación? (Opcional)');
+    if (motivo === null) return; // Se canceló el prompt
+    
     if (!confirm('¿Estás seguro de cancelar esta cita?')) return;
     
     showLoader();
     
     try {
         const response = await fetch(`/api-proxy/citas/${citaId}/cancelar`, {
-            method: 'PATCH',
+            method: 'POST', // Usamos POST en el BFF
             headers: {
                 'X-CSRF-TOKEN': document.querySelector('input[name="_token"]')?.value || '{{ csrf_token() }}',
                 'Content-Type': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest',
                 'Accept': 'application/json'
             },
-            body: JSON.stringify({})
+            body: JSON.stringify({ motivo: motivo })
         });
         
         const data = await response.json();
         
-        if (response.ok) {
+        if (response.ok && data.success !== false) {
             alert('Cita cancelada correctamente');
-            location.reload();
+            location.reload(); // Recarga para actualizar listado y estados
         } else {
             alert(data.message || 'Error al cancelar la cita');
         }
