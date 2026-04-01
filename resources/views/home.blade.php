@@ -14,15 +14,15 @@
                 <div class="max-w-3xl space-y-8 animate-fade-in-up">
                     <h1 class="text-5xl md:text-7xl font-bold uppercase tracking-wide text-white leading-tight">
                         Hola, <br/>
-                        <span class="text-yellow-500">{{ explode(' ', session('usuario')['nombre'])[0] }}!</span>
+                        <span class="text-[#25B5DA]">{{ explode(' ', session('usuario')['nombre'])[0] }}!</span>
                     </h1>
                     
-                    <p class="text-[#9CA3AF] text-lg leading-relaxed max-w-2xl border-l border-yellow-500/50 pl-6">
+                    <p class="text-[#9CA3AF] text-lg leading-relaxed max-w-2xl border-l border-[#25B5DA]/50 pl-6">
                         Explora los mejores negocios cerca de ti. Encuentra servicios exclusivos, reserva en segundos y disfruta de la mejor calidad.
                     </p>
                     
                     <div class="pt-4">
-                        <a href="/mis-citas" class="inline-block py-4 px-10 bg-yellow-500 text-[#1a1a1a] text-sm font-bold uppercase tracking-[0.2em] hover:bg-yellow-400 hover:shadow-lg hover:shadow-yellow-500/20 transition-all duration-300 transform hover:-translate-y-1 rounded-sm">
+                        <a href="/mis-citas" class="inline-block py-4 px-10 bg-[#25B5DA] text-[#1a1a1a] text-sm font-bold uppercase tracking-[0.2em] hover:bg-[#25B5DA] hover:shadow-lg hover:shadow-[#25B5DA]/20 transition-all duration-300 transform hover:-translate-y-1 rounded-sm">
                             Ver Mis Citas
                         </a>
                     </div>
@@ -34,7 +34,7 @@
                 <div class="max-w-3xl space-y-8 animate-fade-in-up">
                     <h1 class="text-5xl md:text-7xl font-bold uppercase tracking-wide text-white leading-tight">
                         Bienvenido a <br/>
-                        <span class="text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-yellow-600">Nexo App!</span>
+                        <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#25B5DA] to-[#1c8fb0]">Nexo App!</span>
                     </h1>
                     
                     <p class="text-[#9CA3AF] text-lg leading-relaxed max-w-2xl border-l border-[#374151] pl-6">
@@ -43,7 +43,7 @@
                     
                     @if(!session()->has('rol'))
                     <div class="pt-4">
-                        <a href="/register" class="inline-block py-4 px-10 bg-[#1a1a1a] border border-yellow-500 text-yellow-500 text-sm font-bold uppercase tracking-[0.2em] hover:bg-yellow-500 hover:text-[#1a1a1a] hover:shadow-[0_0_20px_rgba(234,179,8,0.3)] transition-all duration-300 rounded-sm">
+                        <a href="/register" class="inline-block py-4 px-10 bg-[#1a1a1a] border border-[#25B5DA] text-[#25B5DA] text-sm font-bold uppercase tracking-[0.2em] hover:bg-[#25B5DA] hover:text-[#1a1a1a] hover:shadow-[0_0_20px_rgba(234,179,8,0.3)] transition-all duration-300 rounded-sm">
                             Empezar Ahora
                         </a>
                     </div>
@@ -58,13 +58,13 @@
             <!-- Filter Bar -->
             <div class="flex flex-wrap gap-4 mb-12 border-b border-[#374151] pb-6 items-center justify-between animate-fade-in-up" style="animation-delay: 200ms;">
                 <div class="flex gap-4">
-                    <button class="px-4 py-1.5 border border-[#374151] text-[#9CA3AF] text-[10px] uppercase tracking-widest hover:border-yellow-500 hover:text-yellow-500 rounded-sm transition-all">
+                    <button class="px-4 py-1.5 border border-[#374151] text-[#9CA3AF] text-[10px] uppercase tracking-widest hover:border-[#25B5DA] hover:text-[#25B5DA] rounded-sm transition-all">
                         Ordenar
                     </button>
-                    <button class="px-4 py-1.5 border border-[#374151] text-[#9CA3AF] text-[10px] uppercase tracking-widest hover:border-yellow-500 hover:text-yellow-500 rounded-sm transition-all">
+                    <button class="px-4 py-1.5 border border-[#374151] text-[#9CA3AF] text-[10px] uppercase tracking-widest hover:border-[#25B5DA] hover:text-[#25B5DA] rounded-sm transition-all">
                         Categoría
                     </button>
-                    <button class="px-4 py-1.5 border border-[#374151] text-[#9CA3AF] text-[10px] uppercase tracking-widest hover:border-yellow-500 hover:text-yellow-500 rounded-sm transition-all">
+                    <button class="px-4 py-1.5 border border-[#374151] text-[#9CA3AF] text-[10px] uppercase tracking-widest hover:border-[#25B5DA] hover:text-[#25B5DA] rounded-sm transition-all">
                         Precio
                     </button>
                 </div>
@@ -77,7 +77,7 @@
             <div class="mb-10 animate-fade-in-up" style="animation-delay: 300ms;">
                 <h2 class="text-2xl font-bold uppercase tracking-widest text-white flex items-center gap-4">
                     Destacados
-                    <span class="h-px w-full max-w-[100px] bg-gradient-to-r from-yellow-500/50 to-transparent"></span>
+                    <span class="h-px w-full max-w-[100px] bg-gradient-to-r from-[#25B5DA]/50 to-transparent"></span>
                 </h2>
             </div>
 
@@ -86,7 +86,7 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                 @foreach ($negocios as $index => $negocio)
                 
-                <article class="group relative bg-[#262626] rounded-xl overflow-hidden border border-[#374151] hover:border-yellow-500/50 transition-all duration-500 hover:-translate-y-1 hover:shadow-2xl hover:shadow-yellow-500/10 cursor-pointer animate-fade-in-up block"
+                <article class="group relative bg-[#262626] rounded-xl overflow-hidden border border-[#374151] hover:border-[#25B5DA]/50 transition-all duration-500 hover:-translate-y-1 hover:shadow-2xl hover:shadow-[#25B5DA]/10 cursor-pointer animate-fade-in-up block"
                          onclick="window.location.href='/negocio/{{ $negocio['id_negocio'] ?? $negocio['id'] }}'"
                          style="animation-delay: {{ 300 + ($index * 100) }}ms;">
                     
@@ -107,7 +107,7 @@
                         
                         <!-- Badge calificación -->
                         <div class="absolute top-3 right-3 bg-black/60 backdrop-blur-sm px-2.5 py-1 rounded-full border border-white/10 shadow-lg">
-                            <span class="text-yellow-500 text-xs font-bold flex items-center gap-1">
+                            <span class="text-[#25B5DA] text-xs font-bold flex items-center gap-1">
                                 @if(isset($negocio['calificacion']))
                                     <i class="fas fa-star text-[10px]"></i>
                                     {{ number_format($negocio['calificacion'], 1) }}
@@ -119,8 +119,8 @@
                         </div>
                         
                         <!-- Badge tipo de negocio -->
-                        <div class="absolute bottom-4 left-4 bg-yellow-500/20 backdrop-blur-sm px-3 py-1.5 rounded-full border border-yellow-500/30">
-                            <span class="text-yellow-500 text-[10px] font-bold uppercase tracking-wider">
+                        <div class="absolute bottom-4 left-4 bg-[#25B5DA]/20 backdrop-blur-sm px-3 py-1.5 rounded-full border border-[#25B5DA]/30">
+                            <span class="text-[#25B5DA] text-[10px] font-bold uppercase tracking-wider">
                                 {{ ucfirst($negocio['tipo_negocio'] ?? 'Servicios') }}
                             </span>
                         </div>
@@ -128,7 +128,7 @@
                     
                     <!-- Contenido -->
                     <div class="p-5">
-                        <h3 class="text-white font-bold text-base uppercase tracking-wide group-hover:text-yellow-500 transition-colors line-clamp-1">
+                        <h3 class="text-white font-bold text-base uppercase tracking-wide group-hover:text-[#25B5DA] transition-colors line-clamp-1">
                             {{ $negocio['nombre'] }}
                         </h3>
                         
@@ -138,7 +138,7 @@
                         
                         <!-- Ubicación -->
                         <div class="flex items-center gap-1.5 mt-4 text-[10px] text-[#9CA3AF] uppercase tracking-wider bg-[#1a1a1a] rounded px-2 py-1.5 w-max">
-                            <svg class="w-3.5 h-3.5 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-3.5 h-3.5 text-[#25B5DA]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
                             </svg>
@@ -147,7 +147,7 @@
                     </div>
                     
                     <!-- Barra inferior animada -->
-                    <div class="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-yellow-400 to-yellow-600 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
+                    <div class="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-[#25B5DA] to-[#1c8fb0] transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
                 </article>
 
                 @endforeach
@@ -161,7 +161,7 @@
             @else
             <!-- Mensaje cuando no hay negocios -->
             <div class="text-center py-20 animate-fade-in-up">
-                <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-[#262626] border border-[#374151] text-yellow-500 mb-6">
+                <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-[#262626] border border-[#374151] text-[#25B5DA] mb-6">
                     <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
                     </svg>
@@ -169,7 +169,7 @@
                 <div class="text-white text-xl uppercase tracking-wide font-bold mb-2">No hay negocios aquí</div>
                 <p class="text-[#9CA3AF] text-sm">Aún no hemos registrado negocios en nuestra plataforma.</p>
                 @if(!session()->has('rol'))
-                <a href="/register" class="inline-block mt-8 py-3 px-8 bg-yellow-500 text-[#1a1a1a] font-bold text-xs uppercase tracking-[0.2em] rounded-sm hover:bg-yellow-400 transition-colors shadow-lg shadow-yellow-500/20">
+                <a href="/register" class="inline-block mt-8 py-3 px-8 bg-[#25B5DA] text-[#1a1a1a] font-bold text-xs uppercase tracking-[0.2em] rounded-sm hover:bg-[#25B5DA] transition-colors shadow-lg shadow-[#25B5DA]/20">
                     Registrar el Primer Negocio
                 </a>
                 @endif

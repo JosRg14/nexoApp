@@ -42,7 +42,7 @@
                             $statusClass =
                                 $status === 'activo'
                                     ? 'text-emerald-500 border-emerald-500/20 bg-emerald-500/10'
-                                    : 'text-yellow-500 border-yellow-500/20 bg-yellow-500/10';
+                                    : 'text-[#25B5DA] border-[#25B5DA]/20 bg-[#25B5DA]/10';
                         @endphp
 
                         <span

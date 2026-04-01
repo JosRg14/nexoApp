@@ -65,9 +65,9 @@ window.showToast = function(message, type = 'success', duration = 3000) {
             bgColor = 'bg-red-500';
             break;
         case 'warning':
-            iconClass = 'fas fa-exclamation-triangle text-yellow-500';
-            borderColor = 'border-yellow-500/30';
-            bgColor = 'bg-yellow-500';
+            iconClass = 'fas fa-exclamation-triangle text-[#25B5DA]';
+            borderColor = 'border-[#25B5DA]/30';
+            bgColor = 'bg-[#25B5DA]';
             break;
         case 'info':
         default:

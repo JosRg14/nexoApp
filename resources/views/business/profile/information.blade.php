@@ -2,14 +2,14 @@
 
 @if(!$negocio || empty($negocio))
     <div class="flex flex-col items-center justify-center py-16 text-center">
-        <div class="bg-yellow-500/10 border border-yellow-500/30 rounded-full p-6 mb-6">
-            <i class="fas fa-store text-5xl text-yellow-500"></i>
+        <div class="bg-[#25B5DA]/10 border border-[#25B5DA]/30 rounded-full p-6 mb-6">
+            <i class="fas fa-store text-5xl text-[#25B5DA]"></i>
         </div>
         <h2 class="text-2xl font-bold text-white mb-2">¡Bienvenido a NexoApp!</h2>
         <p class="text-[#9CA3AF] mb-8 max-w-md">Completa los datos de tu negocio para comenzar a usar la plataforma.</p>
         
         <button onclick="mostrarFormularioRegistro()" 
-                class="px-8 py-3 bg-yellow-500 text-black font-bold rounded-lg hover:bg-yellow-400 transition-all duration-300 flex items-center gap-2">
+                class="px-8 py-3 bg-[#25B5DA] text-black font-bold rounded-lg hover:bg-[#1c8fb0] transition-all duration-300 flex items-center gap-2">
             <i class="fas fa-plus-circle"></i>
             Registrar mi Negocio
         </button>
@@ -120,15 +120,15 @@
                         <div class="border-t border-[#374151] pt-6">
                             <h3 class="text-xs uppercase tracking-wider text-[#9CA3AF] mb-4">Plan de Suscripción</h3>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <label class="flex items-center gap-3 p-4 border border-[#374151] rounded-lg cursor-pointer hover:border-yellow-500 transition-all">
-                                    <input type="radio" name="suscripcion_id" value="1" required class="accent-yellow-500">
+                                <label class="flex items-center gap-3 p-4 border border-[#374151] rounded-lg cursor-pointer hover:border-[#25B5DA] transition-all">
+                                    <input type="radio" name="suscripcion_id" value="1" required class="accent-[#25B5DA]">
                                     <div>
                                         <span class="font-bold text-white">Plan Básico</span>
                                         <p class="text-xs text-[#9CA3AF]">$199/mes</p>
                                     </div>
                                 </label>
-                                <label class="flex items-center gap-3 p-4 border border-[#374151] rounded-lg cursor-pointer hover:border-yellow-500">
-                                    <input type="radio" name="suscripcion_id" value="2" class="accent-yellow-500">
+                                <label class="flex items-center gap-3 p-4 border border-[#374151] rounded-lg cursor-pointer hover:border-[#25B5DA]">
+                                    <input type="radio" name="suscripcion_id" value="2" class="accent-[#25B5DA]">
                                     <div>
                                         <span class="font-bold text-white">Plan Premium</span>
                                         <p class="text-xs text-[#9CA3AF]">$399/mes</p>
@@ -154,7 +154,7 @@
                         </div>
                         
                         <button type="submit" 
-                                class="w-full py-4 bg-gradient-to-r from-yellow-500 to-yellow-600 text-black font-bold uppercase tracking-wider rounded-lg hover:from-yellow-400 hover:to-yellow-500 transition-all">
+                                class="w-full py-4 bg-gradient-to-r from-[#25B5DA] to-[#1c8fb0] text-black font-bold uppercase tracking-wider rounded-lg hover:from-[#1c8fb0] hover:to-[#25B5DA] transition-all">
                             Registrar Negocio
                         </button>
                     </div>

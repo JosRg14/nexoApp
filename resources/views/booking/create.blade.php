@@ -36,14 +36,14 @@
             <!-- Servicios -->
             <div class="bg-[#262626] border border-[#374151] rounded-sm p-6">
                 <h3 class="text-sm font-bold uppercase tracking-widest text-white mb-4 flex items-center gap-2">
-                    <i class="fas fa-cut text-yellow-500"></i>
+                    <i class="fas fa-cut text-[#25B5DA]"></i>
                     Selecciona un servicio
                     <span class="text-xs text-[#9CA3AF] font-normal">({{ count($servicios) }} disponibles)</span>
                 </h3>
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     @foreach($servicios as $servicio)
-                    <div class="servicio-card border border-[#374151] rounded-sm p-4 cursor-pointer hover:border-yellow-500 transition-all" 
+                    <div class="servicio-card border border-[#374151] rounded-sm p-4 cursor-pointer hover:border-[#25B5DA] transition-all" 
                          data-id="{{ $servicio['id'] }}"
                          data-nombre="{{ $servicio['nombre'] }}"
                          data-precio="{{ $servicio['precio'] }}"
@@ -53,7 +53,7 @@
                                 <h4 class="text-white font-bold text-sm">{{ $servicio['nombre'] }}</h4>
                                 <p class="text-[#9CA3AF] text-[10px] mt-1">{{ $servicio['descripcion'] ?? 'Sin descripción' }}</p>
                             </div>
-                            <span class="text-yellow-500 font-bold text-sm">${{ number_format($servicio['precio'], 0, ',', '.') }}</span>
+                            <span class="text-[#25B5DA] font-bold text-sm">${{ number_format($servicio['precio'], 0, ',', '.') }}</span>
                         </div>
                         <div class="mt-2 flex items-center gap-2 text-[10px] text-[#9CA3AF]">
                             <i class="far fa-clock"></i>
@@ -67,7 +67,7 @@
             <!-- Empleados -->
             <div class="bg-[#262626] border border-[#374151] rounded-sm p-6">
                 <h3 class="text-sm font-bold uppercase tracking-widest text-white mb-4 flex items-center gap-2">
-                    <i class="fas fa-users text-yellow-500"></i>
+                    <i class="fas fa-users text-[#25B5DA]"></i>
                     Selecciona un empleado
                     <span class="text-xs text-[#9CA3AF] font-normal">({{ count($empleados) }} disponibles)</span>
                 </h3>
@@ -75,10 +75,10 @@
                 @if(count($empleados) > 0)
                 <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                     @foreach($empleados as $empleado)
-                    <div class="empleado-card border border-[#374151] rounded-sm p-3 cursor-pointer hover:border-yellow-500 transition-all text-center"
+                    <div class="empleado-card border border-[#374151] rounded-sm p-3 cursor-pointer hover:border-[#25B5DA] transition-all text-center"
                          data-id="{{ $empleado['id_empleado'] }}"
                          data-nombre="{{ $empleado['nombre'] }}">
-                        <div class="w-14 h-14 mx-auto bg-yellow-500/20 text-yellow-500 rounded-full flex items-center justify-center text-xl font-bold mb-2">
+                        <div class="w-14 h-14 mx-auto bg-[#25B5DA]/20 text-[#25B5DA] rounded-full flex items-center justify-center text-xl font-bold mb-2">
                             {{ strtoupper(substr($empleado['nombre'], 0, 1)) }}
                         </div>
                         <h4 class="text-white font-bold text-sm">{{ $empleado['nombre'] }}</h4>
@@ -94,7 +94,7 @@
             <!-- Fecha y Hora -->
             <div class="bg-[#262626] border border-[#374151] rounded-sm p-6">
                 <h3 class="text-sm font-bold uppercase tracking-widest text-white mb-4 flex items-center gap-2">
-                    <i class="fas fa-calendar-alt text-yellow-500"></i>
+                    <i class="fas fa-calendar-alt text-[#25B5DA]"></i>
                     Selecciona fecha y hora
                 </h3>
                 
@@ -103,12 +103,12 @@
                         <label class="block text-xs text-[#9CA3AF] uppercase tracking-widest mb-2">Fecha</label>
                         <input type="date" id="fecha" name="fecha" 
                                min="{{ date('Y-m-d') }}"
-                               class="w-full bg-[#1a1a1a] border border-[#374151] rounded-sm px-4 py-2 text-white focus:border-yellow-500 focus:outline-none">
+                               class="w-full bg-[#1a1a1a] border border-[#374151] rounded-sm px-4 py-2 text-white focus:border-[#25B5DA] focus:outline-none">
                     </div>
                     <div>
                         <label class="block text-xs text-[#9CA3AF] uppercase tracking-widest mb-2">Hora</label>
                         <select id="hora" name="hora_inicio" 
-                                class="w-full bg-[#1a1a1a] border border-[#374151] rounded-sm px-4 py-2 text-white focus:border-yellow-500 focus:outline-none" disabled>
+                                class="w-full bg-[#1a1a1a] border border-[#374151] rounded-sm px-4 py-2 text-white focus:border-[#25B5DA] focus:outline-none" disabled>
                             <option value="">Primero selecciona un servicio, empleado y fecha</option>
                         </select>
                     </div>
@@ -138,12 +138,12 @@
                 </div>
                 <div class="mt-4 pt-4 border-t border-[#374151] flex justify-between items-center">
                     <span class="text-xs font-bold uppercase text-white">Total</span>
-                    <span id="resumen-total" class="text-xl font-bold text-yellow-500">$0</span>
+                    <span id="resumen-total" class="text-xl font-bold text-[#25B5DA]">$0</span>
                 </div>
             </div>
 
             <button type="submit" 
-                    class="w-full py-4 bg-gradient-to-r from-yellow-500 to-yellow-600 text-black font-bold uppercase tracking-wider rounded-lg hover:from-yellow-400 hover:to-yellow-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                    class="w-full py-4 bg-gradient-to-r from-[#25B5DA] to-[#1c8fb0] text-black font-bold uppercase tracking-wider rounded-lg hover:from-[#1c8fb0] hover:to-[#25B5DA] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                     id="btn-submit" disabled>
                 Confirmar Cita
             </button>
@@ -179,8 +179,8 @@ function checkFormComplete() {
 // Selección de servicio
 document.querySelectorAll('.servicio-card').forEach(card => {
     card.addEventListener('click', function() {
-        document.querySelectorAll('.servicio-card').forEach(c => c.classList.remove('border-yellow-500', 'bg-yellow-500/10'));
-        this.classList.add('border-yellow-500', 'bg-yellow-500/10');
+        document.querySelectorAll('.servicio-card').forEach(c => c.classList.remove('border-[#25B5DA]', 'bg-[#25B5DA]/10'));
+        this.classList.add('border-[#25B5DA]', 'bg-[#25B5DA]/10');
         
         servicioSeleccionado = {
             id: this.dataset.id,
@@ -205,8 +205,8 @@ document.querySelectorAll('.servicio-card').forEach(card => {
 // Selección de empleado
 document.querySelectorAll('.empleado-card').forEach(card => {
     card.addEventListener('click', function() {
-        document.querySelectorAll('.empleado-card').forEach(c => c.classList.remove('border-yellow-500', 'bg-yellow-500/10'));
-        this.classList.add('border-yellow-500', 'bg-yellow-500/10');
+        document.querySelectorAll('.empleado-card').forEach(c => c.classList.remove('border-[#25B5DA]', 'bg-[#25B5DA]/10'));
+        this.classList.add('border-[#25B5DA]', 'bg-[#25B5DA]/10');
         
         empleadoSeleccionado = {
             id: this.dataset.id,

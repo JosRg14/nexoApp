@@ -50,8 +50,8 @@
                         
                         $statusClasses = [
                             'activo'      => 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20',
-                            'en_revision' => 'bg-yellow-500/10 text-yellow-500 border border-yellow-500/20',
-                            'en revision' => 'bg-yellow-500/10 text-yellow-500 border border-yellow-500/20',
+                            'en_revision' => 'bg-[#25B5DA]/10 text-[#25B5DA] border border-[#25B5DA]/20',
+                            'en revision' => 'bg-[#25B5DA]/10 text-[#25B5DA] border border-[#25B5DA]/20',
                             'suspendido'  => 'bg-red-500/10 text-red-500 border border-red-500/20',
                         ];
 

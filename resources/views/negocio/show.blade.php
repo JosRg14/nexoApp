@@ -36,14 +36,14 @@
                         <span class="px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wide border 
                             {{ isset($negocio['estado']) && strtolower($negocio['estado']) === 'activo' 
                                 ? 'text-emerald-500 border-emerald-500/20 bg-emerald-500/10' 
-                                : 'text-yellow-500 border-yellow-500/20 bg-yellow-500/10' }}">
+                                : 'text-[#25B5DA] border-[#25B5DA]/20 bg-[#25B5DA]/10' }}">
                             {{ $negocio['estado'] ?? 'pendiente' }}
                         </span>
                     </div>
                     
                     <div class="flex flex-wrap gap-4 text-gray-300 text-sm">
                         <span class="flex items-center gap-2">
-                            <i class="fas fa-star text-yellow-500"></i>
+                            <i class="fas fa-star text-[#25B5DA]"></i>
                             {{ isset($negocio['calificacion']) ? number_format($negocio['calificacion'], 1) . ' ★' : 'Nuevo' }}
                         </span>
                         <span class="flex items-center gap-2">
@@ -138,7 +138,7 @@
                                 @endif
                                 
                                 <div class="absolute top-3 right-3 bg-black/70 backdrop-blur-sm px-3 py-1 rounded-full">
-                                    <span class="text-yellow-500 font-bold">${{ number_format($servicio['precio'], 0, ',', '.') }}</span>
+                                    <span class="text-[#25B5DA] font-bold">${{ number_format($servicio['precio'], 0, ',', '.') }}</span>
                                 </div>
                                 
                                 <div class="absolute bottom-3 left-3 bg-black/60 backdrop-blur-sm px-2 py-1 rounded-full">
@@ -176,7 +176,7 @@
                         @forelse($resenas as $resena)
                         <div class="border-b border-[#374151] pb-4 last:border-0 last:pb-0">
                             <div class="flex items-center gap-2 mb-2">
-                                <div class="flex text-yellow-500">
+                                <div class="flex text-[#25B5DA]">
                                     @for($i = 1; $i <= 5; $i++)
                                         @if($i <= $resena['calificacion'])
                                             <i class="fas fa-star text-xs"></i>
@@ -207,7 +207,7 @@
                     <div class="space-y-3">
                         @forelse($empleados as $empleado)
                         <div class="flex items-center gap-3 p-3 bg-[#1a1a1a] border border-[#374151] rounded-lg">
-                            <div class="w-10 h-10 bg-gradient-to-br from-yellow-500/20 to-yellow-600/20 text-yellow-500 flex items-center justify-center text-sm font-bold rounded-full">
+                            <div class="w-10 h-10 bg-gradient-to-br from-[#25B5DA]/20 to-[#1c8fb0]/20 text-[#25B5DA] flex items-center justify-center text-sm font-bold rounded-full">
                                 {{ strtoupper(substr($empleado['nombre'], 0, 1)) }}
                             </div>
                             <div class="flex-1">
@@ -219,7 +219,7 @@
                                 @endif
                             </div>
                             @if(isset($empleado['calificacion']))
-                            <div class="flex items-center gap-1 text-[10px] text-yellow-500">
+                            <div class="flex items-center gap-1 text-[10px] text-[#25B5DA]">
                                 <i class="fas fa-star"></i>
                                 <span>{{ number_format($empleado['calificacion'], 1) }}</span>
                             </div>

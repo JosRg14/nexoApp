@@ -30,21 +30,21 @@
                     <div class="bg-[#1a1a1a] border border-[#374151] rounded-lg p-3">
                         <div class="flex flex-wrap items-center gap-4 mb-2">
                             <div class="flex items-center gap-3">
-                                <input type="checkbox" id="negocio_lunes_abierto" class="negocio-checkbox w-4 h-4 accent-yellow-500">
+                                <input type="checkbox" id="negocio_lunes_abierto" class="negocio-checkbox w-4 h-4 accent-[#25B5DA]">
                                 <label for="negocio_lunes_abierto" class="text-white font-bold uppercase tracking-wider text-sm">Lunes</label>
                             </div>
-                            <button type="button" class="agregar-bloque-negocio text-xs text-[#9CA3AF] hover:text-yellow-500 transition-colors" data-day="lunes">
+                            <button type="button" class="agregar-bloque-negocio text-xs text-[#9CA3AF] hover:text-[#25B5DA] transition-colors" data-day="lunes">
                                 <i class="fas fa-plus-circle mr-1"></i> Agregar bloque
                             </button>
                         </div>
                         <div id="negocio_lunes_bloques" class="bloques-container space-y-2 ml-6">
                             <div class="bloque-horario flex flex-wrap items-center gap-3">
                                 <input type="time" name="horarios[lunes][0][hora_apertura]" 
-                                       class="hora-input bg-[#262626] border border-[#374151] rounded px-3 py-1 text-white text-sm focus:border-yellow-500 focus:outline-none"
+                                       class="hora-input bg-[#262626] border border-[#374151] rounded px-3 py-1 text-white text-sm focus:border-[#25B5DA] focus:outline-none"
                                        value="09:00" disabled>
                                 <span class="text-[#9CA3AF] text-xs">a</span>
                                 <input type="time" name="horarios[lunes][0][hora_cierre]" 
-                                       class="hora-input bg-[#262626] border border-[#374151] rounded px-3 py-1 text-white text-sm focus:border-yellow-500 focus:outline-none"
+                                       class="hora-input bg-[#262626] border border-[#374151] rounded px-3 py-1 text-white text-sm focus:border-[#25B5DA] focus:outline-none"
                                        value="18:00" disabled>
                                 <button type="button" class="eliminar-bloque-negocio text-red-500 hover:text-red-400 text-xs" style="display: none;">
                                     <i class="fas fa-trash-alt"></i>
@@ -58,21 +58,21 @@
                     <div class="bg-[#1a1a1a] border border-[#374151] rounded-lg p-3">
                         <div class="flex flex-wrap items-center gap-4 mb-2">
                             <div class="flex items-center gap-3">
-                                <input type="checkbox" id="negocio_martes_abierto" class="negocio-checkbox w-4 h-4 accent-yellow-500">
+                                <input type="checkbox" id="negocio_martes_abierto" class="negocio-checkbox w-4 h-4 accent-[#25B5DA]">
                                 <label for="negocio_martes_abierto" class="text-white font-bold uppercase tracking-wider text-sm">Martes</label>
                             </div>
-                            <button type="button" class="agregar-bloque-negocio text-xs text-[#9CA3AF] hover:text-yellow-500 transition-colors" data-day="martes">
+                            <button type="button" class="agregar-bloque-negocio text-xs text-[#9CA3AF] hover:text-[#25B5DA] transition-colors" data-day="martes">
                                 <i class="fas fa-plus-circle mr-1"></i> Agregar bloque
                             </button>
                         </div>
                         <div id="negocio_martes_bloques" class="bloques-container space-y-2 ml-6">
                             <div class="bloque-horario flex flex-wrap items-center gap-3">
                                 <input type="time" name="horarios[martes][0][hora_apertura]" 
-                                       class="hora-input bg-[#262626] border border-[#374151] rounded px-3 py-1 text-white text-sm focus:border-yellow-500 focus:outline-none"
+                                       class="hora-input bg-[#262626] border border-[#374151] rounded px-3 py-1 text-white text-sm focus:border-[#25B5DA] focus:outline-none"
                                        value="09:00" disabled>
                                 <span class="text-[#9CA3AF] text-xs">a</span>
                                 <input type="time" name="horarios[martes][0][hora_cierre]" 
-                                       class="hora-input bg-[#262626] border border-[#374151] rounded px-3 py-1 text-white text-sm focus:border-yellow-500 focus:outline-none"
+                                       class="hora-input bg-[#262626] border border-[#374151] rounded px-3 py-1 text-white text-sm focus:border-[#25B5DA] focus:outline-none"
                                        value="18:00" disabled>
                                 <button type="button" class="eliminar-bloque-negocio text-red-500 hover:text-red-400 text-xs" style="display: none;">
                                     <i class="fas fa-trash-alt"></i>
@@ -86,21 +86,21 @@
                     <div class="bg-[#1a1a1a] border border-[#374151] rounded-lg p-3">
                         <div class="flex flex-wrap items-center gap-4 mb-2">
                             <div class="flex items-center gap-3">
-                                <input type="checkbox" id="negocio_miercoles_abierto" class="negocio-checkbox w-4 h-4 accent-yellow-500">
+                                <input type="checkbox" id="negocio_miercoles_abierto" class="negocio-checkbox w-4 h-4 accent-[#25B5DA]">
                                 <label for="negocio_miercoles_abierto" class="text-white font-bold uppercase tracking-wider text-sm">Miércoles</label>
                             </div>
-                            <button type="button" class="agregar-bloque-negocio text-xs text-[#9CA3AF] hover:text-yellow-500 transition-colors" data-day="miercoles">
+                            <button type="button" class="agregar-bloque-negocio text-xs text-[#9CA3AF] hover:text-[#25B5DA] transition-colors" data-day="miercoles">
                                 <i class="fas fa-plus-circle mr-1"></i> Agregar bloque
                             </button>
                         </div>
                         <div id="negocio_miercoles_bloques" class="bloques-container space-y-2 ml-6">
                             <div class="bloque-horario flex flex-wrap items-center gap-3">
                                 <input type="time" name="horarios[miercoles][0][hora_apertura]" 
-                                       class="hora-input bg-[#262626] border border-[#374151] rounded px-3 py-1 text-white text-sm focus:border-yellow-500 focus:outline-none"
+                                       class="hora-input bg-[#262626] border border-[#374151] rounded px-3 py-1 text-white text-sm focus:border-[#25B5DA] focus:outline-none"
                                        value="09:00" disabled>
                                 <span class="text-[#9CA3AF] text-xs">a</span>
                                 <input type="time" name="horarios[miercoles][0][hora_cierre]" 
-                                       class="hora-input bg-[#262626] border border-[#374151] rounded px-3 py-1 text-white text-sm focus:border-yellow-500 focus:outline-none"
+                                       class="hora-input bg-[#262626] border border-[#374151] rounded px-3 py-1 text-white text-sm focus:border-[#25B5DA] focus:outline-none"
                                        value="18:00" disabled>
                                 <button type="button" class="eliminar-bloque-negocio text-red-500 hover:text-red-400 text-xs" style="display: none;">
                                     <i class="fas fa-trash-alt"></i>
@@ -114,21 +114,21 @@
                     <div class="bg-[#1a1a1a] border border-[#374151] rounded-lg p-3">
                         <div class="flex flex-wrap items-center gap-4 mb-2">
                             <div class="flex items-center gap-3">
-                                <input type="checkbox" id="negocio_jueves_abierto" class="negocio-checkbox w-4 h-4 accent-yellow-500">
+                                <input type="checkbox" id="negocio_jueves_abierto" class="negocio-checkbox w-4 h-4 accent-[#25B5DA]">
                                 <label for="negocio_jueves_abierto" class="text-white font-bold uppercase tracking-wider text-sm">Jueves</label>
                             </div>
-                            <button type="button" class="agregar-bloque-negocio text-xs text-[#9CA3AF] hover:text-yellow-500 transition-colors" data-day="jueves">
+                            <button type="button" class="agregar-bloque-negocio text-xs text-[#9CA3AF] hover:text-[#25B5DA] transition-colors" data-day="jueves">
                                 <i class="fas fa-plus-circle mr-1"></i> Agregar bloque
                             </button>
                         </div>
                         <div id="negocio_jueves_bloques" class="bloques-container space-y-2 ml-6">
                             <div class="bloque-horario flex flex-wrap items-center gap-3">
                                 <input type="time" name="horarios[jueves][0][hora_apertura]" 
-                                       class="hora-input bg-[#262626] border border-[#374151] rounded px-3 py-1 text-white text-sm focus:border-yellow-500 focus:outline-none"
+                                       class="hora-input bg-[#262626] border border-[#374151] rounded px-3 py-1 text-white text-sm focus:border-[#25B5DA] focus:outline-none"
                                        value="09:00" disabled>
                                 <span class="text-[#9CA3AF] text-xs">a</span>
                                 <input type="time" name="horarios[jueves][0][hora_cierre]" 
-                                       class="hora-input bg-[#262626] border border-[#374151] rounded px-3 py-1 text-white text-sm focus:border-yellow-500 focus:outline-none"
+                                       class="hora-input bg-[#262626] border border-[#374151] rounded px-3 py-1 text-white text-sm focus:border-[#25B5DA] focus:outline-none"
                                        value="18:00" disabled>
                                 <button type="button" class="eliminar-bloque-negocio text-red-500 hover:text-red-400 text-xs" style="display: none;">
                                     <i class="fas fa-trash-alt"></i>
@@ -142,21 +142,21 @@
                     <div class="bg-[#1a1a1a] border border-[#374151] rounded-lg p-3">
                         <div class="flex flex-wrap items-center gap-4 mb-2">
                             <div class="flex items-center gap-3">
-                                <input type="checkbox" id="negocio_viernes_abierto" class="negocio-checkbox w-4 h-4 accent-yellow-500">
+                                <input type="checkbox" id="negocio_viernes_abierto" class="negocio-checkbox w-4 h-4 accent-[#25B5DA]">
                                 <label for="negocio_viernes_abierto" class="text-white font-bold uppercase tracking-wider text-sm">Viernes</label>
                             </div>
-                            <button type="button" class="agregar-bloque-negocio text-xs text-[#9CA3AF] hover:text-yellow-500 transition-colors" data-day="viernes">
+                            <button type="button" class="agregar-bloque-negocio text-xs text-[#9CA3AF] hover:text-[#25B5DA] transition-colors" data-day="viernes">
                                 <i class="fas fa-plus-circle mr-1"></i> Agregar bloque
                             </button>
                         </div>
                         <div id="negocio_viernes_bloques" class="bloques-container space-y-2 ml-6">
                             <div class="bloque-horario flex flex-wrap items-center gap-3">
                                 <input type="time" name="horarios[viernes][0][hora_apertura]" 
-                                       class="hora-input bg-[#262626] border border-[#374151] rounded px-3 py-1 text-white text-sm focus:border-yellow-500 focus:outline-none"
+                                       class="hora-input bg-[#262626] border border-[#374151] rounded px-3 py-1 text-white text-sm focus:border-[#25B5DA] focus:outline-none"
                                        value="09:00" disabled>
                                 <span class="text-[#9CA3AF] text-xs">a</span>
                                 <input type="time" name="horarios[viernes][0][hora_cierre]" 
-                                       class="hora-input bg-[#262626] border border-[#374151] rounded px-3 py-1 text-white text-sm focus:border-yellow-500 focus:outline-none"
+                                       class="hora-input bg-[#262626] border border-[#374151] rounded px-3 py-1 text-white text-sm focus:border-[#25B5DA] focus:outline-none"
                                        value="18:00" disabled>
                                 <button type="button" class="eliminar-bloque-negocio text-red-500 hover:text-red-400 text-xs" style="display: none;">
                                     <i class="fas fa-trash-alt"></i>
@@ -170,21 +170,21 @@
                     <div class="bg-[#1a1a1a] border border-[#374151] rounded-lg p-3">
                         <div class="flex flex-wrap items-center gap-4 mb-2">
                             <div class="flex items-center gap-3">
-                                <input type="checkbox" id="negocio_sabado_abierto" class="negocio-checkbox w-4 h-4 accent-yellow-500">
+                                <input type="checkbox" id="negocio_sabado_abierto" class="negocio-checkbox w-4 h-4 accent-[#25B5DA]">
                                 <label for="negocio_sabado_abierto" class="text-white font-bold uppercase tracking-wider text-sm">Sábado</label>
                             </div>
-                            <button type="button" class="agregar-bloque-negocio text-xs text-[#9CA3AF] hover:text-yellow-500 transition-colors" data-day="sabado">
+                            <button type="button" class="agregar-bloque-negocio text-xs text-[#9CA3AF] hover:text-[#25B5DA] transition-colors" data-day="sabado">
                                 <i class="fas fa-plus-circle mr-1"></i> Agregar bloque
                             </button>
                         </div>
                         <div id="negocio_sabado_bloques" class="bloques-container space-y-2 ml-6">
                             <div class="bloque-horario flex flex-wrap items-center gap-3">
                                 <input type="time" name="horarios[sabado][0][hora_apertura]" 
-                                       class="hora-input bg-[#262626] border border-[#374151] rounded px-3 py-1 text-white text-sm focus:border-yellow-500 focus:outline-none"
+                                       class="hora-input bg-[#262626] border border-[#374151] rounded px-3 py-1 text-white text-sm focus:border-[#25B5DA] focus:outline-none"
                                        value="09:00" disabled>
                                 <span class="text-[#9CA3AF] text-xs">a</span>
                                 <input type="time" name="horarios[sabado][0][hora_cierre]" 
-                                       class="hora-input bg-[#262626] border border-[#374151] rounded px-3 py-1 text-white text-sm focus:border-yellow-500 focus:outline-none"
+                                       class="hora-input bg-[#262626] border border-[#374151] rounded px-3 py-1 text-white text-sm focus:border-[#25B5DA] focus:outline-none"
                                        value="14:00" disabled>
                                 <button type="button" class="eliminar-bloque-negocio text-red-500 hover:text-red-400 text-xs" style="display: none;">
                                     <i class="fas fa-trash-alt"></i>
@@ -198,21 +198,21 @@
                     <div class="bg-[#1a1a1a] border border-[#374151] rounded-lg p-3">
                         <div class="flex flex-wrap items-center gap-4 mb-2">
                             <div class="flex items-center gap-3">
-                                <input type="checkbox" id="negocio_domingo_abierto" class="negocio-checkbox w-4 h-4 accent-yellow-500">
+                                <input type="checkbox" id="negocio_domingo_abierto" class="negocio-checkbox w-4 h-4 accent-[#25B5DA]">
                                 <label for="negocio_domingo_abierto" class="text-white font-bold uppercase tracking-wider text-sm">Domingo</label>
                             </div>
-                            <button type="button" class="agregar-bloque-negocio text-xs text-[#9CA3AF] hover:text-yellow-500 transition-colors" data-day="domingo">
+                            <button type="button" class="agregar-bloque-negocio text-xs text-[#9CA3AF] hover:text-[#25B5DA] transition-colors" data-day="domingo">
                                 <i class="fas fa-plus-circle mr-1"></i> Agregar bloque
                             </button>
                         </div>
                         <div id="negocio_domingo_bloques" class="bloques-container space-y-2 ml-6">
                             <div class="bloque-horario flex flex-wrap items-center gap-3">
                                 <input type="time" name="horarios[domingo][0][hora_apertura]" 
-                                       class="hora-input bg-[#262626] border border-[#374151] rounded px-3 py-1 text-white text-sm focus:border-yellow-500 focus:outline-none"
+                                       class="hora-input bg-[#262626] border border-[#374151] rounded px-3 py-1 text-white text-sm focus:border-[#25B5DA] focus:outline-none"
                                        value="09:00" disabled>
                                 <span class="text-[#9CA3AF] text-xs">a</span>
                                 <input type="time" name="horarios[domingo][0][hora_cierre]" 
-                                       class="hora-input bg-[#262626] border border-[#374151] rounded px-3 py-1 text-white text-sm focus:border-yellow-500 focus:outline-none"
+                                       class="hora-input bg-[#262626] border border-[#374151] rounded px-3 py-1 text-white text-sm focus:border-[#25B5DA] focus:outline-none"
                                        value="14:00" disabled>
                                 <button type="button" class="eliminar-bloque-negocio text-red-500 hover:text-red-400 text-xs" style="display: none;">
                                     <i class="fas fa-trash-alt"></i>
@@ -243,10 +243,10 @@
                 
                 <div class="space-y-3 max-h-[500px] overflow-y-auto custom-scroll pr-2">
                     @forelse($employees as $empleado)
-                    <div class="bg-[#1a1a1a] border border-[#374151] rounded-lg p-4 hover:border-yellow-500/50 transition-all">
+                    <div class="bg-[#1a1a1a] border border-[#374151] rounded-lg p-4 hover:border-[#25B5DA]/50 transition-all">
                         <div class="flex justify-between items-center">
                             <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 bg-yellow-500/20 text-yellow-500 rounded-full flex items-center justify-center font-bold">
+                                <div class="w-10 h-10 bg-[#25B5DA]/20 text-[#25B5DA] rounded-full flex items-center justify-center font-bold">
                                     {{ strtoupper(substr($empleado['nombre'], 0, 1)) }}
                                 </div>
                                 <div>
@@ -255,7 +255,7 @@
                                 </div>
                             </div>
                             <button type="button" onclick="abrirModalHorarioEmpleado({{ $empleado['id_empleado'] }}, '{{ $empleado['nombre'] }}')" 
-                                    class="px-4 py-2 text-xs bg-yellow-500/10 border border-yellow-500/30 text-yellow-500 rounded hover:bg-yellow-500 hover:text-black transition-all">
+                                    class="px-4 py-2 text-xs bg-[#25B5DA]/10 border border-[#25B5DA]/30 text-[#25B5DA] rounded hover:bg-[#25B5DA] hover:text-black transition-all">
                                 <i class="fas fa-clock mr-1"></i> Configurar Horario
                             </button>
                         </div>
@@ -264,7 +264,7 @@
                     <div class="text-center py-8 text-[#9CA3AF]">
                         <i class="fas fa-users text-4xl mb-2 opacity-50"></i>
                         <p>No hay empleados registrados aún.</p>
-                        <a href="#" onclick="switchTab('personnel')" class="text-yellow-500 text-sm hover:underline mt-2 inline-block">
+                        <a href="#" onclick="switchTab('personnel')" class="text-[#25B5DA] text-sm hover:underline mt-2 inline-block">
                             Agregar empleados
                         </a>
                     </div>
@@ -294,7 +294,7 @@
     <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-[#1a1a1a] border border-[#374151] p-6 w-full max-w-3xl max-h-[90vh] overflow-y-auto">
         <div class="flex justify-between items-center mb-4">
             <h3 class="text-white font-bold uppercase flex items-center gap-2">
-                <i class="fas fa-user-clock"></i> Horario de <span id="empleado-nombre" class="text-yellow-500"></span>
+                <i class="fas fa-user-clock"></i> Horario de <span id="empleado-nombre" class="text-[#25B5DA]"></span>
             </h3>
             <button onclick="cerrarModalHorarioEmpleado()" class="text-[#9CA3AF] hover:text-white">
                 <i class="fas fa-times"></i>
@@ -303,7 +303,7 @@
         
         <p class="text-[#9CA3AF] text-xs mb-4">
             Configura los horarios de trabajo para este empleado. 
-            <span class="text-yellow-500">✔ Marca "Usar horario propio"</span> para establecer un horario específico. 
+            <span class="text-[#25B5DA]">✔ Marca "Usar horario propio"</span> para establecer un horario específico. 
             Si no se marca, usará el horario general del negocio.
         </p>
         
@@ -314,9 +314,9 @@
             <!-- Lunes -->
             <div class="bg-[#1a1a1a] border border-[#374151] rounded-lg p-3">
                 <div class="flex items-center gap-3 mb-2">
-                    <input type="checkbox" id="emp_lunes_activo" class="empleado-checkbox w-4 h-4 accent-yellow-500">
+                    <input type="checkbox" id="emp_lunes_activo" class="empleado-checkbox w-4 h-4 accent-[#25B5DA]">
                     <label class="text-white font-bold text-sm">Lunes</label>
-                    <span class="text-[10px] text-yellow-500 ml-auto">
+                    <span class="text-[10px] text-[#25B5DA] ml-auto">
                         <i class="fas fa-check-circle mr-1"></i> Usar horario propio
                     </span>
                 </div>
@@ -325,7 +325,7 @@
                         <input type="time" id="emp_lunes_inicio" class="bg-[#262626] border border-[#374151] rounded px-3 py-1 text-white text-sm" value="09:00" disabled>
                         <span class="text-[#9CA3AF]">a</span>
                         <input type="time" id="emp_lunes_fin" class="bg-[#262626] border border-[#374151] rounded px-3 py-1 text-white text-sm" value="18:00" disabled>
-                        <button type="button" class="agregar-bloque-empleado text-xs text-[#9CA3AF] hover:text-yellow-500 transition-colors" data-dia="lunes">
+                        <button type="button" class="agregar-bloque-empleado text-xs text-[#9CA3AF] hover:text-[#25B5DA] transition-colors" data-dia="lunes">
                             <i class="fas fa-plus-circle mr-1"></i> Agregar bloque
                         </button>
                     </div>
@@ -338,9 +338,9 @@
             <!-- Martes -->
             <div class="bg-[#1a1a1a] border border-[#374151] rounded-lg p-3">
                 <div class="flex items-center gap-3 mb-2">
-                    <input type="checkbox" id="emp_martes_activo" class="empleado-checkbox w-4 h-4 accent-yellow-500">
+                    <input type="checkbox" id="emp_martes_activo" class="empleado-checkbox w-4 h-4 accent-[#25B5DA]">
                     <label class="text-white font-bold text-sm">Martes</label>
-                    <span class="text-[10px] text-yellow-500 ml-auto">
+                    <span class="text-[10px] text-[#25B5DA] ml-auto">
                         <i class="fas fa-check-circle mr-1"></i> Usar horario propio
                     </span>
                 </div>
@@ -349,7 +349,7 @@
                         <input type="time" id="emp_martes_inicio" class="bg-[#262626] border border-[#374151] rounded px-3 py-1 text-white text-sm" value="09:00" disabled>
                         <span class="text-[#9CA3AF]">a</span>
                         <input type="time" id="emp_martes_fin" class="bg-[#262626] border border-[#374151] rounded px-3 py-1 text-white text-sm" value="18:00" disabled>
-                        <button type="button" class="agregar-bloque-empleado text-xs text-[#9CA3AF] hover:text-yellow-500 transition-colors" data-dia="martes">
+                        <button type="button" class="agregar-bloque-empleado text-xs text-[#9CA3AF] hover:text-[#25B5DA] transition-colors" data-dia="martes">
                             <i class="fas fa-plus-circle mr-1"></i> Agregar bloque
                         </button>
                     </div>
@@ -362,9 +362,9 @@
             <!-- Miércoles -->
             <div class="bg-[#1a1a1a] border border-[#374151] rounded-lg p-3">
                 <div class="flex items-center gap-3 mb-2">
-                    <input type="checkbox" id="emp_miercoles_activo" class="empleado-checkbox w-4 h-4 accent-yellow-500">
+                    <input type="checkbox" id="emp_miercoles_activo" class="empleado-checkbox w-4 h-4 accent-[#25B5DA]">
                     <label class="text-white font-bold text-sm">Miércoles</label>
-                    <span class="text-[10px] text-yellow-500 ml-auto">
+                    <span class="text-[10px] text-[#25B5DA] ml-auto">
                         <i class="fas fa-check-circle mr-1"></i> Usar horario propio
                     </span>
                 </div>
@@ -373,7 +373,7 @@
                         <input type="time" id="emp_miercoles_inicio" class="bg-[#262626] border border-[#374151] rounded px-3 py-1 text-white text-sm" value="09:00" disabled>
                         <span class="text-[#9CA3AF]">a</span>
                         <input type="time" id="emp_miercoles_fin" class="bg-[#262626] border border-[#374151] rounded px-3 py-1 text-white text-sm" value="18:00" disabled>
-                        <button type="button" class="agregar-bloque-empleado text-xs text-[#9CA3AF] hover:text-yellow-500 transition-colors" data-dia="miercoles">
+                        <button type="button" class="agregar-bloque-empleado text-xs text-[#9CA3AF] hover:text-[#25B5DA] transition-colors" data-dia="miercoles">
                             <i class="fas fa-plus-circle mr-1"></i> Agregar bloque
                         </button>
                     </div>
@@ -386,9 +386,9 @@
             <!-- Jueves -->
             <div class="bg-[#1a1a1a] border border-[#374151] rounded-lg p-3">
                 <div class="flex items-center gap-3 mb-2">
-                    <input type="checkbox" id="emp_jueves_activo" class="empleado-checkbox w-4 h-4 accent-yellow-500">
+                    <input type="checkbox" id="emp_jueves_activo" class="empleado-checkbox w-4 h-4 accent-[#25B5DA]">
                     <label class="text-white font-bold text-sm">Jueves</label>
-                    <span class="text-[10px] text-yellow-500 ml-auto">
+                    <span class="text-[10px] text-[#25B5DA] ml-auto">
                         <i class="fas fa-check-circle mr-1"></i> Usar horario propio
                     </span>
                 </div>
@@ -397,7 +397,7 @@
                         <input type="time" id="emp_jueves_inicio" class="bg-[#262626] border border-[#374151] rounded px-3 py-1 text-white text-sm" value="09:00" disabled>
                         <span class="text-[#9CA3AF]">a</span>
                         <input type="time" id="emp_jueves_fin" class="bg-[#262626] border border-[#374151] rounded px-3 py-1 text-white text-sm" value="18:00" disabled>
-                        <button type="button" class="agregar-bloque-empleado text-xs text-[#9CA3AF] hover:text-yellow-500 transition-colors" data-dia="jueves">
+                        <button type="button" class="agregar-bloque-empleado text-xs text-[#9CA3AF] hover:text-[#25B5DA] transition-colors" data-dia="jueves">
                             <i class="fas fa-plus-circle mr-1"></i> Agregar bloque
                         </button>
                     </div>
@@ -410,9 +410,9 @@
             <!-- Viernes -->
             <div class="bg-[#1a1a1a] border border-[#374151] rounded-lg p-3">
                 <div class="flex items-center gap-3 mb-2">
-                    <input type="checkbox" id="emp_viernes_activo" class="empleado-checkbox w-4 h-4 accent-yellow-500">
+                    <input type="checkbox" id="emp_viernes_activo" class="empleado-checkbox w-4 h-4 accent-[#25B5DA]">
                     <label class="text-white font-bold text-sm">Viernes</label>
-                    <span class="text-[10px] text-yellow-500 ml-auto">
+                    <span class="text-[10px] text-[#25B5DA] ml-auto">
                         <i class="fas fa-check-circle mr-1"></i> Usar horario propio
                     </span>
                 </div>
@@ -421,7 +421,7 @@
                         <input type="time" id="emp_viernes_inicio" class="bg-[#262626] border border-[#374151] rounded px-3 py-1 text-white text-sm" value="09:00" disabled>
                         <span class="text-[#9CA3AF]">a</span>
                         <input type="time" id="emp_viernes_fin" class="bg-[#262626] border border-[#374151] rounded px-3 py-1 text-white text-sm" value="18:00" disabled>
-                        <button type="button" class="agregar-bloque-empleado text-xs text-[#9CA3AF] hover:text-yellow-500 transition-colors" data-dia="viernes">
+                        <button type="button" class="agregar-bloque-empleado text-xs text-[#9CA3AF] hover:text-[#25B5DA] transition-colors" data-dia="viernes">
                             <i class="fas fa-plus-circle mr-1"></i> Agregar bloque
                         </button>
                     </div>
@@ -434,9 +434,9 @@
             <!-- Sábado -->
             <div class="bg-[#1a1a1a] border border-[#374151] rounded-lg p-3">
                 <div class="flex items-center gap-3 mb-2">
-                    <input type="checkbox" id="emp_sabado_activo" class="empleado-checkbox w-4 h-4 accent-yellow-500">
+                    <input type="checkbox" id="emp_sabado_activo" class="empleado-checkbox w-4 h-4 accent-[#25B5DA]">
                     <label class="text-white font-bold text-sm">Sábado</label>
-                    <span class="text-[10px] text-yellow-500 ml-auto">
+                    <span class="text-[10px] text-[#25B5DA] ml-auto">
                         <i class="fas fa-check-circle mr-1"></i> Usar horario propio
                     </span>
                 </div>
@@ -445,7 +445,7 @@
                         <input type="time" id="emp_sabado_inicio" class="bg-[#262626] border border-[#374151] rounded px-3 py-1 text-white text-sm" value="09:00" disabled>
                         <span class="text-[#9CA3AF]">a</span>
                         <input type="time" id="emp_sabado_fin" class="bg-[#262626] border border-[#374151] rounded px-3 py-1 text-white text-sm" value="14:00" disabled>
-                        <button type="button" class="agregar-bloque-empleado text-xs text-[#9CA3AF] hover:text-yellow-500 transition-colors" data-dia="sabado">
+                        <button type="button" class="agregar-bloque-empleado text-xs text-[#9CA3AF] hover:text-[#25B5DA] transition-colors" data-dia="sabado">
                             <i class="fas fa-plus-circle mr-1"></i> Agregar bloque
                         </button>
                     </div>
@@ -458,9 +458,9 @@
             <!-- Domingo -->
             <div class="bg-[#1a1a1a] border border-[#374151] rounded-lg p-3">
                 <div class="flex items-center gap-3 mb-2">
-                    <input type="checkbox" id="emp_domingo_activo" class="empleado-checkbox w-4 h-4 accent-yellow-500">
+                    <input type="checkbox" id="emp_domingo_activo" class="empleado-checkbox w-4 h-4 accent-[#25B5DA]">
                     <label class="text-white font-bold text-sm">Domingo</label>
-                    <span class="text-[10px] text-yellow-500 ml-auto">
+                    <span class="text-[10px] text-[#25B5DA] ml-auto">
                         <i class="fas fa-check-circle mr-1"></i> Usar horario propio
                     </span>
                 </div>
@@ -469,7 +469,7 @@
                         <input type="time" id="emp_domingo_inicio" class="bg-[#262626] border border-[#374151] rounded px-3 py-1 text-white text-sm" value="09:00" disabled>
                         <span class="text-[#9CA3AF]">a</span>
                         <input type="time" id="emp_domingo_fin" class="bg-[#262626] border border-[#374151] rounded px-3 py-1 text-white text-sm" value="14:00" disabled>
-                        <button type="button" class="agregar-bloque-empleado text-xs text-[#9CA3AF] hover:text-yellow-500 transition-colors" data-dia="domingo">
+                        <button type="button" class="agregar-bloque-empleado text-xs text-[#9CA3AF] hover:text-[#25B5DA] transition-colors" data-dia="domingo">
                             <i class="fas fa-plus-circle mr-1"></i> Agregar bloque
                         </button>
                     </div>
@@ -480,7 +480,7 @@
             </div>
             
             <div class="flex gap-3 mt-6 pt-4 border-t border-[#374151]">
-                <button type="submit" class="flex-1 py-2 bg-yellow-500 text-black font-bold rounded hover:bg-yellow-400 transition">
+                <button type="submit" class="flex-1 py-2 bg-[#25B5DA] text-black font-bold rounded hover:bg-[#1c8fb0] transition">
                     Guardar Horario
                 </button>
                 <button type="button" onclick="cerrarModalHorarioEmpleado()" class="flex-1 py-2 border border-[#374151] text-white rounded hover:bg-[#374151] transition">
@@ -512,11 +512,11 @@ function agregarBloqueNegocio(dia) {
     nuevoBloque.className = 'bloque-horario flex flex-wrap items-center gap-3 mt-2';
     nuevoBloque.innerHTML = `
         <input type="time" name="horarios[${dia}][${bloqueCount}][hora_apertura]" 
-               class="hora-input bg-[#262626] border border-[#374151] rounded px-3 py-1 text-white text-sm focus:border-yellow-500 focus:outline-none"
+               class="hora-input bg-[#262626] border border-[#374151] rounded px-3 py-1 text-white text-sm focus:border-[#25B5DA] focus:outline-none"
                value="16:00">
         <span class="text-[#9CA3AF] text-xs">a</span>
         <input type="time" name="horarios[${dia}][${bloqueCount}][hora_cierre]" 
-               class="hora-input bg-[#262626] border border-[#374151] rounded px-3 py-1 text-white text-sm focus:border-yellow-500 focus:outline-none"
+               class="hora-input bg-[#262626] border border-[#374151] rounded px-3 py-1 text-white text-sm focus:border-[#25B5DA] focus:outline-none"
                value="20:00">
         <button type="button" class="eliminar-bloque-negocio text-red-500 hover:text-red-400 text-xs">
             <i class="fas fa-trash-alt"></i> Eliminar
@@ -643,11 +643,11 @@ async function cargarHorariosNegocio() {
                         bloque1.className = 'bloque-horario flex flex-wrap items-center gap-3';
                         bloque1.innerHTML = `
                             <input type="time" name="horarios[${dia}][0][hora_apertura]" 
-                                   class="hora-input bg-[#262626] border border-[#374151] rounded px-3 py-1 text-white text-sm focus:border-yellow-500 focus:outline-none"
+                                   class="hora-input bg-[#262626] border border-[#374151] rounded px-3 py-1 text-white text-sm focus:border-[#25B5DA] focus:outline-none"
                                    value="${horaApertura}">
                             <span class="text-[#9CA3AF] text-xs">a</span>
                             <input type="time" name="horarios[${dia}][0][hora_cierre]" 
-                                   class="hora-input bg-[#262626] border border-[#374151] rounded px-3 py-1 text-white text-sm focus:border-yellow-500 focus:outline-none"
+                                   class="hora-input bg-[#262626] border border-[#374151] rounded px-3 py-1 text-white text-sm focus:border-[#25B5DA] focus:outline-none"
                                    value="${horaCierre}">
                             <button type="button" class="eliminar-bloque-negocio text-red-500 hover:text-red-400 text-xs">
                                 <i class="fas fa-trash-alt"></i> Eliminar
@@ -663,11 +663,11 @@ async function cargarHorariosNegocio() {
                             bloque2.className = 'bloque-horario flex flex-wrap items-center gap-3 mt-2';
                             bloque2.innerHTML = `
                                 <input type="time" name="horarios[${dia}][1][hora_apertura]" 
-                                       class="hora-input bg-[#262626] border border-[#374151] rounded px-3 py-1 text-white text-sm focus:border-yellow-500 focus:outline-none"
+                                       class="hora-input bg-[#262626] border border-[#374151] rounded px-3 py-1 text-white text-sm focus:border-[#25B5DA] focus:outline-none"
                                        value="${horaApertura2}">
                                 <span class="text-[#9CA3AF] text-xs">a</span>
                                 <input type="time" name="horarios[${dia}][1][hora_cierre]" 
-                                       class="hora-input bg-[#262626] border border-[#374151] rounded px-3 py-1 text-white text-sm focus:border-yellow-500 focus:outline-none"
+                                       class="hora-input bg-[#262626] border border-[#374151] rounded px-3 py-1 text-white text-sm focus:border-[#25B5DA] focus:outline-none"
                                        value="${horaCierre2}">
                                 <button type="button" class="eliminar-bloque-negocio text-red-500 hover:text-red-400 text-xs">
                                     <i class="fas fa-trash-alt"></i> Eliminar
@@ -692,11 +692,11 @@ async function cargarHorariosNegocio() {
                         bloquePlaceholder.className = 'bloque-horario flex flex-wrap items-center gap-3';
                         bloquePlaceholder.innerHTML = `
                             <input type="time" name="horarios[${dia}][0][hora_apertura]" 
-                                   class="hora-input bg-[#262626] border border-[#374151] rounded px-3 py-1 text-white text-sm focus:border-yellow-500 focus:outline-none"
+                                   class="hora-input bg-[#262626] border border-[#374151] rounded px-3 py-1 text-white text-sm focus:border-[#25B5DA] focus:outline-none"
                                    value="09:00" disabled>
                             <span class="text-[#9CA3AF] text-xs">a</span>
                             <input type="time" name="horarios[${dia}][0][hora_cierre]" 
-                                   class="hora-input bg-[#262626] border border-[#374151] rounded px-3 py-1 text-white text-sm focus:border-yellow-500 focus:outline-none"
+                                   class="hora-input bg-[#262626] border border-[#374151] rounded px-3 py-1 text-white text-sm focus:border-[#25B5DA] focus:outline-none"
                                    value="18:00" disabled>
                         `;
                         container.appendChild(bloquePlaceholder);
@@ -731,11 +731,11 @@ function resetHorarioNegocio() {
                 
                 bloque.innerHTML = `
                     <input type="time" name="horarios[${dia}][0][hora_apertura]" 
-                           class="hora-input bg-[#262626] border border-[#374151] rounded px-3 py-1 text-white text-sm focus:border-yellow-500 focus:outline-none"
+                           class="hora-input bg-[#262626] border border-[#374151] rounded px-3 py-1 text-white text-sm focus:border-[#25B5DA] focus:outline-none"
                            value="${apertura}">
                     <span class="text-[#9CA3AF] text-xs">a</span>
                     <input type="time" name="horarios[${dia}][0][hora_cierre]" 
-                           class="hora-input bg-[#262626] border border-[#374151] rounded px-3 py-1 text-white text-sm focus:border-yellow-500 focus:outline-none"
+                           class="hora-input bg-[#262626] border border-[#374151] rounded px-3 py-1 text-white text-sm focus:border-[#25B5DA] focus:outline-none"
                            value="${cierre}">
                     <button type="button" class="eliminar-bloque-negocio text-red-500 hover:text-red-400 text-xs">
                         <i class="fas fa-trash-alt"></i> Eliminar

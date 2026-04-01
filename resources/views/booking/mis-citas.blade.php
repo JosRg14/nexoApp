@@ -14,14 +14,14 @@
         @if(count($citas) > 0)
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             @foreach($citas as $cita)
-            <div class="bg-[#262626] border border-[#374151] rounded-lg p-6 hover:border-yellow-500 transition-all">
+            <div class="bg-[#262626] border border-[#374151] rounded-lg p-6 hover:border-[#25B5DA] transition-all">
                 <div class="flex justify-between items-start mb-4">
                     <div>
                         <h3 class="font-bold text-white text-lg">{{ $cita['servicio']['nombre'] ?? 'Servicio' }}</h3>
                         <p class="text-sm text-[#9CA3AF] mt-1">{{ $cita['negocio']['nombre'] ?? 'Negocio' }}</p>
                     </div>
                     <span class="px-2 py-1 text-xs rounded-full 
-                        {{ $cita['estado'] === 'pendiente' ? 'bg-yellow-500/20 text-yellow-500' : '' }}
+                        {{ $cita['estado'] === 'pendiente' ? 'bg-[#25B5DA]/20 text-[#25B5DA]' : '' }}
                         {{ $cita['estado'] === 'confirmada' ? 'bg-blue-500/20 text-blue-500' : '' }}
                         {{ $cita['estado'] === 'en_proceso' ? 'bg-orange-500/20 text-orange-500' : '' }}
                         {{ $cita['estado'] === 'completada' ? 'bg-emerald-500/20 text-emerald-500' : '' }}
@@ -44,7 +44,7 @@
                         <i class="fas fa-user w-4"></i>
                         <span>{{ $cita['empleado']['nombre'] ?? 'Empleado' }}</span>
                     </div>
-                    <div class="flex items-center gap-2 text-yellow-500">
+                    <div class="flex items-center gap-2 text-[#25B5DA]">
                         <i class="fas fa-dollar-sign w-4"></i>
                         <span>${{ number_format($cita['servicio']['precio'] ?? 0, 2) }}</span>
                     </div>
@@ -65,7 +65,7 @@
         <div class="text-center py-16">
             <i class="fas fa-calendar-alt text-6xl text-[#374151] mb-4"></i>
             <p class="text-[#9CA3AF] text-lg">No tienes citas agendadas</p>
-            <a href="/" class="inline-block mt-4 text-yellow-500 hover:text-yellow-400">Explorar negocios</a>
+            <a href="/" class="inline-block mt-4 text-[#25B5DA] hover:text-[#1c8fb0]">Explorar negocios</a>
         </div>
         @endif
     </div>

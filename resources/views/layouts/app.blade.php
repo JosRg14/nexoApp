@@ -40,7 +40,7 @@
             color: '#fff',
             customClass: {
                 popup: 'border border-[#374151] rounded-xl',
-                confirmButton: 'bg-yellow-500 hover:bg-yellow-600 text-black px-4 py-2 rounded-lg font-bold transition-all',
+                confirmButton: 'bg-[#25B5DA] hover:bg-[#1c8fb0] text-black px-4 py-2 rounded-lg font-bold transition-all',
                 cancelButton: 'bg-transparent text-[#9CA3AF] hover:text-white px-4 py-2 transition-colors'
             },
             buttonsStyling: false
