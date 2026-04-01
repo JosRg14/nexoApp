@@ -36,10 +36,19 @@ public function showClientRegister()
     \Log::info('=== LOGIN NORMAL ===');
     \Log::info('Correo:', ['correo' => $request->email]);
     
-    $response = Http::post(config('services.api.url') . '/api/login', [
-        'correo' => $request->email,
-        'contrasena' => $request->password,
-    ]);
+    $headers = [
+        'Accept' => 'application/json',
+        'ngrok-skip-browser-warning' => 'true',
+        'User-Agent' => 'Mozilla/5.0',
+    ];
+
+    $response = Http::withHeaders($headers)
+        ->timeout(15)
+        ->retry(2, 500)
+        ->post(config('services.api.url') . '/api/login', [
+            'correo' => $request->email,
+            'contrasena' => $request->password,
+        ]);
 
     \Log::info('API Response:', [
         'status' => $response->status(),
