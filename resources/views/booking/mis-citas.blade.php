@@ -76,7 +76,8 @@ async function cancelarCita(citaId) {
     const motivo = prompt('¿Desea ingresar un motivo de cancelación? (Opcional)');
     if (motivo === null) return; // Se canceló el prompt
     
-    if (!confirm('¿Estás seguro de cancelar esta cita?')) return;
+    const confirmacion = await confirmCustom('¿Estás seguro de cancelar esta cita?');
+    if (!confirmacion.isConfirmed) return;
     
     showLoader();
     
@@ -95,14 +96,14 @@ async function cancelarCita(citaId) {
         const data = await response.json();
         
         if (response.ok && data.success !== false) {
-            alert('Cita cancelada correctamente');
-            location.reload(); // Recarga para actualizar listado y estados
+            showToast('Cita cancelada correctamente', 'success');
+            setTimeout(() => location.reload(), 1500); // Recarga para actualizar listado y estados
         } else {
-            alert(data.message || 'Error al cancelar la cita');
+            showToast(data.message || 'Error al cancelar la cita', 'error');
         }
     } catch (error) {
         console.error('Error:', error);
-        alert('Error de conexión');
+        showToast('Error de conexión', 'error');
     } finally {
         hideLoader();
     }

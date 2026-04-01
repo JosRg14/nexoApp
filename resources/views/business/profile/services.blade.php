@@ -268,7 +268,7 @@
                     if (typeof showToast === 'function') {
                         showToast(data.message || "¡Servicio agregado exitosamente!");
                     } else {
-                        alert(data.message || "¡Servicio agregado exitosamente!");
+                        showToast(data.message || "¡Servicio agregado exitosamente!", "success");
                     }
                     setTimeout(() => {
                         window.location.href = redirectUrl;
@@ -280,15 +280,15 @@
                         for (const [field, errors] of Object.entries(data.errors)) {
                             errorMsg += `${field}: ${errors.join(', ')}\n`;
                         }
-                        alert(errorMsg);
+                        showToast(errorMsg, "error");
                     } else {
-                        alert(data.message || "Error al procesar la solicitud.");
+                        showToast(data.message || "Error al procesar la solicitud.", "error");
                     }
                 }
             } catch (error) {
                 if (typeof hideLoader === 'function') hideLoader();
                 console.error("Error:", error);
-                alert("Error de conexión con el servidor");
+                showToast("Error de conexión con el servidor", "error");
             }
         }
     });

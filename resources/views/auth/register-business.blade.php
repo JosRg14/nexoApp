@@ -159,7 +159,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const data = await response.json();
 
             if (!response.ok) {
-                alert(data?.message || 'Error en registro');
+            showToast(data?.message || 'Error en registro', 'error');
                 return;
             }
 
@@ -169,11 +169,16 @@ document.addEventListener('DOMContentLoaded', function () {
 
         } catch (error) {
             console.error(error);
-            alert('Error de conexión');
+            showToast('Error de conexión', 'error');
         }
     });
 
 });
 </script>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="fixed bottom-4 right-4 z-[9999] flex flex-col gap-3 pointer-events-none"></div>
+    @include('components.toast')
+
 </body>
 </html>

@@ -31,6 +31,37 @@
     {{-- Footer --}}
     @include('partials.footer')
 
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        // Custom SweetAlert theme para dark mode
+        const swalCustom = Swal.mixin({
+            background: '#262626',
+            color: '#fff',
+            customClass: {
+                popup: 'border border-[#374151] rounded-xl',
+                confirmButton: 'bg-yellow-500 hover:bg-yellow-600 text-black px-4 py-2 rounded-lg font-bold transition-all',
+                cancelButton: 'bg-transparent text-[#9CA3AF] hover:text-white px-4 py-2 transition-colors'
+            },
+            buttonsStyling: false
+        });
+        window.confirmCustom = function(title, text = '') {
+            return swalCustom.fire({
+                title: title,
+                text: text,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Sí, continuar',
+                cancelButtonText: 'Cancelar'
+            });
+        }
+    </script>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="fixed bottom-4 right-4 z-[9999] flex flex-col gap-3 pointer-events-none"></div>
+
+    @include('components.toast')
+
     {{-- Intercepción de Solicitudes vía API Proxy --}}
     <script>
         document.addEventListener('submit', async function(e) {
@@ -85,11 +116,11 @@
                         }
                     } else {
                         // Error
-                        alert(data.message || 'Ocurrió un error en la solicitud.');
+                        showToast(data.message || 'Ocurrió un error en la solicitud.', 'error');
                     }
                 } catch (error) {
                     console.error('Submission error:', error);
-                    alert('Error de conexión con el servidor.');
+                    showToast('Error de conexión con el servidor.', 'error');
                 } finally {
                     if (submitBtn) {
                         submitBtn.disabled = false;
@@ -103,7 +134,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             const msg = sessionStorage.getItem('success_message');
             if (msg) {
-                alert(msg); // O puedes reemplazarlo con un Toast
+                showToast(msg, 'success');
                 sessionStorage.removeItem('success_message');
             }
         });

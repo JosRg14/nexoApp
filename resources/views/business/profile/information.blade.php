@@ -319,14 +319,14 @@ if (registroForm) {
             const data = await response.json();
             
             if (response.ok && data.success) {
-                alert('¡Negocio registrado exitosamente!');
+                showToast('¡Negocio registrado exitosamente!', 'success');
                 window.location.reload();
             } else {
-                alert(data.message || 'Error al registrar negocio');
+                showToast(data.message || 'Error al registrar negocio', 'error');
             }
         } catch (error) {
             console.error('Error:', error);
-            alert('Error de conexión al servidor');
+            showToast('Error de conexión al servidor', 'error');
         } finally {
             if (typeof hideLoader === 'function') hideLoader();
         }

@@ -156,21 +156,25 @@ document.getElementById('registerForm').addEventListener('submit', async functio
         const data = await response.json().catch(() => null);
 
         if (!response.ok) {
-            alert(data?.message || 'Error en registro');
+            showToast(data?.message || 'Error en registro', 'error');
             return;
         }
 
         if (data?.redirect) {
             window.location.href = data.redirect;
         } else {
-            alert('Registro exitoso');
+            showToast('Registro exitoso', 'success');
         }
 
     } catch (error) {
         console.error(error);
-        alert('Error de conexión con el servidor');
+        showToast('Error de conexión con el servidor', 'error');
     }
 });
 </script>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="fixed bottom-4 right-4 z-[9999] flex flex-col gap-3 pointer-events-none"></div>
+    @include('components.toast')
 </body>
 </html>

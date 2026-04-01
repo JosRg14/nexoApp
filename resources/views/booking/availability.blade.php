@@ -240,7 +240,7 @@
             // Confirm Logic
             btnConfirm.addEventListener('click', () => {
                 if (!selectedTime) {
-                    alert('Por favor selecciona un horario');
+                    showToast('Por favor selecciona un horario', 'warning');
                     return;
                 }
 

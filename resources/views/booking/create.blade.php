@@ -296,7 +296,7 @@ document.getElementById('cita-form').addEventListener('submit', async function(e
     const negocioId = document.getElementById('negocio_id').value;
     
     if (!servicioId || !empleadoId || !fecha || !hora) {
-        alert('Por favor completa todos los campos');
+        showToast('Por favor completa todos los campos', 'warning');
         return;
     }
     
@@ -326,16 +326,16 @@ document.getElementById('cita-form').addEventListener('submit', async function(e
         const data = await response.json();
         
         if (response.ok && data.success) {
-            alert(data.message || 'Cita agendada correctamente');
+            showToast(data.message || 'Cita agendada correctamente', 'success');
             window.location.href = '/mis-citas';
         } else {
-            alert(data.message || 'Error al agendar cita');
+            showToast(data.message || 'Error al agendar cita', 'error');
             btnSubmit.disabled = false;
             btnSubmit.textContent = 'Confirmar Cita';
         }
     } catch (error) {
         console.error('Error:', error);
-        alert('Error de conexión');
+        showToast('Error de conexión', 'error');
         btnSubmit.disabled = false;
         btnSubmit.textContent = 'Confirmar Cita';
     }
