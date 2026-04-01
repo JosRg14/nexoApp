@@ -14,7 +14,7 @@
                 <div class="max-w-3xl space-y-8 animate-fade-in-up">
                     <h1 class="text-5xl md:text-7xl font-bold uppercase tracking-wide text-white leading-tight">
                         Hola, <br/>
-                        <span class="text-[#25B5DA]">{{ explode(' ', session('usuario')['nombre'])[0] }}!</span>
+                        <span class="text-[#25B5DA]">{{ session('usuario')['nombre_completo'] ?? session('usuario')['nombre'] ?? 'Usuario' }}!</span>
                     </h1>
                     
                     <p class="text-[#9CA3AF] text-lg leading-relaxed max-w-2xl border-l border-[#25B5DA]/50 pl-6">

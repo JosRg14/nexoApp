@@ -204,6 +204,15 @@ public function showClientRegister()
      */
     protected function formatUserData(array $usuario): array
     {
+        // Handle nested cliente data
+        if (isset($usuario['rol']) && $usuario['rol'] === 'cliente' && isset($usuario['cliente'])) {
+            $cliente = $usuario['cliente'];
+            $usuario['nombre'] = $cliente['nombre'] ?? '';
+            $usuario['app_paterno'] = $cliente['app_paterno'] ?? '';
+            $usuario['app_materno'] = $cliente['app_materno'] ?? '';
+            $usuario['telefono'] = $cliente['telefono'] ?? null;
+        }
+
         // Construct full name if missing
         if (!isset($usuario['nombre_completo'])) {
             $nombre = $usuario['nombre'] ?? '';

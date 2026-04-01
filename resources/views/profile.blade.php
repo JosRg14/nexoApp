@@ -19,7 +19,7 @@
                 <div class="mb-6 shadow-2xl rounded-full">
                     <x-profile-avatar size="large" />
                 </div>
-                <h2 class="text-xl font-bold text-white text-center mb-1">{{ $usuario['nombre'] }}</h2>
+                <h2 class="text-xl font-bold text-white text-center mb-1">{{ $usuario['nombre_completo'] ?? $usuario['nombre'] ?? 'Usuario' }}</h2>
                 <div class="px-3 py-1 bg-white/10 rounded-full">
                     <span class="text-[10px] uppercase tracking-widest text-[#9CA3AF] font-bold">{{ $rol }}</span>
                 </div>
@@ -31,7 +31,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div>
                         <p class="text-[10px] uppercase tracking-widest text-[#9CA3AF] mb-1 font-bold">Nombre Completo</p>
-                        <p class="text-white font-medium">{{ $usuario['nombre'] }}</p>
+                        <p class="text-white font-medium">{{ $usuario['nombre_completo'] ?? $usuario['nombre'] ?? 'No especificado' }}</p>
                     </div>
                     <div>
                         <p class="text-[10px] uppercase tracking-widest text-[#9CA3AF] mb-1 font-bold">Correo Electrónico</p>
