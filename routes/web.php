@@ -13,6 +13,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\NegocioController;
 use Illuminate\Http\Request;
 use App\Http\Controllers\CitaController;
+use App\Http\Controllers\BookingController;
 
 /*
 |--------------------------------------------------------------------------
@@ -235,16 +236,28 @@ Route::get('/auth/google', [AuthController::class, 'redirectToGoogle']);
 
 Route::get('/auth/google/callback', [AuthController::class, 'googleCallback']);
 
-// Rutas de citas
+/*
+|--------------------------------------------------------------------------
+| 🆕 NUEVAS RUTAS PARA AGENDAR CITAS (Booking)
+|--------------------------------------------------------------------------
+*/
+
+// Rutas para agendar citas (protegidas con autenticación)
 Route::middleware(['auth.session', 'inject.api.token'])->group(function () {
-    Route::get('/booking/create', [CitaController::class, 'create'])->name('booking.create');
-    Route::get('/mis-citas', [CitaController::class, 'misCitas'])->name('mis-citas');
+    // Página para agendar cita
+    Route::get('/agendar-cita', [BookingController::class, 'create'])->name('booking.create');
+    
+    // Mis citas del cliente
+    Route::get('/mis-citas', [BookingController::class, 'misCitas'])->name('booking.mis-citas');
 });
 
-// Ruta para disponibilidad de empleado (proxy)
-Route::get('/api-proxy/disponibilidad/empleado/{id}', function($id, Request $request) {
-    $httpClient = app(App\Services\ExternalApi\HttpClient::class);
-    return $httpClient->get('/api/disponibilidad/empleado/' . $id, $request->all());
+// Rutas AJAX (proxy) para booking
+Route::middleware(['auth.session', 'inject.api.token'])->prefix('api-proxy')->group(function () {
+    // Disponibilidad de empleado
+    Route::get('/disponibilidad/empleado/{id}', [BookingController::class, 'disponibilidad']);
+    
+    // Crear cita
+    Route::post('/citas', [BookingController::class, 'store']);
 });
 
 /*Rutas de completar registro de negocio

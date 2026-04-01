@@ -4,7 +4,7 @@
 
 @section('content')
 <div class="bg-[#1a1a1a] min-h-screen py-12">
-    <div class="max-w-6xl mx-auto px-6">
+    <div class="max-w-4xl mx-auto px-6">
         <!-- Header -->
         <div class="mb-8 border-b border-[#374151] pb-8">
             <a href="{{ url()->previous() }}" 
@@ -21,72 +21,50 @@
             </div>
         </div>
 
-        @if(empty($servicios) && empty($empleados))
+        @if(empty($servicios))
         <div class="bg-red-500/20 border border-red-500 text-red-500 p-6 rounded-sm text-center">
             <i class="fas fa-exclamation-triangle text-2xl mb-2 block"></i>
-            <p>No hay servicios o empleados disponibles para este negocio.</p>
+            <p>No hay servicios disponibles para este negocio.</p>
         </div>
         @else
         <form id="cita-form" class="space-y-8">
             @csrf
-             <input type="hidden" name="negocio_id" id="negocio_id" value="{{ $negocioId ?? '' }}">
-            <!-- Servicios en Carrusel -->
+            <input type="hidden" name="negocio_id" id="negocio_id" value="{{ $negocioId }}">
+            <input type="hidden" name="servicio_id" id="servicio_id">
+            <input type="hidden" name="empleado_id" id="empleado_id">
+            
+            <!-- Servicios -->
             <div class="bg-[#262626] border border-[#374151] rounded-sm p-6">
-                <div class="flex justify-between items-center mb-6">
-                    <h3 class="text-sm font-bold uppercase tracking-widest text-white flex items-center gap-2">
-                        <i class="fas fa-cut text-yellow-500"></i>
-                        Selecciona un servicio
-                        <span class="text-xs text-[#9CA3AF] font-normal">({{ count($servicios) }} disponibles)</span>
-                    </h3>
-                    
-                    @if(count($servicios) > 3)
-                    <div class="flex gap-2">
-                        <button type="button" id="prevServicio" class="w-8 h-8 rounded-full bg-[#1a1a1a] border border-[#374151] text-white hover:bg-white hover:text-black transition-all flex items-center justify-center">
-                            <i class="fas fa-chevron-left text-xs"></i>
-                        </button>
-                        <button type="button" id="nextServicio" class="w-8 h-8 rounded-full bg-[#1a1a1a] border border-[#374151] text-white hover:bg-white hover:text-black transition-all flex items-center justify-center">
-                            <i class="fas fa-chevron-right text-xs"></i>
-                        </button>
-                    </div>
-                    @endif
-                </div>
+                <h3 class="text-sm font-bold uppercase tracking-widest text-white mb-4 flex items-center gap-2">
+                    <i class="fas fa-cut text-yellow-500"></i>
+                    Selecciona un servicio
+                    <span class="text-xs text-[#9CA3AF] font-normal">({{ count($servicios) }} disponibles)</span>
+                </h3>
                 
-                <div class="relative overflow-hidden">
-                    <div id="serviciosCarousel" class="flex transition-transform duration-500 ease-out gap-5">
-                        @foreach($servicios as $index => $servicio)
-                        <div class="servicio-card flex-shrink-0 w-full md:w-[calc(33.333%-1rem)] cursor-pointer border border-[#374151] rounded-sm hover:border-yellow-500 transition-all" 
-                             data-id="{{ $servicio['id'] }}"
-                             data-nombre="{{ $servicio['nombre'] }}"
-                             data-precio="{{ $servicio['precio'] }}"
-                             data-duracion="{{ $servicio['duracion'] }}">
-                            <div class="relative h-44 overflow-hidden rounded-t-sm bg-[#1a1a1a]">
-                                @if(isset($servicio['imagen']) && $servicio['imagen'])
-                                <img src="{{ $servicio['imagen'] }}" alt="{{ $servicio['nombre'] }}" class="w-full h-full object-cover">
-                                @else
-                                <div class="w-full h-full flex items-center justify-center">
-                                    <i class="fas fa-cut text-5xl text-[#374151]"></i>
-                                </div>
-                                @endif
-                                <div class="absolute top-2 right-2 bg-black/70 px-2 py-1 rounded-full">
-                                    <span class="text-yellow-500 font-bold text-sm">${{ number_format($servicio['precio'], 0, ',', '.') }}</span>
-                                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    @foreach($servicios as $servicio)
+                    <div class="servicio-card border border-[#374151] rounded-sm p-4 cursor-pointer hover:border-yellow-500 transition-all" 
+                         data-id="{{ $servicio['id'] }}"
+                         data-nombre="{{ $servicio['nombre'] }}"
+                         data-precio="{{ $servicio['precio'] }}"
+                         data-duracion="{{ $servicio['duracion'] }}">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h4 class="text-white font-bold text-sm">{{ $servicio['nombre'] }}</h4>
+                                <p class="text-[#9CA3AF] text-[10px] mt-1">{{ $servicio['descripcion'] ?? 'Sin descripción' }}</p>
                             </div>
-                            <div class="p-4">
-                                <h4 class="text-white font-bold uppercase tracking-wide text-sm">{{ $servicio['nombre'] }}</h4>
-                                <p class="text-[#9CA3AF] text-xs mt-1 line-clamp-2">{{ $servicio['descripcion'] ?? 'Sin descripción' }}</p>
-                                <div class="mt-3 flex items-center gap-2 text-[10px] text-[#9CA3AF]">
-                                    <i class="far fa-clock"></i>
-                                    <span>{{ $servicio['duracion'] }} minutos</span>
-                                </div>
-                            </div>
+                            <span class="text-yellow-500 font-bold text-sm">${{ number_format($servicio['precio'], 0, ',', '.') }}</span>
                         </div>
-                        @endforeach
+                        <div class="mt-2 flex items-center gap-2 text-[10px] text-[#9CA3AF]">
+                            <i class="far fa-clock"></i>
+                            <span>{{ $servicio['duracion'] }} minutos</span>
+                        </div>
                     </div>
+                    @endforeach
                 </div>
-                <input type="hidden" name="servicio_id" id="servicio_id">
             </div>
 
-            <!-- Empleados en Grid -->
+            <!-- Empleados -->
             <div class="bg-[#262626] border border-[#374151] rounded-sm p-6">
                 <h3 class="text-sm font-bold uppercase tracking-widest text-white mb-4 flex items-center gap-2">
                     <i class="fas fa-users text-yellow-500"></i>
@@ -94,6 +72,7 @@
                     <span class="text-xs text-[#9CA3AF] font-normal">({{ count($empleados) }} disponibles)</span>
                 </h3>
                 
+                @if(count($empleados) > 0)
                 <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                     @foreach($empleados as $empleado)
                     <div class="empleado-card border border-[#374151] rounded-sm p-3 cursor-pointer hover:border-yellow-500 transition-all text-center"
@@ -104,16 +83,12 @@
                         </div>
                         <h4 class="text-white font-bold text-sm">{{ $empleado['nombre'] }}</h4>
                         <p class="text-[#9CA3AF] text-[10px] mt-1">{{ $empleado['especialidad'] ?? 'Especialista' }}</p>
-                        @if(isset($empleado['calificacion']))
-                        <div class="flex items-center justify-center gap-1 mt-1">
-                            <i class="fas fa-star text-yellow-500 text-[8px]"></i>
-                            <span class="text-[10px] text-white">{{ number_format($empleado['calificacion'], 1) }}</span>
-                        </div>
-                        @endif
                     </div>
                     @endforeach
                 </div>
-                <input type="hidden" name="empleado_id" id="empleado_id">
+                @else
+                <p class="text-center text-[#9CA3AF] py-8">No hay empleados disponibles en este momento.</p>
+                @endif
             </div>
 
             <!-- Fecha y Hora -->
@@ -134,7 +109,7 @@
                         <label class="block text-xs text-[#9CA3AF] uppercase tracking-widest mb-2">Hora</label>
                         <select id="hora" name="hora_inicio" 
                                 class="w-full bg-[#1a1a1a] border border-[#374151] rounded-sm px-4 py-2 text-white focus:border-yellow-500 focus:outline-none" disabled>
-                            <option value="">Primero selecciona fecha</option>
+                            <option value="">Primero selecciona un servicio, empleado y fecha</option>
                         </select>
                     </div>
                 </div>
@@ -168,7 +143,8 @@
             </div>
 
             <button type="submit" 
-                    class="w-full py-4 bg-gradient-to-r from-yellow-500 to-yellow-600 text-black font-bold uppercase tracking-wider rounded-lg hover:from-yellow-400 hover:to-yellow-500 transition-all">
+                    class="w-full py-4 bg-gradient-to-r from-yellow-500 to-yellow-600 text-black font-bold uppercase tracking-wider rounded-lg hover:from-yellow-400 hover:to-yellow-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                    id="btn-submit" disabled>
                 Confirmar Cita
             </button>
         </form>
@@ -176,47 +152,29 @@
     </div>
 </div>
 
-<style>
-.line-clamp-2 {
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-}
-</style>
-
 <script>
+// Estado de la cita
 let servicioSeleccionado = null;
 let empleadoSeleccionado = null;
-let currentServicioIndex = 0;
-const itemsPerPage = 3;
 
-// Configurar carrusel
-function updateCarousel() {
-    const carousel = document.getElementById('serviciosCarousel');
-    if (!carousel) return;
-    const totalItems = carousel.children.length;
-    const maxIndex = Math.ceil(totalItems / itemsPerPage) - 1;
-    if (currentServicioIndex > maxIndex) currentServicioIndex = maxIndex;
-    const offset = -currentServicioIndex * (100 / itemsPerPage);
-    carousel.style.transform = `translateX(${offset}%)`;
+// Elementos DOM
+const btnSubmit = document.getElementById('btn-submit');
+const fechaInput = document.getElementById('fecha');
+const horaSelect = document.getElementById('hora');
+const resumenServicio = document.getElementById('resumen-servicio');
+const resumenEmpleado = document.getElementById('resumen-empleado');
+const resumenFecha = document.getElementById('resumen-fecha');
+const resumenHora = document.getElementById('resumen-hora');
+const resumenTotal = document.getElementById('resumen-total');
+
+// Verificar si se puede habilitar el botón
+function checkFormComplete() {
+    if (servicioSeleccionado && empleadoSeleccionado && fechaInput.value && horaSelect.value) {
+        btnSubmit.disabled = false;
+    } else {
+        btnSubmit.disabled = true;
+    }
 }
-
-document.getElementById('prevServicio')?.addEventListener('click', () => {
-    if (currentServicioIndex > 0) {
-        currentServicioIndex--;
-        updateCarousel();
-    }
-});
-
-document.getElementById('nextServicio')?.addEventListener('click', () => {
-    const totalItems = document.querySelectorAll('.servicio-card').length;
-    const maxIndex = Math.ceil(totalItems / itemsPerPage) - 1;
-    if (currentServicioIndex < maxIndex) {
-        currentServicioIndex++;
-        updateCarousel();
-    }
-});
 
 // Selección de servicio
 document.querySelectorAll('.servicio-card').forEach(card => {
@@ -232,12 +190,15 @@ document.querySelectorAll('.servicio-card').forEach(card => {
         };
         
         document.getElementById('servicio_id').value = servicioSeleccionado.id;
-        document.getElementById('resumen-servicio').textContent = servicioSeleccionado.nombre;
-        document.getElementById('resumen-total').textContent = '$' + parseInt(servicioSeleccionado.precio).toLocaleString('es-CL');
+        resumenServicio.textContent = servicioSeleccionado.nombre;
+        resumenTotal.textContent = '$' + parseInt(servicioSeleccionado.precio).toLocaleString('es-CL');
         
-        if (document.getElementById('fecha').value && empleadoSeleccionado) {
+        // Si ya hay empleado y fecha seleccionados, cargar horarios
+        if (empleadoSeleccionado && fechaInput.value) {
             cargarHorarios();
         }
+        
+        checkFormComplete();
     });
 });
 
@@ -253,80 +214,85 @@ document.querySelectorAll('.empleado-card').forEach(card => {
         };
         
         document.getElementById('empleado_id').value = empleadoSeleccionado.id;
-        document.getElementById('resumen-empleado').textContent = empleadoSeleccionado.nombre;
+        resumenEmpleado.textContent = empleadoSeleccionado.nombre;
         
-        if (document.getElementById('fecha').value && servicioSeleccionado) {
+        // Si ya hay servicio y fecha seleccionados, cargar horarios
+        if (servicioSeleccionado && fechaInput.value) {
             cargarHorarios();
         }
+        
+        checkFormComplete();
     });
 });
 
-// Fecha
-document.getElementById('fecha').addEventListener('change', function() {
+// Cambio de fecha
+fechaInput.addEventListener('change', function() {
     const fecha = this.value;
     if (fecha) {
         const date = new Date(fecha);
-        document.getElementById('resumen-fecha').textContent = date.toLocaleDateString('es-CL');
+        resumenFecha.textContent = date.toLocaleDateString('es-CL');
     }
-    if (fecha && servicioSeleccionado && empleadoSeleccionado) {
+    
+    // Si ya hay servicio y empleado seleccionados, cargar horarios
+    if (servicioSeleccionado && empleadoSeleccionado && fecha) {
         cargarHorarios();
     }
+    
+    checkFormComplete();
 });
 
+// Cargar horarios disponibles
 async function cargarHorarios() {
-    const fecha = document.getElementById('fecha').value;
+    const fecha = fechaInput.value;
     const empleadoId = empleadoSeleccionado?.id;
     const duracion = parseInt(servicioSeleccionado?.duracion, 10);
     
     if (!fecha || !empleadoId || !duracion) {
-        console.log('Faltan datos:', { fecha, empleadoId, duracion });
         return;
     }
     
-    const selectHora = document.getElementById('hora');
-    selectHora.innerHTML = '<option value="">Cargando horarios...</option>';
-    selectHora.disabled = true;
+    horaSelect.innerHTML = '<option value="">Cargando horarios...</option>';
+    horaSelect.disabled = true;
     
     try {
-        // ✅ CAMBIADO: Usar el proxy en lugar de la API directa
         const response = await fetch(`/api-proxy/disponibilidad/empleado/${empleadoId}?fecha=${fecha}&duracion=${duracion}`);
         const data = await response.json();
         
-        selectHora.innerHTML = '<option value="">Selecciona una hora</option>';
-        
-        console.log('Respuesta disponibilidad:', data);
+        horaSelect.innerHTML = '<option value="">Selecciona una hora</option>';
         
         if (data.success && data.slots && data.slots.length > 0) {
             data.slots.forEach(slot => {
                 const option = document.createElement('option');
                 option.value = slot.hora_inicio;
                 option.textContent = `${slot.hora_inicio} - ${slot.hora_fin}`;
-                selectHora.appendChild(option);
+                horaSelect.appendChild(option);
             });
-            selectHora.disabled = false;
+            horaSelect.disabled = false;
         } else {
-            selectHora.innerHTML = '<option value="">No hay horarios disponibles para este día</option>';
-            selectHora.disabled = true;
+            horaSelect.innerHTML = '<option value="">No hay horarios disponibles para este día</option>';
+            horaSelect.disabled = true;
         }
     } catch (error) {
         console.error('Error cargando horarios:', error);
-        selectHora.innerHTML = '<option value="">Error al cargar horarios</option>';
-        selectHora.disabled = true;
+        horaSelect.innerHTML = '<option value="">Error al cargar horarios</option>';
+        horaSelect.disabled = true;
     }
 }
 
-document.getElementById('hora').addEventListener('change', function() {
-    document.getElementById('resumen-hora').textContent = this.value || '-';
+// Selección de hora
+horaSelect.addEventListener('change', function() {
+    resumenHora.textContent = this.value || '-';
+    checkFormComplete();
 });
 
-// Envío
+// Envío del formulario
 document.getElementById('cita-form').addEventListener('submit', async function(e) {
     e.preventDefault();
     
     const servicioId = document.getElementById('servicio_id').value;
     const empleadoId = document.getElementById('empleado_id').value;
-    const fecha = document.getElementById('fecha').value;
-    const hora = document.getElementById('hora').value;
+    const fecha = fechaInput.value;
+    const hora = horaSelect.value;
     const negocioId = document.getElementById('negocio_id').value;
     
     if (!servicioId || !empleadoId || !fecha || !hora) {
@@ -334,9 +300,9 @@ document.getElementById('cita-form').addEventListener('submit', async function(e
         return;
     }
     
-    showLoader();
+    btnSubmit.disabled = true;
+    btnSubmit.textContent = 'Agendando...';
     
-    //  Obtener el token CSRF correctamente
     const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || 
                       document.querySelector('input[name="_token"]')?.value;
     
@@ -346,10 +312,8 @@ document.getElementById('cita-form').addEventListener('submit', async function(e
             headers: {
                 'X-CSRF-TOKEN': csrfToken,
                 'Content-Type': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest',
                 'Accept': 'application/json'
             },
-            credentials: 'same-origin', // 🔥 Importante para enviar cookies
             body: JSON.stringify({
                 servicio_id: servicioId,
                 empleado_id: empleadoId,
@@ -361,28 +325,20 @@ document.getElementById('cita-form').addEventListener('submit', async function(e
         
         const data = await response.json();
         
-        if (response.ok) {
+        if (response.ok && data.success) {
             alert(data.message || 'Cita agendada correctamente');
             window.location.href = '/mis-citas';
         } else {
             alert(data.message || 'Error al agendar cita');
+            btnSubmit.disabled = false;
+            btnSubmit.textContent = 'Confirmar Cita';
         }
     } catch (error) {
         console.error('Error:', error);
         alert('Error de conexión');
-    } finally {
-        hideLoader();
+        btnSubmit.disabled = false;
+        btnSubmit.textContent = 'Confirmar Cita';
     }
 });
-
-function showLoader() {
-    const loader = document.getElementById('global-loader');
-    if (loader) loader.classList.remove('hidden');
-}
-
-function hideLoader() {
-    const loader = document.getElementById('global-loader');
-    if (loader) loader.classList.add('hidden');
-}
 </script>
 @endsection
