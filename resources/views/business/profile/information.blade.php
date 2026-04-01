@@ -225,39 +225,74 @@
                     <div class="border-t border-[#374151] pt-6 mt-8">
                         <div class="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-3">
                             <h3 class="text-xs uppercase tracking-wider text-[#9CA3AF]">Dirección</h3>
-                            <div class="px-3 py-2 bg-[#3B82F6]/10 border border-[#3B82F6]/30 rounded text-xs text-[#9CA3AF] flex items-center gap-2">
-                                <i class="fa-solid fa-circle-info text-[#3B82F6]"></i>
-                                Para modificar la dirección contacte al administrador del sistema.
-                            </div>
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                             <div class="group/input relative md:col-span-2">
-                                <input type="text" value="{{ $negocio['direccion']['calle'] ?? '' }}" readonly class="w-full bg-transparent border-b border-[#374151]/30 py-3 text-[#6B7280] cursor-not-allowed" />
-                                <label class="absolute left-0 -top-3.5 text-[#6B7280] text-xs">Calle</label>
+                                <input type="text" name="calle" value="{{ old('calle', $negocio['direccion']['calle'] ?? '') }}" required class="w-full bg-transparent border-b border-[#374151] py-3 text-white focus:border-white focus:outline-none transition-colors" />
+                                <label class="absolute left-0 -top-3.5 text-[#9CA3AF] text-xs">Calle *</label>
                             </div>
                             <div class="group/input relative">
-                                <input type="text" value="{{ $negocio['direccion']['numero'] ?? '' }}" readonly class="w-full bg-transparent border-b border-[#374151]/30 py-3 text-[#6B7280] cursor-not-allowed" />
-                                <label class="absolute left-0 -top-3.5 text-[#6B7280] text-xs">Número</label>
+                                <input type="text" name="numero" value="{{ old('numero', $negocio['direccion']['numero'] ?? '') }}" required class="w-full bg-transparent border-b border-[#374151] py-3 text-white focus:border-white focus:outline-none transition-colors" />
+                                <label class="absolute left-0 -top-3.5 text-[#9CA3AF] text-xs">Número *</label>
                             </div>
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                             <div class="group/input relative">
-                                <input type="text" value="{{ $negocio['direccion']['colonia'] ?? '' }}" readonly class="w-full bg-transparent border-b border-[#374151]/30 py-3 text-[#6B7280] cursor-not-allowed" />
-                                <label class="absolute left-0 -top-3.5 text-[#6B7280] text-xs">Colonia</label>
+                                <input type="text" name="colonia" value="{{ old('colonia', $negocio['direccion']['colonia'] ?? '') }}" required class="w-full bg-transparent border-b border-[#374151] py-3 text-white focus:border-white focus:outline-none transition-colors" />
+                                <label class="absolute left-0 -top-3.5 text-[#9CA3AF] text-xs">Colonia *</label>
                             </div>
                             <div class="group/input relative">
-                                <input type="text" value="{{ $negocio['direccion']['codigo_postal'] ?? '' }}" readonly class="w-full bg-transparent border-b border-[#374151]/30 py-3 text-[#6B7280] cursor-not-allowed" />
-                                <label class="absolute left-0 -top-3.5 text-[#6B7280] text-xs">Código Postal</label>
+                                <input type="text" name="codigo_postal" value="{{ old('codigo_postal', $negocio['direccion']['codigo_postal'] ?? '') }}" required class="w-full bg-transparent border-b border-[#374151] py-3 text-white focus:border-white focus:outline-none transition-colors" />
+                                <label class="absolute left-0 -top-3.5 text-[#9CA3AF] text-xs">Código Postal *</label>
                             </div>
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div class="group/input relative">
-                                <input type="text" value="{{ $negocio['direccion']['ciudad'] ?? '' }}" readonly class="w-full bg-transparent border-b border-[#374151]/30 py-3 text-[#6B7280] cursor-not-allowed" />
-                                <label class="absolute left-0 -top-3.5 text-[#6B7280] text-xs">Ciudad</label>
+                                <input type="text" name="ciudad" value="{{ old('ciudad', $negocio['direccion']['ciudad'] ?? '') }}" required class="w-full bg-transparent border-b border-[#374151] py-3 text-white focus:border-white focus:outline-none transition-colors" />
+                                <label class="absolute left-0 -top-3.5 text-[#9CA3AF] text-xs">Ciudad *</label>
                             </div>
                             <div class="group/input relative">
-                                <input type="text" value="{{ $negocio['direccion']['estado'] ?? '' }}" readonly class="w-full bg-transparent border-b border-[#374151]/30 py-3 text-[#6B7280] cursor-not-allowed" />
-                                <label class="absolute left-0 -top-3.5 text-[#6B7280] text-xs">Estado</label>
+                                <input type="text" name="estado" value="{{ old('estado', $negocio['direccion']['estado'] ?? '') }}" required class="w-full bg-transparent border-b border-[#374151] py-3 text-white focus:border-white focus:outline-none transition-colors" />
+                                <label class="absolute left-0 -top-3.5 text-[#9CA3AF] text-xs">Estado *</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- CAMPOS: IMÁGENES -->
+                    <div class="border-t border-[#374151] pt-6 mt-8">
+                        <h3 class="text-xs uppercase tracking-wider text-[#9CA3AF] mb-6">Imágenes del Negocio</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <!-- Foto Perfil -->
+                            <div class="space-y-4">
+                                <label class="block text-xs text-[#9CA3AF] uppercase tracking-wider">Foto de Perfil</label>
+                                <div class="flex items-center gap-4">
+                                    <div class="w-16 h-16 rounded-full bg-[#1a1a1a] border border-[#374151] overflow-hidden flex-shrink-0 relative">
+                                        <img id="preview_img_perfil" src="{{ isset($negocio['foto_perfil']) ? (is_array($negocio['foto_perfil']) ? $negocio['foto_perfil']['url_imagen'] : (config('services.api.url') . '/' . ltrim($negocio['foto_perfil'], '/'))) : '' }}" class="w-full h-full object-cover {{ empty($negocio['foto_perfil']) ? 'hidden' : '' }}">
+                                        @if(empty($negocio['foto_perfil']))
+                                            <div id="placeholder_perfil" class="absolute inset-0 flex items-center justify-center text-[#374151]"><i class="fas fa-store"></i></div>
+                                        @endif
+                                    </div>
+                                    <div class="flex-1">
+                                        <input type="file" name="foto_perfil" id="input_foto_perfil" accept="image/*" class="w-full text-xs text-[#9CA3AF] file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-[#25B5DA]/10 file:text-[#25B5DA] hover:file:bg-[#25B5DA]/20 transition-all cursor-pointer">
+                                        <p class="mt-1 text-[10px] text-[#6B7280]">Recomendado: 500x500px, máx 2MB</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Banner -->
+                            <div class="space-y-4">
+                                <label class="block text-xs text-[#9CA3AF] uppercase tracking-wider">Banner Principal</label>
+                                <div class="flex items-center gap-4">
+                                    <div class="w-24 h-16 rounded bg-[#1a1a1a] border border-[#374151] overflow-hidden flex-shrink-0 relative">
+                                        <img id="preview_img_banner" src="{{ isset($negocio['banner']) ? (is_array($negocio['banner']) ? $negocio['banner']['url_imagen'] : (config('services.api.url') . '/' . ltrim($negocio['banner'], '/'))) : '' }}" class="w-full h-full object-cover {{ empty($negocio['banner']) ? 'hidden' : '' }}">
+                                        @if(empty($negocio['banner']))
+                                            <div id="placeholder_banner" class="absolute inset-0 flex items-center justify-center text-[#374151]"><i class="fas fa-image"></i></div>
+                                        @endif
+                                    </div>
+                                    <div class="flex-1">
+                                        <input type="file" name="banner" id="input_banner" accept="image/*" class="w-full text-xs text-[#9CA3AF] file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-[#25B5DA]/10 file:text-[#25B5DA] hover:file:bg-[#25B5DA]/20 transition-all cursor-pointer">
+                                        <p class="mt-1 text-[10px] text-[#6B7280]">Recomendado: 1200x400px, máx 5MB</p>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -273,9 +308,10 @@
             <div class="relative z-10 text-center">
                 <div class="w-32 h-32 rounded-full bg-[#262626] border-2 border-[#374151] mx-auto mb-6 flex items-center justify-center overflow-hidden">
                     @if(isset($negocio['foto_perfil']) && $negocio['foto_perfil'])
-                        <img src="{{ is_array($negocio['foto_perfil']) ? $negocio['foto_perfil']['url_imagen'] : (config('services.api.url') . $negocio['foto_perfil']) }}" class="w-full h-full object-cover">
+                        <img id="side_preview_perfil" src="{{ is_array($negocio['foto_perfil']) ? $negocio['foto_perfil']['url_imagen'] : (config('services.api.url') . '/' . ltrim($negocio['foto_perfil'], '/')) }}" class="w-full h-full object-cover">
                     @else
-                        <i class="fas fa-store text-4xl text-[#9CA3AF]"></i>
+                        <img id="side_preview_perfil" src="" class="w-full h-full object-cover hidden">
+                        <i id="side_placeholder_perfil" class="fas fa-store text-4xl text-[#9CA3AF]"></i>
                     @endif
                 </div>
                 <h2 class="text-2xl font-bold text-white uppercase tracking-wide">{{ $negocio['nombre'] ?? 'Mi Negocio' }}</h2>
@@ -332,4 +368,43 @@ if (registroForm) {
         }
     });
 }
+</script>
+
+<script>
+    document.getElementById('input_foto_perfil')?.addEventListener('change', function(e) {
+        if(e.target.files && e.target.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = document.getElementById('preview_img_perfil');
+                img.src = e.target.result;
+                img.classList.remove('hidden');
+                
+                // Update side panel preview as well
+                const sideImg = document.getElementById('side_preview_perfil');
+                if(sideImg) { sideImg.src = e.target.result; sideImg.classList.remove('hidden'); }
+                
+                const placeholder = document.getElementById('placeholder_perfil');
+                if(placeholder) placeholder.classList.add('hidden');
+                
+                const sidePlaceholder = document.getElementById('side_placeholder_perfil');
+                if(sidePlaceholder) sidePlaceholder.classList.add('hidden');
+            }
+            reader.readAsDataURL(e.target.files[0]);
+        }
+    });
+
+    document.getElementById('input_banner')?.addEventListener('change', function(e) {
+        if(e.target.files && e.target.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = document.getElementById('preview_img_banner');
+                img.src = e.target.result;
+                img.classList.remove('hidden');
+                
+                const placeholder = document.getElementById('placeholder_banner');
+                if(placeholder) placeholder.classList.add('hidden');
+            }
+            reader.readAsDataURL(e.target.files[0]);
+        }
+    });
 </script>
