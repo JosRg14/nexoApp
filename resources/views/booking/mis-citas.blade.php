@@ -109,5 +109,23 @@ async function cancelarCita(citaId) {
         hideLoader();
     }
 }
+
+function showLoader() {
+
+    const loader = document.getElementById('global-loader');
+
+    if (loader) loader.classList.remove('hidden');
+
+}
+
+
+
+function hideLoader() {
+
+    const loader = document.getElementById('global-loader');
+
+    if (loader) loader.classList.add('hidden');
+
+}
 </script>
 @endsection
