@@ -106,11 +106,11 @@
                 @if(isset($negocio['redes_sociales']) && $negocio['redes_sociales'])
                 <div class="bg-[#262626] border border-[#374151] rounded-sm p-6">
                     <h3 class="text-sm font-bold uppercase tracking-widest text-white mb-4 flex items-center gap-2">
-                        <i class="fab fa-instagram"></i> Redes Sociales
+                        <i class="fab fa-instagram text-[#25B5DA]"></i> Redes Sociales
                     </h3>
                     <a href="{{ $negocio['redes_sociales'] }}" target="_blank" 
                        class="inline-flex items-center gap-2 px-4 py-2 bg-[#1a1a1a] border border-[#374151] text-[#9CA3AF] hover:text-white hover:border-white transition-all text-xs uppercase tracking-wider">
-                        <i class="fab fa-instagram"></i>
+                        <i class="fab fa-instagram text-[#25B5DA]"></i>
                         {{ $negocio['redes_sociales'] }}
                     </a>
                 </div>
@@ -120,7 +120,7 @@
                 <div class="bg-[#262626] border border-[#374151] rounded-sm p-6">
                     <div class="flex justify-between items-center mb-6">
                         <h3 class="text-xl font-bold uppercase tracking-widest text-white flex items-center gap-3">
-                            <i class="fas fa-cut text-2xl"></i> 
+                            <i class="fas fa-cut text-2xl text-[#25B5DA]"></i> 
                             Nuestros Servicios
                             <span class="text-sm text-[#9CA3AF] font-normal">({{ count($servicios) }})</span>
                         </h3>
@@ -149,7 +149,7 @@
                                 
                                 <div class="absolute bottom-3 left-3 bg-black/60 backdrop-blur-sm px-2 py-1 rounded-full">
                                     <span class="text-white text-xs flex items-center gap-1">
-                                        <i class="far fa-clock"></i> {{ $servicio['duracion'] ?? 30 }} min
+                                        <i class="far fa-clock text-[#25B5DA]"></i> {{ $servicio['duracion'] ?? 30 }} min
                                     </span>
                                 </div>
                             </div>
@@ -176,7 +176,7 @@
                 <!-- Reseñas -->
                 <div class="bg-[#262626] border border-[#374151] rounded-sm p-6">
                     <h3 class="text-sm font-bold uppercase tracking-widest text-white mb-4 flex items-center gap-2">
-                        <i class="fas fa-star"></i> Reseñas ({{ count($resenas) }})
+                        <i class="fas fa-star text-[#25B5DA]"></i> Reseñas ({{ count($resenas) }})
                     </h3>
                     <div class="space-y-4">
                         @forelse($resenas as $resena)
@@ -208,7 +208,7 @@
                 <!-- Equipo de Trabajo - Solo mostrar información, sin botón de agendar -->
                 <div class="bg-[#262626] border border-[#374151] rounded-sm p-6">
                     <h3 class="text-sm font-bold uppercase tracking-widest text-white mb-4 flex items-center gap-2">
-                        <i class="fas fa-users"></i> Nuestro Equipo ({{ count($empleados) }})
+                        <i class="fas fa-users text-[#25B5DA]"></i> Nuestro Equipo ({{ count($empleados) }})
                     </h3>
                     <div class="space-y-3">
                         @forelse($empleados as $empleado)
@@ -226,7 +226,7 @@
                             </div>
                             @if(isset($empleado['calificacion']))
                             <div class="flex items-center gap-1 text-[10px] text-[#25B5DA]">
-                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star text-[#25B5DA]"></i>
                                 <span>{{ number_format($empleado['calificacion'], 1) }}</span>
                             </div>
                             @endif
@@ -240,7 +240,7 @@
                 <!-- Horario -->
                 <div class="bg-[#262626] border border-[#374151] rounded-sm p-6">
                     <h3 class="text-sm font-bold uppercase tracking-widest text-white mb-4 flex items-center gap-2">
-                        <i class="fas fa-clock"></i> Horario de Atención
+                        <i class="fas fa-clock text-[#25B5DA]"></i> Horario de Atención
                     </h3>
                     @if(isset($horariosFormateados) && count($horariosFormateados) > 0)
                     <div class="space-y-2">
@@ -317,7 +317,7 @@
                 @if(isset($negocio['telefono']) && $negocio['telefono'])
                 <div class="bg-[#262626] border border-[#374151] rounded-sm p-6">
                     <h3 class="text-sm font-bold uppercase tracking-widest text-white mb-4 flex items-center gap-2">
-                        <i class="fas fa-phone"></i> Contacto
+                        <i class="fas fa-phone text-[#25B5DA]"></i> Contacto
                     </h3>
                     <div class="flex items-center gap-3">
                         <a href="tel:{{ $negocio['telefono'] }}" 
