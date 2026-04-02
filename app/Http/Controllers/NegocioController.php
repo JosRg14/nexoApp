@@ -37,19 +37,19 @@ class NegocioController extends Controller
             if (isset($negocio['imagenes']) && is_array($negocio['imagenes'])) {
                 $fotoObj = collect($negocio['imagenes'])->where('tipo', 'perfil_negocio')->first();
                 if ($fotoObj && isset($fotoObj['url_imagen'])) {
-                    $fotoUrl = $apiBaseUrl . '/' . ltrim($fotoObj['url_imagen'], '/');
+                    $fotoUrl = $apiBaseUrl . $fotoObj['url_imagen'];
                 }
                 
                 $bannerObj = collect($negocio['imagenes'])->where('tipo', 'banner_negocio')->first();
                 if ($bannerObj && isset($bannerObj['url_imagen'])) {
-                    $bannerUrl = $apiBaseUrl . '/' . ltrim($bannerObj['url_imagen'], '/');
+                    $bannerUrl = $apiBaseUrl . $bannerObj['url_imagen'];
                 }
             } else {
                 if (isset($negocio['foto_perfil']) && is_string($negocio['foto_perfil'])) {
-                    $fotoUrl = \Illuminate\Support\Str::startsWith($negocio['foto_perfil'], 'http') ? $negocio['foto_perfil'] : $apiBaseUrl . '/' . ltrim($negocio['foto_perfil'], '/');
+                    $fotoUrl = \Illuminate\Support\Str::startsWith($negocio['foto_perfil'], 'http') ? $negocio['foto_perfil'] : $apiBaseUrl . $negocio['foto_perfil'];
                 }
                 if (isset($negocio['banner']) && is_string($negocio['banner'])) {
-                    $bannerUrl = \Illuminate\Support\Str::startsWith($negocio['banner'], 'http') ? $negocio['banner'] : $apiBaseUrl . '/' . ltrim($negocio['banner'], '/');
+                    $bannerUrl = \Illuminate\Support\Str::startsWith($negocio['banner'], 'http') ? $negocio['banner'] : $apiBaseUrl . $negocio['banner'];
                 }
             }
             
