@@ -30,19 +30,31 @@ class NegocioController extends Controller
             ]);
             
             $apiBaseUrl = rtrim(config('services.api.url'), '/');
-            // Extraer imágenes de la relación (o adaptar strings para compatibilidad con las vistas)
+            // Extraer imágenes de la relación y armar la URL absoluta final como en los servicios
+            $fotoUrl = null;
+            $bannerUrl = null;
+            
             if (isset($negocio['imagenes']) && is_array($negocio['imagenes'])) {
-                $negocio['foto_perfil'] = collect($negocio['imagenes'])->where('tipo', 'perfil_negocio')->first();
-                $negocio['banner'] = collect($negocio['imagenes'])->where('tipo', 'banner_negocio')->first();
+                $fotoObj = collect($negocio['imagenes'])->where('tipo', 'perfil_negocio')->first();
+                if ($fotoObj && isset($fotoObj['url_imagen'])) {
+                    $fotoUrl = $apiBaseUrl . '/' . ltrim($fotoObj['url_imagen'], '/');
+                }
+                
+                $bannerObj = collect($negocio['imagenes'])->where('tipo', 'banner_negocio')->first();
+                if ($bannerObj && isset($bannerObj['url_imagen'])) {
+                    $bannerUrl = $apiBaseUrl . '/' . ltrim($bannerObj['url_imagen'], '/');
+                }
             } else {
                 if (isset($negocio['foto_perfil']) && is_string($negocio['foto_perfil'])) {
-                    $negocio['foto_perfil'] = ['url_imagen' => $negocio['foto_perfil']];
+                    $fotoUrl = \Illuminate\Support\Str::startsWith($negocio['foto_perfil'], 'http') ? $negocio['foto_perfil'] : $apiBaseUrl . '/' . ltrim($negocio['foto_perfil'], '/');
                 }
                 if (isset($negocio['banner']) && is_string($negocio['banner'])) {
-                    $negocio['banner'] = ['url_imagen' => $negocio['banner']];
+                    $bannerUrl = \Illuminate\Support\Str::startsWith($negocio['banner'], 'http') ? $negocio['banner'] : $apiBaseUrl . '/' . ltrim($negocio['banner'], '/');
                 }
             }
             
+            $negocio['foto_perfil'] = $fotoUrl;
+            $negocio['banner'] = $bannerUrl;
             // Obtener horarios del negocio
             $horariosResponse = $this->httpClient->getPublic('/api/negocios/' . $id . '/horarios');
             $horarios = [];

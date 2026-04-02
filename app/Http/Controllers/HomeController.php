@@ -29,15 +29,23 @@ class HomeController extends Controller
                 'primer_negocio_foto' => ($negocios[0]['foto_perfil'] ?? 'No tiene foto_perfil directly')
             ]);
             
-            // Completar URLs de imágenes estructurando la respuesta en forma de array para la vista
+            $apiBaseUrl = rtrim(config('services.api.url'), '/');
+            // Completar URLs de imágenes estructurando la respuesta en forma de string final para la vista
             foreach ($negocios as &$negocio) {
+                $fotoUrl = null;
                 if (isset($negocio['imagenes']) && is_array($negocio['imagenes'])) {
-                    $negocio['foto_perfil'] = collect($negocio['imagenes'])->where('tipo', 'perfil_negocio')->first();
+                    $fotoObj = collect($negocio['imagenes'])->where('tipo', 'perfil_negocio')->first();
+                    if ($fotoObj && isset($fotoObj['url_imagen'])) {
+                        $fotoUrl = $apiBaseUrl . '/' . ltrim($fotoObj['url_imagen'], '/');
+                    }
                 } elseif (isset($negocio['foto_perfil']) && is_string($negocio['foto_perfil'])) {
-                    $negocio['foto_perfil'] = ['url_imagen' => $negocio['foto_perfil']];
+                    $fotoUrl = \Illuminate\Support\Str::startsWith($negocio['foto_perfil'], 'http') 
+                        ? $negocio['foto_perfil'] 
+                        : $apiBaseUrl . '/' . ltrim($negocio['foto_perfil'], '/');
                 }
+                
+                $negocio['foto_perfil'] = $fotoUrl;
             }
-            
         } catch (\Exception $e) {
             \Log::error('Error en HomeController: ' . $e->getMessage());
             $negocios = [];

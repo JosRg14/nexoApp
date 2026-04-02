@@ -7,15 +7,13 @@
     <!-- Hero Section con imagen de fondo -->
     <div class="relative h-80 md:h-96 overflow-hidden">
         @php
-            $urlBanner = '';
-            if (isset($negocio['banner']) && is_array($negocio['banner']) && isset($negocio['banner']['url_imagen'])) {
-                $urlBanner = rtrim(config('services.api.url'), '/') . '/' . ltrim($negocio['banner']['url_imagen'], '/');
-            } elseif (isset($negocio['banner']) && is_string($negocio['banner']) && !empty($negocio['banner'])) {
-                $urlBanner = Str::startsWith($negocio['banner'], 'http') ? $negocio['banner'] : rtrim(config('services.api.url'), '/') . '/' . ltrim($negocio['banner'], '/');
-            }
+            \Log::info('Vista show - Negocio (Limpio):', [
+                'id' => $negocio['id_negocio'] ?? $negocio['id'] ?? null,
+                'banner_url' => $negocio['banner'] ?? null
+            ]);
         @endphp
-        @if($urlBanner)
-            <img src="{{ $urlBanner }}" 
+        @if(!empty($negocio['banner']))
+            <img src="{{ $negocio['banner'] }}" 
                  alt="{{ $negocio['nombre'] }}"
                  class="w-full h-full object-cover">
         @else
@@ -27,16 +25,8 @@
             <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-start md:items-end gap-6">
                 <!-- Logo -->
                 <div class="w-28 h-28 md:w-36 md:h-36 rounded-full border-4 border-white overflow-hidden bg-[#2a2a2a]">
-                    @php
-                        $urlPerfil = '';
-                        if (isset($negocio['foto_perfil']) && is_array($negocio['foto_perfil']) && isset($negocio['foto_perfil']['url_imagen'])) {
-                            $urlPerfil = rtrim(config('services.api.url'), '/') . '/' . ltrim($negocio['foto_perfil']['url_imagen'], '/');
-                        } elseif (isset($negocio['foto_perfil']) && is_string($negocio['foto_perfil']) && !empty($negocio['foto_perfil'])) {
-                            $urlPerfil = Str::startsWith($negocio['foto_perfil'], 'http') ? $negocio['foto_perfil'] : rtrim(config('services.api.url'), '/') . '/' . ltrim($negocio['foto_perfil'], '/');
-                        }
-                    @endphp
-                    @if($urlPerfil)
-                        <img src="{{ $urlPerfil }}" 
+                    @if(!empty($negocio['foto_perfil']))
+                        <img src="{{ $negocio['foto_perfil'] }}" 
                              alt="{{ $negocio['nombre'] }}"
                              class="w-full h-full object-cover">
                     @else

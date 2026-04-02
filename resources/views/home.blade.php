@@ -93,21 +93,14 @@
                     <!-- Imagen con overlay -->
                     <div class="relative aspect-[4/5] overflow-hidden">
                         @php
-                            \Log::info('Vista home - Negocio:', [
+                            \Log::info('Vista home - Negocio (Limpio):', [
                                 'id' => $negocio['id_negocio'] ?? $negocio['id'] ?? null,
                                 'nombre' => $negocio['nombre'] ?? null,
-                                'tiene_imagenes' => isset($negocio['imagenes']),
-                                'imagenes' => $negocio['imagenes'] ?? []
+                                'foto_perfil_url' => $negocio['foto_perfil'] ?? null
                             ]);
-                            $urlFoto = '';
-                            if (isset($negocio['foto_perfil']) && is_array($negocio['foto_perfil']) && isset($negocio['foto_perfil']['url_imagen'])) {
-                                $urlFoto = rtrim(config('services.api.url'), '/') . '/' . ltrim($negocio['foto_perfil']['url_imagen'], '/');
-                            } elseif (isset($negocio['foto_perfil']) && is_string($negocio['foto_perfil']) && !empty($negocio['foto_perfil'])) {
-                                $urlFoto = Str::startsWith($negocio['foto_perfil'], 'http') ? $negocio['foto_perfil'] : rtrim(config('services.api.url'), '/') . '/' . ltrim($negocio['foto_perfil'], '/');
-                            }
                         @endphp
-                        @if($urlFoto)
-                            <img src="{{ $urlFoto }}" 
+                        @if(!empty($negocio['foto_perfil']))
+                            <img src="{{ $negocio['foto_perfil'] }}" 
                                  alt="{{ $negocio['nombre'] }}"
                                  class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
                         @else
