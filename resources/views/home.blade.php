@@ -100,7 +100,7 @@
                             ]);
                         @endphp
                         @if(!empty($negocio['foto_perfil']))
-                            <img src="{{ $negocio['foto_perfil'] }}" 
+                            <img src="https://devlink-servidorapi.td60xq.easypanel.host/storage/negocios/perfiles/OuVOIfa9QAfwwE3s5yOGR9sCkKA3Wt1h2sQQThVa.jpg" 
                                  alt="{{ $negocio['nombre'] }}"
                                  class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
                         @else
