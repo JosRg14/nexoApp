@@ -32,28 +32,47 @@ class HomeController extends Controller
             $apiBaseUrl = rtrim(config('services.api.url'), '/');
             // Completar URLs de imágenes estructurando la respuesta en forma de string final para la vista
             foreach ($negocios as &$negocio) {
-                $fotoUrl = null;
-                if (isset($negocio['imagenes']) && is_array($negocio['imagenes'])) {
-                    $fotoObj = collect($negocio['imagenes'])->where('tipo', 'perfil_negocio')->first();
-                    if ($fotoObj && isset($fotoObj['url_imagen'])) {
-                        $fotoUrl = $apiBaseUrl . $fotoObj['url_imagen'];
-                    }
-                } elseif (isset($negocio['foto_perfil']) && is_string($negocio['foto_perfil'])) {
-                    $fotoUrl = \Illuminate\Support\Str::startsWith($negocio['foto_perfil'], 'http') 
-                        ? $negocio['foto_perfil'] 
-                        : $apiBaseUrl . $negocio['foto_perfil'];
-                }
                 
+                $fotoUrl = null;
+
+                // Lógica para procesar la imagen
+                if (isset($negocio['imagenes']) && is_array($negocio['imagenes']) && count($negocio['imagenes']) > 0) {
+                    // Buscar imagen de tipo perfil_negocio
+                    foreach ($negocio['imagenes'] as $img) {
+                        if (isset($img['tipo']) && $img['tipo'] === 'perfil_negocio') {
+                            $fotoUrl = $img['url_imagen'] ?? null;
+                            break;
+                        }
+                    }
+                    
+                    // Si no encontró por tipo, tomar la primera
+                    if (!$fotoUrl) {
+                        $fotoUrl = $negocio['imagenes'][0]['url_imagen'] ?? $negocio['imagenes'][0] ?? null;
+                    }
+                }
+
+                // Si la API ya devolvió foto_perfil directamente
+                if (!$fotoUrl && isset($negocio['foto_perfil']) && $negocio['foto_perfil']) {
+                    $fotoUrl = $negocio['foto_perfil'];
+                }
+
+                // Asignar la URL completa con el base de la API si es necesario
+                if ($fotoUrl && !\Illuminate\Support\Str::startsWith($fotoUrl, 'http')) {
+                    $apiBaseUrl = rtrim(config('services.api.url'), '/');
+                    $fotoUrl = $apiBaseUrl . (\Illuminate\Support\Str::startsWith($fotoUrl, '/') ? '' : '/') . $fotoUrl;
+                }
+
                 $negocio['foto_perfil'] = $fotoUrl;
 
-                \Log::info('DEBUG NEGOCIO:', [
+                // LOG DETALLADO
+                \Log::info('DEBUG NEGOCIO: ' . ($negocio['nombre'] ?? 'Sin nombre'), [
                     'id' => $negocio['id_negocio'] ?? $negocio['id'] ?? null,
-                    'nombre' => $negocio['nombre'] ?? null,
-                    'imagenes_raw' => $negocio['imagenes'] ?? 'NO EXISTE',
-                    'fotoUrl_generada' => $fotoUrl ?? null,
-                    'foto_perfil_final' => $negocio['foto_perfil'] ?? null
+                    'imagenes_raw' => $negocio['imagenes'] ?? 'NO EXISTE O ESTÁ VACÍO',
+                    'fotoUrl_generada' => $fotoUrl,
+                    'foto_perfil_final' => $negocio['foto_perfil']
                 ]);
             }
+            unset($negocio);
         } catch (\Exception $e) {
             \Log::error('Error en HomeController: ' . $e->getMessage());
             $negocios = [];

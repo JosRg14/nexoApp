@@ -30,30 +30,40 @@ class NegocioController extends Controller
             ]);
             
             $apiBaseUrl = rtrim(config('services.api.url'), '/');
-            // Extraer imágenes de la relación y armar la URL absoluta final como en los servicios
+            // Procesar foto_perfil
             $fotoUrl = null;
-            $bannerUrl = null;
-            
             if (isset($negocio['imagenes']) && is_array($negocio['imagenes'])) {
-                $fotoObj = collect($negocio['imagenes'])->where('tipo', 'perfil_negocio')->first();
-                if ($fotoObj && isset($fotoObj['url_imagen'])) {
-                    $fotoUrl = $apiBaseUrl . $fotoObj['url_imagen'];
-                }
-                
-                $bannerObj = collect($negocio['imagenes'])->where('tipo', 'banner_negocio')->first();
-                if ($bannerObj && isset($bannerObj['url_imagen'])) {
-                    $bannerUrl = $apiBaseUrl . $bannerObj['url_imagen'];
-                }
-            } else {
-                if (isset($negocio['foto_perfil']) && is_string($negocio['foto_perfil'])) {
-                    $fotoUrl = \Illuminate\Support\Str::startsWith($negocio['foto_perfil'], 'http') ? $negocio['foto_perfil'] : $apiBaseUrl . $negocio['foto_perfil'];
-                }
-                if (isset($negocio['banner']) && is_string($negocio['banner'])) {
-                    $bannerUrl = \Illuminate\Support\Str::startsWith($negocio['banner'], 'http') ? $negocio['banner'] : $apiBaseUrl . $negocio['banner'];
+                foreach ($negocio['imagenes'] as $img) {
+                    if (isset($img['tipo']) && $img['tipo'] === 'perfil_negocio') {
+                        $fotoUrl = $img['url_imagen'] ?? null;
+                        break;
+                    }
                 }
             }
-            
+            if (!$fotoUrl && isset($negocio['foto_perfil']) && $negocio['foto_perfil']) {
+                $fotoUrl = $negocio['foto_perfil'];
+            }
+            if ($fotoUrl && !\Illuminate\Support\Str::startsWith($fotoUrl, 'http')) {
+                $fotoUrl = $apiBaseUrl . (\Illuminate\Support\Str::startsWith($fotoUrl, '/') ? '' : '/') . $fotoUrl;
+            }
             $negocio['foto_perfil'] = $fotoUrl;
+
+            // Misma lógica para banner
+            $bannerUrl = null;
+            if (isset($negocio['imagenes']) && is_array($negocio['imagenes'])) {
+                foreach ($negocio['imagenes'] as $img) {
+                    if (isset($img['tipo']) && $img['tipo'] === 'banner_negocio') {
+                        $bannerUrl = $img['url_imagen'] ?? null;
+                        break;
+                    }
+                }
+            }
+            if (!$bannerUrl && isset($negocio['banner']) && $negocio['banner']) {
+                $bannerUrl = $negocio['banner'];
+            }
+            if ($bannerUrl && !\Illuminate\Support\Str::startsWith($bannerUrl, 'http')) {
+                $bannerUrl = $apiBaseUrl . (\Illuminate\Support\Str::startsWith($bannerUrl, '/') ? '' : '/') . $bannerUrl;
+            }
             $negocio['banner'] = $bannerUrl;
             // Obtener horarios del negocio
             $horariosResponse = $this->httpClient->getPublic('/api/negocios/' . $id . '/horarios');
