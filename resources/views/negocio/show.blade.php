@@ -12,23 +12,6 @@
                 'banner_url' => $negocio['banner'] ?? null
             ]);
         @endphp
-
-        <!-- DEBUG VISUAL COMPLETO -->
-        <div style="background: #000; color: #0f0; padding: 15px; margin: 15px; border: 2px solid red; position: relative; z-index: 9999; font-size: 10px; overflow-wrap: break-word;">
-            <strong>=== DEBUG NEGOCIO (SHOW) ===</strong><br>
-            Nombre: {{ $negocio['nombre'] ?? 'N/A' }}<br>
-            ID: {{ $negocio['id_negocio'] ?? $negocio['id'] ?? 'N/A' }}<br>
-            foto_perfil valor: {{ $negocio['foto_perfil'] ?? 'VACÍO' }}<br>
-            banner valor: {{ $negocio['banner'] ?? 'VACÍO' }}<br>
-            imagenes existe? {{ isset($negocio['imagenes']) ? 'SI' : 'NO' }}<br>
-            @if(isset($negocio['imagenes']))
-                Cantidad de imágenes: {{ count($negocio['imagenes']) }}<br>
-                @foreach($negocio['imagenes'] as $idx => $img)
-                    Imagen {{ $idx }}: tipo={{ $img['tipo'] ?? 'N/A' }}, url={{ $img['url_imagen'] ?? 'N/A' }}<br>
-                @endforeach
-            @endif
-        </div>
-
         @if(!empty($negocio['banner']))
             <img src="{{ $negocio['banner'] }}" 
                  alt="{{ $negocio['nombre'] }}"
