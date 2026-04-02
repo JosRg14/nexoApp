@@ -55,21 +55,66 @@
         <!-- Filters & Grid -->
         <section class="max-w-7xl mx-auto px-6 pb-24">
             
-            <!-- Filter Bar -->
+           <!-- Filter Bar -->
             <div class="flex flex-wrap gap-4 mb-12 border-b border-[#374151] pb-6 items-center justify-between animate-fade-in-up" style="animation-delay: 200ms;">
                 <div class="flex gap-4">
-                    <button class="px-4 py-1.5 border border-[#374151] text-[#9CA3AF] text-[10px] uppercase tracking-widest hover:border-[#25B5DA] hover:text-[#25B5DA] rounded-sm transition-all">
-                        Ordenar
-                    </button>
-                    <button class="px-4 py-1.5 border border-[#374151] text-[#9CA3AF] text-[10px] uppercase tracking-widest hover:border-[#25B5DA] hover:text-[#25B5DA] rounded-sm transition-all">
-                        Categoría
-                    </button>
-                    <button class="px-4 py-1.5 border border-[#374151] text-[#9CA3AF] text-[10px] uppercase tracking-widest hover:border-[#25B5DA] hover:text-[#25B5DA] rounded-sm transition-all">
-                        Precio
+                    <!-- Filtro Ordenar -->
+                    <div class="relative">
+                        <button id="btnOrdenar" class="px-4 py-1.5 border border-[#374151] text-[#9CA3AF] text-[10px] uppercase tracking-widest hover:border-[#25B5DA] hover:text-[#25B5DA] rounded-sm transition-all flex items-center gap-2">
+                            Ordenar
+                            <i class="fas fa-chevron-down text-[8px]"></i>
+                        </button>
+                        <div id="dropdownOrdenar" class="hidden absolute top-full left-0 mt-1 bg-[#262626] border border-[#374151] rounded-sm z-10 min-w-[150px]">
+                            <div class="py-1">
+                                <button data-order="nombre" class="dropdown-order w-full text-left px-4 py-2 text-xs text-[#9CA3AF] hover:bg-[#1a1a1a] hover:text-[#25B5DA] transition-colors">Nombre (A-Z)</button>
+                                <button data-order="nombre_desc" class="dropdown-order w-full text-left px-4 py-2 text-xs text-[#9CA3AF] hover:bg-[#1a1a1a] hover:text-[#25B5DA] transition-colors">Nombre (Z-A)</button>
+                                <button data-order="calificacion" class="dropdown-order w-full text-left px-4 py-2 text-xs text-[#9CA3AF] hover:bg-[#1a1a1a] hover:text-[#25B5DA] transition-colors">Mejor calificados</button>
+                                <button data-order="reciente" class="dropdown-order w-full text-left px-4 py-2 text-xs text-[#9CA3AF] hover:bg-[#1a1a1a] hover:text-[#25B5DA] transition-colors">Más recientes</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Filtro Categoría -->
+                    <div class="relative">
+                        <button id="btnCategoria" class="px-4 py-1.5 border border-[#374151] text-[#9CA3AF] text-[10px] uppercase tracking-widest hover:border-[#25B5DA] hover:text-[#25B5DA] rounded-sm transition-all flex items-center gap-2">
+                            Categoría
+                            <i class="fas fa-chevron-down text-[8px]"></i>
+                        </button>
+                        <div id="dropdownCategoria" class="hidden absolute top-full left-0 mt-1 bg-[#262626] border border-[#374151] rounded-sm z-10 min-w-[150px]">
+                            <div class="py-1">
+                                <button data-categoria="" class="dropdown-categoria w-full text-left px-4 py-2 text-xs text-[#9CA3AF] hover:bg-[#1a1a1a] hover:text-[#25B5DA] transition-colors">Todas</button>
+                                <button data-categoria="barberia" class="dropdown-categoria w-full text-left px-4 py-2 text-xs text-[#9CA3AF] hover:bg-[#1a1a1a] hover:text-[#25B5DA] transition-colors">Barbería</button>
+                                <button data-categoria="salon" class="dropdown-categoria w-full text-left px-4 py-2 text-xs text-[#9CA3AF] hover:bg-[#1a1a1a] hover:text-[#25B5DA] transition-colors">Salón de belleza</button>
+                                <button data-categoria="peluqueria" class="dropdown-categoria w-full text-left px-4 py-2 text-xs text-[#9CA3AF] hover:bg-[#1a1a1a] hover:text-[#25B5DA] transition-colors">Peluquería</button>
+                                <button data-categoria="spa" class="dropdown-categoria w-full text-left px-4 py-2 text-xs text-[#9CA3AF] hover:bg-[#1a1a1a] hover:text-[#25B5DA] transition-colors">Spa</button>
+                                <button data-categoria="otros" class="dropdown-categoria w-full text-left px-4 py-2 text-xs text-[#9CA3AF] hover:bg-[#1a1a1a] hover:text-[#25B5DA] transition-colors">Otros</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Filtro Precio -->
+                    <div class="relative">
+                        <button id="btnPrecio" class="px-4 py-1.5 border border-[#374151] text-[#9CA3AF] text-[10px] uppercase tracking-widest hover:border-[#25B5DA] hover:text-[#25B5DA] rounded-sm transition-all flex items-center gap-2">
+                            Precio
+                            <i class="fas fa-chevron-down text-[8px]"></i>
+                        </button>
+                        <div id="dropdownPrecio" class="hidden absolute top-full left-0 mt-1 bg-[#262626] border border-[#374151] rounded-sm z-10 min-w-[180px]">
+                            <div class="py-1">
+                                <button data-precio="" class="dropdown-precio w-full text-left px-4 py-2 text-xs text-[#9CA3AF] hover:bg-[#1a1a1a] hover:text-[#25B5DA] transition-colors">Todos</button>
+                                <button data-precio="bajo" class="dropdown-precio w-full text-left px-4 py-2 text-xs text-[#9CA3AF] hover:bg-[#1a1a1a] hover:text-[#25B5DA] transition-colors">$ - Económico</button>
+                                <button data-precio="medio" class="dropdown-precio w-full text-left px-4 py-2 text-xs text-[#9CA3AF] hover:bg-[#1a1a1a] hover:text-[#25B5DA] transition-colors">$$ - Moderado</button>
+                                <button data-precio="alto" class="dropdown-precio w-full text-left px-4 py-2 text-xs text-[#9CA3AF] hover:bg-[#1a1a1a] hover:text-[#25B5DA] transition-colors">$$$ - Premium</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Botón limpiar filtros (aparece cuando hay filtros activos) -->
+                    <button id="btnLimpiar" class="hidden px-4 py-1.5 border border-red-500/50 text-red-500 text-[10px] uppercase tracking-widest hover:bg-red-500/10 rounded-sm transition-all">
+                        Limpiar filtros
                     </button>
                 </div>
                 <div class="text-[#9CA3AF] text-xs uppercase tracking-widest">
-                    Mostrando <span class="text-white">{{ count($negocios) }}</span> resultados
+                    Mostrando <span id="resultados-count" class="text-white">{{ count($negocios) }}</span> resultados
                 </div>
             </div>
 
@@ -197,5 +242,247 @@
         </section>
 
     </main>
+
+    
+    <script>
+        // Pasar los datos de negocios a JavaScript
+        const negociosOriginales = @json($negocios);
+        let negociosFiltrados = [...negociosOriginales];
+        let filtroActivo = {
+            categoria: '',
+            precio: '',
+            orden: ''
+        };
+
+        // Mapeo de categorías
+        const categoriasMap = {
+            'barberia': 'Barbería',
+            'salon': 'Salón de belleza',
+            'peluqueria': 'Peluquería',
+            'spa': 'Spa',
+            'otros': 'Otros'
+        };
+
+        // Rangos de precio
+        const rangosPrecio = {
+            bajo: { min: 0, max: 200 },
+            medio: { min: 201, max: 500 },
+            alto: { min: 501, max: Infinity }
+        };
+
+        // Obtener precio promedio del negocio (de sus servicios)
+        function getPrecioPromedio(negocio) {
+            if (negocio.servicios && negocio.servicios.length > 0) {
+                let total = negocio.servicios.reduce((sum, s) => sum + (s.precio || 0), 0);
+                return total / negocio.servicios.length;
+            }
+            return 0;
+        }
+
+        // Aplicar filtros
+        function aplicarFiltros() {
+            negociosFiltrados = [...negociosOriginales];
+            
+            // Filtrar por categoría
+            if (filtroActivo.categoria) {
+                negociosFiltrados = negociosFiltrados.filter(negocio => 
+                    negocio.tipo_negocio === filtroActivo.categoria
+                );
+            }
+            
+            // Filtrar por precio
+            if (filtroActivo.precio) {
+                const rango = rangosPrecio[filtroActivo.precio];
+                negociosFiltrados = negociosFiltrados.filter(negocio => {
+                    const precioPromedio = getPrecioPromedio(negocio);
+                    return precioPromedio >= rango.min && precioPromedio <= rango.max;
+                });
+            }
+            
+            // Ordenar
+            if (filtroActivo.orden) {
+                switch(filtroActivo.orden) {
+                    case 'nombre':
+                        negociosFiltrados.sort((a, b) => a.nombre.localeCompare(b.nombre));
+                        break;
+                    case 'nombre_desc':
+                        negociosFiltrados.sort((a, b) => b.nombre.localeCompare(a.nombre));
+                        break;
+                    case 'calificacion':
+                        negociosFiltrados.sort((a, b) => (b.calificacion || 0) - (a.calificacion || 0));
+                        break;
+                    case 'reciente':
+                        negociosFiltrados.sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
+                        break;
+                }
+            }
+            
+            renderizarNegocios();
+            
+            // Mostrar/ocultar botón limpiar
+            const tieneFiltros = filtroActivo.categoria || filtroActivo.precio || filtroActivo.orden;
+            document.getElementById('btnLimpiar').classList.toggle('hidden', !tieneFiltros);
+        }
+
+        // Renderizar negocios en el grid
+        function renderizarNegocios() {
+            const gridContainer = document.getElementById('negocios-grid');
+            const resultadosCount = document.getElementById('resultados-count');
+            
+            if (!gridContainer) return;
+            
+            if (negociosFiltrados.length === 0) {
+                gridContainer.innerHTML = `
+                    <div class="col-span-full text-center py-20">
+                        <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-[#262626] border border-[#374151] text-[#25B5DA] mb-6">
+                            <i class="fas fa-search text-2xl"></i>
+                        </div>
+                        <div class="text-white text-xl uppercase tracking-wide font-bold mb-2">No hay resultados</div>
+                        <p class="text-[#9CA3AF] text-sm">No encontramos negocios con esos filtros.</p>
+                        <button onclick="limpiarFiltros()" class="mt-4 px-6 py-2 bg-[#25B5DA] text-black text-xs font-bold uppercase rounded-lg hover:bg-[#1c8fb0] transition-all">
+                            Limpiar filtros
+                        </button>
+                    </div>
+                `;
+                resultadosCount.textContent = '0';
+                return;
+            }
+            
+            let html = '';
+            negociosFiltrados.forEach((negocio, index) => {
+                const fotoPerfil = negocio.foto_perfil || '';
+                const calificacion = negocio.calificacion || null;
+                const tipoNegocio = categoriasMap[negocio.tipo_negocio] || 'Servicios';
+                
+                let ciudad = 'Ubicación no especificada';
+                if (negocio.direccion && negocio.direccion.ciudad) {
+                    ciudad = negocio.direccion.ciudad;
+                } else if (negocio.ciudad) {
+                    ciudad = negocio.ciudad;
+                }
+                
+                html += `
+                    <article class="group relative bg-[#262626] rounded-xl overflow-hidden border border-[#374151] hover:border-[#25B5DA]/50 transition-all duration-500 hover:-translate-y-1 hover:shadow-2xl hover:shadow-[#25B5DA]/10 cursor-pointer animate-fade-in-up block"
+                             onclick="window.location.href='/negocio/${negocio.id_negocio}'"
+                             style="animation-delay: ${300 + (index * 100)}ms;">
+                        
+                        <div class="relative aspect-[4/5] overflow-hidden">
+                            ${fotoPerfil ? 
+                                `<img src="${fotoPerfil}" alt="${negocio.nombre}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">` :
+                                `<div class="w-full h-full bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center group-hover:scale-110 transition-transform duration-700">
+                                    <svg class="w-16 h-16 text-[#374151]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="0.5" d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"></path>
+                                    </svg>
+                                </div>`
+                            }
+                            <div class="absolute inset-0 bg-gradient-to-t from-[#1a1a1a] via-[#1a1a1a]/40 to-transparent opacity-90 group-hover:opacity-80 transition-opacity duration-300"></div>
+                            
+                            <div class="absolute top-3 right-3 bg-black/60 backdrop-blur-sm px-2.5 py-1 rounded-full border border-white/10 shadow-lg">
+                                <span class="text-[#25B5DA] text-xs font-bold flex items-center gap-1">
+                                    <i class="fas fa-star text-[10px]"></i>
+                                    ${calificacion ? calificacion.toFixed(1) : 'NUEVO'}
+                                </span>
+                            </div>
+                            
+                            <div class="absolute bottom-4 left-4 bg-[#25B5DA]/20 backdrop-blur-sm px-3 py-1.5 rounded-full border border-[#25B5DA]/30">
+                                <span class="text-[#25B5DA] text-[10px] font-bold uppercase tracking-wider">${tipoNegocio}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="p-5">
+                            <h3 class="text-white font-bold text-base uppercase tracking-wide group-hover:text-[#25B5DA] transition-colors line-clamp-1">
+                                ${negocio.nombre}
+                            </h3>
+                            
+                            <p class="text-[#9CA3AF] text-xs mt-2 line-clamp-2 leading-relaxed h-8">
+                                ${negocio.acerca_de || 'Descubre los mejores servicios en ' + negocio.nombre}
+                            </p>
+                            
+                            <div class="flex items-center gap-1.5 mt-4 text-[10px] text-[#9CA3AF] uppercase tracking-wider bg-[#1a1a1a] rounded px-2 py-1.5 w-max">
+                                <svg class="w-3.5 h-3.5 text-[#25B5DA]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                </svg>
+                                <span class="truncate max-w-[150px]">${ciudad}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-[#25B5DA] to-[#1c8fb0] transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
+                    </article>
+                `;
+            });
+            
+            gridContainer.innerHTML = html;
+            resultadosCount.textContent = negociosFiltrados.length;
+        }
+
+        // Limpiar filtros
+        function limpiarFiltros() {
+            filtroActivo = { categoria: '', precio: '', orden: '' };
+            aplicarFiltros();
+        }
+
+        // Event listeners para dropdowns
+        document.getElementById('btnOrdenar').addEventListener('click', () => {
+            document.getElementById('dropdownOrdenar').classList.toggle('hidden');
+            document.getElementById('dropdownCategoria').classList.add('hidden');
+            document.getElementById('dropdownPrecio').classList.add('hidden');
+        });
+
+        document.getElementById('btnCategoria').addEventListener('click', () => {
+            document.getElementById('dropdownCategoria').classList.toggle('hidden');
+            document.getElementById('dropdownOrdenar').classList.add('hidden');
+            document.getElementById('dropdownPrecio').classList.add('hidden');
+        });
+
+        document.getElementById('btnPrecio').addEventListener('click', () => {
+            document.getElementById('dropdownPrecio').classList.toggle('hidden');
+            document.getElementById('dropdownOrdenar').classList.add('hidden');
+            document.getElementById('dropdownCategoria').classList.add('hidden');
+        });
+
+        // Cerrar dropdowns al hacer clic fuera
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('#btnOrdenar') && !e.target.closest('#dropdownOrdenar')) {
+                document.getElementById('dropdownOrdenar').classList.add('hidden');
+            }
+            if (!e.target.closest('#btnCategoria') && !e.target.closest('#dropdownCategoria')) {
+                document.getElementById('dropdownCategoria').classList.add('hidden');
+            }
+            if (!e.target.closest('#btnPrecio') && !e.target.closest('#dropdownPrecio')) {
+                document.getElementById('dropdownPrecio').classList.add('hidden');
+            }
+        });
+
+        // Event listeners para opciones
+        document.querySelectorAll('.dropdown-order').forEach(btn => {
+            btn.addEventListener('click', () => {
+                filtroActivo.orden = btn.dataset.order;
+                aplicarFiltros();
+                document.getElementById('dropdownOrdenar').classList.add('hidden');
+            });
+        });
+
+        document.querySelectorAll('.dropdown-categoria').forEach(btn => {
+            btn.addEventListener('click', () => {
+                filtroActivo.categoria = btn.dataset.categoria;
+                aplicarFiltros();
+                document.getElementById('dropdownCategoria').classList.add('hidden');
+            });
+        });
+
+        document.querySelectorAll('.dropdown-precio').forEach(btn => {
+            btn.addEventListener('click', () => {
+                filtroActivo.precio = btn.dataset.precio;
+                aplicarFiltros();
+                document.getElementById('dropdownPrecio').classList.add('hidden');
+            });
+        });
+
+        document.getElementById('btnLimpiar').addEventListener('click', limpiarFiltros);
+
+        // Inicializar renderizado
+        renderizarNegocios();
+    </script>
 
 @endsection
