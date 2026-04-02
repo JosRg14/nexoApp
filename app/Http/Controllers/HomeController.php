@@ -45,6 +45,14 @@ class HomeController extends Controller
                 }
                 
                 $negocio['foto_perfil'] = $fotoUrl;
+
+                \Log::info('DEBUG NEGOCIO:', [
+                    'id' => $negocio['id_negocio'] ?? $negocio['id'] ?? null,
+                    'nombre' => $negocio['nombre'] ?? null,
+                    'imagenes_raw' => $negocio['imagenes'] ?? 'NO EXISTE',
+                    'fotoUrl_generada' => $fotoUrl ?? null,
+                    'foto_perfil_final' => $negocio['foto_perfil'] ?? null
+                ]);
             }
         } catch (\Exception $e) {
             \Log::error('Error en HomeController: ' . $e->getMessage());
