@@ -1,17 +1,15 @@
-<header class="w-full border-b border-[#374151]/50 sticky top-0 bg-[#1a1a1a]/95 backdrop-blur-sm z-50">
-    <div class="max-w-7xl mx-auto px-6 py-5 flex flex-col md:flex-row justify-between items-center gap-6">
+<header class="w-full border-b border-[#374151]/50 bg-[#1a1a1a] z-50">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center gap-4">
 
-        <div class="flex items-center w-full md:w-auto gap-8">
-            <div class="text-2xl font-bold tracking-widest uppercase text-white shrink-0">
+        <div class="flex items-center gap-8">
+            <div class="text-xl md:text-2xl font-bold tracking-widest uppercase text-white shrink-0">
                 <a href="{{ url('/') }}">NEXOAPP</a>
             </div>
         </div>
 
         
 
-
-
-        <nav class="flex items-center gap-6 w-full md:w-auto justify-between md:justify-end">
+        <nav class="flex items-center gap-4 justify-end">
 
             @if(session()->has('rol'))
 

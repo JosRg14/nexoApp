@@ -12,6 +12,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>NexoApp - Mi Negocio</title>
+    <link rel="icon" type="image/png" href="{{ asset('logo.png') }}">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
@@ -87,27 +88,27 @@ class="w-full text-left px-4 py-2 text-xs text-red-400 hover:text-red-300 hover:
     <main class="flex-grow max-w-7xl mx-auto w-full px-6 py-12">
         
         <!-- Header Section -->
-        <div class="mb-12 flex flex-col md:flex-row justify-between items-end gap-6">
+        <div class="mb-12 flex flex-col md:flex-row justify-between items-start md:items-end gap-6 overflow-hidden">
             <div>
                 <h1 class="text-4xl font-bold uppercase tracking-wide text-white mb-2">Mi Negocio</h1>
                 <p class="text-[#9CA3AF] text-sm tracking-wide">GESTIONA TU PERFIL Y SERVICIOS</p>
             </div>
             
             <!-- Tabs Navigation -->
-            <div class="flex space-x-1 bg-[#0f0f0f] p-1 border border-[#374151]/50 rounded-sm">
-                <button onclick="switchTab('info')" id="tab-btn-info" class="px-6 py-2 text-xs font-bold uppercase tracking-widest transition-all text-[#1a1a1a] bg-[#F3F4F6]">
+            <div class="w-full md:w-auto flex space-x-1 bg-[#0f0f0f] p-1 border border-[#374151]/50 rounded-sm overflow-x-auto whitespace-nowrap [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                <button onclick="switchTab('info')" id="tab-btn-info" class="shrink-0 px-6 py-2 text-xs font-bold uppercase tracking-widest transition-all text-[#1a1a1a] bg-[#F3F4F6]">
                     Información
                 </button>
-                <button onclick="switchTab('services')" id="tab-btn-services" class="px-6 py-2 text-xs font-bold uppercase tracking-widest transition-all text-[#9CA3AF] hover:text-white">
+                <button onclick="switchTab('services')" id="tab-btn-services" class="shrink-0 px-6 py-2 text-xs font-bold uppercase tracking-widest transition-all text-[#9CA3AF] hover:text-white">
                     Servicios
                 </button>
-                <button onclick="switchTab('schedule')" id="tab-btn-schedule" class="px-6 py-2 text-xs font-bold uppercase tracking-widest transition-all text-[#9CA3AF] hover:text-white">
+                <button onclick="switchTab('schedule')" id="tab-btn-schedule" class="shrink-0 px-6 py-2 text-xs font-bold uppercase tracking-widest transition-all text-[#9CA3AF] hover:text-white">
                     Horario
                 </button>
-                <button onclick="switchTab('finances')" id="tab-btn-finances" class="px-6 py-2 text-xs font-bold uppercase tracking-widest transition-all text-[#9CA3AF] hover:text-white">
+                <button onclick="switchTab('finances')" id="tab-btn-finances" class="shrink-0 px-6 py-2 text-xs font-bold uppercase tracking-widest transition-all text-[#9CA3AF] hover:text-white">
                     Finanzas
                 </button>
-                <button onclick="switchTab('personnel')" id="tab-btn-personnel" class="px-6 py-2 text-xs font-bold uppercase tracking-widest transition-all text-[#9CA3AF] hover:text-white">
+                <button onclick="switchTab('personnel')" id="tab-btn-personnel" class="shrink-0 px-6 py-2 text-xs font-bold uppercase tracking-widest transition-all text-[#9CA3AF] hover:text-white">
                     Personal
                 </button>
             </div>
