@@ -5,20 +5,22 @@
 @section('content')
 <div class="bg-[#1a1a1a] min-h-screen">
     <!-- Hero Section con imagen de fondo -->
-    <div class="relative h-80 md:h-96 overflow-hidden">
-        @if(isset($negocio['banner']) && $negocio['banner'])
-            <img src="{{ $negocio['banner'] }}" 
-                 alt="{{ $negocio['nombre'] }}"
-                 class="w-full h-full object-cover">
-        @else
-            <div class="w-full h-full bg-gradient-to-r from-gray-800 to-gray-900"></div>
-        @endif
-        <div class="absolute inset-0 bg-black/50"></div>
+    <div class="relative min-h-[24rem] md:min-h-[28rem] flex flex-col justify-end overflow-hidden">
+        <div class="absolute inset-0 z-0">
+            @if(isset($negocio['banner']) && $negocio['banner'])
+                <img src="{{ $negocio['banner'] }}" 
+                     alt="{{ $negocio['nombre'] }}"
+                     class="w-full h-full object-cover">
+            @else
+                <div class="w-full h-full bg-gradient-to-r from-gray-800 to-gray-900"></div>
+            @endif
+        </div>
+        <div class="absolute inset-0 bg-black/60 z-0"></div>
         
-        <div class="absolute bottom-0 left-0 right-0 p-6 md:p-10">
+        <div class="relative z-10 w-full p-6 pt-24 md:p-10">
             <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-start md:items-end gap-6">
                 <!-- Logo -->
-                <div class="w-28 h-28 md:w-36 md:h-36 rounded-full border-4 border-white overflow-hidden bg-[#2a2a2a]">
+                <div class="w-28 h-28 md:w-36 md:h-36 shrink-0 rounded-full border-4 border-[#1a1a1a] shadow-xl overflow-hidden bg-[#2a2a2a]">
                     @if(isset($negocio['foto_perfil']) && $negocio['foto_perfil'])
                         <img src="{{ $negocio['foto_perfil'] }}" 
                              alt="{{ $negocio['nombre'] }}"
