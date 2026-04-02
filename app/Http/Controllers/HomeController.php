@@ -23,11 +23,12 @@ class HomeController extends Controller
             $response = $this->httpClient->getPublic('/api/negocios');
             $negocios = $response['data'] ?? [];
             
-            // Completar URLs de imágenes
-            $apiBaseUrl = rtrim(config('services.api.url'), '/');
+            // Completar URLs de imágenes estructurando la respuesta en forma de array para la vista
             foreach ($negocios as &$negocio) {
-                if (isset($negocio['foto_perfil']) && $negocio['foto_perfil']) {
-                    $negocio['foto_perfil'] = $apiBaseUrl . $negocio['foto_perfil'];
+                if (isset($negocio['imagenes']) && is_array($negocio['imagenes'])) {
+                    $negocio['foto_perfil'] = collect($negocio['imagenes'])->where('tipo', 'perfil_negocio')->first();
+                } elseif (isset($negocio['foto_perfil']) && is_string($negocio['foto_perfil'])) {
+                    $negocio['foto_perfil'] = ['url_imagen' => $negocio['foto_perfil']];
                 }
             }
             

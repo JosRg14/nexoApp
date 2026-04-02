@@ -6,8 +6,12 @@
 <div class="bg-[#1a1a1a] min-h-screen">
     <!-- Hero Section con imagen de fondo -->
     <div class="relative h-80 md:h-96 overflow-hidden">
-        @if(isset($negocio['banner']) && $negocio['banner'])
-            <img src="{{ $negocio['banner'] }}" 
+        @if(isset($negocio['banner']) && (is_array($negocio['banner']) ? isset($negocio['banner']['url_imagen']) : true))
+            @php 
+                $apiUrl = rtrim(config('services.api.url'), '/'); 
+                $bannerUrl = is_array($negocio['banner']) ? $negocio['banner']['url_imagen'] : $negocio['banner'];
+            @endphp
+            <img src="{{ Str::startsWith($bannerUrl, 'http') ? $bannerUrl : $apiUrl . '/' . ltrim($bannerUrl, '/') }}" 
                  alt="{{ $negocio['nombre'] }}"
                  class="w-full h-full object-cover">
         @else
@@ -19,8 +23,12 @@
             <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-start md:items-end gap-6">
                 <!-- Logo -->
                 <div class="w-28 h-28 md:w-36 md:h-36 rounded-full border-4 border-white overflow-hidden bg-[#2a2a2a]">
-                    @if(isset($negocio['foto_perfil']) && $negocio['foto_perfil'])
-                        <img src="{{ $negocio['foto_perfil'] }}" 
+                    @if(isset($negocio['foto_perfil']) && (is_array($negocio['foto_perfil']) ? isset($negocio['foto_perfil']['url_imagen']) : true))
+                        @php 
+                            $apiUrl = rtrim(config('services.api.url'), '/'); 
+                            $perfilUrl = is_array($negocio['foto_perfil']) ? $negocio['foto_perfil']['url_imagen'] : $negocio['foto_perfil'];
+                        @endphp
+                        <img src="{{ Str::startsWith($perfilUrl, 'http') ? $perfilUrl : $apiUrl . '/' . ltrim($perfilUrl, '/') }}" 
                              alt="{{ $negocio['nombre'] }}"
                              class="w-full h-full object-cover">
                     @else

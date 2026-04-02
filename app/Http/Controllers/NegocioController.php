@@ -21,13 +21,18 @@ class NegocioController extends Controller
             $response = $this->httpClient->getPublic('/api/negocios/' . $id);
             $negocio = $response['data'] ?? [];
             
-            // Completar URLs de imágenes del negocio
             $apiBaseUrl = rtrim(config('services.api.url'), '/');
-            if (isset($negocio['foto_perfil']) && $negocio['foto_perfil']) {
-                $negocio['foto_perfil'] = $apiBaseUrl . $negocio['foto_perfil'];
-            }
-            if (isset($negocio['banner']) && $negocio['banner']) {
-                $negocio['banner'] = $apiBaseUrl . $negocio['banner'];
+            // Extraer imágenes de la relación (o adaptar strings para compatibilidad con las vistas)
+            if (isset($negocio['imagenes']) && is_array($negocio['imagenes'])) {
+                $negocio['foto_perfil'] = collect($negocio['imagenes'])->where('tipo', 'perfil_negocio')->first();
+                $negocio['banner'] = collect($negocio['imagenes'])->where('tipo', 'banner_negocio')->first();
+            } else {
+                if (isset($negocio['foto_perfil']) && is_string($negocio['foto_perfil'])) {
+                    $negocio['foto_perfil'] = ['url_imagen' => $negocio['foto_perfil']];
+                }
+                if (isset($negocio['banner']) && is_string($negocio['banner'])) {
+                    $negocio['banner'] = ['url_imagen' => $negocio['banner']];
+                }
             }
             
             // Obtener horarios del negocio

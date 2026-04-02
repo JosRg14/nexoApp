@@ -92,8 +92,12 @@
                     
                     <!-- Imagen con overlay -->
                     <div class="relative aspect-[4/5] overflow-hidden">
-                        @if(isset($negocio['foto_perfil']) && $negocio['foto_perfil'])
-                            <img src="{{ Str::startsWith($negocio['foto_perfil'], 'http') ? $negocio['foto_perfil'] : config('services.api.url') . '/' . ltrim($negocio['foto_perfil'], '/') }}" 
+                        @if(isset($negocio['foto_perfil']) && (is_array($negocio['foto_perfil']) ? isset($negocio['foto_perfil']['url_imagen']) : true))
+                            @php 
+                                $apiUrl = rtrim(config('services.api.url'), '/'); 
+                                $imgUrl = is_array($negocio['foto_perfil']) ? $negocio['foto_perfil']['url_imagen'] : $negocio['foto_perfil'];
+                            @endphp
+                            <img src="{{ Str::startsWith($imgUrl, 'http') ? $imgUrl : $apiUrl . '/' . ltrim($imgUrl, '/') }}" 
                                  alt="{{ $negocio['nombre'] }}"
                                  class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
                         @else
