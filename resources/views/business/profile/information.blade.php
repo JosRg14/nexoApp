@@ -274,10 +274,18 @@
                             <!-- Foto Perfil -->
                             <div class="space-y-4">
                                 <label class="block text-xs text-[#9CA3AF] uppercase tracking-wider">Foto de Perfil</label>
+                                @php
+                                    $prevPerfil = '';
+                                    if (isset($negocio['foto_perfil']) && is_array($negocio['foto_perfil']) && isset($negocio['foto_perfil']['url_imagen'])) {
+                                        $prevPerfil = rtrim(config('services.api.url'), '/') . '/' . ltrim($negocio['foto_perfil']['url_imagen'], '/');
+                                    } elseif (isset($negocio['foto_perfil']) && is_string($negocio['foto_perfil']) && !empty($negocio['foto_perfil'])) {
+                                        $prevPerfil = Str::startsWith($negocio['foto_perfil'], 'http') ? $negocio['foto_perfil'] : rtrim(config('services.api.url'), '/') . '/' . ltrim($negocio['foto_perfil'], '/');
+                                    }
+                                @endphp
                                 <div class="flex items-center gap-4">
                                     <div class="w-16 h-16 rounded-full bg-[#1a1a1a] border border-[#374151] overflow-hidden flex-shrink-0 relative">
-                                        <img id="preview_img_perfil" src="{{ isset($negocio['foto_perfil']) ? rtrim(config('services.api.url'), '/') . '/' . ltrim(is_array($negocio['foto_perfil']) ? $negocio['foto_perfil']['url_imagen'] : $negocio['foto_perfil'], '/') : '' }}" class="w-full h-full object-cover {{ empty($negocio['foto_perfil']) ? 'hidden' : '' }}">
-                                        @if(empty($negocio['foto_perfil']))
+                                        <img id="preview_img_perfil" src="{{ $prevPerfil }}" class="w-full h-full object-cover {{ empty($prevPerfil) ? 'hidden' : '' }}">
+                                        @if(empty($prevPerfil))
                                             <div id="placeholder_perfil" class="absolute inset-0 flex items-center justify-center text-[#374151]"><i class="fas fa-store"></i></div>
                                         @endif
                                     </div>
@@ -290,10 +298,18 @@
                             <!-- Banner -->
                             <div class="space-y-4">
                                 <label class="block text-xs text-[#9CA3AF] uppercase tracking-wider">Banner Principal</label>
+                                @php
+                                    $prevBanner = '';
+                                    if (isset($negocio['banner']) && is_array($negocio['banner']) && isset($negocio['banner']['url_imagen'])) {
+                                        $prevBanner = rtrim(config('services.api.url'), '/') . '/' . ltrim($negocio['banner']['url_imagen'], '/');
+                                    } elseif (isset($negocio['banner']) && is_string($negocio['banner']) && !empty($negocio['banner'])) {
+                                        $prevBanner = Str::startsWith($negocio['banner'], 'http') ? $negocio['banner'] : rtrim(config('services.api.url'), '/') . '/' . ltrim($negocio['banner'], '/');
+                                    }
+                                @endphp
                                 <div class="flex items-center gap-4">
                                     <div class="w-24 h-16 rounded bg-[#1a1a1a] border border-[#374151] overflow-hidden flex-shrink-0 relative">
-                                        <img id="preview_img_banner" src="{{ isset($negocio['banner']) ? rtrim(config('services.api.url'), '/') . '/' . ltrim(is_array($negocio['banner']) ? $negocio['banner']['url_imagen'] : $negocio['banner'], '/') : '' }}" class="w-full h-full object-cover {{ empty($negocio['banner']) ? 'hidden' : '' }}">
-                                        @if(empty($negocio['banner']))
+                                        <img id="preview_img_banner" src="{{ $prevBanner }}" class="w-full h-full object-cover {{ empty($prevBanner) ? 'hidden' : '' }}">
+                                        @if(empty($prevBanner))
                                             <div id="placeholder_banner" class="absolute inset-0 flex items-center justify-center text-[#374151]"><i class="fas fa-image"></i></div>
                                         @endif
                                     </div>
@@ -316,8 +332,16 @@
         <div class="flex flex-col items-center justify-center border border-[#374151]/30 bg-[#0f0f0f] p-12 relative overflow-hidden">
             <div class="relative z-10 text-center">
                 <div class="w-32 h-32 rounded-full bg-[#262626] border-2 border-[#374151] mx-auto mb-6 flex items-center justify-center overflow-hidden">
-                    @if(isset($negocio['foto_perfil']) && $negocio['foto_perfil'])
-                        <img id="side_preview_perfil" src="{{ rtrim(config('services.api.url'), '/') . '/' . ltrim(is_array($negocio['foto_perfil']) ? $negocio['foto_perfil']['url_imagen'] : $negocio['foto_perfil'], '/') }}" class="w-full h-full object-cover">
+                    @php
+                        $sidePerfil = '';
+                        if (isset($negocio['foto_perfil']) && is_array($negocio['foto_perfil']) && isset($negocio['foto_perfil']['url_imagen'])) {
+                            $sidePerfil = rtrim(config('services.api.url'), '/') . '/' . ltrim($negocio['foto_perfil']['url_imagen'], '/');
+                        } elseif (isset($negocio['foto_perfil']) && is_string($negocio['foto_perfil']) && !empty($negocio['foto_perfil'])) {
+                            $sidePerfil = Str::startsWith($negocio['foto_perfil'], 'http') ? $negocio['foto_perfil'] : rtrim(config('services.api.url'), '/') . '/' . ltrim($negocio['foto_perfil'], '/');
+                        }
+                    @endphp
+                    @if($sidePerfil)
+                        <img id="side_preview_perfil" src="{{ $sidePerfil }}" class="w-full h-full object-cover">
                     @else
                         <img id="side_preview_perfil" src="" class="w-full h-full object-cover hidden">
                         <i id="side_placeholder_perfil" class="fas fa-store text-4xl text-[#9CA3AF]"></i>
