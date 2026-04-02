@@ -6,12 +6,22 @@
 <div class="bg-[#1a1a1a] min-h-screen">
     <!-- Hero Section con imagen de fondo -->
     <div class="relative h-80 md:h-96 overflow-hidden">
+        @php
+            \Log::info('Negocio en vista show:', [
+                'id' => $negocio['id_negocio'] ?? $negocio['id'] ?? null,
+                'tiene_imagenes' => isset($negocio['imagenes']),
+                'foto_perfil' => $negocio['foto_perfil'] ?? null,
+                'banner' => $negocio['banner'] ?? null
+            ]);
+        @endphp
         @if(isset($negocio['banner']) && (is_array($negocio['banner']) ? isset($negocio['banner']['url_imagen']) : true))
             @php 
                 $apiUrl = rtrim(config('services.api.url'), '/'); 
                 $bannerUrl = is_array($negocio['banner']) ? $negocio['banner']['url_imagen'] : $negocio['banner'];
+                $finalBannerUrl = Str::startsWith($bannerUrl, 'http') ? $bannerUrl : $apiUrl . '/' . ltrim($bannerUrl, '/');
+                \Log::info('URL final banner show:', ['url' => $finalBannerUrl]);
             @endphp
-            <img src="{{ Str::startsWith($bannerUrl, 'http') ? $bannerUrl : $apiUrl . '/' . ltrim($bannerUrl, '/') }}" 
+            <img src="{{ $finalBannerUrl }}" 
                  alt="{{ $negocio['nombre'] }}"
                  class="w-full h-full object-cover">
         @else
@@ -27,8 +37,10 @@
                         @php 
                             $apiUrl = rtrim(config('services.api.url'), '/'); 
                             $perfilUrl = is_array($negocio['foto_perfil']) ? $negocio['foto_perfil']['url_imagen'] : $negocio['foto_perfil'];
+                            $finalPerfilUrl = Str::startsWith($perfilUrl, 'http') ? $perfilUrl : $apiUrl . '/' . ltrim($perfilUrl, '/');
+                            \Log::info('URL final perfil show:', ['url' => $finalPerfilUrl]);
                         @endphp
-                        <img src="{{ Str::startsWith($perfilUrl, 'http') ? $perfilUrl : $apiUrl . '/' . ltrim($perfilUrl, '/') }}" 
+                        <img src="{{ $finalPerfilUrl }}" 
                              alt="{{ $negocio['nombre'] }}"
                              class="w-full h-full object-cover">
                     @else

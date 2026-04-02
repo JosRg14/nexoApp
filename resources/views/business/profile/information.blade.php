@@ -1,4 +1,13 @@
 <section id="tab-info" class="animate-fade-in-up">
+@php
+    \Log::info('Negocio en vista profile.information:', [
+        'id' => $negocio['id_negocio'] ?? $negocio['id'] ?? null,
+        'tiene_imagenes' => isset($negocio['imagenes']),
+        'imagenes' => $negocio['imagenes'] ?? [],
+        'foto_perfil' => $negocio['foto_perfil'] ?? null,
+        'banner' => $negocio['banner'] ?? null
+    ]);
+@endphp
 
 @if(!$negocio || empty($negocio))
     <div class="flex flex-col items-center justify-center py-16 text-center">

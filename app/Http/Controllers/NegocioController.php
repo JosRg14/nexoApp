@@ -21,6 +21,14 @@ class NegocioController extends Controller
             $response = $this->httpClient->getPublic('/api/negocios/' . $id);
             $negocio = $response['data'] ?? [];
             
+            \Log::info('NegocioController API Response:', [
+                'id' => $id,
+                'tiene_imagenes' => isset($negocio['imagenes']),
+                'imagenes' => $negocio['imagenes'] ?? [],
+                'foto_perfil' => $negocio['foto_perfil'] ?? null,
+                'banner' => $negocio['banner'] ?? null
+            ]);
+            
             $apiBaseUrl = rtrim(config('services.api.url'), '/');
             // Extraer imágenes de la relación (o adaptar strings para compatibilidad con las vistas)
             if (isset($negocio['imagenes']) && is_array($negocio['imagenes'])) {

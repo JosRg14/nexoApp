@@ -92,12 +92,22 @@
                     
                     <!-- Imagen con overlay -->
                     <div class="relative aspect-[4/5] overflow-hidden">
+                        @php
+                            \Log::info('Negocio en vista home:', [
+                                'id' => $negocio['id_negocio'] ?? $negocio['id'] ?? null,
+                                'tiene_imagenes' => isset($negocio['imagenes']),
+                                'imagenes' => $negocio['imagenes'] ?? [],
+                                'foto_perfil' => $negocio['foto_perfil'] ?? null,
+                            ]);
+                        @endphp
                         @if(isset($negocio['foto_perfil']) && (is_array($negocio['foto_perfil']) ? isset($negocio['foto_perfil']['url_imagen']) : true))
                             @php 
                                 $apiUrl = rtrim(config('services.api.url'), '/'); 
                                 $imgUrl = is_array($negocio['foto_perfil']) ? $negocio['foto_perfil']['url_imagen'] : $negocio['foto_perfil'];
+                                $finalUrl = Str::startsWith($imgUrl, 'http') ? $imgUrl : $apiUrl . '/' . ltrim($imgUrl, '/');
+                                \Log::info('URL final generada en home:', ['url' => $finalUrl]);
                             @endphp
-                            <img src="{{ Str::startsWith($imgUrl, 'http') ? $imgUrl : $apiUrl . '/' . ltrim($imgUrl, '/') }}" 
+                            <img src="{{ $finalUrl }}" 
                                  alt="{{ $negocio['nombre'] }}"
                                  class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
                         @else

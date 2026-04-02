@@ -23,6 +23,12 @@ class HomeController extends Controller
             $response = $this->httpClient->getPublic('/api/negocios');
             $negocios = $response['data'] ?? [];
             
+            \Log::info('HomeController API Response:', [
+                'count' => count($negocios),
+                'primer_negocio_imagenes' => ($negocios[0]['imagenes'] ?? 'No tiene imagenes'),
+                'primer_negocio_foto' => ($negocios[0]['foto_perfil'] ?? 'No tiene foto_perfil directly')
+            ]);
+            
             // Completar URLs de imágenes estructurando la respuesta en forma de array para la vista
             foreach ($negocios as &$negocio) {
                 if (isset($negocio['imagenes']) && is_array($negocio['imagenes'])) {
