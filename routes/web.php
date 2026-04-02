@@ -243,6 +243,11 @@ Route::middleware(['auth.session', 'inject.api.token'])->group(function () {
 
         // Cancelar cita — acepta tanto POST (formulario) como PATCH (fetch JS)
         Route::match(['POST', 'PATCH'], '/citas/{id}/cancelar', [BookingController::class, 'cancelarCita']);
+
+        // Reseñas
+        Route::post('/citas/{id}/resena', [BookingController::class, 'crearResena']);
+        Route::put('/resenas/cita/{id}', [BookingController::class, 'editarResena']);
+        Route::delete('/resenas/cita/{id}', [BookingController::class, 'eliminarResena']);
     });
 });
 

@@ -199,4 +199,55 @@ class BookingController extends Controller
             ], $statusCode);
         }
     }
+
+    /**
+     * Crear reseña
+     */
+    public function crearResena(Request $request, $citaId)
+    {
+        try {
+            $response = $this->httpClient->post("/api/citas/{$citaId}/resena", [
+                'calificacion' => $request->calificacion,
+                'comentario' => $request->comentario
+            ]);
+            return response()->json($response);
+        } catch (\Exception $e) {
+            Log::error('Error al crear reseña: ' . $e->getMessage());
+            $statusCode = $e->getCode() && is_numeric($e->getCode()) && $e->getCode() >= 400 && $e->getCode() < 600 ? $e->getCode() : 500;
+            return response()->json(['success' => false, 'message' => 'Error al crear la reseña: ' . $e->getMessage()], $statusCode);
+        }
+    }
+
+    /**
+     * Editar reseña
+     */
+    public function editarResena(Request $request, $resenaId)
+    {
+        try {
+            $response = $this->httpClient->put("/api/resenas/cita/{$resenaId}", [
+                'calificacion' => $request->calificacion,
+                'comentario' => $request->comentario
+            ]);
+            return response()->json($response);
+        } catch (\Exception $e) {
+            Log::error('Error al editar reseña: ' . $e->getMessage());
+            $statusCode = $e->getCode() && is_numeric($e->getCode()) && $e->getCode() >= 400 && $e->getCode() < 600 ? $e->getCode() : 500;
+            return response()->json(['success' => false, 'message' => 'Error al editar la reseña: ' . $e->getMessage()], $statusCode);
+        }
+    }
+
+    /**
+     * Eliminar reseña
+     */
+    public function eliminarResena($resenaId)
+    {
+        try {
+            $response = $this->httpClient->delete("/api/resenas/cita/{$resenaId}");
+            return response()->json($response);
+        } catch (\Exception $e) {
+            Log::error('Error al eliminar reseña: ' . $e->getMessage());
+            $statusCode = $e->getCode() && is_numeric($e->getCode()) && $e->getCode() >= 400 && $e->getCode() < 600 ? $e->getCode() : 500;
+            return response()->json(['success' => false, 'message' => 'Error al eliminar la reseña: ' . $e->getMessage()], $statusCode);
+        }
+    }
 }
