@@ -55,42 +55,54 @@
         <!-- Filters & Grid -->
         <section class="max-w-7xl mx-auto px-6 pb-24">
             
-                <!-- Filter Bar Simplificado -->
+        <!-- Filter Bar Simplificado con formulario GET -->
         <div class="flex flex-wrap items-center justify-between gap-4 mb-12 border-b border-[#374151] pb-6 animate-fade-in-up" style="animation-delay: 200ms;">
-            <!-- Filtro de Categoría (horizontal, visible siempre) -->
             <div class="flex flex-wrap items-center gap-2">
                 <span class="text-[#9CA3AF] text-[10px] uppercase tracking-widest mr-2">Filtrar por:</span>
-                <button data-categoria="" class="filtro-categoria px-3 py-1.5 rounded-full text-[10px] uppercase tracking-wider transition-all bg-[#25B5DA] text-black font-bold">
+                
+                <a href="{{ route('home') }}?categoria=todos" 
+                class="px-3 py-1.5 rounded-full text-[10px] uppercase tracking-wider transition-all {{ empty($categoria) || $categoria === 'todos' ? 'bg-[#25B5DA] text-black font-bold' : 'bg-[#1a1a1a] border border-[#374151] text-[#9CA3AF] hover:border-[#25B5DA] hover:text-[#25B5DA]' }}">
                     Todos
-                </button>
-                <button data-categoria="barberia" class="filtro-categoria px-3 py-1.5 rounded-full text-[10px] uppercase tracking-wider transition-all bg-[#1a1a1a] border border-[#374151] text-[#9CA3AF] hover:border-[#25B5DA] hover:text-[#25B5DA]">
+                </a>
+                
+                <a href="{{ route('home') }}?categoria=barberia" 
+                class="px-3 py-1.5 rounded-full text-[10px] uppercase tracking-wider transition-all {{ $categoria === 'barberia' ? 'bg-[#25B5DA] text-black font-bold' : 'bg-[#1a1a1a] border border-[#374151] text-[#9CA3AF] hover:border-[#25B5DA] hover:text-[#25B5DA]' }}">
                     Barbería
-                </button>
-                <button data-categoria="salon" class="filtro-categoria px-3 py-1.5 rounded-full text-[10px] uppercase tracking-wider transition-all bg-[#1a1a1a] border border-[#374151] text-[#9CA3AF] hover:border-[#25B5DA] hover:text-[#25B5DA]">
+                </a>
+                
+                <a href="{{ route('home') }}?categoria=salon" 
+                class="px-3 py-1.5 rounded-full text-[10px] uppercase tracking-wider transition-all {{ $categoria === 'salon' ? 'bg-[#25B5DA] text-black font-bold' : 'bg-[#1a1a1a] border border-[#374151] text-[#9CA3AF] hover:border-[#25B5DA] hover:text-[#25B5DA]' }}">
                     Salón
-                </button>
-                <button data-categoria="peluqueria" class="filtro-categoria px-3 py-1.5 rounded-full text-[10px] uppercase tracking-wider transition-all bg-[#1a1a1a] border border-[#374151] text-[#9CA3AF] hover:border-[#25B5DA] hover:text-[#25B5DA]">
+                </a>
+                
+                <a href="{{ route('home') }}?categoria=peluqueria" 
+                class="px-3 py-1.5 rounded-full text-[10px] uppercase tracking-wider transition-all {{ $categoria === 'peluqueria' ? 'bg-[#25B5DA] text-black font-bold' : 'bg-[#1a1a1a] border border-[#374151] text-[#9CA3AF] hover:border-[#25B5DA] hover:text-[#25B5DA]' }}">
                     Peluquería
-                </button>
-                <button data-categoria="spa" class="filtro-categoria px-3 py-1.5 rounded-full text-[10px] uppercase tracking-wider transition-all bg-[#1a1a1a] border border-[#374151] text-[#9CA3AF] hover:border-[#25B5DA] hover:text-[#25B5DA]">
+                </a>
+                
+                <a href="{{ route('home') }}?categoria=spa" 
+                class="px-3 py-1.5 rounded-full text-[10px] uppercase tracking-wider transition-all {{ $categoria === 'spa' ? 'bg-[#25B5DA] text-black font-bold' : 'bg-[#1a1a1a] border border-[#374151] text-[#9CA3AF] hover:border-[#25B5DA] hover:text-[#25B5DA]' }}">
                     Spa
-                </button>
-                <button data-categoria="otros" class="filtro-categoria px-3 py-1.5 rounded-full text-[10px] uppercase tracking-wider transition-all bg-[#1a1a1a] border border-[#374151] text-[#9CA3AF] hover:border-[#25B5DA] hover:text-[#25B5DA]">
+                </a>
+                
+                <a href="{{ route('home') }}?categoria=otros" 
+                class="px-3 py-1.5 rounded-full text-[10px] uppercase tracking-wider transition-all {{ $categoria === 'otros' ? 'bg-[#25B5DA] text-black font-bold' : 'bg-[#1a1a1a] border border-[#374151] text-[#9CA3AF] hover:border-[#25B5DA] hover:text-[#25B5DA]' }}">
                     Otros
-                </button>
+                </a>
             </div>
             
             <div class="text-[#9CA3AF] text-xs uppercase tracking-widest">
-                Mostrando <span id="resultados-count" class="text-white">{{ count($negocios) }}</span> resultados
+                Mostrando <span class="text-white">{{ count($negocios) }}</span> resultados
             </div>
-</div>
-            <!-- Trends Title -->
-            <div class="mb-10 animate-fade-in-up" style="animation-delay: 300ms;">
-                <h2 class="text-2xl font-bold uppercase tracking-widest text-white flex items-center gap-4">
-                    Destacados
-                    <span class="h-px w-full max-w-[100px] bg-gradient-to-r from-[#25B5DA]/50 to-transparent"></span>
-                </h2>
-            </div>
+        </div>
+        
+        <!-- Trends Title -->
+        <div class="mb-10 animate-fade-in-up" style="animation-delay: 300ms;">
+            <h2 class="text-2xl font-bold uppercase tracking-widest text-white flex items-center gap-4">
+                Destacados
+                <span class="h-px w-full max-w-[100px] bg-gradient-to-r from-[#25B5DA]/50 to-transparent"></span>
+            </h2>
+        </div>
 
             <!-- Grid de Negocios desde API -->
             @if(count($negocios) > 0)
@@ -208,140 +220,5 @@
         </section>
 
     </main>
-
-    <script>
-        // Datos de negocios desde el servidor
-        const negociosOriginales = @json($negocios);
-        let categoriaActiva = '';
-        
-        // Función para renderizar negocios
-        function renderizarNegocios() {
-            const gridContainer = document.getElementById('negocios-grid');
-            const resultadosCount = document.getElementById('resultados-count');
-            
-            // Filtrar por categoría
-            let negociosFiltrados = negociosOriginales;
-            if (categoriaActiva) {
-                negociosFiltrados = negociosOriginales.filter(negocio => 
-                    negocio.tipo_negocio === categoriaActiva
-                );
-            }
-            
-            resultadosCount.textContent = negociosFiltrados.length;
-            
-            if (negociosFiltrados.length === 0) {
-                gridContainer.innerHTML = `
-                    <div class="col-span-full text-center py-20">
-                        <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-[#262626] border border-[#374151] text-[#25B5DA] mb-6">
-                            <i class="fas fa-search text-2xl"></i>
-                        </div>
-                        <div class="text-white text-xl uppercase tracking-wide font-bold mb-2">No hay resultados</div>
-                        <p class="text-[#9CA3AF] text-sm">No hay negocios en esta categoría.</p>
-                    </div>
-                `;
-                return;
-            }
-            
-            // Mapeo de categorías para mostrar bonito
-            const categoriasMap = {
-                'barberia': 'Barbería',
-                'salon': 'Salón',
-                'peluqueria': 'Peluquería',
-                'spa': 'Spa',
-                'otros': 'Otros'
-            };
-            
-            let html = '';
-            negociosFiltrados.forEach((negocio, index) => {
-                const fotoPerfil = negocio.foto_perfil || '';
-                const calificacion = negocio.calificacion || null;
-                const tipoNegocio = categoriasMap[negocio.tipo_negocio] || 'Servicios';
-                
-                let ciudad = 'Ubicación no especificada';
-                if (negocio.direccion && negocio.direccion.ciudad) {
-                    ciudad = negocio.direccion.ciudad;
-                }
-                
-                html += `
-                    <article class="group relative bg-[#262626] rounded-xl overflow-hidden border border-[#374151] hover:border-[#25B5DA]/50 transition-all duration-500 hover:-translate-y-1 hover:shadow-2xl hover:shadow-[#25B5DA]/10 cursor-pointer"
-                            onclick="window.location.href='/negocio/${negocio.id_negocio}'"
-                            style="animation-delay: ${300 + (index * 100)}ms;">
-                        
-                        <div class="relative aspect-[4/5] overflow-hidden">
-                            ${fotoPerfil ? 
-                                `<img src="${fotoPerfil}" alt="${negocio.nombre}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">` :
-                                `<div class="w-full h-full bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center">
-                                    <svg class="w-16 h-16 text-[#374151]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="0.5" d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"></path>
-                                    </svg>
-                                </div>`
-                            }
-                            <div class="absolute inset-0 bg-gradient-to-t from-[#1a1a1a] via-[#1a1a1a]/40 to-transparent opacity-90 group-hover:opacity-80 transition-opacity duration-300"></div>
-                            
-                            <div class="absolute top-3 right-3 bg-black/60 backdrop-blur-sm px-2.5 py-1 rounded-full border border-white/10">
-                                <span class="text-[#25B5DA] text-xs font-bold">
-                                    ${calificacion ? calificacion.toFixed(1) + ' ★' : 'NUEVO'}
-                                </span>
-                            </div>
-                            
-                            <div class="absolute bottom-4 left-4 bg-[#25B5DA]/20 backdrop-blur-sm px-3 py-1.5 rounded-full border border-[#25B5DA]/30">
-                                <span class="text-[#25B5DA] text-[10px] font-bold uppercase tracking-wider">${tipoNegocio}</span>
-                            </div>
-                        </div>
-                        
-                        <div class="p-5">
-                            <h3 class="text-white font-bold text-base uppercase tracking-wide group-hover:text-[#25B5DA] transition-colors line-clamp-1">
-                                ${negocio.nombre}
-                            </h3>
-                            
-                            <p class="text-[#9CA3AF] text-xs mt-2 line-clamp-2 leading-relaxed h-8">
-                                ${negocio.acerca_de || 'Descubre los mejores servicios en ' + negocio.nombre}
-                            </p>
-                            
-                            <div class="flex items-center gap-1.5 mt-4 text-[10px] text-[#9CA3AF] uppercase tracking-wider bg-[#1a1a1a] rounded px-2 py-1.5 w-max">
-                                <svg class="w-3.5 h-3.5 text-[#25B5DA]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                </svg>
-                                <span class="truncate max-w-[150px]">${ciudad}</span>
-                            </div>
-                        </div>
-                        
-                        <div class="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-[#25B5DA] to-[#1c8fb0] transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
-                    </article>
-                `;
-            });
-            
-            gridContainer.innerHTML = html;
-        }
-        
-        // Configurar filtros
-        function setupFiltros() {
-            const botones = document.querySelectorAll('.filtro-categoria');
-            
-            botones.forEach(boton => {
-                boton.addEventListener('click', function() {
-                    const categoria = this.dataset.categoria;
-                    
-                    // Actualizar estilo de los botones
-                    botones.forEach(btn => {
-                        btn.classList.remove('bg-[#25B5DA]', 'text-black', 'font-bold');
-                        btn.classList.add('bg-[#1a1a1a]', 'text-[#9CA3AF]', 'border', 'border-[#374151]');
-                    });
-                    
-                    this.classList.remove('bg-[#1a1a1a]', 'text-[#9CA3AF]', 'border', 'border-[#374151]');
-                    this.classList.add('bg-[#25B5DA]', 'text-black', 'font-bold');
-                    
-                    // Actualizar filtro
-                    categoriaActiva = categoria;
-                    renderizarNegocios();
-                });
-            });
-        }
-        
-        // Inicializar
-        renderizarNegocios();
-        setupFiltros();
-    </script>
 
 @endsection

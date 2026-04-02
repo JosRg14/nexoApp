@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Services\ExternalApi\HttpClient;
+use Illuminate\Http\Request;
 
 class HomeController extends Controller
 {
@@ -16,9 +17,10 @@ class HomeController extends Controller
     /**
      * Mostrar la página de inicio con los negocios
      */
-    public function index()
+    public function index(Request $request)
     {
         try {
+            $categoria = $request->input('categoria', '');
             // Obtener negocios públicos usando HttpClient
             $response = $this->httpClient->getPublic('/api/negocios');
             $negocios = $response['data'] ?? [];
@@ -33,6 +35,12 @@ class HomeController extends Controller
                 'negocio_completo' => $negocios[0] ?? 'No hay negocios'
             ]);
             
+            if ($categoria && $categoria !== 'todos') {
+                $negocios = array_filter($negocios, function($negocio) use ($categoria) {
+                    return ($negocio['tipo_negocio'] ?? '') === $categoria;
+                });
+                $negocios = array_values($negocios); // Reindexar array
+            }
             $apiBaseUrl = rtrim(config('services.api.url'), '/');
             // Completar URLs de imágenes estructurando la respuesta en forma de string final para la vista
             foreach ($negocios as &$negocio) {
@@ -82,7 +90,7 @@ class HomeController extends Controller
             $negocios = [];
         }
         
-        return view('home', compact('negocios'));
+        return view('home', compact('negocios', 'categoria'));
     }
     
     /**
