@@ -268,20 +268,48 @@
                     @endif
                 </div>
                 
-                <!-- Ubicación -->
+                <!-- Ubicación con enlace a Google Maps -->
                 @if(isset($negocio['direccion']))
-                <div class="bg-[#262626] border border-[#374151] rounded-sm p-6">
+                @php
+                    // Construir la dirección completa para Google Maps
+                    $calle = $negocio['direccion']['calle'] ?? '';
+                    $numero = $negocio['direccion']['numero'] ?? '';
+                    $colonia = $negocio['direccion']['colonia'] ?? '';
+                    $ciudad = $negocio['direccion']['ciudad'] ?? '';
+                    $estado = $negocio['direccion']['estado'] ?? '';
+                    $cp = $negocio['direccion']['codigo_postal'] ?? '';
+                    
+                    $direccionCompleta = trim("$calle $numero, $colonia, $ciudad, $estado, CP $cp");
+                    
+                    // URL de Google Maps (búsqueda)
+                    $googleMapsUrl = 'https://www.google.com/maps/search/?api=1&query=' . urlencode($direccionCompleta);
+                    
+                    // Alternativa: URL con coordenadas si las tuvieras
+                    // $googleMapsUrl = 'https://www.google.com/maps/search/?api=1&query=' . $latitud . ',' . $longitud;
+                @endphp
+
+                <div class="bg-[#262626] border border-[#374151] rounded-sm p-6 group hover:border-[#25B5DA]/50 transition-all duration-300">
                     <h3 class="text-sm font-bold uppercase tracking-widest text-white mb-4 flex items-center gap-2">
-                        <i class="fas fa-location-dot"></i> Ubicación
+                        <i class="fas fa-location-dot text-[#25B5DA]"></i> Ubicación
                     </h3>
-                    <div class="space-y-1 text-sm">
-                        <p class="text-[#D1D5DB]">
-                            {{ $negocio['direccion']['calle'] ?? '' }} {{ $negocio['direccion']['numero'] ?? '' }}<br>
-                            {{ $negocio['direccion']['colonia'] ?? '' }}<br>
-                            {{ $negocio['direccion']['ciudad'] ?? '' }}, {{ $negocio['direccion']['estado'] ?? '' }}<br>
-                            <span class="text-[#9CA3AF]">CP: {{ $negocio['direccion']['codigo_postal'] ?? '' }}</span>
-                        </p>
-                    </div>
+                    
+                    <a href="{{ $googleMapsUrl }}" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    class="block group/link">
+                        <div class="space-y-1 text-sm">
+                            <p class="text-[#D1D5DB] group-hover/link:text-[#25B5DA] transition-colors">
+                                {{ $calle }} {{ $numero }}<br>
+                                {{ $colonia }}<br>
+                                {{ $ciudad }}, {{ $estado }}<br>
+                                <span class="text-[#9CA3AF] group-hover/link:text-[#25B5DA]/70 transition-colors">CP: {{ $cp }}</span>
+                            </p>
+                            <div class="flex items-center gap-2 mt-3 text-xs text-[#25B5DA] opacity-0 group-hover/link:opacity-100 transition-opacity">
+                                <i class="fas fa-external-link-alt"></i>
+                                <span>Abrir en Google Maps</span>
+                            </div>
+                        </div>
+                    </a>
                 </div>
                 @endif
                 
