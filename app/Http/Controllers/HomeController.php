@@ -85,6 +85,14 @@ class HomeController extends Controller
                 ]);
             }
             unset($negocio);
+
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'negocios' => $negocios,
+                    'total' => count($negocios)
+                ]);
+            }
         } catch (\Exception $e) {
             \Log::error('Error en HomeController: ' . $e->getMessage());
             $negocios = [];
