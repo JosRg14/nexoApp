@@ -143,15 +143,26 @@
                             {{ $negocio['acerca_de'] ?? 'Descubre los mejores servicios en ' . $negocio['nombre'] }}
                         </p>
                         
-                        <!-- Ubicación -->
+                       <!-- Ubicación -->
+                        @php
+                            $ciudad = 'Ubicación no especificada';
+                            
+                            if (isset($negocio['direccion']) && is_array($negocio['direccion'])) {
+                                $ciudad = $negocio['direccion']['ciudad'] ?? 'Ubicación no especificada';
+                            } elseif (isset($negocio['ciudad'])) {
+                                $ciudad = $negocio['ciudad'];
+                            }
+                        @endphp
+
                         <div class="flex items-center gap-1.5 mt-4 text-[10px] text-[#9CA3AF] uppercase tracking-wider bg-[#1a1a1a] rounded px-2 py-1.5 w-max">
                             <svg class="w-3.5 h-3.5 text-[#25B5DA]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
                             </svg>
-                            <span class="truncate max-w-[150px]">{{ $negocio['direccion']['ciudad'] ?? $negocio['ciudad'] ?? 'Ubicación no especificada' }}</span>
+                            <span class="truncate max-w-[150px]">
+                                {{ $ciudad }}
+                            </span>
                         </div>
-                    </div>
                     
                     <!-- Barra inferior animada -->
                     <div class="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-[#25B5DA] to-[#1c8fb0] transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
