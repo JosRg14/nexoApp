@@ -29,6 +29,10 @@ class NegocioController extends Controller
                 'banner' => $negocio['banner'] ?? null
             ]);
             
+            \Log::info('=== ESTRUCTURA COMPLETA DEL NEGOCIO (SHOW) ===', [
+                'negocio_completo' => $negocio ?? 'No hay datos'
+            ]);
+            
             $apiBaseUrl = rtrim(config('services.api.url'), '/');
             // Procesar foto_perfil
             $fotoUrl = null;

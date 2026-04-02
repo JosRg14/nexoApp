@@ -29,6 +29,10 @@ class HomeController extends Controller
                 'primer_negocio_foto' => ($negocios[0]['foto_perfil'] ?? 'No tiene foto_perfil directly')
             ]);
             
+            \Log::info('=== ESTRUCTURA COMPLETA DEL PRIMER NEGOCIO ===', [
+                'negocio_completo' => $negocios[0] ?? 'No hay negocios'
+            ]);
+            
             $apiBaseUrl = rtrim(config('services.api.url'), '/');
             // Completar URLs de imágenes estructurando la respuesta en forma de string final para la vista
             foreach ($negocios as &$negocio) {
