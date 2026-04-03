@@ -97,7 +97,7 @@
         </div>
         
         <!-- Trends Title -->
-        <div class="mb-10 animate-fade-in-up" style="animation-delay: 300ms;">
+        <div  id="destacados" class="mb-10 animate-fade-in-up" style="animation-delay: 300ms;">
             <h2 class="text-2xl font-bold uppercase tracking-widest text-white flex items-center gap-4">
                 Destacados
                 <span class="h-px w-full max-w-[100px] bg-gradient-to-r from-[#25B5DA]/50 to-transparent"></span>

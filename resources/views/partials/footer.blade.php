@@ -20,7 +20,7 @@
                 <h4 class="text-white text-sm font-bold uppercase tracking-wider mb-4 border-l-2 border-[#25B5DA] pl-2">NexoApp</h4>
                 <ul class="space-y-3 text-[#9CA3AF] text-xs">
                     <li><a href="/" class="hover:text-[#25B5DA] transition-colors flex items-center gap-2"><i class="fas fa-chevron-right text-[8px] text-[#25B5DA]"></i> Inicio</a></li>
-                    <li><a href="/negocios" class="hover:text-[#25B5DA] transition-colors flex items-center gap-2"><i class="fas fa-chevron-right text-[8px] text-[#25B5DA]"></i> Negocios</a></li>
+                    <li><a href="#destacados" class="hover:text-[#25B5DA] transition-colors flex items-center gap-2"><i class="fas fa-chevron-right text-[8px] text-[#25B5DA]"></i> Negocios</a></li>
                     <li><a href="/register" class="hover:text-[#25B5DA] transition-colors flex items-center gap-2"><i class="fas fa-chevron-right text-[8px] text-[#25B5DA]"></i> Registrarse</a></li>
                 </ul>
             </div>
