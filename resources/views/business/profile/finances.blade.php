@@ -1,7 +1,27 @@
 <!-- TAB 3: FINANZAS -->
 <section id="tab-finances" class="hidden animate-fade-in-up">
     <div class="mb-8">
-        <h2 class="text-xl font-bold uppercase tracking-wide text-white mb-6">Resumen de la salud de tu negocio</h2>
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div class="flex items-center gap-2">
+                <h2 class="text-xl font-bold uppercase tracking-wide text-white">Resumen de la salud de tu negocio</h2>
+                <div class="relative group">
+                    <i class="fas fa-circle-info text-[#9CA3AF] hover:text-[#25B5DA] cursor-pointer transition-colors text-lg"></i>
+                    <div class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block bg-[#1a1a1a] border border-[#374151] rounded-lg p-3 w-64 z-10 shadow-xl">
+                        <p class="text-[#9CA3AF] text-xs leading-relaxed text-center">
+                            Los datos mostrados corresponden exclusivamente al día de hoy. 
+                            <span class="text-white font-bold block mt-1">{{ now()->format('d/m/Y') }}</span>
+                        </p>
+                        <div class="absolute top-full left-1/2 -translate-x-1/2 border-solid border-4 border-transparent border-t-[#1a1a1a]"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-[#1a1a1a] border border-[#374151] rounded-lg px-4 py-2 flex items-center">
+                <span class="text-[#9CA3AF] text-xs uppercase tracking-wider">Datos de hoy</span>
+                <span class="text-white text-sm font-bold ml-2">{{ now()->format('d/m/Y') }}</span>
+            </div>
+        </div>
+        <p class="text-[#9CA3AF] text-xs mt-2">Métricas actualizadas al día de hoy</p>
+    </div>
         
         <!-- KPI Grid -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -49,14 +69,15 @@
                     </span>
                 </div>
                 <div>
-                    <div class="text-3xl font-bold text-white tracking-tight mb-1" title="Completadas: {{ $finanzas['citas_hoy']['completadas'] ?? 0 }} | Pendientes: {{ $finanzas['citas_hoy']['pendientes'] ?? 0 }} | En proceso: {{ $finanzas['citas_hoy']['en_proceso'] ?? 0 }}">
+                    <div class="text-3xl font-bold text-white tracking-tight mb-1" title="Completadas: {{ $finanzas['citas_hoy']['completadas'] ?? 0 }} | Pendientes: {{ $finanzas['citas_hoy']['pendientes'] ?? 0 }} | En proceso: {{ $finanzas['citas_hoy']['en_proceso'] ?? 0 }} | Canceladas: {{ $finanzas['citas_hoy']['canceladas'] ?? 0 }}">
                         {{ $finanzas['citas_hoy']['total'] ?? 0 }}
                     </div>
                     <div class="text-[#9CA3AF] text-xs uppercase tracking-wider">Citas Hoy</div>
-                    <div class="text-[10px] tracking-wide mt-2 flex items-center justify-start gap-3">
+                    <div class="text-[10px] tracking-wide mt-2 flex items-center justify-start gap-2 flex-wrap">
                         <span class="text-emerald-500 font-medium whitespace-nowrap" title="Completadas"><i class="fas fa-check-circle mr-1"></i> {{ $finanzas['citas_hoy']['completadas'] ?? 0 }}</span>
                         <span class="text-[#F59E0B] font-medium whitespace-nowrap" title="Pendientes"><i class="fas fa-clock mr-1"></i> {{ $finanzas['citas_hoy']['pendientes'] ?? 0 }}</span>
                         <span class="text-blue-500 font-medium whitespace-nowrap" title="En Proceso"><i class="fas fa-spinner fa-spin mr-1"></i> {{ $finanzas['citas_hoy']['en_proceso'] ?? 0 }}</span>
+                        <span class="text-red-500 font-medium whitespace-nowrap" title="Canceladas"><i class="fas fa-times-circle mr-1"></i> {{ $finanzas['citas_hoy']['canceladas'] ?? 0 }}</span>
                     </div>
                 </div>
             </div>

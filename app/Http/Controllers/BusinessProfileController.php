@@ -89,10 +89,11 @@ class BusinessProfileController extends Controller
                 $dataCitas = $resCitas['data'] ?? [];
                 \Log::info('=== BFF FINANZAS - citas_hoy ===', (array)$dataCitas);
                 $finanzas['citas_hoy'] = [
-                    'total'       => $dataCitas['total_citas'] ?? 0,
+                    'total'       => max($dataCitas['total_citas'] ?? 0, ($dataCitas['confirmadas'] ?? 0) + ($dataCitas['pendientes'] ?? 0) + ($dataCitas['en_proceso'] ?? 0) + ($dataCitas['canceladas'] ?? 0)),
                     'completadas' => $dataCitas['confirmadas'] ?? 0,
                     'pendientes'  => $dataCitas['pendientes']  ?? 0,
                     'en_proceso'  => $dataCitas['en_proceso']  ?? 0,
+                    'canceladas'  => $dataCitas['canceladas']  ?? 0,
                     'variacion'   => $dataCitas['variacion']   ?? 0,
                 ];
                 
