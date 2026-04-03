@@ -51,7 +51,7 @@
                         <span class="flex items-center gap-2">
                             <i class="fas fa-star text-[#25B5DA]"></i>
                             @if(isset($negocio['calificacion']) && $negocio['calificacion'] > 0)
-                                {{ number_format($negocio['calificacion'], 1) . ' ★' }}
+                                {{ number_format($negocio['calificacion'], 1)}}
                             @else
                                 Sin reseñas
                             @endif
