@@ -86,19 +86,25 @@
         <div class="flex flex-col lg:flex-row gap-8 items-stretch">
             <!-- Columna izquierda - Servicios (ocupa 2/3) -->
             <div class="lg:w-2/3 space-y-6">
-                <!-- Stats Cards -->
+                <!-- Stats Cards con navegación smooth-scroll -->
                 <div class="grid grid-cols-3 gap-4">
-                    <div class="bg-[#262626] border border-[#374151] p-4 rounded-sm text-center">
-                        <p class="text-[10px] uppercase tracking-widest text-[#9CA3AF]">Servicios</p>
+                    <div onclick="document.getElementById('servicios-section').scrollIntoView({ behavior: 'smooth' })" 
+                         class="bg-[#262626] border border-[#374151] p-4 rounded-sm text-center cursor-pointer hover:border-[#25B5DA] hover:bg-[#25B5DA]/5 transition-all duration-300 group">
+                        <p class="text-[10px] uppercase tracking-widest text-[#9CA3AF] group-hover:text-[#25B5DA] transition-colors">Servicios</p>
                         <p class="text-2xl font-bold text-white mt-1">{{ count($servicios) }}</p>
+                        <i class="fas fa-scissors text-[#374151] group-hover:text-[#25B5DA]/40 text-xs mt-1 transition-colors"></i>
                     </div>
-                    <div class="bg-[#262626] border border-[#374151] p-4 rounded-sm text-center">
-                        <p class="text-[10px] uppercase tracking-widest text-[#9CA3AF]">Empleados</p>
+                    <div onclick="document.getElementById('empleados-section').scrollIntoView({ behavior: 'smooth' })" 
+                         class="bg-[#262626] border border-[#374151] p-4 rounded-sm text-center cursor-pointer hover:border-[#25B5DA] hover:bg-[#25B5DA]/5 transition-all duration-300 group">
+                        <p class="text-[10px] uppercase tracking-widest text-[#9CA3AF] group-hover:text-[#25B5DA] transition-colors">Empleados</p>
                         <p class="text-2xl font-bold text-white mt-1">{{ count($empleados) }}</p>
+                        <i class="fas fa-users text-[#374151] group-hover:text-[#25B5DA]/40 text-xs mt-1 transition-colors"></i>
                     </div>
-                    <div class="bg-[#262626] border border-[#374151] p-4 rounded-sm text-center">
-                        <p class="text-[10px] uppercase tracking-widest text-[#9CA3AF]">Reseñas</p>
+                    <div onclick="document.getElementById('resenas-section').scrollIntoView({ behavior: 'smooth' })" 
+                         class="bg-[#262626] border border-[#374151] p-4 rounded-sm text-center cursor-pointer hover:border-[#25B5DA] hover:bg-[#25B5DA]/5 transition-all duration-300 group">
+                        <p class="text-[10px] uppercase tracking-widest text-[#9CA3AF] group-hover:text-[#25B5DA] transition-colors">Reseñas</p>
                         <p class="text-2xl font-bold text-white mt-1">{{ count($resenas) }}</p>
+                        <i class="fas fa-star text-[#374151] group-hover:text-[#25B5DA]/40 text-xs mt-1 transition-colors"></i>
                     </div>
                 </div>
                 
@@ -117,7 +123,7 @@
                 @endif
                 
                 <!-- Servicios - Solo mostrar información, sin botón de selección -->
-                <div class="bg-[#262626] border border-[#374151] rounded-sm p-6">
+                <div id="servicios-section" class="bg-[#262626] border border-[#374151] rounded-sm p-6">
                     <div class="flex justify-between items-center mb-6">
                         <h3 class="text-xl font-bold uppercase tracking-widest text-white flex items-center gap-3">
                             <i class="fas fa-cut text-2xl text-[#25B5DA]"></i> 
@@ -174,30 +180,50 @@
                 </div>
                 
                 <!-- Reseñas -->
-                <div class="bg-[#262626] border border-[#374151] rounded-sm p-6">
+                <div id="resenas-section" class="bg-[#262626] border border-[#374151] rounded-sm p-6">
                     <h3 class="text-sm font-bold uppercase tracking-widest text-white mb-4 flex items-center gap-2">
                         <i class="fas fa-star text-[#25B5DA]"></i> Reseñas ({{ count($resenas) }})
                     </h3>
                     <div class="space-y-4">
                         @forelse($resenas as $resena)
+                        @php
+                            $cal = $resena['calificacion'] ?? 0;
+                            $starColor = $cal >= 4 ? 'text-emerald-400' : ($cal <= 2 ? 'text-red-400' : 'text-yellow-400');
+                            $clienteNombre = $resena['cliente']['nombre_completo']
+                                ?? $resena['cliente']['nombre']
+                                ?? 'Cliente';
+                        @endphp
                         <div class="border-b border-[#374151] pb-4 last:border-0 last:pb-0">
-                            <div class="flex items-center gap-2 mb-2">
-                                <div class="flex text-[#25B5DA]">
-                                    @for($i = 1; $i <= 5; $i++)
-                                        @if($i <= $resena['calificacion'])
-                                            <i class="fas fa-star text-xs"></i>
-                                        @else
-                                            <i class="far fa-star text-xs"></i>
-                                        @endif
-                                    @endfor
+                            <div class="flex items-center justify-between mb-2">
+                                <div class="flex items-center gap-2">
+                                    <div class="flex {{ $starColor }}">
+                                        @for($i = 1; $i <= 5; $i++)
+                                            @if($i <= $cal)
+                                                <i class="fas fa-star text-xs"></i>
+                                            @else
+                                                <i class="far fa-star text-xs text-[#374151]"></i>
+                                            @endif
+                                        @endfor
+                                    </div>
+                                    <span class="text-xs font-bold {{ $starColor }}">{{ $cal }}/5</span>
                                 </div>
-                                <span class="text-xs text-[#9CA3AF]">{{ $resena['cliente']['nombre'] ?? 'Cliente' }}</span>
+                                <div class="flex items-center gap-2">
+                                    <div class="w-6 h-6 rounded-full bg-[#374151] flex items-center justify-center text-[10px] font-bold text-[#9CA3AF]">
+                                        {{ strtoupper(substr($clienteNombre, 0, 1)) }}
+                                    </div>
+                                    <span class="text-xs text-[#9CA3AF]">{{ $clienteNombre }}</span>
+                                </div>
                             </div>
-                            <p class="text-sm text-[#D1D5DB]">{{ $resena['comentario'] }}</p>
-                            <p class="text-[10px] text-[#52525b] mt-1">{{ \Carbon\Carbon::parse($resena['created_at'])->diffForHumans() }}</p>
+                            @if($resena['comentario'])
+                            <p class="text-sm text-[#D1D5DB] leading-relaxed">"{{ $resena['comentario'] }}"</p>
+                            @endif
+                            <p class="text-[10px] text-[#52525b] mt-2">{{ \Carbon\Carbon::parse($resena['created_at'])->diffForHumans() }}</p>
                         </div>
                         @empty
-                        <p class="text-xs text-[#52525b] italic">No hay reseñas aún. ¡Sé el primero en calificar!</p>
+                        <div class="text-center py-6">
+                            <i class="far fa-star text-3xl text-[#374151] mb-2"></i>
+                            <p class="text-xs text-[#52525b] italic">No hay reseñas aún. ¡Sé el primero en calificar!</p>
+                        </div>
                         @endforelse
                     </div>
                 </div>
@@ -206,7 +232,7 @@
             <!-- Columna derecha -->
             <div class="lg:w-1/3 flex flex-col gap-6">
                 <!-- Equipo de Trabajo - Solo mostrar información, sin botón de agendar -->
-                <div class="bg-[#262626] border border-[#374151] rounded-sm p-6">
+                <div id="empleados-section" class="bg-[#262626] border border-[#374151] rounded-sm p-6">
                     <h3 class="text-sm font-bold uppercase tracking-widest text-white mb-4 flex items-center gap-2">
                         <i class="fas fa-users text-[#25B5DA]"></i> Nuestro Equipo ({{ count($empleados) }})
                     </h3>
