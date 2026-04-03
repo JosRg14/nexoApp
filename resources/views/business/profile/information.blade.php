@@ -183,6 +183,29 @@
     </div>
 
 @else
+@php
+    // Extraer imágenes desde el array 'imagenes' por tipo
+    $fotoPerfil = null;
+    $bannerImg  = null;
+    if (isset($negocio['imagenes']) && is_array($negocio['imagenes'])) {
+        foreach ($negocio['imagenes'] as $img) {
+            if (isset($img['tipo'])) {
+                if ($img['tipo'] === 'perfil_negocio' && !empty($img['url_imagen'])) {
+                    $fotoPerfil = $img['url_imagen'];
+                }
+                if ($img['tipo'] === 'banner_negocio' && !empty($img['url_imagen'])) {
+                    $bannerImg = $img['url_imagen'];
+                }
+            }
+        }
+    }
+    // Función helper para construir URL absoluta
+    $buildUrl = function(?string $url) {
+        if (!$url) return '';
+        if (\Illuminate\Support\Str::startsWith($url, 'http')) return $url;
+        return rtrim(config('services.api.url'), '/') . '/' . ltrim($url, '/');
+    };
+@endphp
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-16">
         <div class="space-y-8">
             <form method="POST" id="editNegocioForm" action="{{ url('/api-proxy/api/negocios/mi-negocio') }}" data-redirect="{{ route('business.profile') }}" class="space-y-8" enctype="multipart/form-data" data-custom-handler="true">
@@ -275,11 +298,14 @@
                             <div class="space-y-4">
                                 <label class="block text-xs text-[#9CA3AF] uppercase tracking-wider">Foto de Perfil</label>
                                 @php
-                                    $prevPerfil = '';
-                                    if (isset($negocio['foto_perfil']) && is_array($negocio['foto_perfil']) && isset($negocio['foto_perfil']['url_imagen'])) {
-                                        $prevPerfil = rtrim(config('services.api.url'), '/') . '/' . ltrim($negocio['foto_perfil']['url_imagen'], '/');
-                                    } elseif (isset($negocio['foto_perfil']) && is_string($negocio['foto_perfil']) && !empty($negocio['foto_perfil'])) {
-                                        $prevPerfil = Str::startsWith($negocio['foto_perfil'], 'http') ? $negocio['foto_perfil'] : rtrim(config('services.api.url'), '/') . '/' . ltrim($negocio['foto_perfil'], '/');
+                                    // Priorizar imagen desde array 'imagenes', luego campo directo
+                                    $prevPerfil = $buildUrl($fotoPerfil);
+                                    if (!$prevPerfil) {
+                                        if (isset($negocio['foto_perfil']) && is_array($negocio['foto_perfil']) && isset($negocio['foto_perfil']['url_imagen'])) {
+                                            $prevPerfil = $buildUrl($negocio['foto_perfil']['url_imagen']);
+                                        } elseif (isset($negocio['foto_perfil']) && is_string($negocio['foto_perfil']) && !empty($negocio['foto_perfil'])) {
+                                            $prevPerfil = $buildUrl($negocio['foto_perfil']);
+                                        }
                                     }
                                 @endphp
                                 <div class="flex items-center gap-4">
@@ -299,11 +325,14 @@
                             <div class="space-y-4">
                                 <label class="block text-xs text-[#9CA3AF] uppercase tracking-wider">Banner Principal</label>
                                 @php
-                                    $prevBanner = '';
-                                    if (isset($negocio['banner']) && is_array($negocio['banner']) && isset($negocio['banner']['url_imagen'])) {
-                                        $prevBanner = rtrim(config('services.api.url'), '/') . '/' . ltrim($negocio['banner']['url_imagen'], '/');
-                                    } elseif (isset($negocio['banner']) && is_string($negocio['banner']) && !empty($negocio['banner'])) {
-                                        $prevBanner = Str::startsWith($negocio['banner'], 'http') ? $negocio['banner'] : rtrim(config('services.api.url'), '/') . '/' . ltrim($negocio['banner'], '/');
+                                    // Priorizar imagen desde array 'imagenes', luego campo directo
+                                    $prevBanner = $buildUrl($bannerImg);
+                                    if (!$prevBanner) {
+                                        if (isset($negocio['banner']) && is_array($negocio['banner']) && isset($negocio['banner']['url_imagen'])) {
+                                            $prevBanner = $buildUrl($negocio['banner']['url_imagen']);
+                                        } elseif (isset($negocio['banner']) && is_string($negocio['banner']) && !empty($negocio['banner'])) {
+                                            $prevBanner = $buildUrl($negocio['banner']);
+                                        }
                                     }
                                 @endphp
                                 <div class="flex items-center gap-4">
@@ -333,11 +362,14 @@
             <div class="relative z-10 text-center">
                 <div class="w-32 h-32 rounded-full bg-[#262626] border-2 border-[#374151] mx-auto mb-6 flex items-center justify-center overflow-hidden">
                     @php
-                        $sidePerfil = '';
-                        if (isset($negocio['foto_perfil']) && is_array($negocio['foto_perfil']) && isset($negocio['foto_perfil']['url_imagen'])) {
-                            $sidePerfil = rtrim(config('services.api.url'), '/') . '/' . ltrim($negocio['foto_perfil']['url_imagen'], '/');
-                        } elseif (isset($negocio['foto_perfil']) && is_string($negocio['foto_perfil']) && !empty($negocio['foto_perfil'])) {
-                            $sidePerfil = Str::startsWith($negocio['foto_perfil'], 'http') ? $negocio['foto_perfil'] : rtrim(config('services.api.url'), '/') . '/' . ltrim($negocio['foto_perfil'], '/');
+                        // Priorizar imagen desde array 'imagenes', luego campo directo
+                        $sidePerfil = $buildUrl($fotoPerfil);
+                        if (!$sidePerfil) {
+                            if (isset($negocio['foto_perfil']) && is_array($negocio['foto_perfil']) && isset($negocio['foto_perfil']['url_imagen'])) {
+                                $sidePerfil = $buildUrl($negocio['foto_perfil']['url_imagen']);
+                            } elseif (isset($negocio['foto_perfil']) && is_string($negocio['foto_perfil']) && !empty($negocio['foto_perfil'])) {
+                                $sidePerfil = $buildUrl($negocio['foto_perfil']);
+                            }
                         }
                     @endphp
                     @if($sidePerfil)
