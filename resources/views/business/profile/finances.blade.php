@@ -106,7 +106,6 @@
                 </div>
             </div>
         </div>
-    </div>
 
     <!-- Weekly Income Chart -->
     <div class="border border-[#374151] bg-[#1a1a1a] p-5 rounded-sm">
