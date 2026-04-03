@@ -138,12 +138,12 @@
                         <!-- Badge calificación -->
                         <div class="absolute top-3 right-3 bg-black/60 backdrop-blur-sm px-2.5 py-1 rounded-full border border-white/10 shadow-lg">
                             <span class="text-[#25B5DA] text-xs font-bold flex items-center gap-1">
-                                @if(isset($negocio['calificacion']))
+                                @if(isset($negocio['calificacion']) && $negocio['calificacion'] > 0)
                                     <i class="fas fa-star text-[10px]"></i>
                                     {{ number_format($negocio['calificacion'], 1) }}
                                 @else
                                     <i class="fas fa-star text-[10px]"></i>
-                                    NUEVO
+                                    Sin reseñas
                                 @endif
                             </span>
                         </div>

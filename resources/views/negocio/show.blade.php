@@ -50,7 +50,11 @@
                     <div class="flex flex-wrap gap-4 text-gray-300 text-sm">
                         <span class="flex items-center gap-2">
                             <i class="fas fa-star text-[#25B5DA]"></i>
-                            {{ isset($negocio['calificacion']) ? number_format($negocio['calificacion'], 1) . ' ★' : 'Nuevo' }}
+                            @if(isset($negocio['calificacion']) && $negocio['calificacion'] > 0)
+                                {{ number_format($negocio['calificacion'], 1) . ' ★' }}
+                            @else
+                                Sin reseñas
+                            @endif
                         </span>
                         <span class="flex items-center gap-2">
                             <i class="fas fa-map-marker-alt"></i>
