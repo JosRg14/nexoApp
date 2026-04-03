@@ -4,7 +4,7 @@
             <!-- Logo y descripción -->
             <div>
                 <div class="flex items-center gap-3 mb-4">
-                    <img src="{{ asset('images/logo.png') }}" alt="NexoApp Logo" class="h-8 opacity-80" onerror="this.outerHTML='<div class=\'w-8 h-8 rounded bg-[#25B5DA] flex items-center justify-center\'><span class=\'text-black font-bold text-lg\'>N</span></div>'">
+                    <img src="{{ asset('logo.png') }}" alt="NexoApp Logo" class="h-8 opacity-80" onerror="this.outerHTML='<div class=\'w-8 h-8 rounded bg-[#25B5DA] flex items-center justify-center\'><span class=\'text-black font-bold text-lg\'>N</span></div>'">
                     <span class="text-xl font-bold uppercase tracking-widest text-white">Nexo App</span>
                 </div>
                 <p class="text-[#9CA3AF] text-xs leading-relaxed">Conectamos necesidades con soluciones. La mejor experiencia en servicios.</p>
@@ -31,7 +31,7 @@
                 <ul class="space-y-3 text-[#9CA3AF] text-xs">
                     <li class="flex items-center gap-3">
                         <i class="fas fa-envelope text-[#25B5DA]"></i> 
-                        contacto@nexoapp.com
+                        contactodevlinkoficial@gmail.com
                     </li>
                     <li class="flex items-center gap-3">
                         <i class="fas fa-phone-alt text-[#25B5DA]"></i> 
@@ -40,7 +40,7 @@
                 </ul>
             </div>
             
-            <!-- Estadísticas (opcional, desde API) -->
+            <!-- Estadísticas -->
             <div>
                 <h4 class="text-white text-sm font-bold uppercase tracking-wider mb-4 border-l-2 border-[#25B5DA] pl-2">Plataforma</h4>
                 <ul class="space-y-3 text-[#9CA3AF] text-xs font-medium">
@@ -59,7 +59,9 @@
         
         <div class="border-t border-[#374151] mt-12 pt-8 flex flex-col md:flex-row justify-between items-center text-[#9CA3AF] text-[10px] tracking-wider uppercase">
             <div>
-                © {{ date('Y') }} NexoApp. Todos los derechos reservados.
+                © {{ date('Y') }} 
+                <span onclick="openTeamModal()" class="cursor-pointer hover:text-[#25B5DA] transition-colors border-b border-dotted border-[#374151] hover:border-[#25B5DA]">DevLink</span>
+                . Todos los derechos reservados.
             </div>
             <div class="mt-4 md:mt-0 flex gap-4">
                 <a href="#" class="hover:text-[#25B5DA] transition-colors">Términos</a>
@@ -68,3 +70,92 @@
         </div>
     </div>
 </footer>
+
+<!-- Modal del equipo de desarrollo -->
+<div id="teamModal" class="fixed inset-0 bg-black/70 hidden items-center justify-center z-50" onclick="closeTeamModal()">
+    <div class="bg-[#1a1a1a] border border-[#374151] rounded-lg p-6 max-w-sm mx-4 shadow-2xl" onclick="event.stopPropagation()">
+        <div class="flex justify-between items-center mb-5">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded bg-[#25B5DA] flex items-center justify-center">
+                    <i class="fas fa-code text-black text-sm"></i>
+                </div>
+                <h3 class="text-white font-bold uppercase tracking-wide">Equipo DevLink</h3>
+            </div>
+            <button onclick="closeTeamModal()" class="text-[#9CA3AF] hover:text-white transition-colors">
+                <i class="fas fa-times text-lg"></i>
+            </button>
+        </div>
+        
+        <div class="space-y-3">
+            <div class="flex items-center gap-3 p-3 bg-[#262626] rounded-lg border border-[#374151]">
+                <div class="w-10 h-10 rounded-full bg-[#25B5DA]/20 flex items-center justify-center">
+                    <i class="fas fa-code text-[#25B5DA] text-sm"></i>
+                </div>
+                <div>
+                    <p class="text-white font-bold text-sm">Betanzo Alva Abimael Enrique</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-3 p-3 bg-[#262626] rounded-lg border border-[#374151]">
+                <div class="w-10 h-10 rounded-full bg-[#25B5DA]/20 flex items-center justify-center">
+                    <i class="fas fa-database text-[#25B5DA] text-sm"></i>
+                </div>
+                <div>
+                    <p class="text-white font-bold text-sm">Ginez Pérez Josué Iván</p>
+                </div>
+            </div>
+
+             <div class="flex items-center gap-3 p-3 bg-[#262626] rounded-lg border border-[#374151]">
+                <div class="w-10 h-10 rounded-full bg-[#25B5DA]/20 flex items-center justify-center">
+                    <i class="fas fa-database text-[#25B5DA] text-sm"></i>
+                </div>
+                <div>
+                    <p class="text-white font-bold text-sm">González Martínez Josué Rubén</p>
+                </div>
+            </div>
+
+             <div class="flex items-center gap-3 p-3 bg-[#262626] rounded-lg border border-[#374151]">
+                <div class="w-10 h-10 rounded-full bg-[#25B5DA]/20 flex items-center justify-center">
+                    <i class="fas fa-database text-[#25B5DA] text-sm"></i>
+                </div>
+                <div>
+                    <p class="text-white font-bold text-sm">Gonzalez Contreras Osbaldo</p>
+                </div>
+            </div>
+
+             <div class="flex items-center gap-3 p-3 bg-[#262626] rounded-lg border border-[#374151]">
+                <div class="w-10 h-10 rounded-full bg-[#25B5DA]/20 flex items-center justify-center">
+                    <i class="fas fa-database text-[#25B5DA] text-sm"></i>
+                </div>
+                <div>
+                    <p class="text-white font-bold text-sm">Morales Martínez Alan</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="mt-6 pt-4 border-t border-[#374151] text-center">
+            <p class="text-[#9CA3AF] text-[9px] uppercase tracking-wider">Gracias por hacer esto posible</p>
+        </div>
+    </div>
+</div>
+
+<script>
+function openTeamModal() {
+    const modal = document.getElementById('teamModal');
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+}
+
+function closeTeamModal() {
+    const modal = document.getElementById('teamModal');
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+}
+
+// Cerrar modal con tecla ESC
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+        closeTeamModal();
+    }
+});
+</script>

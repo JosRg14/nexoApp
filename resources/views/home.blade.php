@@ -38,7 +38,7 @@
                     </h1>
                     
                     <p class="text-[#9CA3AF] text-lg leading-relaxed max-w-2xl border-l border-[#374151] pl-6">
-                        Conectamos necesidades con soluciones. Descubre una red exclusiva de servicios y negocios curados para ofrecerte la mejor experiencia en tu ciudad. Calidad, rapidez y estilo en un solo lugar.
+                        Encuentra tu próximo estilo en 3 pasos: explora negocios cerca de ti, agenda tu cita y comparte tu experiencia. Conectamos necesidades con soluciones.
                     </p>
                     
                     @if(!session()->has('rol'))
