@@ -1,6 +1,6 @@
 <!-- TAB 3: FINANZAS -->
 <section id="tab-finances" class="hidden animate-fade-in-up">
-    <div class="mb-8">
+    <div class="mb-5">
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div class="flex items-center gap-2">
                 <h2 class="text-xl font-bold uppercase tracking-wide text-white">Resumen de la salud de tu negocio</h2>
@@ -24,7 +24,7 @@
     </div>
         
         <!-- KPI Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             
             <!-- Card 1: Ingresos Hoy -->
             <div class="bg-[#262626] border border-[#374151]/50 p-6 flex flex-col justify-between h-40 group hover:border-[#F3F4F6]/30 transition-colors duration-300">
@@ -109,8 +109,8 @@
     </div>
 
     <!-- Weekly Income Chart -->
-    <div class="border border-[#374151] bg-[#1a1a1a] p-6 rounded-sm">
-        <div class="flex justify-between items-center mb-6">
+    <div class="border border-[#374151] bg-[#1a1a1a] p-5 rounded-sm">
+        <div class="flex justify-between items-center mb-5">
             <h2 class="text-xl font-bold uppercase tracking-wide text-white">Ingresos Semanales</h2>
             <select class="bg-[#262626] text-white text-xs uppercase tracking-wider border border-[#374151] px-3 py-1 outline-none focus:border-white transition-colors">
                 <option>Esta Semana</option>
@@ -122,8 +122,8 @@
     </div>
 
     <!-- Top Services Section -->
-    <div class="mt-6 border border-[#374151] bg-[#1a1a1a] p-6 rounded-sm">
-        <h2 class="text-xl font-bold uppercase tracking-wide text-white mb-6">Servicios Top</h2>
+    <div class="mt-5 border border-[#374151] bg-[#1a1a1a] p-5 rounded-sm">
+        <h2 class="text-xl font-bold uppercase tracking-wide text-white mb-5">Servicios Top</h2>
         
         <div class="space-y-6">
             @forelse($finanzas['servicios_top'] ?? [] as $index => $servicio)
