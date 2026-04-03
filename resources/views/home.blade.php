@@ -52,6 +52,67 @@
             </section>
         @endif
 
+        @if(!session()->has('rol'))
+        <!-- Sección Colapsable: Cómo funciona -->
+        <div class="max-w-7xl mx-auto px-6 mb-12 animate-fade-in-up" style="animation-delay: 100ms;">
+            <div class="border border-[#374151] rounded-lg overflow-hidden shadow-2xl shadow-black/20">
+                <!-- Header colapsable -->
+                <button onclick="toggleComoFunciona()" 
+                        class="w-full flex items-center justify-between p-5 bg-[#262626] hover:bg-[#2d2d2d] transition-all duration-300 group">
+                    <div class="flex items-center gap-4">
+                        <div class="w-10 h-10 rounded-full bg-[#25B5DA]/10 flex items-center justify-center group-hover:bg-[#25B5DA]/20 transition-colors">
+                            <i class="fas fa-question-circle text-[#25B5DA] text-lg"></i>
+                        </div>
+                        <span class="text-white text-sm font-bold uppercase tracking-[0.1em]">¿Cómo funciona NexoApp?</span>
+                    </div>
+                    <i id="como-funciona-icon" class="fas fa-chevron-down text-[#9CA3AF] transition-transform duration-500 mr-2"></i>
+                </button>
+                
+                <!-- Contenido colapsable (oculto por defecto) -->
+                <div id="como-funciona-content" class="hidden p-8 bg-[#1a1a1a] border-t border-[#374151]">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+                        <div class="text-center group">
+                            <div class="w-16 h-16 mx-auto bg-[#25B5DA]/10 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+                                <i class="fas fa-search text-2xl text-[#25B5DA]"></i>
+                            </div>
+                            <h3 class="text-white font-bold text-sm mb-2 uppercase tracking-wide">1. Explora</h3>
+                            <p class="text-[#9CA3AF] text-xs leading-relaxed px-4">Encuentra el negocio perfecto cerca de ti navegando por nuestras categorías curadas.</p>
+                        </div>
+                        <div class="text-center group">
+                            <div class="w-16 h-16 mx-auto bg-[#25B5DA]/10 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+                                <i class="fas fa-calendar-alt text-2xl text-[#25B5DA]"></i>
+                            </div>
+                            <h3 class="text-white font-bold text-sm mb-2 uppercase tracking-wide">2. Agenda</h3>
+                            <p class="text-[#9CA3AF] text-xs leading-relaxed px-4">Selecciona el servicio, tu empleado de confianza y el horario que mejor te convenga.</p>
+                        </div>
+                        <div class="text-center group">
+                            <div class="w-16 h-16 mx-auto bg-[#25B5DA]/10 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+                                <i class="fas fa-star text-2xl text-[#25B5DA]"></i>
+                            </div>
+                            <h3 class="text-white font-bold text-sm mb-2 uppercase tracking-wide">3. Disfruta</h3>
+                            <p class="text-[#9CA3AF] text-xs leading-relaxed px-4">Recibe atención de primer nivel, califica y comparte tu experiencia con la comunidad.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+        function toggleComoFunciona() {
+            const content = document.getElementById('como-funciona-content');
+            const icon = document.getElementById('como-funciona-icon');
+            
+            if (content.classList.contains('hidden')) {
+                content.classList.remove('hidden');
+                icon.style.transform = 'rotate(180deg)';
+            } else {
+                content.classList.add('hidden');
+                icon.style.transform = 'rotate(0deg)';
+            }
+        }
+        </script>
+        @endif
+
         <!-- Filters & Grid -->
         <section class="max-w-7xl mx-auto px-6 pb-24">
             
@@ -216,8 +277,6 @@
                 @endif
             </div>
             @endif
-
-        </section>
 
         </section>
 
