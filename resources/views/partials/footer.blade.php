@@ -143,9 +143,6 @@
             </div>
         </div>
         
-        <div class="mt-6 pt-4 border-t border-[#374151] text-center">
-            <p class="text-[#9CA3AF] text-[9px] uppercase tracking-wider">Gracias por hacer esto posible</p>
-        </div>
     </div>
 </div>
 
