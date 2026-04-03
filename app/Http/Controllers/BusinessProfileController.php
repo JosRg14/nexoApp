@@ -84,13 +84,13 @@ class BusinessProfileController extends Controller
                     'variacion' => $dataHoy['variacion']    ?? 0,
                 ];
                 
-                // Respuesta: {"success":true,"data":{"total_citas":0,"confirmadas":0,"en_proceso":0,"variacion":-5}}
+                // Respuesta real: {"success":true,"data":{"negocio_id":2,"hoy":"...","total_citas":7,"pendientes":3,"completadas":1,"canceladas":3,"variacion":600}}
                 $resCitas = $this->httpClient->get('/api/finanzas/citas-hoy');
                 $dataCitas = $resCitas['data'] ?? [];
                 \Log::info('=== BFF FINANZAS - citas_hoy ===', (array)$dataCitas);
                 $finanzas['citas_hoy'] = [
-                    'total'       => max($dataCitas['total_citas'] ?? 0, ($dataCitas['confirmadas'] ?? 0) + ($dataCitas['pendientes'] ?? 0) + ($dataCitas['en_proceso'] ?? 0) + ($dataCitas['canceladas'] ?? 0)),
-                    'completadas' => $dataCitas['confirmadas'] ?? 0,
+                    'total'       => $dataCitas['total_citas'] ?? 0,
+                    'completadas' => $dataCitas['completadas'] ?? 0,  // ✅ era 'confirmadas', ahora 'completadas'
                     'pendientes'  => $dataCitas['pendientes']  ?? 0,
                     'en_proceso'  => $dataCitas['en_proceso']  ?? 0,
                     'canceladas'  => $dataCitas['canceladas']  ?? 0,
