@@ -76,13 +76,22 @@ class BusinessProfileController extends Controller
             // 4. Obtener finanzas
             try {
                 $resHoy = $this->httpClient->get('/api/finanzas/ingresos-hoy');
-                $finanzas['ingresos_hoy'] = $resHoy['data'] ?? $resHoy['ingresos_hoy'] ?? $resHoy;
+                \Log::info('API finanzas/ingresos-hoy:', (array)$resHoy);
+                $ingHoy = $resHoy['data'] ?? $resHoy['ingresos_hoy'] ?? $resHoy;
+                $finanzas['ingresos_hoy']['total'] = $ingHoy['total'] ?? $ingHoy['ingresos'] ?? 0;
+                $finanzas['ingresos_hoy']['variacion'] = $ingHoy['variacion'] ?? 0;
                 
                 $resCitas = $this->httpClient->get('/api/finanzas/citas-hoy');
-                $finanzas['citas_hoy'] = $resCitas['data'] ?? $resCitas['citas_hoy'] ?? $resCitas;
+                \Log::info('API finanzas/citas-hoy:', (array)$resCitas);
+                $finanzas['citas_hoy'] = array_merge([
+                    'total' => 0, 'completadas' => 0, 'pendientes' => 0, 'en_proceso' => 0, 'variacion' => 0
+                ], $resCitas['data'] ?? $resCitas['citas_hoy'] ?? $resCitas);
                 
                 $resMes = $this->httpClient->get('/api/finanzas/ingresos-mes');
-                $finanzas['ingresos_mes'] = $resMes['data'] ?? $resMes['ingresos_mes'] ?? $resMes;
+                \Log::info('API finanzas/ingresos-mes:', (array)$resMes);
+                $ingMes = $resMes['data'] ?? $resMes['ingresos_mes'] ?? $resMes;
+                $finanzas['ingresos_mes']['total'] = $ingMes['total'] ?? $ingMes['ingresos'] ?? 0;
+                $finanzas['ingresos_mes']['variacion'] = $ingMes['variacion'] ?? 0;
                 
                 $resSem = $this->httpClient->get('/api/finanzas/ingresos-semanales');
                 $finanzas['ingresos_semanales'] = $resSem['data'] ?? $resSem['ingresos_semanales'] ?? $resSem;
@@ -91,6 +100,65 @@ class BusinessProfileController extends Controller
                 $finanzas['servicios_top'] = $resTop['data'] ?? $resTop['servicios_top'] ?? $resTop;
             } catch (\Exception $e) {
                 \Log::warning('No se pudieron cargar las finanzas: ' . $e->getMessage());
+            }
+
+            // 4.5 Asegurar que los cálculos sean correctos (Backup de lógica)
+            try {
+                $resTodasCitas = $this->httpClient->get('/api/citas');
+                $citasArray = $resTodasCitas['data'] ?? [];
+                
+                if (is_array($citasArray) && count($citasArray) > 0) {
+                    $hoy = \Carbon\Carbon::now()->format('Y-m-d');
+                    $mesActual = \Carbon\Carbon::now()->format('Y-m');
+
+                    $ingresosHoy = 0;
+                    $citasHoyTotal = 0;
+                    $citasHoyCompletadas = 0;
+                    $citasHoyPendientes = 0;
+                    $citasHoyEnProceso = 0;
+                    $ingresosMes = 0;
+
+                    foreach ($citasArray as $cita) {
+                        if (!isset($cita['fecha'])) continue;
+                        
+                        $fechaCita = \Carbon\Carbon::parse($cita['fecha'])->format('Y-m-d');
+                        $mesCita = \Carbon\Carbon::parse($cita['fecha'])->format('Y-m');
+                        $estado = strtolower($cita['estado'] ?? '');
+                        // Obtener precio del servicio asociado o costo total
+                        $precio = isset($cita['servicio']['precio']) ? (float)$cita['servicio']['precio'] : 
+                                  (isset($cita['total']) ? (float)$cita['total'] : 0);
+
+                        // Citas e Ingresos de Hoy
+                        if ($fechaCita === $hoy) {
+                            $citasHoyTotal++;
+                            if ($estado === 'completada') {
+                                $citasHoyCompletadas++;
+                                $ingresosHoy += $precio;
+                            } elseif ($estado === 'pendiente') {
+                                $citasHoyPendientes++;
+                            } elseif ($estado === 'en_proceso') {
+                                $citasHoyEnProceso++;
+                            }
+                        }
+
+                        // Ingresos del Mes Actual
+                        if ($mesCita === $mesActual && $estado === 'completada') {
+                            $ingresosMes += $precio;
+                        }
+                    }
+
+                    // Forzar los valores calculados manualmente para priorizar la corrección
+                    $finanzas['ingresos_hoy']['total'] = $ingresosHoy;
+                    $finanzas['citas_hoy']['total'] = $citasHoyTotal;
+                    $finanzas['citas_hoy']['completadas'] = $citasHoyCompletadas;
+                    $finanzas['citas_hoy']['pendientes'] = $citasHoyPendientes;
+                    $finanzas['citas_hoy']['en_proceso'] = $citasHoyEnProceso;
+                    $finanzas['ingresos_mes']['total'] = $ingresosMes;
+                    
+                    \Log::info('Finanzas calculadas manualmente aplicadas', $finanzas);
+                }
+            } catch (\Exception $e) {
+                \Log::error('Error validando calculos de citas manuales: ' . $e->getMessage());
             }
 
         } catch (\Exception $e) {

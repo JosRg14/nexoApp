@@ -49,8 +49,15 @@
                     </span>
                 </div>
                 <div>
-                    <div class="text-3xl font-bold text-white tracking-tight mb-1">{{ $finanzas['citas_hoy']['total'] ?? 0 }}</div>
+                    <div class="text-3xl font-bold text-white tracking-tight mb-1" title="Completadas: {{ $finanzas['citas_hoy']['completadas'] ?? 0 }} | Pendientes: {{ $finanzas['citas_hoy']['pendientes'] ?? 0 }} | En proceso: {{ $finanzas['citas_hoy']['en_proceso'] ?? 0 }}">
+                        {{ $finanzas['citas_hoy']['total'] ?? 0 }}
+                    </div>
                     <div class="text-[#9CA3AF] text-xs uppercase tracking-wider">Citas Hoy</div>
+                    <div class="text-[10px] tracking-wide mt-2 flex items-center justify-start gap-3">
+                        <span class="text-emerald-500 font-medium whitespace-nowrap" title="Completadas"><i class="fas fa-check-circle mr-1"></i> {{ $finanzas['citas_hoy']['completadas'] ?? 0 }}</span>
+                        <span class="text-[#F59E0B] font-medium whitespace-nowrap" title="Pendientes"><i class="fas fa-clock mr-1"></i> {{ $finanzas['citas_hoy']['pendientes'] ?? 0 }}</span>
+                        <span class="text-blue-500 font-medium whitespace-nowrap" title="En Proceso"><i class="fas fa-spinner fa-spin mr-1"></i> {{ $finanzas['citas_hoy']['en_proceso'] ?? 0 }}</span>
+                    </div>
                 </div>
             </div>
 
@@ -74,7 +81,7 @@
                 </div>
                 <div>
                     <div class="text-3xl font-bold text-white tracking-tight mb-1">${{ number_format($finanzas['ingresos_mes']['total'] ?? 0, 2) }}</div>
-                    <div class="text-[#9CA3AF] text-xs uppercase tracking-wider">Ingresos Mes</div>
+                    <div class="text-[#9CA3AF] text-xs uppercase tracking-wider">Ingresos Mes ({{ ucfirst(\Carbon\Carbon::now()->translatedFormat('F')) }})</div>
                 </div>
             </div>
         </div>
