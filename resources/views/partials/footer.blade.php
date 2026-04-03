@@ -40,20 +40,27 @@
                 </ul>
             </div>
             
-            <!-- Estadísticas -->
+            <!-- Ventajas -->
             <div>
-                <h4 class="text-white text-sm font-bold uppercase tracking-wider mb-4 border-l-2 border-[#25B5DA] pl-2">Plataforma</h4>
-                <ul class="space-y-3 text-[#9CA3AF] text-xs font-medium">
-                    <li class="flex items-center gap-2">
-                        <span class="text-[#25B5DA] font-bold">{{ $stats['negocios'] ?? '250+' }}</span> Negocios
-                    </li>
-                    <li class="flex items-center gap-2">
-                        <span class="text-[#25B5DA] font-bold">{{ $stats['clientes'] ?? '10K+' }}</span> Clientes
-                    </li>
-                    <li class="flex items-center gap-2">
-                        <span class="text-[#25B5DA] font-bold">{{ $stats['citas'] ?? '50K+' }}</span> Citas
-                    </li>
-                </ul>
+                 <h4 class="text-white text-sm font-bold uppercase tracking-wider mb-4 border-l-2 border-[#25B5DA] pl-2">Ventajas</h4>
+                    <ul class="space-y-3 text-[#9CA3AF] text-xs">
+                        <li class="flex items-center gap-2">
+                            <i class="fas fa-clock text-[#25B5DA] text-xs"></i>
+                            Reserva en minutos
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <i class="fas fa-star text-[#25B5DA] text-xs"></i>
+                            Calificación real
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <i class="fas fa-shield-alt text-[#25B5DA] text-xs"></i>
+                            Seguridad garantizada
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <i class="fas fa-headset text-[#25B5DA] text-xs"></i>
+                            Atención personalizada
+                        </li>
+                    </ul>
             </div>
         </div>
         
