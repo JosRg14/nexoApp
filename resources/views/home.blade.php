@@ -50,36 +50,6 @@
                     @endif
                 </div>
             </section>
-            
-            @if(!session()->has('rol'))
-            <!-- Section Cómo funciona -->
-            <section class="max-w-7xl mx-auto px-6 pb-20 animate-fade-in-up" style="animation-delay: 100ms;">
-                <h2 class="text-3xl font-bold uppercase tracking-wide text-white text-center mb-12">¿Cómo funciona?</h2>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    <div class="text-center group bg-[#1a1a1a] border border-[#374151] p-8 rounded-xl hover:border-[#25B5DA]/50 transition-all duration-300">
-                        <div class="w-16 h-16 mx-auto bg-[#25B5DA]/10 rounded-full flex items-center justify-center mb-6 group-hover:bg-[#25B5DA]/20 group-hover:scale-110 transition-all duration-300">
-                            <i class="fas fa-search text-2xl text-[#25B5DA]"></i>
-                        </div>
-                        <h3 class="text-white font-bold text-lg mb-3 tracking-wide">1. Explora</h3>
-                        <p class="text-[#9CA3AF] text-sm leading-relaxed">Descubre negocios exclusivos en tu área y explora sus servicios, horarios y valoraciones reales.</p>
-                    </div>
-                    <div class="text-center group bg-[#1a1a1a] border border-[#374151] p-8 rounded-xl hover:border-[#25B5DA]/50 transition-all duration-300">
-                        <div class="w-16 h-16 mx-auto bg-[#25B5DA]/10 rounded-full flex items-center justify-center mb-6 group-hover:bg-[#25B5DA]/20 group-hover:scale-110 transition-all duration-300">
-                            <i class="fas fa-calendar-alt text-2xl text-[#25B5DA]"></i>
-                        </div>
-                        <h3 class="text-white font-bold text-lg mb-3 tracking-wide">2. Agenda</h3>
-                        <p class="text-[#9CA3AF] text-sm leading-relaxed">Reserva en segundos eligiendo el servicio, el profesional de tu preferencia y el horario ideal.</p>
-                    </div>
-                    <div class="text-center group bg-[#1a1a1a] border border-[#374151] p-8 rounded-xl hover:border-[#25B5DA]/50 transition-all duration-300">
-                        <div class="w-16 h-16 mx-auto bg-[#25B5DA]/10 rounded-full flex items-center justify-center mb-6 group-hover:bg-[#25B5DA]/20 group-hover:scale-110 transition-all duration-300">
-                            <i class="fas fa-star text-2xl text-[#25B5DA]"></i>
-                        </div>
-                        <h3 class="text-white font-bold text-lg mb-3 tracking-wide">3. Disfruta</h3>
-                        <p class="text-[#9CA3AF] text-sm leading-relaxed">Recibe un servicio excelente en el lugar, califica tu experiencia y compártela a la comunidad.</p>
-                    </div>
-                </div>
-            </section>
-            @endif
         @endif
 
         <!-- Filters & Grid -->
@@ -249,48 +219,7 @@
 
         </section>
 
-        <!-- Stats & Company Footer -->
-        <div class="bg-[#0f0f0f] border-t border-[#374151] py-16">
-            <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-5 gap-12 items-center">
-                <!-- Información de la Empresa -->
-                <div class="md:col-span-2 space-y-5 text-center md:text-left">
-                    <div class="flex items-center justify-center md:justify-start gap-3">
-                        <div class="w-12 h-12 rounded bg-[#25B5DA] flex items-center justify-center shadow-lg shadow-[#25B5DA]/20">
-                            <span class="text-black font-extrabold text-2xl">N</span>
-                        </div>
-                        <span class="text-3xl font-bold uppercase tracking-widest text-white">Nexo App</span>
-                    </div>
-                    <p class="text-[#9CA3AF] text-sm leading-relaxed max-w-sm mx-auto md:mx-0">
-                        La mejor forma de conectar talento excepcional con clientes exigentes. Simplifica tus reservas y haz crecer tu negocio.
-                    </p>
-                    <div class="flex items-center justify-center md:justify-start gap-5 pt-2">
-                        <a href="#" class="text-[#9CA3AF] hover:text-[#25B5DA] transition-colors"><i class="fab fa-instagram text-xl"></i></a>
-                        <a href="#" class="text-[#9CA3AF] hover:text-[#25B5DA] transition-colors"><i class="fab fa-facebook text-xl"></i></a>
-                        <a href="#" class="text-[#9CA3AF] hover:text-[#25B5DA] transition-colors"><i class="fab fa-twitter text-xl"></i></a>
-                    </div>
-                </div>
-
-                <!-- Estadísticas -->
-                <div class="md:col-span-3 grid grid-cols-2 md:grid-cols-4 gap-8 border-t border-[#374151] md:border-t-0 md:border-l md:border-[#374151] md:pl-12 pt-8 md:pt-0">
-                    <div class="text-center group">
-                        <div class="text-4xl font-bold text-white group-hover:text-[#25B5DA] transition-colors">{{ $stats['negocios'] ?? '250+' }}</div>
-                        <p class="text-[#9CA3AF] text-[10px] uppercase tracking-wider mt-3 font-semibold group-hover:text-white transition-colors">Negocios</p>
-                    </div>
-                    <div class="text-center group">
-                        <div class="text-4xl font-bold text-white group-hover:text-[#25B5DA] transition-colors">{{ $stats['clientes'] ?? '10K+' }}</div>
-                        <p class="text-[#9CA3AF] text-[10px] uppercase tracking-wider mt-3 font-semibold group-hover:text-white transition-colors">Clientes</p>
-                    </div>
-                    <div class="text-center group">
-                        <div class="text-4xl font-bold text-white group-hover:text-[#25B5DA] transition-colors">{{ $stats['citas'] ?? '50K+' }}</div>
-                        <p class="text-[#9CA3AF] text-[10px] uppercase tracking-wider mt-3 font-semibold group-hover:text-white transition-colors">Citas realizadas</p>
-                    </div>
-                    <div class="text-center group">
-                        <div class="text-4xl font-bold text-white group-hover:text-[#25B5DA] transition-colors">{{ $stats['empleados'] ?? '500+' }}</div>
-                        <p class="text-[#9CA3AF] text-[10px] uppercase tracking-wider mt-3 font-semibold group-hover:text-white transition-colors">Profesionales</p>
-                    </div>
-                </div>
-            </div>
-        </div>
+        </section>
 
     </main>
 
