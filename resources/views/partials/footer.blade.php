@@ -98,7 +98,7 @@
             
             <div class="flex items-center gap-3 p-3 bg-[#262626] rounded-lg border border-[#374151]">
                 <div class="w-10 h-10 rounded-full bg-[#25B5DA]/20 flex items-center justify-center">
-                    <i class="fas fa-elephant text-[#25B5DA] text-sm"></i>
+                    <i class="fas fa-database text-[#25B5DA] text-sm"></i>
                 </div>
                 <div>
                     <p class="text-white font-bold text-sm">Ginez Pérez Josué Iván</p>
