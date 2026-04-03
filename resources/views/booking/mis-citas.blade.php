@@ -45,8 +45,7 @@
                         <span>{{ $cita['empleado']['nombre'] ?? 'Empleado' }}</span>
                     </div>
                     <div class="flex items-center gap-2 text-[#25B5DA]">
-                        <i class="fas fa-dollar-sign w-4"></i>
-                        <span>${{ number_format($cita['servicio']['precio'] ?? 0, 2) }}</span>
+                        <span class="font-medium">${{ number_format($cita['servicio']['precio'] ?? 0, 2) }}</span>
                     </div>
                 </div>
                 
@@ -63,13 +62,12 @@
                         <div class="flex items-center justify-between mb-2">
                             <div class="flex items-center gap-1">
                                 @for($i = 1; $i <= 5; $i++)
-                                    <i class="fas fa-star {{ $i <= $cita['resena']['calificacion'] ? 'text-yellow-400' : 'text-gray-600' }}"></i>
+                                    <i class="fas fa-star {{ $i <= $cita['resena']['calificacion'] ? 'text-[#25B5DA]' : 'text-[#374151]' }} text-xs"></i>
                                 @endfor
-                                <span class="ml-2 text-xl">{{ ['😡', '😞', '😐', '😊', '😍'][$cita['resena']['calificacion'] - 1] ?? '😐' }}</span>
                             </div>
                         </div>
                         @if($cita['resena']['comentario'])
-                        <p class="text-sm text-gray-400 italic mb-3">"{{ $cita['resena']['comentario'] }}"</p>
+                        <p class="text-sm text-[#9CA3AF] italic mb-3">"{{ $cita['resena']['comentario'] }}"</p>
                         @endif
                         <div class="flex gap-2 mt-3">
                             <button onclick="abrirModalEditarResena({{ $cita['id'] ?? $cita['id_cita'] }}, {{ $cita['resena']['id'] }}, {{ $cita['resena']['calificacion'] }}, '{{ addslashes($cita['resena']['comentario'] ?? '') }}')" class="flex-1 py-1.5 text-[#25B5DA] border border-[#25B5DA]/30 rounded-lg hover:bg-[#25B5DA]/10 transition-all text-xs flex justify-center items-center gap-1">
@@ -167,7 +165,6 @@ function hideLoader() {
 
 // Lógica de Reseñas
 
-const emojis = ['😡', '😞', '😐', '😊', '😍'];
 let calificacionSeleccionada = 0;
 
 function abrirModalResena(citaId) {
@@ -224,13 +221,11 @@ function resetFormularioResena() {
     calificacionSeleccionada = 0;
     document.getElementById('resena-calificacion').value = 0;
     document.getElementById('resena-comentario').value = '';
-    document.getElementById('resena-emoji').innerText = '🤔';
-    document.getElementById('resena-emoji').classList.add('scale-100');
     actualizarContador();
     const stars = document.querySelectorAll('.star-btn');
     stars.forEach(s => {
-        s.classList.remove('text-yellow-400');
-        s.classList.add('text-gray-500');
+        s.classList.remove('text-[#25B5DA]');
+        s.classList.add('text-[#374151]');
     });
 }
 
@@ -238,28 +233,26 @@ function hoverEstrellas(val) {
     const stars = document.querySelectorAll('.star-btn');
     stars.forEach((s, index) => {
         if (index < val) {
-            s.classList.remove('text-gray-500');
-            s.classList.add('text-yellow-400');
+            s.classList.remove('text-[#374151]');
+            s.classList.add('text-[#25B5DA]');
         } else if (index >= calificacionSeleccionada) {
-            s.classList.remove('text-yellow-400');
-            s.classList.add('text-gray-500');
+            s.classList.remove('text-[#25B5DA]');
+            s.classList.add('text-[#374151]');
         }
     });
-    actualizarEmoji(val);
 }
 
 function resetEstrellas() {
     const stars = document.querySelectorAll('.star-btn');
     stars.forEach((s, index) => {
         if (index < calificacionSeleccionada) {
-            s.classList.remove('text-gray-500');
-            s.classList.add('text-yellow-400');
+            s.classList.remove('text-[#374151]');
+            s.classList.add('text-[#25B5DA]');
         } else {
-            s.classList.remove('text-yellow-400');
-            s.classList.add('text-gray-500');
+            s.classList.remove('text-[#25B5DA]');
+            s.classList.add('text-[#374151]');
         }
     });
-    actualizarEmoji(calificacionSeleccionada || 0);
 }
 
 function seleccionarEstrellas(val) {
@@ -267,20 +260,12 @@ function seleccionarEstrellas(val) {
     document.getElementById('resena-calificacion').value = val;
     resetEstrellas();
     
-    const emojiEl = document.getElementById('resena-emoji');
-    emojiEl.classList.add('scale-125', 'rotate-12');
+    // Animación de feedback en la estrella seleccionada
+    const starBtn = document.querySelectorAll('.star-btn')[val-1];
+    starBtn.classList.add('scale-125');
     setTimeout(() => {
-        emojiEl.classList.remove('scale-125', 'rotate-12');
+        starBtn.classList.remove('scale-125');
     }, 200);
-}
-
-function actualizarEmoji(val) {
-    const emojiEl = document.getElementById('resena-emoji');
-    if (val === 0) {
-        emojiEl.innerText = '🤔';
-    } else {
-        emojiEl.innerText = emojis[val - 1];
-    }
 }
 
 function actualizarContador() {
@@ -411,13 +396,10 @@ async function eliminarResena(resenaId) {
             <input type="hidden" id="resena-mode" value="create">
             <input type="hidden" id="resena-calificacion" value="0">
             
-            <!-- Emojis flotantes -->
-            <div class="text-center text-5xl mb-4 h-16 flex items-center justify-center transition-all duration-300" id="resena-emoji">🤔</div>
-            
             <!-- Estrellas -->
             <div class="flex justify-center gap-2 mb-6" id="resena-estrellas">
                 @for($i=1; $i<=5; $i++)
-                <button type="button" class="text-gray-500 hover:text-yellow-400 text-3xl transition-colors transform hover:scale-110 focus:outline-none star-btn" data-value="{{$i}}" onmouseover="hoverEstrellas({{$i}})" onmouseout="resetEstrellas()" onclick="seleccionarEstrellas({{$i}})">
+                <button type="button" class="text-[#374151] hover:text-[#25B5DA] text-3xl transition-all transform hover:scale-110 focus:outline-none star-btn" data-value="{{$i}}" onmouseover="hoverEstrellas({{$i}})" onmouseout="resetEstrellas()" onclick="seleccionarEstrellas({{$i}})">
                     <i class="fas fa-star"></i>
                 </button>
                 @endfor
