@@ -29,11 +29,20 @@ class BusinessProfileController extends Controller
         $employees = [];
         $negocio = [];
         $finanzas = [
-            'ingresos_hoy' => ['total' => 0, 'variacion' => 0],
-            'citas_hoy' => ['total' => 0, 'confirmadas' => 0, 'en_proceso' => 0, 'variacion' => 0],
-            'ingresos_mes' => ['total' => 0, 'variacion' => 0],
-            'ingresos_semanales' => ['dias' => [], 'ingresos' => []],
-            'servicios_top' => []
+            'con_cita' => [
+                'ingresos_hoy' => ['total' => 0, 'variacion' => 0],
+                'citas_hoy' => ['total' => 0, 'completadas' => 0, 'en_proceso' => 0, 'pendientes' => 0, 'canceladas' => 0, 'variacion' => 0],
+                'ingresos_mes' => ['total' => 0, 'variacion' => 0],
+                'ingresos_semanales' => ['dias' => [], 'ingresos' => []],
+                'servicios_top' => []
+            ],
+            'sin_cita' => [
+                'ingresos_hoy' => ['total' => 0, 'variacion' => 0],
+                'citas_hoy' => ['total' => 0, 'completadas' => 0, 'en_proceso' => 0, 'pendientes' => 0, 'canceladas' => 0, 'variacion' => 0],
+                'ingresos_mes' => ['total' => 0, 'variacion' => 0],
+                'ingresos_semanales' => ['dias' => [], 'ingresos' => []],
+                'servicios_top' => []
+            ]
         ];
 
         try {
@@ -74,47 +83,44 @@ class BusinessProfileController extends Controller
             })->toArray();
 
             // 4. Obtener finanzas
-            try {
-                // Respuesta: {"success":true,"data":{"ingresos_hoy":3000,"variacion":100}}
-                $resHoy = $this->httpClient->get('/api/finanzas/ingresos-hoy');
-                $dataHoy = $resHoy['data'] ?? [];
-                \Log::info('=== BFF FINANZAS - ingresos_hoy ===', (array)$dataHoy);
-                $finanzas['ingresos_hoy'] = [
-                    'total'     => $dataHoy['ingresos_hoy'] ?? 0,
-                    'variacion' => $dataHoy['variacion']    ?? 0,
-                ];
-                
-                // Respuesta real: {"success":true,"data":{"negocio_id":2,"hoy":"...","total_citas":7,"pendientes":3,"completadas":1,"canceladas":3,"variacion":600}}
-                $resCitas = $this->httpClient->get('/api/finanzas/citas-hoy');
-                $dataCitas = $resCitas['data'] ?? [];
-                \Log::info('=== BFF FINANZAS - citas_hoy ===', (array)$dataCitas);
-                $finanzas['citas_hoy'] = [
-                    'total'       => $dataCitas['total_citas'] ?? 0,
-                    'completadas' => $dataCitas['completadas'] ?? 0,  // ✅ era 'confirmadas', ahora 'completadas'
-                    'pendientes'  => $dataCitas['pendientes']  ?? 0,
-                    'en_proceso'  => $dataCitas['en_proceso']  ?? 0,
-                    'canceladas'  => $dataCitas['canceladas']  ?? 0,
-                    'variacion'   => $dataCitas['variacion']   ?? 0,
-                ];
-                
-                // Respuesta: {"success":true,"data":{"ingresos_mes":3000,"variacion":100}}
-                $resMes = $this->httpClient->get('/api/finanzas/ingresos-mes');
-                $dataMes = $resMes['data'] ?? [];
-                \Log::info('=== BFF FINANZAS - ingresos_mes ===', (array)$dataMes);
-                $finanzas['ingresos_mes'] = [
-                    'total'     => $dataMes['ingresos_mes'] ?? 0,
-                    'variacion' => $dataMes['variacion']    ?? 0,
-                ];
-                
-                // Respuesta: {"success":true,"data":{"dias":[...],"ingresos":[...]}}
-                $resSem = $this->httpClient->get('/api/finanzas/ingresos-semanales');
-                $finanzas['ingresos_semanales'] = $resSem['data'] ?? ['dias' => [], 'ingresos' => []];
-                
-                // Respuesta: {"success":true,"data":[{"nombre":"...","total_citas":1,"porcentaje":100}]}
-                $resTop = $this->httpClient->get('/api/finanzas/servicios-top', ['limite' => 5]);
-                $finanzas['servicios_top'] = $resTop['data'] ?? [];
-            } catch (\Exception $e) {
-                \Log::warning('No se pudieron cargar las finanzas: ' . $e->getMessage());
+            $tipos = ['con_cita', 'sin_cita'];
+            foreach ($tipos as $tipo) {
+                try {
+                    $queryParams = ['tipo' => $tipo];
+
+                    $resHoy = $this->httpClient->get('/api/finanzas/ingresos-hoy', $queryParams);
+                    $dataHoy = $resHoy['data'] ?? [];
+                    $finanzas[$tipo]['ingresos_hoy'] = [
+                        'total'     => $dataHoy['ingresos_hoy'] ?? 0,
+                        'variacion' => $dataHoy['variacion']    ?? 0,
+                    ];
+                    
+                    $resCitas = $this->httpClient->get('/api/finanzas/citas-hoy', $queryParams);
+                    $dataCitas = $resCitas['data'] ?? [];
+                    $finanzas[$tipo]['citas_hoy'] = [
+                        'total'       => $dataCitas['total_citas'] ?? 0,
+                        'completadas' => $dataCitas['completadas'] ?? 0,
+                        'pendientes'  => $dataCitas['pendientes']  ?? 0,
+                        'en_proceso'  => $dataCitas['en_proceso']  ?? 0,
+                        'canceladas'  => $dataCitas['canceladas']  ?? 0,
+                        'variacion'   => $dataCitas['variacion']   ?? 0,
+                    ];
+                    
+                    $resMes = $this->httpClient->get('/api/finanzas/ingresos-mes', $queryParams);
+                    $dataMes = $resMes['data'] ?? [];
+                    $finanzas[$tipo]['ingresos_mes'] = [
+                        'total'     => $dataMes['ingresos_mes'] ?? 0,
+                        'variacion' => $dataMes['variacion']    ?? 0,
+                    ];
+                    
+                    $resSem = $this->httpClient->get('/api/finanzas/ingresos-semanales', $queryParams);
+                    $finanzas[$tipo]['ingresos_semanales'] = $resSem['data'] ?? ['dias' => [], 'ingresos' => []];
+                    
+                    $resTop = $this->httpClient->get('/api/finanzas/servicios-top', array_merge($queryParams, ['limite' => 5]));
+                    $finanzas[$tipo]['servicios_top'] = $resTop['data'] ?? [];
+                } catch (\Exception $e) {
+                    \Log::warning("No se pudieron cargar las finanzas tipo {$tipo}: " . $e->getMessage());
+                }
             }
 
 
