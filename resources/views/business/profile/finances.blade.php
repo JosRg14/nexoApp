@@ -27,7 +27,7 @@
             Ingresos con cita
         </button>
         <button type="button" class="px-4 py-3 text-sm font-medium border-b-2 border-transparent text-[#9CA3AF] hover:text-white hover:border-[#374151] focus:outline-none transition-colors tab-finance-btn" data-target="sin_cita">
-            Ingresos sin cita (Walk-in)
+            Ingresos sin cita
         </button>
     </div>
 
@@ -79,15 +79,23 @@
                     </span>
                 </div>
                 <div>
-                    <div class="text-3xl font-bold text-white tracking-tight mb-1" title="Completadas: {{ $finanzas[$tipo]['citas_hoy']['completadas'] ?? 0 }} | Pendientes: {{ $finanzas[$tipo]['citas_hoy']['pendientes'] ?? 0 }} | En proceso: {{ $finanzas[$tipo]['citas_hoy']['en_proceso'] ?? 0 }} | Canceladas: {{ $finanzas[$tipo]['citas_hoy']['canceladas'] ?? 0 }}">
-                        {{ $finanzas[$tipo]['citas_hoy']['total'] ?? 0 }}
+                    <div class="text-3xl font-bold text-white tracking-tight mb-1" 
+                        @if($tipo === 'con_cita')
+                            title="Completadas: {{ $finanzas[$tipo]['citas_hoy']['completadas'] ?? 0 }} | Pendientes: {{ $finanzas[$tipo]['citas_hoy']['pendientes'] ?? 0 }} | En proceso: {{ $finanzas[$tipo]['citas_hoy']['en_proceso'] ?? 0 }} | Canceladas: {{ $finanzas[$tipo]['citas_hoy']['canceladas'] ?? 0 }}"
+                        @else
+                            title="Completadas: {{ $finanzas[$tipo]['citas_hoy']['completadas'] ?? 0 }}"
+                        @endif
+                    >
+                        {{ $tipo === 'con_cita' ? ($finanzas[$tipo]['citas_hoy']['total'] ?? 0) : ($finanzas[$tipo]['citas_hoy']['completadas'] ?? 0) }}
                     </div>
-                    <div class="text-[#9CA3AF] text-xs uppercase tracking-wider">{{ $tipo === 'con_cita' ? 'Citas Hoy' : 'Walk-ins Hoy' }}</div>
+                    <div class="text-[#9CA3AF] text-xs uppercase tracking-wider">{{ $tipo === 'con_cita' ? 'Citas Hoy' : 'Servicios Hoy' }}</div>
                     <div class="text-[10px] tracking-wide mt-2 flex items-center justify-start gap-2 flex-wrap">
                         <span class="text-emerald-500 font-medium whitespace-nowrap" title="Completadas"><i class="fas fa-check-circle mr-1"></i> {{ $finanzas[$tipo]['citas_hoy']['completadas'] ?? 0 }}</span>
+                        @if($tipo === 'con_cita')
                         <span class="text-[#F59E0B] font-medium whitespace-nowrap" title="Pendientes"><i class="fas fa-clock mr-1"></i> {{ $finanzas[$tipo]['citas_hoy']['pendientes'] ?? 0 }}</span>
                         <span class="text-blue-500 font-medium whitespace-nowrap" title="En Proceso"><i class="fas fa-spinner fa-spin mr-1"></i> {{ $finanzas[$tipo]['citas_hoy']['en_proceso'] ?? 0 }}</span>
                         <span class="text-red-500 font-medium whitespace-nowrap" title="Canceladas"><i class="fas fa-times-circle mr-1"></i> {{ $finanzas[$tipo]['citas_hoy']['canceladas'] ?? 0 }}</span>
+                        @endif
                     </div>
                 </div>
             </div>
@@ -120,7 +128,7 @@
         <!-- Weekly Income Chart -->
         <div class="border border-[#374151] bg-[#1a1a1a] p-5 rounded-sm mt-5">
             <div class="flex justify-between items-center mb-5">
-                <h2 class="text-xl font-bold uppercase tracking-wide text-white">Ingresos Semanales ({{ $tipo === 'con_cita' ? 'Citas' : 'Walk-in' }})</h2>
+                <h2 class="text-xl font-bold uppercase tracking-wide text-white">Ingresos Semanales ({{ $tipo === 'con_cita' ? 'Citas' : 'Servicios' }})</h2>
                 <select class="bg-[#262626] text-white text-xs uppercase tracking-wider border border-[#374151] px-3 py-1 outline-none focus:border-white transition-colors">
                     <option>Esta Semana</option>
                 </select>
@@ -132,7 +140,7 @@
 
         <!-- Top Services Section -->
         <div class="border border-[#374151] bg-[#1a1a1a] p-5 rounded-sm mt-5">
-            <h2 class="text-xl font-bold uppercase tracking-wide text-white mb-5">Servicios Top ({{ $tipo === 'con_cita' ? 'Citas' : 'Walk-in' }})</h2>
+            <h2 class="text-xl font-bold uppercase tracking-wide text-white mb-5">Servicios Top ({{ $tipo === 'con_cita' ? 'Citas' : 'Servicios' }})</h2>
             
             <div class="space-y-6">
                 @forelse($finanzas[$tipo]['servicios_top'] ?? [] as $index => $servicio)
