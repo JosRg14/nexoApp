@@ -66,7 +66,7 @@
                             <td class="p-4 text-[#9CA3AF] whitespace-nowrap" x-text="cliente.ultima_visita ? new Date(cliente.ultima_visita).toLocaleDateString('es-ES') : 'N/A'"></td>
                             <td class="p-4 text-right">
                                 <button @click="abrirModalAsignar(cliente)" class="text-[#25B5DA] font-bold text-[10px] uppercase tracking-widest hover:text-white transition-colors">
-                                    🎁 Asignar Promoción
+                                    Asignar Promoción
                                 </button>
                             </td>
                         </tr>
