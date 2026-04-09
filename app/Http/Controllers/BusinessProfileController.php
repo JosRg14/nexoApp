@@ -175,4 +175,19 @@ class BusinessProfileController extends Controller
                 ->with('error', 'Error al actualizar el negocio: ' . $e->getMessage());
         }
     }
+
+    public function clientesFrecuentes(Request $request)
+    {
+        $limit = $request->get('limit', 20);
+        $desde = $request->get('desde');
+        $hasta = $request->get('hasta');
+        
+        $response = $this->httpClient->get('/api/clientes-frecuentes', [
+            'limit' => $limit,
+            'desde' => $desde,
+            'hasta' => $hasta
+        ]);
+        
+        return response()->json($response);
+    }
 }

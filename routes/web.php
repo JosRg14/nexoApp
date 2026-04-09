@@ -248,6 +248,9 @@ Route::middleware(['auth.session', 'inject.api.token'])->group(function () {
         Route::post('/citas/{id}/resena', [BookingController::class, 'crearResena']);
         Route::put('/resenas/cita/{id}', [BookingController::class, 'editarResena']);
         Route::delete('/resenas/cita/{id}', [BookingController::class, 'eliminarResena']);
+
+        // Clientes frecuentes
+        Route::get('/clientes-frecuentes', [BusinessProfileController::class, 'clientesFrecuentes']);
     });
 });
 
