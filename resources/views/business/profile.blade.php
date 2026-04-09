@@ -258,81 +258,84 @@ function closeEditModal() {
             }
 
             // Chart Logic
-            const ctx = document.getElementById('weeklyIncomeChart').getContext('2d');
-            
-            // Gradient for bars
-            const gradient = ctx.createLinearGradient(0, 0, 0, 400);
-            gradient.addColorStop(0, '#A855F7'); // Purple start
-            gradient.addColorStop(1, '#3B82F6'); // Blue end
+            const chartCanvas = document.getElementById('weeklyIncomeChart');
+            if (chartCanvas && chartCanvas.getContext) {
+                const ctx = chartCanvas.getContext('2d');
+                
+                // Gradient for bars
+                const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+                gradient.addColorStop(0, '#A855F7'); // Purple start
+                gradient.addColorStop(1, '#3B82F6'); // Blue end
 
-            window.myChart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'],
-                    datasets: [{
-                        label: 'Ingresos ($)',
-                        data: [120, 190, 150, 250, 320, 450, 280],
-                        backgroundColor: gradient,
-                        borderRadius: 4,
-                        hoverBackgroundColor: '#F3F4F6'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: false
-                        },
-                        tooltip: {
-                            backgroundColor: '#262626',
-                            titleColor: '#F3F4F6',
-                            bodyColor: '#9CA3AF',
-                            borderColor: '#374151',
-                            borderWidth: 1,
-                            padding: 10,
-                            displayColors: false,
-                            callbacks: {
-                                label: function(context) {
-                                    return '$ ' + context.raw;
-                                }
-                            }
-                        }
+                window.myChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'],
+                        datasets: [{
+                            label: 'Ingresos ($)',
+                            data: [120, 190, 150, 250, 320, 450, 280],
+                            backgroundColor: gradient,
+                            borderRadius: 4,
+                            hoverBackgroundColor: '#F3F4F6'
+                        }]
                     },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            grid: {
-                                color: '#374151',
-                                drawBorder: false,
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
                             },
-                            ticks: {
-                                color: '#9CA3AF',
-                                font: {
-                                    family: 'sans-serif',
-                                    size: 10
-                                },
-                                callback: function(value) {
-                                    return '$' + value;
+                            tooltip: {
+                                backgroundColor: '#262626',
+                                titleColor: '#F3F4F6',
+                                bodyColor: '#9CA3AF',
+                                borderColor: '#374151',
+                                borderWidth: 1,
+                                padding: 10,
+                                displayColors: false,
+                                callbacks: {
+                                    label: function(context) {
+                                        return '$ ' + context.raw;
+                                    }
                                 }
                             }
                         },
-                        x: {
-                            grid: {
-                                display: false,
-                                drawBorder: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: {
+                                    color: '#374151',
+                                    drawBorder: false,
+                                },
+                                ticks: {
+                                    color: '#9CA3AF',
+                                    font: {
+                                        family: 'sans-serif',
+                                        size: 10
+                                    },
+                                    callback: function(value) {
+                                        return '$' + value;
+                                    }
+                                }
                             },
-                            ticks: {
-                                color: '#9CA3AF',
-                                font: {
-                                    family: 'sans-serif',
-                                    size: 10
+                            x: {
+                                grid: {
+                                    display: false,
+                                    drawBorder: false,
+                                },
+                                ticks: {
+                                    color: '#9CA3AF',
+                                    font: {
+                                        family: 'sans-serif',
+                                        size: 10
+                                    }
                                 }
                             }
                         }
                     }
-                }
-            });
+                });
+            }
         });
 
         // Toggle Modal Helper

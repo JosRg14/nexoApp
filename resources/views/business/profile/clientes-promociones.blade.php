@@ -396,6 +396,7 @@ function clientesPromociones() {
         },
 
         get promocionesActivas() {
+            console.log('Promociones activas:', this.promociones.filter(p => p.activo));
             return this.promociones.filter(p => p.activo);
         },
 
@@ -523,8 +524,15 @@ function clientesPromociones() {
         // --- ASIGNACIONES ---
 
         abrirModalAsignar(cliente) {
-            // Usa cliente_id del proc o id_usuario (dependiendo de la vista SQL de clientes_frecuentes)
-            const cid = cliente.cliente_id || cliente.id_usuario || cliente.id;
+            // Usar el campo correcto según la estructura de datos
+            const cid = cliente.cliente_id || cliente.id_cliente || cliente.id_usuario || cliente.id;
+            
+            if (!cid) {
+                console.error('No se pudo obtener el ID del cliente', cliente);
+                if (typeof showToast !== 'undefined') showToast('Error: ID de cliente no encontrado');
+                return;
+            }
+            
             this.formAsignar = {
                 cliente_id: cid,
                 cliente_nombre: cliente.nombre_completo || 'Cliente Frecuente',
@@ -535,6 +543,17 @@ function clientesPromociones() {
         },
 
         async confirmarAsignar() {
+            console.log('Asignando promoción:', {
+                cliente_id: this.formAsignar.cliente_id,
+                promocion_id: this.formAsignar.promocion_id
+            });
+            
+            if (!this.formAsignar.cliente_id) {
+                console.error('cliente_id es null/undefined');
+                if (typeof showToast !== 'undefined') showToast('Error: ID de cliente no válido');
+                return;
+            }
+
             if (!this.formAsignar.promocion_id) {
                 if (typeof showToast !== 'undefined') showToast('Debe seleccionar una plantilla');
                 return;
