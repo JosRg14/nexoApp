@@ -190,4 +190,48 @@ class BusinessProfileController extends Controller
         
         return response()->json($response);
     }
+
+    public function listarPromociones()
+    {
+        $response = $this->httpClient->get('/api/promociones');
+        return response()->json($response);
+    }
+
+    public function crearPromocion(Request $request)
+    {
+        $response = $this->httpClient->post('/api/promociones', $request->all());
+        return response()->json($response);
+    }
+
+    public function actualizarPromocion(Request $request, $id)
+    {
+        // El framework Laravel podría enviar un _method=PUT o hacer un PUT real
+        // HttpClient suele soportar put directo.
+        $response = $this->httpClient->put("/api/promociones/{$id}", $request->all());
+        return response()->json($response);
+    }
+
+    public function eliminarPromocion($id)
+    {
+        $response = $this->httpClient->delete("/api/promociones/{$id}");
+        return response()->json($response);
+    }
+
+    public function listarPromocionesCliente($clienteId)
+    {
+        $response = $this->httpClient->get("/api/clientes/{$clienteId}/promociones");
+        return response()->json($response);
+    }
+
+    public function asignarPromocionCliente(Request $request, $clienteId)
+    {
+        $response = $this->httpClient->post("/api/clientes/{$clienteId}/promociones", $request->all());
+        return response()->json($response);
+    }
+
+    public function eliminarPromocionCliente($clienteId, $promoId)
+    {
+        $response = $this->httpClient->delete("/api/clientes/{$clienteId}/promociones/{$promoId}");
+        return response()->json($response);
+    }
 }

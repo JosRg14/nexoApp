@@ -251,6 +251,17 @@ Route::middleware(['auth.session', 'inject.api.token'])->group(function () {
 
         // Clientes frecuentes
         Route::get('/clientes-frecuentes', [BusinessProfileController::class, 'clientesFrecuentes']);
+
+        // Promociones (plantillas)
+        Route::get('/promociones', [BusinessProfileController::class, 'listarPromociones']);
+        Route::post('/promociones', [BusinessProfileController::class, 'crearPromocion']);
+        Route::put('/promociones/{id}', [BusinessProfileController::class, 'actualizarPromocion']);
+        Route::delete('/promociones/{id}', [BusinessProfileController::class, 'eliminarPromocion']);
+        
+        // Promociones asignadas a cliente
+        Route::get('/clientes/{id}/promociones', [BusinessProfileController::class, 'listarPromocionesCliente']);
+        Route::post('/clientes/{id}/promociones', [BusinessProfileController::class, 'asignarPromocionCliente']);
+        Route::delete('/clientes/{id}/promociones/{promo_id}', [BusinessProfileController::class, 'eliminarPromocionCliente']);
     });
 });
 
