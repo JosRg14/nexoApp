@@ -1,7 +1,7 @@
-<div id="tab-clientes-promociones" class="hidden w-full space-y-6" x-data="clientesPromociones()" x-init="initData()">
+<div id="tab-clientes-promociones" class="hidden animate-fade-in-up w-full space-y-6" x-data="clientesPromociones()" x-init="initData()">
     
     <!-- SECCIÓN A: Clientes Frecuentes -->
-    <div class="bg-[#1e1e1e] border border-[#374151] p-6 rounded-lg shadow-xl">
+    <div class="bg-[#1e1e1e] border border-[#374151] p-4 md:p-6 rounded-lg shadow-xl">
         <div class="flex flex-col md:flex-row justify-between md:items-end gap-4 mb-6">
             <h2 class="text-xl font-bold uppercase tracking-widest text-white">Clientes Frecuentes</h2>
             <div class="flex gap-4 items-end flex-wrap">
@@ -29,7 +29,7 @@
         </div>
 
         <div class="overflow-x-auto border border-[#374151] rounded-lg">
-            <table class="w-full text-left border-collapse">
+            <table class="w-full text-left border-collapse min-w-[800px]">
                 <thead>
                     <tr class="bg-[#0f0f0f] border-b border-[#374151]">
                         <th class="p-4 text-[10px] uppercase tracking-widest font-bold text-[#F3F4F6]">Cliente</th>
@@ -77,7 +77,7 @@
     </div>
 
     <!-- SECCIÓN B: Promociones -->
-    <div class="bg-[#1e1e1e] border border-[#374151] p-6 rounded-lg shadow-xl">
+    <div class="bg-[#1e1e1e] border border-[#374151] p-4 md:p-6 rounded-lg shadow-xl">
         <div class="flex justify-between items-center mb-6">
             <h2 class="text-xl font-bold uppercase tracking-widest text-white">Promociones (Plantillas)</h2>
             <button @click="abrirModalCrear()" class="bg-[#F3F4F6] text-[#1a1a1a] px-4 py-2 font-bold text-xs uppercase tracking-widest hover:bg-white transition-colors rounded-sm shadow-sm">
@@ -86,7 +86,7 @@
         </div>
 
         <div class="overflow-x-auto border border-[#374151] rounded-lg">
-            <table class="w-full text-left border-collapse">
+            <table class="w-full text-left border-collapse min-w-[800px]">
                 <thead>
                     <tr class="bg-[#0f0f0f] border-b border-[#374151]">
                         <th class="p-4 text-[10px] uppercase tracking-widest font-bold text-[#F3F4F6]">Nombre</th>
@@ -108,7 +108,7 @@
                             <td colspan="6" class="p-8 text-center text-[#9CA3AF]">No hay promociones configuradas.</td>
                         </tr>
                     </template>
-                    <template x-for="promo in promociones" :key="promo.id">
+                    <template x-for="promo in promociones" :key="promo.id_promocion">
                         <tr class="border-b border-[#374151]/50 hover:bg-[#262626] transition-colors">
                             <td class="p-4 font-semibold text-white whitespace-nowrap" x-text="promo.nombre"></td>
                             <td class="p-4 text-[#9CA3AF] whitespace-nowrap" x-text="formatearBeneficio(promo)"></td>
@@ -136,10 +136,10 @@
     </div>
 
     <!-- SECCIÓN C: Asignaciones Recientes -->
-    <div class="bg-[#1e1e1e] border border-[#374151] p-6 rounded-lg shadow-xl" x-show="asignacionesRecientes.length > 0">
+    <div class="bg-[#1e1e1e] border border-[#374151] p-4 md:p-6 rounded-lg shadow-xl" x-show="asignacionesRecientes.length > 0">
         <h2 class="text-xl font-bold uppercase tracking-widest text-white mb-6">Asignaciones Recientes</h2>
         <div class="overflow-x-auto border border-[#374151] rounded-lg">
-            <table class="w-full text-left border-collapse">
+            <table class="w-full text-left border-collapse min-w-[800px]">
                 <thead>
                     <tr class="bg-[#0f0f0f] border-b border-[#374151]">
                         <th class="p-4 text-[10px] uppercase tracking-widest font-bold text-[#F3F4F6]">Cliente</th>
@@ -188,7 +188,7 @@
                     <textarea x-model="formPromo.descripcion" class="w-full bg-[#0f0f0f] border border-[#374151] rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-[#25B5DA]" rows="2"></textarea>
                 </div>
                 
-                <div class="grid grid-cols-2 gap-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-xs uppercase tracking-widest text-[#9CA3AF] font-bold mb-1">Tipo de Beneficio</label>
                         <select x-model="formPromo.beneficio_tipo" class="w-full bg-[#0f0f0f] border border-[#374151] rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-[#25B5DA]">
@@ -212,7 +212,7 @@
                     </select>
                 </div>
 
-                <div class="grid grid-cols-2 gap-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-xs uppercase tracking-widest text-[#9CA3AF] font-bold mb-1">Vigencia (Días)</label>
                         <input type="number" placeholder="Ej. 30" x-model="formPromo.vigencia_dias" class="w-full bg-[#0f0f0f] border border-[#374151] rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-[#25B5DA]">
@@ -269,8 +269,8 @@
                     <label class="block text-xs uppercase tracking-widest text-[#9CA3AF] font-bold mb-1">Seleccionar Plantilla</label>
                     <select x-model="formAsignar.promocion_id" class="w-full bg-[#0f0f0f] border border-[#374151] rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-[#25B5DA]">
                         <option value="">Seleccione una plantilla activa...</option>
-                        <template x-for="p in promocionesActivas" :key="p.id">
-                            <option :value="p.id" x-text="p.nombre + ' (' + formatearBeneficio(p) + ')'"></option>
+                        <template x-for="p in promocionesActivas" :key="p.id_promocion">
+                            <option :value="p.id_promocion" x-text="p.nombre + ' (' + formatearBeneficio(p) + ')'"></option>
                         </template>
                     </select>
                 </div>
@@ -317,7 +317,7 @@ function clientesPromociones() {
         },
 
         formPromo: {
-            id: null,
+            id_promocion: null,
             nombre: '',
             descripcion: '',
             beneficio_tipo: 'descuento',
@@ -401,7 +401,7 @@ function clientesPromociones() {
         },
 
         abrirModalCrear() {
-            this.formPromo = { id: null, nombre: '', descripcion: '', beneficio_tipo: 'descuento', beneficio_valor: '', servicio_id: '', vigencia_dias: '', activo: true };
+            this.formPromo = { id_promocion: null, nombre: '', descripcion: '', beneficio_tipo: 'descuento', beneficio_valor: '', servicio_id: '', vigencia_dias: '', activo: true };
             this.modales.formulario = true;
         },
 
@@ -427,8 +427,8 @@ function clientesPromociones() {
 
             try {
                 if (typeof showLoader !== 'undefined') showLoader();
-                const isEdit = !!this.formPromo.id;
-                const url = isEdit ? `/api-proxy/promociones/${this.formPromo.id}` : '/api-proxy/promociones';
+                const isEdit = !!this.formPromo.id_promocion;
+                const url = isEdit ? `/api-proxy/promociones/${this.formPromo.id_promocion}` : '/api-proxy/promociones';
                 const method = isEdit ? 'PUT' : 'POST';
 
                 const response = await fetch(url, {
@@ -462,7 +462,7 @@ function clientesPromociones() {
             if (!this.promoSeleccionada) return;
             try {
                 if (typeof showLoader !== 'undefined') showLoader();
-                const response = await fetch(`/api-proxy/promociones/${this.promoSeleccionada.id}`, {
+                const response = await fetch(`/api-proxy/promociones/${this.promoSeleccionada.id_promocion}`, {
                     method: 'DELETE',
                     headers: {
                         'X-Requested-With': 'XMLHttpRequest',
@@ -492,7 +492,7 @@ function clientesPromociones() {
                 // To toggle easily we can just make a quick PUT with contrary state
                 const payload = { ...promo, activo: !promo.activo };
                 
-                const response = await fetch(`/api-proxy/promociones/${promo.id}`, {
+                const response = await fetch(`/api-proxy/promociones/${promo.id_promocion}`, {
                     method: 'PUT',
                     headers: {
                         'X-Requested-With': 'XMLHttpRequest',
@@ -543,10 +543,10 @@ function clientesPromociones() {
         },
 
         async confirmarAsignar() {
-            console.log('Asignando promoción:', {
-                cliente_id: this.formAsignar.cliente_id,
-                promocion_id: this.formAsignar.promocion_id
-            });
+            console.log('=== confirmarAsignar ===');
+            console.log('cliente_id:', this.formAsignar.cliente_id);
+            console.log('promocion_id:', this.formAsignar.promocion_id);
+            console.log('tipo promocion_id:', typeof this.formAsignar.promocion_id);
             
             if (!this.formAsignar.cliente_id) {
                 console.error('cliente_id es null/undefined');
@@ -554,8 +554,8 @@ function clientesPromociones() {
                 return;
             }
 
-            if (!this.formAsignar.promocion_id) {
-                if (typeof showToast !== 'undefined') showToast('Debe seleccionar una plantilla');
+            if (!this.formAsignar.promocion_id || isNaN(parseInt(this.formAsignar.promocion_id))) {
+                if (typeof showToast !== 'undefined') showToast('Seleccione una promoción válida');
                 return;
             }
 
