@@ -94,7 +94,7 @@
                         method: method, // Usamos el método detectado (POST, PUT, DELETE, etc.)
                         headers: {
                             'Accept': 'application/json',
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || form.querySelector('input[name="_token"]')?.value
+                            'X-CSRF-TOKEN': getCsrfToken()
                         },
                         body: formData
                     });

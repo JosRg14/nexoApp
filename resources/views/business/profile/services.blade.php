@@ -460,7 +460,7 @@
         const action = form.action || `/api-proxy/api/servicios/${document.getElementById('edit_id').value}`;
         const formData = new FormData(form);
         const redirectUrl = form.getAttribute('data-redirect') || window.location.href;
-        const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+        const token = getCsrfToken();
         
         // Obtener el método correcto (_method)
         let method = 'POST';
@@ -505,7 +505,7 @@
         
         const form = this;
         const action = form.action;
-        const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+        const token = getCsrfToken();
         
         if (typeof showLoader === 'function') showLoader();
         

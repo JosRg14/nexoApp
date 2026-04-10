@@ -412,7 +412,8 @@ if (registroForm) {
                 method: 'POST',
                 headers: {
                     'Authorization': 'Bearer ' + token,
-                    'Accept': 'application/json'
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': getCsrfToken()
                 },
                 body: formData
             });
@@ -485,7 +486,7 @@ if (registroForm) {
             const formData = new FormData(this);
             const action = this.getAttribute('action');
             const redirectUrl = this.getAttribute('data-redirect');
-            const csrfToken = document.querySelector('input[name="_token"]')?.value;
+            const csrfToken = getCsrfToken();
             const authToken = '{{ session("auth_token") }}';
 
             // Limpiar campos de archivo vacíos para no enviar límites multipart vacíos
