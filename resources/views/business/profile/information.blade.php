@@ -389,6 +389,11 @@
 </section>
 
 <script>
+function getCsrfToken() {
+    return document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ||
+           document.querySelector('input[name="_token"]')?.value;
+}
+
 function mostrarFormularioRegistro() {
     const mensajeBienvenida = document.querySelector('#tab-info > .flex');
     if (mensajeBienvenida) mensajeBienvenida.classList.add('hidden');

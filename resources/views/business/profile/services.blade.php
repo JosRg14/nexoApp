@@ -242,6 +242,11 @@
 </div>
 
 <script>
+    function getCsrfToken() {
+        return document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ||
+               document.querySelector('input[name="_token"]')?.value;
+    }
+
     // --- CIERRE CORRECTO DE openDeleteModal ---
     function openDeleteModal(id, nombre) 
     {

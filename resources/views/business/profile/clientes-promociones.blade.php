@@ -293,6 +293,11 @@
 </div>
 
 <script>
+function getCsrfToken() {
+    return document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ||
+           document.querySelector('input[name="_token"]')?.value;
+}
+
 function clientesPromociones() {
     return {
         clientes: [],

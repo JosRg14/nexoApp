@@ -144,6 +144,11 @@
   </div>
 </div>
 <script>
+  function getCsrfToken() {
+      return document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ||
+             document.querySelector('input[name="_token"]')?.value;
+  }
+
   window.openEditEmployee = function(id, nombre, app_paterno, app_materno, correo, comision, estado) {
     console.log({
       nombre,
