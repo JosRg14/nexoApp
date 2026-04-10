@@ -47,7 +47,7 @@
             <!-- Comisión -->
             <div class="bg-[#262626] rounded p-3 flex flex-col items-center justify-center text-center">
                 <span class="text-xl font-bold leading-none mb-1 {{ ($emp['comision'] ?? 0) > 0 ? 'text-emerald-500' : 'text-[#6B7280]' }}">
-                    ${{ number_format(floatval($emp['comision'] ?? 0), 2) }}
+                    {{ number_format(floatval($emp['comision'] ?? 0), 0) }}%
                 </span>
                 <span class="text-[10px] text-[#9CA3AF] uppercase tracking-widest font-bold">Comisión</span>
             </div>
