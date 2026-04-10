@@ -15,12 +15,12 @@
                 <div class="w-full h-full bg-gradient-to-r from-gray-800 to-gray-900"></div>
             @endif
         </div>
-        <div class="absolute inset-0 bg-black/60 z-0"></div>
+        <div class="absolute inset-0 bg-black/50 z-0"></div>
         
         <div class="relative z-10 w-full p-6 pt-24 md:p-10">
             <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-start md:items-end gap-6">
                 <!-- Logo -->
-                <div class="w-28 h-28 md:w-36 md:h-36 shrink-0 rounded-full border-4 border-[#1a1a1a] shadow-xl overflow-hidden bg-[#2a2a2a]">
+                <div class="w-28 h-28 md:w-36 md:h-36 shrink-0 rounded-full border-4 border-white shadow-xl overflow-hidden bg-[#2a2a2a]">
                     @if(!empty($negocio['foto_perfil']))
                         <img src="{{ $negocio['foto_perfil'] }}" 
                              alt="{{ $negocio['nombre'] }}"
@@ -35,13 +35,19 @@
                 <div class="flex-1">
                     <div class="flex items-center gap-3 mb-2 flex-wrap">
                         <h1 class="text-3xl md:text-4xl font-bold uppercase tracking-wide text-white">{{ $negocio['nombre'] }}</h1>
+                        <span class="px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wide border 
+                            {{ isset($negocio['estado']) && strtolower($negocio['estado']) === 'activo' 
+                                ? 'text-emerald-500 border-emerald-500/20 bg-emerald-500/10' 
+                                : 'text-[#25B5DA] border-[#25B5DA]/20 bg-[#25B5DA]/10' }}">
+                            {{ $negocio['estado'] ?? 'pendiente' }}
+                        </span>
                     </div>
                     
                     <div class="flex flex-wrap gap-4 text-gray-300 text-sm">
                         <span class="flex items-center gap-2">
                             <i class="fas fa-star text-[#25B5DA]"></i>
                             @if(isset($negocio['calificacion']) && $negocio['calificacion'] > 0)
-                                {{ number_format($negocio['calificacion'], 1)}}
+                                {{ number_format($negocio['calificacion'], 1) . ' ★' }}
                             @else
                                 Sin reseñas
                             @endif
@@ -173,8 +179,7 @@
                     @endif
                 </div>
                 
-                <!-- Nuestros Trabajos (Evidencias) -->
-                @if(count($evidencias) > 0)
+                <!-- Nuestros Trabajos (Evidencias) - AGREGADA AQUÍ (sin hidden) -->
                 <div id="evidencias-section" class="bg-[#262626] border border-[#374151] rounded-sm p-6">
                     <div class="flex justify-between items-center mb-6">
                         <h3 class="text-xl font-bold uppercase tracking-widest text-white flex items-center gap-3">
@@ -184,14 +189,17 @@
                     </div>
                     
                     <div id="evidencias-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                        <!-- Las evidencias se cargarán con JavaScript -->
+                        <!-- Evidencias loader here -->
+                        <div class="col-span-full text-center py-8 text-[#9CA3AF]">
+                            <i class="fas fa-spinner fa-spin text-3xl mb-3"></i>
+                            <p class="text-sm">Cargando trabajos...</p>
+                        </div>
                     </div>
                 </div>
-                @endif
 
                 <!-- Reseñas -->
                 <div id="resenas-section" class="bg-[#262626] border border-[#374151] rounded-sm p-6">
-                    <h3 class="text-sm font-bold uppercase tracking-widest text-white mb-6 flex items-center gap-2">
+                    <h3 class="text-sm font-bold uppercase tracking-widest text-white mb-4 flex items-center gap-2">
                         <i class="fas fa-star text-[#25B5DA]"></i> Reseñas ({{ count($resenas) }})
                     </h3>
                     <div class="space-y-4">
@@ -235,14 +243,15 @@
                             <p class="text-xs text-[#52525b] italic">No hay reseñas aún. ¡Sé el primero en calificar!</p>
                         </div>
                         @endforelse
+                    </div>
                 </div>
             </div>
             
             <!-- Columna derecha (1/3) -->
-            <div class="lg:w-1/3 space-y-6">
-                <!-- Equipo de Trabajo - Solo mostrar información, sin botón de agendar -->
+            <div class="lg:w-1/3 flex flex-col gap-6">
+                <!-- Equipo de Trabajo -->
                 <div id="empleados-section" class="bg-[#262626] border border-[#374151] rounded-sm p-6">
-                    <h3 class="text-sm font-bold uppercase tracking-widest text-white mb-6 flex items-center gap-2">
+                    <h3 class="text-sm font-bold uppercase tracking-widest text-white mb-4 flex items-center gap-2">
                         <i class="fas fa-users text-[#25B5DA]"></i> Nuestro Equipo ({{ count($empleados) }})
                     </h3>
                     <div class="space-y-3">
@@ -274,7 +283,7 @@
                 
                 <!-- Horario -->
                 <div class="bg-[#262626] border border-[#374151] rounded-sm p-6">
-                    <h3 class="text-sm font-bold uppercase tracking-widest text-white mb-6 flex items-center gap-2">
+                    <h3 class="text-sm font-bold uppercase tracking-widest text-white mb-4 flex items-center gap-2">
                         <i class="fas fa-clock text-[#25B5DA]"></i> Horario de Atención
                     </h3>
                     @if(isset($horariosFormateados) && count($horariosFormateados) > 0)
@@ -306,7 +315,6 @@
                 <!-- Ubicación con enlace a Google Maps -->
                 @if(isset($negocio['direccion']))
                 @php
-                    // Construir la dirección completa para Google Maps
                     $calle = $negocio['direccion']['calle'] ?? '';
                     $numero = $negocio['direccion']['numero'] ?? '';
                     $colonia = $negocio['direccion']['colonia'] ?? '';
@@ -315,16 +323,11 @@
                     $cp = $negocio['direccion']['codigo_postal'] ?? '';
                     
                     $direccionCompleta = trim("$calle $numero, $colonia, $ciudad, $estado, CP $cp");
-                    
-                    // URL de Google Maps (búsqueda)
                     $googleMapsUrl = 'https://www.google.com/maps/search/?api=1&query=' . urlencode($direccionCompleta);
-                    
-                    // Alternativa: URL con coordenadas si las tuvieras
-                    // $googleMapsUrl = 'https://www.google.com/maps/search/?api=1&query=' . $latitud . ',' . $longitud;
                 @endphp
 
                 <div class="bg-[#262626] border border-[#374151] rounded-sm p-6 group hover:border-[#25B5DA]/50 transition-all duration-300">
-                    <h3 class="text-sm font-bold uppercase tracking-widest text-white mb-6 flex items-center gap-2">
+                    <h3 class="text-sm font-bold uppercase tracking-widest text-white mb-4 flex items-center gap-2">
                         <i class="fas fa-location-dot text-[#25B5DA]"></i> Ubicación
                     </h3>
                     
@@ -351,7 +354,7 @@
                 <!-- Contacto -->
                 @if(isset($negocio['telefono']) && $negocio['telefono'])
                 <div class="bg-[#262626] border border-[#374151] rounded-sm p-6">
-                    <h3 class="text-sm font-bold uppercase tracking-widest text-white mb-6 flex items-center gap-2">
+                    <h3 class="text-sm font-bold uppercase tracking-widest text-white mb-4 flex items-center gap-2">
                         <i class="fas fa-phone text-[#25B5DA]"></i> Contacto
                     </h3>
                     <div class="flex items-center gap-3">
@@ -380,12 +383,10 @@
 <div id="modal-evidencia" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4 sm:p-6 bg-black/90 backdrop-blur-sm">
     <div class="absolute inset-0" onclick="closeEvidenciaModal()"></div>
     <div class="relative w-full max-w-4xl max-h-[90vh] flex flex-col items-center justify-center">
-        <!-- Close button -->
         <button onclick="closeEvidenciaModal()" class="absolute -top-10 right-0 sm:-right-10 text-white hover:text-[#25B5DA] transition-colors text-3xl focus:outline-none z-10">
             <i class="fas fa-times"></i>
         </button>
 
-        <!-- Navigation Buttons -->
         <button id="prev-evidencia" class="absolute left-0 top-1/2 -translate-y-1/2 sm:-left-12 text-white hover:text-[#25B5DA] text-4xl p-2 transition-colors hidden focus:outline-none bg-black/40 hover:bg-black/80 rounded-full w-12 h-12 flex items-center justify-center z-10">
             <i class="fas fa-chevron-left"></i>
         </button>
@@ -393,12 +394,10 @@
             <i class="fas fa-chevron-right"></i>
         </button>
 
-        <!-- Contenido principal (imagen grande) -->
         <div class="relative w-full flex items-center justify-center overflow-hidden rounded-lg shadow-2xl bg-[#1a1a1a] border border-[#374151]">
             <img id="evidencia-imagen-grande" src="" alt="Evidencia" class="max-h-[70vh] w-auto object-contain drop-shadow-lg">
         </div>
         
-        <!-- Info inferior -->
         <div class="mt-4 w-full bg-[#262626] p-4 rounded-lg border border-[#374151] flex flex-col gap-2 relative z-10">
             <div class="flex items-center gap-2 border-b border-[#374151] pb-2">
                 <i class="fas fa-cut text-[#25B5DA]"></i>
@@ -410,15 +409,27 @@
 </div>
 
 <script>
-    let evidenciasData = @json($evidencias);
+    let evidenciasData = [];
     let currentEvidenciaIndex = 0;
 
     document.addEventListener('DOMContentLoaded', () => {
-        if (evidenciasData.length > 0) {
-            renderEvidenciasPublic(evidenciasData);
-        }
+        const negocioId = "{{ $negocio['id_negocio'] ?? $negocio['id'] }}";
+        fetch(`/api-proxy/negocios/${negocioId}/evidencias`)
+            .then(response => response.json())
+            .then(res => {
+                if(res.success && res.data && res.data.length > 0) {
+                    evidenciasData = res.data;
+                    renderEvidenciasPublic(evidenciasData);
+                    document.getElementById('evidencias-section').classList.remove('hidden');
+                } else {
+                    document.getElementById('evidencias-section').remove();
+                }
+            })
+            .catch(err => {
+                console.error('Error al cargar evidencias:', err);
+                document.getElementById('evidencias-section').remove();
+            });
             
-        // Key bindings para navegación modal
         document.addEventListener('keydown', (e) => {
             const modal = document.getElementById('modal-evidencia');
             if(!modal.classList.contains('hidden')) {
@@ -433,8 +444,6 @@
         const grid = document.getElementById('evidencias-grid');
         grid.innerHTML = '';
         evidencias.forEach((ev, index) => {
-            // Solo mostramos las evidencias que sean públicas (es un control extra aunque la API ya debe filtrarlas)
-            // No obstante, confiamos en la API public.
             const baseUrl = "{{ rtrim(config('services.api.url'), '/') }}";
             let imgUrl = ev.url_imagen;
             if(imgUrl && !imgUrl.startsWith('http')) {
@@ -459,12 +468,12 @@
         currentEvidenciaIndex = index;
         updateModalContent();
         document.getElementById('modal-evidencia').classList.remove('hidden');
-        document.body.style.overflow = 'hidden'; // prevent scrolling
+        document.body.style.overflow = 'hidden';
     }
 
     function closeEvidenciaModal() {
         document.getElementById('modal-evidencia').classList.add('hidden');
-        document.body.style.overflow = 'auto'; // allow scrolling
+        document.body.style.overflow = 'auto';
     }
 
     function updateModalContent() {
@@ -481,7 +490,6 @@
         document.getElementById('evidencia-servicio-nombre').innerText = ev.servicio?.nombre || 'Trabajo General';
         document.getElementById('evidencia-descripcion').innerText = ev.descripcion || 'Sin descripción adicional.';
 
-        // Navigation buttons
         const prevBtn = document.getElementById('prev-evidencia');
         const nextBtn = document.getElementById('next-evidencia');
 
@@ -489,7 +497,6 @@
             prevBtn.classList.remove('hidden');
             nextBtn.classList.remove('hidden');
             
-            // Re-assign listeners
             prevBtn.onclick = (e) => { e.stopPropagation(); navigateEvidencia(-1); };
             nextBtn.onclick = (e) => { e.stopPropagation(); navigateEvidencia(1); };
         } else {
