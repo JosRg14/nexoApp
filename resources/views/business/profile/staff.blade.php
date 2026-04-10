@@ -232,6 +232,8 @@
   document.getElementById('deleteEmployeeForm')?.addEventListener('submit', async function(e) {
       e.preventDefault();
       
+      if (!confirm('¿Eliminar este empleado?')) return;
+      
       const form = this;
       const action = form.action;
       const token = getCsrfToken();
@@ -249,11 +251,9 @@
           
           const data = await response.json();
           
-          if (response.ok && data.success !== false) {
+          if (response.ok) {
               if (typeof showToast === 'function') showToast(data.message || 'Empleado eliminado', 'success');
-              setTimeout(() => {
-                  window.location.reload();
-              }, 1000);
+              setTimeout(() => window.location.reload(), 1000);
           } else {
               if (typeof showToast === 'function') showToast(data.message || 'Error al eliminar', 'error');
           }

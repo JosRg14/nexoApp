@@ -506,53 +506,37 @@
         e.preventDefault();
         
         const form = this;
-        const action = form.action || `/api-proxy/api/servicios/${document.getElementById('edit_id').value}`;
         const formData = new FormData(form);
-        
-        // 🔥 LOG PARA DEPURAR
-        console.log('=== FORMULARIO EDITAR SERVICIO ===');
-        console.log('Action:', action);
-        for (let [key, value] of formData.entries()) {
-            console.log(`${key}:`, value);
-        }
-        
-        const redirectUrl = form.getAttribute('data-redirect') || window.location.href;
+        const action = form.action;
         const token = getCsrfToken();
         
-        // Obtener el método correcto (_method)
+        // Siempre usar POST: el campo _method=PUT en FormData hace el spoofing para Laravel
         let method = 'POST';
         const methodInput = form.querySelector('input[name="_method"]');
-        if (methodInput) {
-            method = methodInput.value;
-        }
+        if (methodInput) method = methodInput.value;
         
-        if (typeof showLoader === 'function') showLoader();
+        showLoader();
         
         try {
             const response = await fetch(action, {
                 method: method,
-                headers: {
-                    'Accept': 'application/json',
-                    'X-CSRF-TOKEN': token
-                },
+                headers: { 'X-CSRF-TOKEN': token },
                 body: formData
             });
             
             const data = await response.json();
             
-            if (response.ok && data.success !== false) {
-                if (typeof showToast === 'function') showToast(data.message || 'Servicio actualizado correctamente', 'success');
-                setTimeout(() => {
-                    window.location.href = redirectUrl;
-                }, 1000);
+            if (response.ok) {
+                if (typeof showToast === 'function') showToast(data.message || 'Servicio actualizado', 'success');
+                setTimeout(() => window.location.reload(), 1000);
             } else {
-                if (typeof showToast === 'function') showToast(data.message || 'Error en la operación', 'error');
+                if (typeof showToast === 'function') showToast(data.message || 'Error', 'error');
             }
         } catch (error) {
             console.error(error);
             if (typeof showToast === 'function') showToast('Error de conexión', 'error');
         } finally {
-            if (typeof hideLoader === 'function') hideLoader();
+            hideLoader();
         }
     });
 
