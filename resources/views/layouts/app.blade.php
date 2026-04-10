@@ -69,7 +69,7 @@
             const form = e.target;
             const action = form.getAttribute('action');
 
-            if (action && action.includes('/api-proxy/') && !form.hasAttribute('data-custom-handler')) {
+            if (action && action.includes('/api-proxy/') && form.getAttribute('data-custom-handler') !== 'true') {
                 e.preventDefault();
 
                 let method = form.getAttribute('method') || 'POST';

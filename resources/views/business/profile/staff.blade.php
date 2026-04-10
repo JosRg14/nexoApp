@@ -51,7 +51,7 @@
             Editar
           </button>
           <form method="POST" action="{{ url('/api-proxy/api/empleados/'.$emp['id_empleado']) }}"
-          data-redirect="{{ route('business.profile') }}">
+          data-redirect="{{ route('business.profile') }}" data-custom-handler="false">
             @csrf @method('DELETE')
             <button type="submit" onclick="return confirm('¿Eliminar empleado?')"
             class="text-red-400 text-xs hover:text-red-300">
