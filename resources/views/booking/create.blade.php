@@ -93,25 +93,68 @@
 
             <!-- Fecha y Hora -->
             <div class="bg-[#262626] border border-[#374151] rounded-sm p-6">
-                <h3 class="text-sm font-bold uppercase tracking-widest text-white mb-4 flex items-center gap-2">
+                <h3 class="text-sm font-bold uppercase tracking-widest text-white mb-6 flex items-center gap-2">
                     <i class="fas fa-calendar-alt text-[#25B5DA]"></i>
                     Selecciona fecha y hora
                 </h3>
-                
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                <!-- Hidden inputs para el formulario -->
+                <input type="hidden" id="fecha" name="fecha">
+                <input type="hidden" id="hora" name="hora_inicio">
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+                    <!-- Calendario visual -->
                     <div>
-                        <label class="block text-xs text-[#9CA3AF] uppercase tracking-widest mb-2">Fecha</label>
-                        <input type="date" id="fecha" name="fecha" 
-                               min="{{ date('Y-m-d') }}"
-                               class="w-full bg-[#1a1a1a] border border-[#374151] rounded-sm px-4 py-2 text-white focus:border-[#25B5DA] focus:outline-none">
+                        <p class="text-xs text-[#9CA3AF] uppercase tracking-widest mb-3">Fecha</p>
+                        <div class="bg-[#1a1a1a] border border-[#374151] rounded-lg p-4 select-none">
+                            <!-- Navegación de mes -->
+                            <div class="flex justify-between items-center mb-4">
+                                <button type="button" id="prev-month"
+                                        class="w-8 h-8 flex items-center justify-center rounded-full text-[#9CA3AF] hover:text-white hover:bg-[#374151] transition-all">
+                                    <i class="fas fa-chevron-left text-xs"></i>
+                                </button>
+                                <h4 id="current-month" class="text-white font-bold text-sm uppercase tracking-widest"></h4>
+                                <button type="button" id="next-month"
+                                        class="w-8 h-8 flex items-center justify-center rounded-full text-[#9CA3AF] hover:text-white hover:bg-[#374151] transition-all">
+                                    <i class="fas fa-chevron-right text-xs"></i>
+                                </button>
+                            </div>
+                            <!-- Cabecera días de la semana -->
+                            <div class="grid grid-cols-7 gap-1 text-center mb-2">
+                                <div class="text-[10px] text-[#9CA3AF] uppercase tracking-wider py-1">Lun</div>
+                                <div class="text-[10px] text-[#9CA3AF] uppercase tracking-wider py-1">Mar</div>
+                                <div class="text-[10px] text-[#9CA3AF] uppercase tracking-wider py-1">Mié</div>
+                                <div class="text-[10px] text-[#9CA3AF] uppercase tracking-wider py-1">Jue</div>
+                                <div class="text-[10px] text-[#9CA3AF] uppercase tracking-wider py-1">Vie</div>
+                                <div class="text-[10px] text-[#9CA3AF] uppercase tracking-wider py-1">Sáb</div>
+                                <div class="text-[10px] text-[#9CA3AF] uppercase tracking-wider py-1">Dom</div>
+                            </div>
+                            <!-- Cuadrícula de días -->
+                            <div id="calendar-days" class="grid grid-cols-7 gap-1"></div>
+                        </div>
                     </div>
+
+                    <!-- Selector de horarios tipo pills -->
                     <div>
-                        <label class="block text-xs text-[#9CA3AF] uppercase tracking-widest mb-2">Hora</label>
-                        <select id="hora" name="hora_inicio" 
-                                class="w-full bg-[#1a1a1a] border border-[#374151] rounded-sm px-4 py-2 text-white focus:border-[#25B5DA] focus:outline-none" disabled>
-                            <option value="">Primero selecciona un servicio, empleado y fecha</option>
-                        </select>
+                        <p class="text-xs text-[#9CA3AF] uppercase tracking-widest mb-3">Horario disponible</p>
+                        <div id="horarios-container" class="bg-[#1a1a1a] border border-[#374151] rounded-lg p-4 min-h-[220px] flex flex-col justify-center">
+                            <div id="horarios-placeholder" class="text-center">
+                                <i class="far fa-clock text-[#374151] text-3xl mb-3 block"></i>
+                                <p class="text-[#9CA3AF] text-xs">Selecciona un servicio, empleado y fecha para ver los horarios disponibles</p>
+                            </div>
+                            <div id="horarios-loading" class="text-center hidden">
+                                <div class="inline-block w-6 h-6 border-2 border-[#25B5DA] border-t-transparent rounded-full animate-spin mb-3"></div>
+                                <p class="text-[#9CA3AF] text-xs">Cargando horarios...</p>
+                            </div>
+                            <div id="horarios-empty" class="text-center hidden">
+                                <i class="fas fa-calendar-times text-[#374151] text-3xl mb-3 block"></i>
+                                <p class="text-[#9CA3AF] text-xs">No hay horarios disponibles para este día</p>
+                            </div>
+                            <div id="horarios-grid" class="grid grid-cols-3 gap-2 hidden"></div>
+                        </div>
                     </div>
+
                 </div>
             </div>
 
@@ -153,159 +196,303 @@
 </div>
 
 <script>
-// Estado de la cita
+// ============================================================
+// ESTADO DE LA CITA
+// ============================================================
 let servicioSeleccionado = null;
 let empleadoSeleccionado = null;
+let horaSeleccionada = null;
 
 // Elementos DOM
-const btnSubmit = document.getElementById('btn-submit');
-const fechaInput = document.getElementById('fecha');
-const horaSelect = document.getElementById('hora');
+const btnSubmit       = document.getElementById('btn-submit');
+const fechaHidden     = document.getElementById('fecha');       // <input type="hidden">
+const horaHidden      = document.getElementById('hora');        // <input type="hidden">
 const resumenServicio = document.getElementById('resumen-servicio');
 const resumenEmpleado = document.getElementById('resumen-empleado');
-const resumenFecha = document.getElementById('resumen-fecha');
-const resumenHora = document.getElementById('resumen-hora');
-const resumenTotal = document.getElementById('resumen-total');
+const resumenFecha    = document.getElementById('resumen-fecha');
+const resumenHora     = document.getElementById('resumen-hora');
+const resumenTotal    = document.getElementById('resumen-total');
 
-// Verificar si se puede habilitar el botón
+// ============================================================
+// VALIDACIÓN DEL FORMULARIO
+// ============================================================
 function checkFormComplete() {
-    if (servicioSeleccionado && empleadoSeleccionado && fechaInput.value && horaSelect.value) {
+    if (servicioSeleccionado && empleadoSeleccionado && fechaHidden.value && horaHidden.value) {
         btnSubmit.disabled = false;
     } else {
         btnSubmit.disabled = true;
     }
 }
 
-// Selección de servicio
+// ============================================================
+// SELECCIÓN DE SERVICIO
+// ============================================================
 document.querySelectorAll('.servicio-card').forEach(card => {
     card.addEventListener('click', function() {
         document.querySelectorAll('.servicio-card').forEach(c => c.classList.remove('border-[#25B5DA]', 'bg-[#25B5DA]/10'));
         this.classList.add('border-[#25B5DA]', 'bg-[#25B5DA]/10');
-        
+
         servicioSeleccionado = {
-            id: this.dataset.id,
-            nombre: this.dataset.nombre,
-            precio: this.dataset.precio,
+            id:       this.dataset.id,
+            nombre:   this.dataset.nombre,
+            precio:   this.dataset.precio,
             duracion: this.dataset.duracion
         };
-        
+
         document.getElementById('servicio_id').value = servicioSeleccionado.id;
         resumenServicio.textContent = servicioSeleccionado.nombre;
         resumenTotal.textContent = '$' + parseInt(servicioSeleccionado.precio).toLocaleString('es-CL');
-        
-        // Si ya hay empleado y fecha seleccionados, cargar horarios
-        if (empleadoSeleccionado && fechaInput.value) {
-            cargarHorarios();
-        }
-        
+
+        if (empleadoSeleccionado && fechaHidden.value) cargarHorarios();
         checkFormComplete();
     });
 });
 
-// Selección de empleado
+// ============================================================
+// SELECCIÓN DE EMPLEADO
+// ============================================================
 document.querySelectorAll('.empleado-card').forEach(card => {
     card.addEventListener('click', function() {
         document.querySelectorAll('.empleado-card').forEach(c => c.classList.remove('border-[#25B5DA]', 'bg-[#25B5DA]/10'));
         this.classList.add('border-[#25B5DA]', 'bg-[#25B5DA]/10');
-        
+
         empleadoSeleccionado = {
-            id: this.dataset.id,
+            id:     this.dataset.id,
             nombre: this.dataset.nombre
         };
-        
+
         document.getElementById('empleado_id').value = empleadoSeleccionado.id;
         resumenEmpleado.textContent = empleadoSeleccionado.nombre;
-        
-        // Si ya hay servicio y fecha seleccionados, cargar horarios
-        if (servicioSeleccionado && fechaInput.value) {
-            cargarHorarios();
-        }
-        
+
+        if (servicioSeleccionado && fechaHidden.value) cargarHorarios();
         checkFormComplete();
     });
 });
 
-// Cambio de fecha
-fechaInput.addEventListener('change', function() {
-    const fecha = this.value;
-    if (fecha) {
-        const date = new Date(fecha);
-        resumenFecha.textContent = date.toLocaleDateString('es-CL');
+// ============================================================
+// CALENDARIO INTERACTIVO
+// ============================================================
+const calendarDays  = document.getElementById('calendar-days');
+const currentMonthEl = document.getElementById('current-month');
+const prevMonthBtn  = document.getElementById('prev-month');
+const nextMonthBtn  = document.getElementById('next-month');
+
+const today       = new Date();
+today.setHours(0, 0, 0, 0);
+let viewYear  = today.getFullYear();
+let viewMonth = today.getMonth(); // 0-indexed
+
+const MONTHS_ES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio',
+                   'Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+
+function pad2(n) { return String(n).padStart(2, '0'); }
+
+function toYMD(date) {
+    return `${date.getFullYear()}-${pad2(date.getMonth()+1)}-${pad2(date.getDate())}`;
+}
+
+function renderCalendar() {
+    currentMonthEl.textContent = `${MONTHS_ES[viewMonth]} ${viewYear}`;
+    calendarDays.innerHTML = '';
+
+    // Primer día del mes (0=Dom … 6=Sáb) → convertir a Lun=0
+    const firstDay = new Date(viewYear, viewMonth, 1);
+    const startOffset = (firstDay.getDay() + 6) % 7; // Monday-first
+
+    // Total de días en el mes
+    const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
+
+    // Celdas vacías al inicio
+    for (let i = 0; i < startOffset; i++) {
+        calendarDays.insertAdjacentHTML('beforeend', '<div></div>');
     }
-    
-    // Si ya hay servicio y empleado seleccionados, cargar horarios
-    if (servicioSeleccionado && empleadoSeleccionado && fecha) {
-        cargarHorarios();
+
+    const selectedYMD = fechaHidden.value;
+
+    for (let d = 1; d <= daysInMonth; d++) {
+        const cellDate = new Date(viewYear, viewMonth, d);
+        const ymd      = toYMD(cellDate);
+        const isPast   = cellDate < today;
+        const isToday  = ymd === toYMD(today);
+        const isSelected = ymd === selectedYMD;
+
+        let classes = 'relative flex items-center justify-center rounded-lg text-sm font-medium transition-all duration-150 aspect-square cursor-pointer ';
+        let attrs   = `data-date="${ymd}"`;
+
+        if (isPast) {
+            classes += 'text-[#4B5563] cursor-not-allowed opacity-40';
+            attrs   += ' data-disabled="true"';
+        } else if (isSelected) {
+            classes += 'bg-[#25B5DA] text-black font-bold shadow-lg shadow-[#25B5DA]/30';
+        } else {
+            classes += 'text-white border border-[#374151] hover:border-[#25B5DA] hover:bg-[#25B5DA]/10';
+        }
+
+        const todayDot = isToday && !isSelected
+            ? '<span class="absolute bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-[#25B5DA]"></span>'
+            : '';
+
+        calendarDays.insertAdjacentHTML('beforeend',
+            `<div class="${classes}" ${attrs}>${d}${todayDot}</div>`);
     }
-    
+
+    // Listeners en celdas de día
+    calendarDays.querySelectorAll('[data-date]').forEach(cell => {
+        if (cell.dataset.disabled) return;
+        cell.addEventListener('click', () => selectDate(cell.dataset.date));
+    });
+
+    // Deshabilitar flecha si estamos en el mes/año actual
+    const isCurrentMonthYear = viewYear === today.getFullYear() && viewMonth === today.getMonth();
+    prevMonthBtn.disabled = isCurrentMonthYear;
+    prevMonthBtn.classList.toggle('opacity-30', isCurrentMonthYear);
+    prevMonthBtn.classList.toggle('cursor-not-allowed', isCurrentMonthYear);
+}
+
+function selectDate(ymd) {
+    fechaHidden.value = ymd;
+
+    // Actualizar resumen con formato local
+    const [y, m, d] = ymd.split('-').map(Number);
+    const displayDate = new Date(y, m - 1, d);
+    resumenFecha.textContent = displayDate.toLocaleDateString('es-CL', { day: 'numeric', month: 'long', year: 'numeric' });
+
+    // Resetear hora seleccionada
+    horaSeleccionada = null;
+    horaHidden.value = '';
+    resumenHora.textContent = '-';
+
+    renderCalendar(); // re-render para marcar seleccionado
+
+    if (servicioSeleccionado && empleadoSeleccionado) cargarHorarios();
     checkFormComplete();
+}
+
+prevMonthBtn.addEventListener('click', () => {
+    if (prevMonthBtn.disabled) return;
+    viewMonth--;
+    if (viewMonth < 0) { viewMonth = 11; viewYear--; }
+    renderCalendar();
 });
 
-// Cargar horarios disponibles
+nextMonthBtn.addEventListener('click', () => {
+    viewMonth++;
+    if (viewMonth > 11) { viewMonth = 0; viewYear++; }
+    renderCalendar();
+});
+
+// Renderizado inicial
+renderCalendar();
+
+// ============================================================
+// HORARIOS TIPO PILLS
+// ============================================================
+const horariosGrid        = document.getElementById('horarios-grid');
+const horariosPlaceholder = document.getElementById('horarios-placeholder');
+const horariosLoading     = document.getElementById('horarios-loading');
+const horariosEmpty       = document.getElementById('horarios-empty');
+
+function showHorariosState(state) {
+    horariosPlaceholder.classList.add('hidden');
+    horariosLoading.classList.add('hidden');
+    horariosEmpty.classList.add('hidden');
+    horariosGrid.classList.add('hidden');
+    if (state === 'placeholder') horariosPlaceholder.classList.remove('hidden');
+    if (state === 'loading')     horariosLoading.classList.remove('hidden');
+    if (state === 'empty')       horariosEmpty.classList.remove('hidden');
+    if (state === 'grid')        horariosGrid.classList.remove('hidden');
+}
+
+function buildHorarioPill(slot) {
+    const btn = document.createElement('button');
+    btn.type        = 'button';
+    btn.dataset.hora = slot.hora_inicio;
+    btn.textContent  = slot.hora_inicio;
+    btn.title        = `${slot.hora_inicio} – ${slot.hora_fin}`;
+    btn.className    = [
+        'horario-pill',
+        'text-xs font-semibold px-2 py-2 rounded-lg border',
+        'border-[#374151] bg-[#262626] text-[#9CA3AF]',
+        'hover:border-[#25B5DA] hover:text-white hover:bg-[#25B5DA]/10',
+        'transition-all duration-150 cursor-pointer'
+    ].join(' ');
+
+    btn.addEventListener('click', () => selectHora(slot.hora_inicio, slot.hora_fin, btn));
+    return btn;
+}
+
+function selectHora(horaInicio, horaFin, btn) {
+    // Restablecer todos
+    document.querySelectorAll('.horario-pill').forEach(p => {
+        p.classList.remove('bg-[#25B5DA]', 'text-black', 'border-[#25B5DA]', 'shadow-lg', 'shadow-[#25B5DA]/30');
+        p.classList.add('border-[#374151]', 'bg-[#262626]', 'text-[#9CA3AF]');
+    });
+
+    // Seleccionar el activo
+    btn.classList.remove('border-[#374151]', 'bg-[#262626]', 'text-[#9CA3AF]');
+    btn.classList.add('bg-[#25B5DA]', 'text-black', 'border-[#25B5DA]', 'shadow-lg', 'shadow-[#25B5DA]/30');
+
+    horaSeleccionada  = horaInicio;
+    horaHidden.value  = horaInicio;
+    resumenHora.textContent = `${horaInicio} – ${horaFin}`;
+    checkFormComplete();
+}
+
 async function cargarHorarios() {
-    const fecha = fechaInput.value;
+    const fecha      = fechaHidden.value;
     const empleadoId = empleadoSeleccionado?.id;
-    const duracion = parseInt(servicioSeleccionado?.duracion, 10);
-    
-    if (!fecha || !empleadoId || !duracion) {
-        return;
-    }
-    
-    horaSelect.innerHTML = '<option value="">Cargando horarios...</option>';
-    horaSelect.disabled = true;
-    
+    const duracion   = parseInt(servicioSeleccionado?.duracion, 10);
+
+    if (!fecha || !empleadoId || !duracion) return;
+
+    // Resetear hora al cargar nuevos horarios
+    horaSeleccionada = null;
+    horaHidden.value = '';
+    resumenHora.textContent = '-';
+    checkFormComplete();
+
+    showHorariosState('loading');
+
     try {
-        const response = await fetch(`/api-proxy/disponibilidad/empleado/${empleadoId}?fecha=${fecha}&duracion=${duracion}`);
-        const data = await response.json();
-        
-        horaSelect.innerHTML = '<option value="">Selecciona una hora</option>';
-        
+        const res  = await fetch(`/api-proxy/disponibilidad/empleado/${empleadoId}?fecha=${fecha}&duracion=${duracion}`);
+        const data = await res.json();
+
         if (data.success && data.slots && data.slots.length > 0) {
-            data.slots.forEach(slot => {
-                const option = document.createElement('option');
-                option.value = slot.hora_inicio;
-                option.textContent = `${slot.hora_inicio} - ${slot.hora_fin}`;
-                horaSelect.appendChild(option);
-            });
-            horaSelect.disabled = false;
+            horariosGrid.innerHTML = '';
+            data.slots.forEach(slot => horariosGrid.appendChild(buildHorarioPill(slot)));
+            showHorariosState('grid');
         } else {
-            horaSelect.innerHTML = '<option value="">No hay horarios disponibles para este día</option>';
-            horaSelect.disabled = true;
+            showHorariosState('empty');
         }
-    } catch (error) {
-        console.error('Error cargando horarios:', error);
-        horaSelect.innerHTML = '<option value="">Error al cargar horarios</option>';
-        horaSelect.disabled = true;
+    } catch (err) {
+        console.error('Error cargando horarios:', err);
+        showHorariosState('empty');
     }
 }
 
-// Selección de hora
-horaSelect.addEventListener('change', function() {
-    resumenHora.textContent = this.value || '-';
-    checkFormComplete();
-});
-
-// Envío del formulario
+// ============================================================
+// ENVÍO DEL FORMULARIO
+// ============================================================
 document.getElementById('cita-form').addEventListener('submit', async function(e) {
     e.preventDefault();
-    
+
     const servicioId = document.getElementById('servicio_id').value;
     const empleadoId = document.getElementById('empleado_id').value;
-    const fecha = fechaInput.value;
-    const hora = horaSelect.value;
-    const negocioId = document.getElementById('negocio_id').value;
-    
+    const fecha      = fechaHidden.value;
+    const hora       = horaHidden.value;
+    const negocioId  = document.getElementById('negocio_id').value;
+
     if (!servicioId || !empleadoId || !fecha || !hora) {
         showToast('Por favor completa todos los campos', 'warning');
         return;
     }
-    
+
     btnSubmit.disabled = true;
     btnSubmit.textContent = 'Agendando...';
-    
-    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || 
+
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ||
                       document.querySelector('input[name="_token"]')?.value;
-    
+
     try {
         const response = await fetch('/api-proxy/citas', {
             method: 'POST',
@@ -317,19 +504,16 @@ document.getElementById('cita-form').addEventListener('submit', async function(e
             body: JSON.stringify({
                 servicio_id: servicioId,
                 empleado_id: empleadoId,
-                fecha: fecha,
+                fecha:       fecha,
                 hora_inicio: hora,
-                negocio_id: negocioId
+                negocio_id:  negocioId
             })
         });
-        
+
         let data = {};
-        try {
-            data = await response.json();
-        } catch(e) {
-            data = { message: 'Error procesando respuesta del servidor' };
-        }
-        
+        try { data = await response.json(); }
+        catch(e) { data = { message: 'Error procesando respuesta del servidor' }; }
+
         if (response.ok && data.success !== false) {
             showToast(data.message || 'Cita agendada correctamente', 'success');
             window.location.href = '/mis-citas';
