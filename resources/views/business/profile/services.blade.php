@@ -217,6 +217,7 @@
         <p class="text-white text-sm mb-6">¿Estás seguro que deseas eliminar <span id="deleteServiceName" class="font-bold"></span>?</p>
         <form method="POST" id="deleteServiceForm" data-custom-handler="true">
             @csrf
+            @method('DELETE')
             <div class="flex gap-4">
                 <button type="button" onclick="closeDeleteModal()" class="w-1/2 py-2 border border-[#374151] text-white text-xs uppercase">Cancelar</button>
                 <button type="submit" class="w-1/2 py-2 bg-red-600 text-white text-xs uppercase font-bold hover:bg-red-700">Eliminar</button>
@@ -354,21 +355,7 @@
         console.log('🗑️ Abriendo modal de eliminación para servicio ID:', id);
         document.getElementById('deleteServiceName').innerText = nombre;
         const form = document.getElementById('deleteServiceForm');
-        // Usar el proxy API para eliminar
         form.action = '/api-proxy/api/servicios/' + id;
-        
-        // Agregar método DELETE como campo oculto
-        // Primero eliminar si existe
-        let methodInput = form.querySelector('input[name="_method"]');
-        if (!methodInput) {
-            methodInput = document.createElement('input');
-            methodInput.type = 'hidden';
-            methodInput.name = '_method';
-            form.appendChild(methodInput);
-        }
-        methodInput.value = 'DELETE';
-        
-        console.log('🗑️ Action del formulario de eliminación:', form.action);
         document.getElementById('modal-delete-service').classList.remove('hidden');
     }
 
