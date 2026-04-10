@@ -156,8 +156,8 @@ class ProxyController extends Controller
             $statusCode = $response->status();
             $contentType = $response->header('Content-Type');
 
-            // 1. Verificar si la respuesta es JSON
-            if ($contentType && strpos($contentType, 'application/json') === 0) {
+            // 1. Verificar si la respuesta es JSON (más inclusivo)
+            if ($contentType && strpos($contentType, 'application/json') !== false) {
                 return response($body, $statusCode)->header('Content-Type', 'application/json');
             }
 
@@ -175,7 +175,8 @@ class ProxyController extends Controller
 
             return response()->json([
                 'success' => false,
-                'message' => 'Error en el servidor externo'
+                'message' => 'Error en el servidor externo',
+                'status'  => $statusCode
             ], $statusCode);
 
         } catch (\Exception $e) {
@@ -186,7 +187,7 @@ class ProxyController extends Controller
 
             return response()->json([
                 'success' => false,
-                'message' => 'Error de conexión con el servidor'
+                'message' => 'Error de conexión con el servidor: ' . $e->getMessage()
             ], 503);
         }
     }
