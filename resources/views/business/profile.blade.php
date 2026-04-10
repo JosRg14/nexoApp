@@ -112,7 +112,7 @@ class="w-full text-left px-4 py-2 text-xs text-red-400 hover:text-red-300 hover:
                     Personal
                 </button>
                 <button onclick="switchTab('clientes-promociones')" id="tab-btn-clientes-promociones" class="shrink-0 px-6 py-2 text-xs font-bold uppercase tracking-widest transition-all text-[#9CA3AF] hover:text-white">
-                    Clientes y Promociones
+                    Promociones
                 </button>
             </div>
         </div>
