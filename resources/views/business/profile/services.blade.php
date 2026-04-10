@@ -508,6 +508,14 @@
         const form = this;
         const action = form.action || `/api-proxy/api/servicios/${document.getElementById('edit_id').value}`;
         const formData = new FormData(form);
+        
+        // 🔥 LOG PARA DEPURAR
+        console.log('=== FORMULARIO EDITAR SERVICIO ===');
+        console.log('Action:', action);
+        for (let [key, value] of formData.entries()) {
+            console.log(`${key}:`, value);
+        }
+        
         const redirectUrl = form.getAttribute('data-redirect') || window.location.href;
         const token = getCsrfToken();
         
