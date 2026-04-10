@@ -261,6 +261,40 @@
         document.getElementById('modal-delete-service').classList.add('hidden');
     }
 
+    function openEditModal(id, nombre, descripcion, precio, duracion, imagen) {
+        console.log('✏️ Abriendo modal de edición para servicio ID:', id);
+        
+        const modal = document.getElementById('modal-edit-service');
+        const form = document.getElementById('editServiceForm');
+        
+        // Seteamos los campos del formulario
+        document.getElementById('edit_id').value = id;
+        document.getElementById('edit_nombre').value = nombre;
+        document.getElementById('edit_descripcion').value = descripcion;
+        document.getElementById('edit_precio').value = precio;
+        document.getElementById('edit_duracion').value = duracion;
+        
+        // Manejo de la previsualización de imagen
+        const previewImg = document.getElementById('edit_imagen_preview');
+        if (imagen) {
+            previewImg.src = imagen;
+            previewImg.classList.remove('hidden');
+        } else {
+            previewImg.src = '';
+            previewImg.classList.add('hidden');
+        }
+        
+        // CORRECCIÓN: Setear el action correctamente para la API
+        form.action = '/api-proxy/api/servicios/' + id;
+        
+        // Mostramos el modal
+        modal.classList.remove('hidden');
+    }
+
+    function closeEditModal() {
+        document.getElementById('modal-edit-service').classList.add('hidden');
+    }
+
     function handleImagePreview(input, containerId, imgId, isEdit = false) {
         const errorId = isEdit ? 'edit-image-error' : 'image-error';
         const errorElement = document.getElementById(errorId);
