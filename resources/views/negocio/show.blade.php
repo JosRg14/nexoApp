@@ -191,7 +191,7 @@
 
                 <!-- Reseñas -->
                 <div id="resenas-section" class="bg-[#262626] border border-[#374151] rounded-sm p-6">
-                    <h3 class="text-sm font-bold uppercase tracking-widest text-white mb-4 flex items-center gap-2">
+                    <h3 class="text-sm font-bold uppercase tracking-widest text-white mb-6 flex items-center gap-2">
                         <i class="fas fa-star text-[#25B5DA]"></i> Reseñas ({{ count($resenas) }})
                     </h3>
                     <div class="space-y-4">
@@ -235,16 +235,14 @@
                             <p class="text-xs text-[#52525b] italic">No hay reseñas aún. ¡Sé el primero en calificar!</p>
                         </div>
                         @endforelse
-                    </div>
                 </div>
-
-
+            </div>
             
-            <!-- Columna derecha -->
-            <div class="lg:w-1/3 flex flex-col gap-6">
+            <!-- Columna derecha (1/3) -->
+            <div class="lg:w-1/3 space-y-6">
                 <!-- Equipo de Trabajo - Solo mostrar información, sin botón de agendar -->
                 <div id="empleados-section" class="bg-[#262626] border border-[#374151] rounded-sm p-6">
-                    <h3 class="text-sm font-bold uppercase tracking-widest text-white mb-4 flex items-center gap-2">
+                    <h3 class="text-sm font-bold uppercase tracking-widest text-white mb-6 flex items-center gap-2">
                         <i class="fas fa-users text-[#25B5DA]"></i> Nuestro Equipo ({{ count($empleados) }})
                     </h3>
                     <div class="space-y-3">
@@ -276,7 +274,7 @@
                 
                 <!-- Horario -->
                 <div class="bg-[#262626] border border-[#374151] rounded-sm p-6">
-                    <h3 class="text-sm font-bold uppercase tracking-widest text-white mb-4 flex items-center gap-2">
+                    <h3 class="text-sm font-bold uppercase tracking-widest text-white mb-6 flex items-center gap-2">
                         <i class="fas fa-clock text-[#25B5DA]"></i> Horario de Atención
                     </h3>
                     @if(isset($horariosFormateados) && count($horariosFormateados) > 0)
@@ -326,7 +324,7 @@
                 @endphp
 
                 <div class="bg-[#262626] border border-[#374151] rounded-sm p-6 group hover:border-[#25B5DA]/50 transition-all duration-300">
-                    <h3 class="text-sm font-bold uppercase tracking-widest text-white mb-4 flex items-center gap-2">
+                    <h3 class="text-sm font-bold uppercase tracking-widest text-white mb-6 flex items-center gap-2">
                         <i class="fas fa-location-dot text-[#25B5DA]"></i> Ubicación
                     </h3>
                     
@@ -353,7 +351,7 @@
                 <!-- Contacto -->
                 @if(isset($negocio['telefono']) && $negocio['telefono'])
                 <div class="bg-[#262626] border border-[#374151] rounded-sm p-6">
-                    <h3 class="text-sm font-bold uppercase tracking-widest text-white mb-4 flex items-center gap-2">
+                    <h3 class="text-sm font-bold uppercase tracking-widest text-white mb-6 flex items-center gap-2">
                         <i class="fas fa-phone text-[#25B5DA]"></i> Contacto
                     </h3>
                     <div class="flex items-center gap-3">
