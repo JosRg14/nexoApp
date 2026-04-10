@@ -510,10 +510,16 @@
         const action = form.action;
         const token = getCsrfToken();
         
-        // Siempre usar POST: el campo _method=PUT en FormData hace el spoofing para Laravel
-        let method = 'POST';
-        const methodInput = form.querySelector('input[name="_method"]');
-        if (methodInput) method = methodInput.value;
+        // 🔥 LOG DE DEPURACIÓN: verificar qué campos contiene el FormData
+        console.log('=== FORMULARIO EDITAR SERVICIO ===');
+        console.log('Action:', action);
+        for (let [key, value] of formData.entries()) {
+            console.log(key, value);
+        }
+        
+        // ✅ SIEMPRE usar 'POST' en fetch — PHP no parsea body multipart en PUT/PATCH.
+        // El campo _method=PUT dentro del FormData hace el method spoofing de Laravel.
+        const method = 'POST';
         
         showLoader();
         
