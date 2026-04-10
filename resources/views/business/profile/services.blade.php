@@ -240,130 +240,7 @@
     </div>
 </div>
 
-<script>
-    // --- INTERCEPTOR PARA AGREGAR SERVICIOS ---
-    document.addEventListener('submit', async function(e) {
-        const form = e.target;
-        
-        // ============================================
-        // SOLO para el formulario de agregar servicio
-        // ============================================
-        const action = form.getAttribute('action') || '';
-        
-        if (action.includes('/api-proxy/')) {
-            console.log('🔄 Interceptando formulario de AGREGAR servicio');
-            e.preventDefault();
-            
-            if (typeof showLoader === 'function') showLoader();
-
-            const formData = new FormData(form);
-            const redirectUrl = form.getAttribute('data-redirect') || window.location.href;
-
-            // Si no hay archivo en el campo imagen, lo eliminamos del FormData
-            const fileInput = form.querySelector('input[name="imagen"]');
-            if (fileInput && !fileInput.files.length) {
-                formData.delete('imagen');
-            }
-          
-            try {
-                const response = await fetch(action, {
-                    method: 'POST',
-                    headers: {
-                        'Accept': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value
-                    },
-                    body: formData
-                });
-
-                const data = await response.json();
-                
-                console.log('Respuesta:', data);
-
-                if (response.ok) {
-                    if (typeof showToast === 'function') {
-                        showToast(data.message || "¡Servicio agregado exitosamente!");
-                    } else {
-                        showToast(data.message || "¡Servicio agregado exitosamente!", "success");
-                    }
-                    setTimeout(() => {
-                        window.location.href = redirectUrl;
-                    }, 1000);
-                } else {
-                    if (typeof hideLoader === 'function') hideLoader();
-                    if (data.errors) {
-                        let errorMsg = "Errores de validación:\n";
-                        for (const [field, errors] of Object.entries(data.errors)) {
-                            errorMsg += `${field}: ${errors.join(', ')}\n`;
-                        }
-                        showToast(errorMsg, "error");
-                    } else {
-                        showToast(data.message || "Error al procesar la solicitud.", "error");
-                    }
-                }
-            } catch (error) {
-                if (typeof hideLoader === 'function') hideLoader();
-                console.error("Error:", error);
-                showToast("Error de conexión con el servidor", "error");
-            }
-        }
-    });
-
-    function openEditModal(id, nombre, descripcion, precio, duracion, imagen) 
-    {
-        console.log('📝 Abriendo modal de edición para servicio ID:', id);
-        
-        // Setear valores en los campos
-        document.getElementById('edit_id').value = id;
-        document.getElementById('edit_nombre').value = nombre;
-        document.getElementById('edit_descripcion').value = descripcion;
-        document.getElementById('edit_precio').value = precio;
-        document.getElementById('edit_duracion').value = duracion;
-        
-       //CAMBIO IMPORTANTE: Usar el proxy API en lugar de la ruta directa
-        const form = document.getElementById('editServiceForm');
-        // ANTES: form.action = '/business/services/' + id;
-        // AHORA: Usar el proxy API con POST
-        form.action = '/api-proxy/api/servicios/' + id;
-        
-        console.log('📝 Action del formulario de edición (proxy):', form.action);
-        console.log('📝 El formulario tiene data-custom-handler:', form.getAttribute('data-custom-handler'));
-        
-        // Resto del código igual...
-        // Manejar la imagen
-        const previewImg = document.getElementById('edit_imagen_preview');
-        if (imagen && imagen !== 'null' && imagen !== '') {
-            previewImg.src = imagen + '?v=' + Date.now();
-            previewImg.classList.remove('hidden');
-        } else {
-            previewImg.classList.add('hidden');
-        }
-        
-        // Limpiar el campo de archivo
-        const fileInput = document.getElementById('edit_imagen');
-        if (fileInput) {
-            fileInput.value = '';
-        }
-        
-        // Limpiar mensajes de error
-        const errorElement = document.getElementById('edit-image-error');
-        if (errorElement) {
-            errorElement.classList.add('hidden');
-        }
-        
-        // Mostrar el modal
-        const modal = document.getElementById('modal-edit-service');
-        if (modal) {
-            modal.classList.remove('hidden');
-        }
-    }
-
-    function closeEditModal() {
-        const modal = document.getElementById('modal-edit-service');
-        if (modal) {
-            modal.classList.add('hidden');
-        }
-    }
-
+    // --- CIERRE CORRECTO DE openDeleteModal ---
     function openDeleteModal(id, nombre) 
     {
         console.log('🗑️ Abriendo modal de eliminación para servicio ID:', id);
@@ -371,6 +248,8 @@
         const form = document.getElementById('deleteServiceForm');
         form.action = '/api-proxy/api/servicios/' + id;
         document.getElementById('modal-delete-service').classList.remove('hidden');
+    }
+
     function closeDeleteModal() {
         document.getElementById('modal-delete-service').classList.add('hidden');
     }
@@ -413,28 +292,34 @@
     });
 
     async function cargarEvidenciasAdmin() {
+        const grid = document.getElementById('admin-evidencias-grid');
+        if (!grid) return;
+        
+        grid.innerHTML = `
+            <div class="col-span-full py-8 text-center text-[#9CA3AF]">
+                <i class="fas fa-spinner fa-spin text-2xl mb-2"></i>
+                <p class="text-xs uppercase tracking-widest">Cargando galería...</p>
+            </div>
+        `;
+        
         try {
-            // Include Accept headers to prevent HTML redirect errors
             const res = await fetch('/api-proxy/evidencias', {
-                headers: {
-                    'Accept': 'application/json'
-                }
+                headers: { 'Accept': 'application/json' }
             });
-            const text = await res.text();
             
-            try {
-                const json = JSON.parse(text);
-                if(json.success && json.data) {
-                    renderAdminEvidencias(json.data);
-                } else {
-                    renderAdminEvidencias([]);
-                }
-            } catch (jsonErr) {
-                console.error("Error parseando JSON (probablemente recibiendo HTML):", text.substring(0, 50));
+            if (!res.ok) {
+                throw new Error(`HTTP ${res.status}`);
+            }
+            
+            const json = await res.json();
+            
+            if (json.success && json.data) {
+                renderAdminEvidencias(json.data);
+            } else {
                 renderAdminEvidencias([]);
             }
         } catch (error) {
-            console.error("Error cargando evidencias", error);
+            console.error("Error cargando evidencias:", error);
             renderAdminEvidencias([]);
         }
     }
@@ -443,9 +328,10 @@
         adminEvidenciasData = evidencias;
         const grid = document.getElementById('admin-evidencias-grid');
         
+        if (!grid) return;
         grid.innerHTML = '';
 
-        if(evidencias.length === 0) {
+        if (evidencias.length === 0) {
             grid.innerHTML = `
                 <div class="col-span-full py-12 text-center text-[#9CA3AF]">
                     <i class="fas fa-images text-4xl mb-3 opacity-50"></i>
@@ -455,21 +341,18 @@
             return;
         }
 
-        const baseUrl = "{{ rtrim(config('services.api.url'), '/') }}";
+        // Usar la URL base desde un meta tag o definirla manualmente
+        const baseUrl = "https://devlink-servidorapi.td60xq.easypanel.host";
 
         evidencias.forEach(ev => {
-            const isPublic = ev.es_publica || ev.publica; // handle API structure variants
+            const isPublic = ev.publica === true || ev.publica === 1;
             let imgUrl = ev.url_imagen;
-            if(imgUrl && !imgUrl.startsWith('http')) {
+            if (imgUrl && !imgUrl.startsWith('http')) {
                 imgUrl = baseUrl + (imgUrl.startsWith('/') ? '' : '/') + imgUrl;
             }
 
-            const nombreServicio = ev.servicio?.nombre || ev.servicio_nombre || 'General';
-            
-            const toggleColor = isPublic ? 'text-[#25B5DA]' : 'text-[#9CA3AF]';
-            const toggleIcon = isPublic ? 'fa-eye' : 'fa-eye-slash';
-            const toggleText = isPublic ? 'Pública' : 'Privada';
-            const idItem = ev.id || ev.id_evidencia;
+            const nombreServicio = ev.servicio_nombre || 'General';
+            const idItem = ev.id_evidencia || ev.id;
 
             const card = document.createElement('div');
             card.className = 'bg-[#262626] border border-[#374151] rounded-lg overflow-hidden flex flex-col group transition-colors hover:border-[#F3F4F6]/50';
@@ -483,10 +366,10 @@
                         ${ev.descripcion ? `<p class="text-[10px] text-[#9CA3AF] line-clamp-2 leading-tight">${ev.descripcion}</p>` : ''}
                     </div>
                     <div class="flex justify-between items-center mt-3 pt-2 border-t border-[#374151]">
-                        <button onclick="toggleEvidenciaState(${idItem}, ${!isPublic})" class="text-[10px] font-bold uppercase ${toggleColor} hover:brightness-125 transition-all flex items-center gap-1">
-                            <i class="fas ${toggleIcon}"></i> ${toggleText}
+                        <button onclick="toggleEvidenciaState(${idItem}, ${!isPublic})" class="text-[10px] font-bold uppercase ${isPublic ? 'text-[#25B5DA]' : 'text-[#9CA3AF]'} hover:brightness-125 transition-all flex items-center gap-1">
+                            <i class="fas ${isPublic ? 'fa-eye' : 'fa-eye-slash'}"></i> ${isPublic ? 'Pública' : 'Privada'}
                         </button>
-                        <button onclick="deleteEvidenciaItem(${idItem})" class="text-[#EF4444] hover:text-red-400 text-xs transition-colors">
+                        <button onclick="deleteEvidenciaItem(${idItem})" class="text-red-500 hover:text-red-400 text-xs transition-colors">
                             <i class="fas fa-trash"></i>
                         </button>
                     </div>
@@ -497,9 +380,11 @@
     }
 
     async function toggleEvidenciaState(id, makePublic) {
-        if(typeof showLoader === 'function') showLoader();
+        if (typeof showLoader === 'function') showLoader();
         try {
-            const token = document.querySelector('input[name="_token"]')?.value || document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+            const token = document.querySelector('input[name="_token"]')?.value || 
+                          document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+                          
             const res = await fetch(`/api-proxy/evidencias/${id}/publica`, {
                 method: 'PATCH',
                 headers: {
@@ -507,35 +392,37 @@
                     'Accept': 'application/json',
                     'X-CSRF-TOKEN': token
                 },
-                body: JSON.stringify({ es_publica: makePublic })
+                body: JSON.stringify({ publica: makePublic })
             });
 
             const data = await res.json();
-            if(data.success || res.ok) {
-                const evIndex = adminEvidenciasData.findIndex(e => (e.id || e.id_evidencia) === id);
-                if(evIndex !== -1) {
-                    // Update both field styles since API might respond with either
-                    adminEvidenciasData[evIndex].es_publica = makePublic;
+            
+            if (data.success || res.ok) {
+                const evIndex = adminEvidenciasData.findIndex(e => (e.id_evidencia || e.id) === id);
+                if (evIndex !== -1) {
                     adminEvidenciasData[evIndex].publica = makePublic;
                     renderAdminEvidencias(adminEvidenciasData);
-                    if(typeof showToast === 'function') showToast(`Evidencia actualizada a ${makePublic ? 'Pública' : 'Privada'}`);
+                    if (typeof showToast === 'function') showToast(`Evidencia ${makePublic ? 'publicada' : 'privada'}`, 'success');
                 }
             } else {
                 if (typeof showToast === 'function') showToast(data.message || 'Error al cambiar visibilidad', 'error');
             }
         } catch (error) {
             console.error(error);
+            if (typeof showToast === 'function') showToast('Error de conexión', 'error');
         } finally {
-            if(typeof hideLoader === 'function') hideLoader();
+            if (typeof hideLoader === 'function') hideLoader();
         }
     }
 
     async function deleteEvidenciaItem(id) {
-        if(!confirm('¿Estás seguro de eliminar esta evidencia permanentemente?')) return;
+        if (!confirm('¿Estás seguro de eliminar esta evidencia permanentemente?')) return;
         
-        if(typeof showLoader === 'function') showLoader();
+        if (typeof showLoader === 'function') showLoader();
         try {
-            const token = document.querySelector('input[name="_token"]')?.value || document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+            const token = document.querySelector('input[name="_token"]')?.value || 
+                          document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+                          
             const res = await fetch(`/api-proxy/evidencias/${id}`, {
                 method: 'DELETE',
                 headers: {
@@ -545,17 +432,19 @@
             });
 
             const data = await res.json();
-            if(data.success || res.ok) {
-                const navArr = adminEvidenciasData.filter(e => (e.id || e.id_evidencia) !== id);
-                renderAdminEvidencias(navArr);
-                if(typeof showToast === 'function') showToast('Evidencia borrada exitosamente');
+            
+            if (data.success || res.ok) {
+                adminEvidenciasData = adminEvidenciasData.filter(e => (e.id_evidencia || e.id) !== id);
+                renderAdminEvidencias(adminEvidenciasData);
+                if (typeof showToast === 'function') showToast('Evidencia eliminada', 'success');
             } else {
                 if (typeof showToast === 'function') showToast(data.message || 'Error al eliminar', 'error');
             }
         } catch (error) {
             console.error(error);
+            if (typeof showToast === 'function') showToast('Error de conexión', 'error');
         } finally {
-            if(typeof hideLoader === 'function') hideLoader();
+            if (typeof hideLoader === 'function') hideLoader();
         }
     }
 </script>
