@@ -50,14 +50,10 @@
           )' class="text-blue-400 text-xs hover:text-blue-300">
             Editar
           </button>
-          <form method="POST" action="{{ url('/api-proxy/api/empleados/'.$emp['id_empleado']) }}"
-          data-redirect="{{ route('business.profile') }}" data-custom-handler="false">
-            @csrf @method('DELETE')
-            <button type="submit" onclick="return confirm('¿Eliminar empleado?')"
-            class="text-red-400 text-xs hover:text-red-300">
-              Eliminar
-            </button>
-          </form>
+          <button type="button" onclick="openDeleteEmployeeModal({{ $emp['id_empleado'] }}, '{{ trim(($emp['nombre'] ?? '').' '.($emp['app_paterno'] ?? '')) }}')"
+          class="text-red-400 text-xs hover:text-red-300">
+            Eliminar
+          </button>
         </div>
       </div>
     </div>
@@ -130,6 +126,23 @@
     </form>
   </div>
 </div>
+
+<!-- MODAL ELIMINAR EMPLEADO -->
+<div id="modal-delete-employee" class="fixed inset-0 hidden z-50">
+  <div class="absolute inset-0 bg-black/80" onclick="closeDeleteEmployeeModal()"></div>
+  <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-[#1a1a1a] border border-[#374151] p-8 w-full max-w-md">
+      <h3 class="text-red-500 font-bold mb-4 uppercase">Confirmar eliminación</h3>
+      <p class="text-white text-sm mb-6">¿Estás seguro que deseas eliminar al empleado <span id="deleteEmployeeName" class="font-bold"></span>?</p>
+      <form method="POST" id="deleteEmployeeForm" data-custom-handler="false">
+          @csrf
+          @method('DELETE')
+          <div class="flex gap-4">
+              <button type="button" onclick="closeDeleteEmployeeModal()" class="w-1/2 py-2 border border-[#374151] text-white text-xs uppercase">Cancelar</button>
+              <button type="submit" class="w-1/2 py-2 bg-red-600 text-white text-xs uppercase font-bold hover:bg-red-700">Eliminar</button>
+          </div>
+      </form>
+  </div>
+</div>
 <script>
   window.openEditEmployee = function(id, nombre, app_paterno, app_materno, correo, comision, estado) {
     console.log({
@@ -149,4 +162,102 @@
     document.getElementById("editEmployeeForm").setAttribute("data-redirect", "{{ route('business.profile') }}");
     toggleModal("modal-edit-employee", true)
   }
+
+  window.openDeleteEmployeeModal = function(id, nombre) {
+    document.getElementById('deleteEmployeeName').innerText = nombre;
+    const form = document.getElementById('deleteEmployeeForm');
+    form.action = '/api-proxy/api/empleados/' + id;
+    document.getElementById('modal-delete-employee').classList.remove('hidden');
+  }
+
+  window.closeDeleteEmployeeModal = function() {
+    document.getElementById('modal-delete-employee').classList.add('hidden');
+  }
+
+  // --- CONTROLADORES DE SUBMIT DIRECTOS ---
+
+  // Para el formulario de editar empleado
+  document.getElementById('editEmployeeForm')?.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      const form = this;
+      const action = form.action;
+      const formData = new FormData(form);
+      const redirectUrl = form.getAttribute('data-redirect') || window.location.href;
+      const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+      
+      // Obtener el método correcto (_method)
+      let method = 'POST';
+      const methodInput = form.querySelector('input[name="_method"]');
+      if (methodInput) {
+          method = methodInput.value;
+      }
+      
+      if (typeof showLoader === 'function') showLoader();
+      
+      try {
+          const response = await fetch(action, {
+              method: method,
+              headers: {
+                  'Accept': 'application/json',
+                  'X-CSRF-TOKEN': token
+              },
+              body: formData
+          });
+          
+          const data = await response.json();
+          
+          if (response.ok && data.success !== false) {
+              if (typeof showToast === 'function') showToast(data.message || 'Operación exitosa', 'success');
+              setTimeout(() => {
+                  window.location.href = redirectUrl;
+              }, 1000);
+          } else {
+              if (typeof showToast === 'function') showToast(data.message || 'Error en la operación', 'error');
+          }
+      } catch (error) {
+          console.error(error);
+          if (typeof showToast === 'function') showToast('Error de conexión', 'error');
+      } finally {
+          if (typeof hideLoader === 'function') hideLoader();
+      }
+  });
+
+  // Para el formulario de eliminar empleado
+  document.getElementById('deleteEmployeeForm')?.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      const form = this;
+      const action = form.action;
+      const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+      
+      if (typeof showLoader === 'function') showLoader();
+      
+      try {
+          const response = await fetch(action, {
+              method: 'DELETE',
+              headers: {
+                  'Accept': 'application/json',
+                  'X-CSRF-TOKEN': token
+              }
+          });
+          
+          const data = await response.json();
+          
+          if (response.ok && data.success !== false) {
+              if (typeof showToast === 'function') showToast(data.message || 'Empleado eliminado', 'success');
+              setTimeout(() => {
+                  window.location.reload();
+              }, 1000);
+          } else {
+              if (typeof showToast === 'function') showToast(data.message || 'Error al eliminar', 'error');
+          }
+      } catch (error) {
+          console.error(error);
+          if (typeof showToast === 'function') showToast('Error de conexión', 'error');
+      } finally {
+          if (typeof hideLoader === 'function') hideLoader();
+          closeDeleteEmployeeModal();
+      }
+  });
 </script>

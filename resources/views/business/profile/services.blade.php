@@ -449,4 +449,91 @@
             if (typeof hideLoader === 'function') hideLoader();
         }
     }
+
+    // --- CONTROLADORES DE SUBMIT DIRECTOS ---
+
+    // Para el formulario de editar servicio
+    document.getElementById('editServiceForm')?.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const form = this;
+        const action = form.action || `/api-proxy/api/servicios/${document.getElementById('edit_id').value}`;
+        const formData = new FormData(form);
+        const redirectUrl = form.getAttribute('data-redirect') || window.location.href;
+        const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+        
+        // Obtener el método correcto (_method)
+        let method = 'POST';
+        const methodInput = form.querySelector('input[name="_method"]');
+        if (methodInput) {
+            method = methodInput.value;
+        }
+        
+        if (typeof showLoader === 'function') showLoader();
+        
+        try {
+            const response = await fetch(action, {
+                method: method,
+                headers: {
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': token
+                },
+                body: formData
+            });
+            
+            const data = await response.json();
+            
+            if (response.ok && data.success !== false) {
+                if (typeof showToast === 'function') showToast(data.message || 'Servicio actualizado correctamente', 'success');
+                setTimeout(() => {
+                    window.location.href = redirectUrl;
+                }, 1000);
+            } else {
+                if (typeof showToast === 'function') showToast(data.message || 'Error en la operación', 'error');
+            }
+        } catch (error) {
+            console.error(error);
+            if (typeof showToast === 'function') showToast('Error de conexión', 'error');
+        } finally {
+            if (typeof hideLoader === 'function') hideLoader();
+        }
+    });
+
+    // Para el formulario de eliminar servicio
+    document.getElementById('deleteServiceForm')?.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const form = this;
+        const action = form.action;
+        const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+        
+        if (typeof showLoader === 'function') showLoader();
+        
+        try {
+            const response = await fetch(action, {
+                method: 'DELETE',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': token
+                }
+            });
+            
+            const data = await response.json();
+            
+            if (response.ok && data.success !== false) {
+                if (typeof showToast === 'function') showToast(data.message || 'Servicio eliminado', 'success');
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1000);
+            } else {
+                if (typeof showToast === 'function') showToast(data.message || 'Error al eliminar', 'error');
+            }
+        } catch (error) {
+            console.error(error);
+            if (typeof showToast === 'function') showToast('Error de conexión', 'error');
+        } finally {
+            if (typeof hideLoader === 'function') hideLoader();
+            if (typeof closeDeleteModal === 'function') closeDeleteModal();
+        }
+    });
 </script>
