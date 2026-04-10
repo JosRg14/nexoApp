@@ -501,6 +501,41 @@
 
     // --- CONTROLADORES DE SUBMIT DIRECTOS ---
 
+    // Para el formulario de agregar servicio (nuevo)
+    document.querySelector('form[action*="/api-proxy/api/servicios"]:not(#editServiceForm):not(#deleteServiceForm)')
+        ?.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const form = this;
+        const formData = new FormData(form);
+        const redirectUrl = form.getAttribute('data-redirect') || window.location.href;
+        const token = getCsrfToken();
+        
+        if (typeof showLoader === 'function') showLoader();
+        
+        try {
+            const response = await fetch(form.action, {
+                method: 'POST',
+                headers: { 'X-CSRF-TOKEN': token },
+                body: formData
+            });
+            
+            const data = await response.json();
+            
+            if (response.ok) {
+                if (typeof showToast === 'function') showToast(data.message || 'Servicio creado', 'success');
+                setTimeout(() => { window.location.href = redirectUrl; }, 1000);
+            } else {
+                if (typeof showToast === 'function') showToast(data.message || 'Error al crear servicio', 'error');
+            }
+        } catch (error) {
+            console.error(error);
+            if (typeof showToast === 'function') showToast('Error de conexión', 'error');
+        } finally {
+            if (typeof hideLoader === 'function') hideLoader();
+        }
+    });
+
     // Para el formulario de editar servicio
     document.getElementById('editServiceForm')?.addEventListener('submit', async function(e) {
         e.preventDefault();
