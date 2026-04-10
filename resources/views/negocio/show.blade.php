@@ -35,12 +35,6 @@
                 <div class="flex-1">
                     <div class="flex items-center gap-3 mb-2 flex-wrap">
                         <h1 class="text-3xl md:text-4xl font-bold uppercase tracking-wide text-white">{{ $negocio['nombre'] }}</h1>
-                        <span class="px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wide border 
-                            {{ isset($negocio['estado']) && strtolower($negocio['estado']) === 'activo' 
-                                ? 'text-emerald-500 border-emerald-500/20 bg-emerald-500/10' 
-                                : 'text-[#25B5DA] border-[#25B5DA]/20 bg-[#25B5DA]/10' }}">
-                            {{ $negocio['estado'] ?? 'pendiente' }}
-                        </span>
                     </div>
 
                     <div class="flex flex-wrap gap-4 text-gray-300 text-sm">
