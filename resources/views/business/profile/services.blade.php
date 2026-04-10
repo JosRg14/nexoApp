@@ -76,7 +76,7 @@
                 </p>
             </div>
 
-            <form method="POST" action="{{ url('/api-proxy/api/servicios') }}" data-redirect="{{ route('business.profile') }}" enctype="multipart/form-data" class="space-y-6">
+            <form method="POST" action="{{ url('/api-proxy/api/servicios') }}" data-redirect="{{ route('business.profile') }}" enctype="multipart/form-data" class="space-y-6" data-custom-handler="false">
                 @csrf
                 {{-- NOMBRE --}}
                 <div class="group/input relative">
