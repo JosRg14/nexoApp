@@ -99,25 +99,32 @@
                         body: formData
                     });
 
-                    // Intentar parsear JSON
-                    let data = {};
-                    try {
-                        data = await response.json();
-                    } catch (parseErr) {
-                        data = { message: 'Error procesando respuesta del servidor' };
-                    }
-
                     if (response.ok) {
-                        // Success
-                        sessionStorage.setItem('success_message', data.message || 'Operación exitosa');
+                        // Éxito: redirigir o recargar
+                        const data = await response.json();
+                        if (typeof showToast === 'function') {
+                            showToast(data.message || 'Operación exitosa', 'success');
+                        }
                         if (redirectUrl) {
-                            window.location.href = redirectUrl;
+                            setTimeout(() => { window.location.href = redirectUrl; }, 1000);
                         } else {
-                            window.location.reload();
+                            setTimeout(() => { window.location.reload(); }, 1000);
                         }
                     } else {
-                        // Error
-                        showToast(data.message || 'Ocurrió un error en la solicitud.', 'error');
+                        // Error: NUNCA mostrar JSON en la página
+                        let errorMessage = 'Error en la solicitud';
+                        try {
+                            const data = await response.json();
+                            errorMessage = data.message || errorMessage;
+                        } catch (e) {
+                            errorMessage = `Error ${response.status}: ${response.statusText}`;
+                        }
+                        // SOLO mostrar toast, NADA más
+                        if (typeof showToast === 'function') {
+                            showToast(errorMessage, 'error');
+                        } else {
+                            alert(errorMessage);
+                        }
                     }
                 } catch (error) {
                     console.error('Submission error:', error);
