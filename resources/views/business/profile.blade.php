@@ -102,6 +102,9 @@ class="w-full text-left px-4 py-2 text-xs text-red-400 hover:text-red-300 hover:
                 <button onclick="switchTab('services')" id="tab-btn-services" class="shrink-0 px-6 py-2 text-xs font-bold uppercase tracking-widest transition-all text-[#9CA3AF] hover:text-white">
                     Servicios
                 </button>
+                <button onclick="switchTab('evidencias')" id="tab-btn-evidencias" class="shrink-0 px-6 py-2 text-xs font-bold uppercase tracking-widest transition-all text-[#9CA3AF] hover:text-white">
+                    Evidencias
+                </button>
                 <button onclick="switchTab('schedule')" id="tab-btn-schedule" class="shrink-0 px-6 py-2 text-xs font-bold uppercase tracking-widest transition-all text-[#9CA3AF] hover:text-white">
                     Horario
                 </button>
@@ -121,6 +124,7 @@ class="w-full text-left px-4 py-2 text-xs text-red-400 hover:text-red-300 hover:
         <div class="relative w-full">
             @include('business.profile.information')
             @include('business.profile.services')
+            @include('business.profile.evidencias')
             @include('business.profile.schedule')
             @include('business.profile.finances')
             @include('business.profile.staff')
@@ -137,7 +141,7 @@ class="w-full text-left px-4 py-2 text-xs text-red-400 hover:text-red-300 hover:
 
     <script>
         function switchTab(tab) {
-            const tabs = ['info', 'services', 'schedule', 'finances', 'personnel', 'clientes-promociones'];
+            const tabs = ['info', 'services', 'evidencias', 'schedule', 'finances', 'personnel', 'clientes-promociones'];
             
             tabs.forEach(t => {
                 const section = document.getElementById(`tab-${t}`);
