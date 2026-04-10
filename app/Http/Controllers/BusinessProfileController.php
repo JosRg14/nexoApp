@@ -234,4 +234,22 @@ class BusinessProfileController extends Controller
         $response = $this->httpClient->delete("/api/clientes/{$clienteId}/promociones/{$promoId}");
         return response()->json($response);
     }
+
+    public function obtenerEvidenciasNegocio()
+    {
+        $response = $this->httpClient->get('/api/evidencias');
+        return response()->json($response);
+    }
+
+    public function toggleEvidenciaPublica($id, Request $request)
+    {
+        $response = $this->httpClient->patch("/api/evidencias/{$id}/publica", $request->all());
+        return response()->json($response);
+    }
+
+    public function eliminarEvidencia($id)
+    {
+        $response = $this->httpClient->delete("/api/evidencias/{$id}");
+        return response()->json($response);
+    }
 }

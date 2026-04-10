@@ -186,4 +186,10 @@ class NegocioController extends Controller
         
         return $bloques;
     }
+
+    public function obtenerEvidenciasPublicas($id)
+    {
+        $response = $this->httpClient->getPublic("/api/negocios/{$id}/evidencias");
+        return response()->json($response);
+    }
 }

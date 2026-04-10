@@ -221,6 +221,24 @@
                         @endforelse
                     </div>
                 </div>
+
+                <!-- Nuestros Trabajos (Evidencias) -->
+                <div id="evidencias-section" class="bg-[#262626] border border-[#374151] rounded-sm p-6 hidden">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-xl font-bold uppercase tracking-widest text-white flex items-center gap-3">
+                            <i class="fas fa-camera text-2xl text-[#25B5DA]"></i> 
+                            Nuestros Trabajos
+                        </h3>
+                    </div>
+                    
+                    <div id="evidencias-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                        <!-- Evidencias loader here -->
+                        <div class="col-span-full text-center py-8 text-[#9CA3AF]">
+                            <i class="fas fa-spinner fa-spin text-3xl mb-3"></i>
+                            <p class="text-sm">Cargando trabajos...</p>
+                        </div>
+                    </div>
+                </div>
             </div>
             
             <!-- Columna derecha -->
@@ -360,4 +378,148 @@
     overflow: hidden;
 }
 </style>
+
+<!-- Modal de Evidencias -->
+<div id="modal-evidencia" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4 sm:p-6 bg-black/90 backdrop-blur-sm">
+    <div class="absolute inset-0" onclick="closeEvidenciaModal()"></div>
+    <div class="relative w-full max-w-4xl max-h-[90vh] flex flex-col items-center justify-center">
+        <!-- Close button -->
+        <button onclick="closeEvidenciaModal()" class="absolute -top-10 right-0 sm:-right-10 text-white hover:text-[#25B5DA] transition-colors text-3xl focus:outline-none z-10">
+            <i class="fas fa-times"></i>
+        </button>
+
+        <!-- Navigation Buttons -->
+        <button id="prev-evidencia" class="absolute left-0 top-1/2 -translate-y-1/2 sm:-left-12 text-white hover:text-[#25B5DA] text-4xl p-2 transition-colors hidden focus:outline-none bg-black/40 hover:bg-black/80 rounded-full w-12 h-12 flex items-center justify-center z-10">
+            <i class="fas fa-chevron-left"></i>
+        </button>
+        <button id="next-evidencia" class="absolute right-0 top-1/2 -translate-y-1/2 sm:-right-12 text-white hover:text-[#25B5DA] text-4xl p-2 transition-colors hidden focus:outline-none bg-black/40 hover:bg-black/80 rounded-full w-12 h-12 flex items-center justify-center z-10">
+            <i class="fas fa-chevron-right"></i>
+        </button>
+
+        <!-- Contenido principal (imagen grande) -->
+        <div class="relative w-full flex items-center justify-center overflow-hidden rounded-lg shadow-2xl bg-[#1a1a1a] border border-[#374151]">
+            <img id="evidencia-imagen-grande" src="" alt="Evidencia" class="max-h-[70vh] w-auto object-contain drop-shadow-lg">
+        </div>
+        
+        <!-- Info inferior -->
+        <div class="mt-4 w-full bg-[#262626] p-4 rounded-lg border border-[#374151] flex flex-col gap-2 relative z-10">
+            <div class="flex items-center gap-2 border-b border-[#374151] pb-2">
+                <i class="fas fa-cut text-[#25B5DA]"></i>
+                <h4 id="evidencia-servicio-nombre" class="font-bold text-white text-lg uppercase tracking-wide"></h4>
+            </div>
+            <p id="evidencia-descripcion" class="text-gray-300 text-sm mt-1"></p>
+        </div>
+    </div>
+</div>
+
+<script>
+    let evidenciasData = [];
+    let currentEvidenciaIndex = 0;
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const negocioId = "{{ $negocio['id_negocio'] ?? $negocio['id'] }}";
+        fetch(`/api-proxy/negocios/${negocioId}/evidencias`)
+            .then(response => response.json())
+            .then(res => {
+                if(res.success && res.data && res.data.length > 0) {
+                    evidenciasData = res.data;
+                    renderEvidenciasPublic(evidenciasData);
+                    document.getElementById('evidencias-section').classList.remove('hidden');
+                } else {
+                    document.getElementById('evidencias-section').remove();
+                }
+            })
+            .catch(err => {
+                console.error('Error al cargar evidencias:', err);
+                document.getElementById('evidencias-section').remove();
+            });
+            
+        // Key bindings para navegación modal
+        document.addEventListener('keydown', (e) => {
+            const modal = document.getElementById('modal-evidencia');
+            if(!modal.classList.contains('hidden')) {
+                if(e.key === 'Escape') closeEvidenciaModal();
+                if(e.key === 'ArrowLeft') navigateEvidencia(-1);
+                if(e.key === 'ArrowRight') navigateEvidencia(1);
+            }
+        });
+    });
+
+    function renderEvidenciasPublic(evidencias) {
+        const grid = document.getElementById('evidencias-grid');
+        grid.innerHTML = '';
+        evidencias.forEach((ev, index) => {
+            // Solo mostramos las evidencias que sean públicas (es un control extra aunque la API ya debe filtrarlas)
+            // No obstante, confiamos en la API public.
+            const baseUrl = "{{ rtrim(config('services.api.url'), '/') }}";
+            let imgUrl = ev.url_imagen;
+            if(imgUrl && !imgUrl.startsWith('http')) {
+                imgUrl = baseUrl + (imgUrl.startsWith('/') ? '' : '/') + imgUrl;
+            }
+
+            const item = document.createElement('div');
+            item.className = 'group relative rounded-xl overflow-hidden cursor-pointer aspect-square bg-[#1a1a1a] border border-[#374151] hover:border-[#25B5DA] transition-all duration-300 transform hover:scale-105';
+            item.onclick = () => openEvidenciaModal(index);
+
+            item.innerHTML = `
+                <img src="${imgUrl}" alt="${ev.servicio?.nombre || 'Evidencia'}" class="w-full h-full object-cover">
+                <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-3">
+                    <span class="text-white font-bold text-xs md:text-sm truncate uppercase tracking-widest">${ev.servicio?.nombre || 'General'}</span>
+                </div>
+            `;
+            grid.appendChild(item);
+        });
+    }
+
+    function openEvidenciaModal(index) {
+        currentEvidenciaIndex = index;
+        updateModalContent();
+        document.getElementById('modal-evidencia').classList.remove('hidden');
+        document.body.style.overflow = 'hidden'; // prevent scrolling
+    }
+
+    function closeEvidenciaModal() {
+        document.getElementById('modal-evidencia').classList.add('hidden');
+        document.body.style.overflow = 'auto'; // allow scrolling
+    }
+
+    function updateModalContent() {
+        if(evidenciasData.length === 0) return;
+        const ev = evidenciasData[currentEvidenciaIndex];
+        
+        const baseUrl = "{{ rtrim(config('services.api.url'), '/') }}";
+        let imgUrl = ev.url_imagen;
+        if(imgUrl && !imgUrl.startsWith('http')) {
+            imgUrl = baseUrl + (imgUrl.startsWith('/') ? '' : '/') + imgUrl;
+        }
+
+        document.getElementById('evidencia-imagen-grande').src = imgUrl;
+        document.getElementById('evidencia-servicio-nombre').innerText = ev.servicio?.nombre || 'Trabajo General';
+        document.getElementById('evidencia-descripcion').innerText = ev.descripcion || 'Sin descripción adicional.';
+
+        // Navigation buttons
+        const prevBtn = document.getElementById('prev-evidencia');
+        const nextBtn = document.getElementById('next-evidencia');
+
+        if(evidenciasData.length > 1) {
+            prevBtn.classList.remove('hidden');
+            nextBtn.classList.remove('hidden');
+            
+            // Re-assign listeners
+            prevBtn.onclick = (e) => { e.stopPropagation(); navigateEvidencia(-1); };
+            nextBtn.onclick = (e) => { e.stopPropagation(); navigateEvidencia(1); };
+        } else {
+            prevBtn.classList.add('hidden');
+            nextBtn.classList.add('hidden');
+        }
+    }
+
+    function navigateEvidencia(direction) {
+        currentEvidenciaIndex += direction;
+        if(currentEvidenciaIndex < 0) currentEvidenciaIndex = evidenciasData.length - 1;
+        if(currentEvidenciaIndex >= evidenciasData.length) currentEvidenciaIndex = 0;
+        updateModalContent();
+    }
+</script>
+
 @endsection

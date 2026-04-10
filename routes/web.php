@@ -262,7 +262,17 @@ Route::middleware(['auth.session', 'inject.api.token'])->group(function () {
         Route::get('/clientes/{id}/promociones', [BusinessProfileController::class, 'listarPromocionesCliente']);
         Route::post('/clientes/{id}/promociones', [BusinessProfileController::class, 'asignarPromocionCliente']);
         Route::delete('/clientes/{id}/promociones/{promo_id}', [BusinessProfileController::class, 'eliminarPromocionCliente']);
+
+        // Evidencias (Admin)
+        Route::get('/evidencias', [BusinessProfileController::class, 'obtenerEvidenciasNegocio']);
+        Route::patch('/evidencias/{id}/publica', [BusinessProfileController::class, 'toggleEvidenciaPublica']);
+        Route::delete('/evidencias/{id}', [BusinessProfileController::class, 'eliminarEvidencia']);
     });
+});
+
+// Evidencias (Público)
+Route::prefix('api-proxy')->group(function () {
+    Route::get('/negocios/{id}/evidencias', [NegocioController::class, 'obtenerEvidenciasPublicas']);
 });
 
 /*Rutas de completar registro de negocio
