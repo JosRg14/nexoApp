@@ -262,7 +262,12 @@
     }
 
     function openEditModal(id, nombre, descripcion, precio, duracion, imagen) {
-        console.log('✏️ Abriendo modal de edición para servicio ID:', id);
+        console.log('=== openEditModal DEBUG ===');
+        console.log('ID:', id);
+        console.log('Nombre:', nombre);
+        console.log('Descripcion:', descripcion);
+        console.log('Precio:', precio);
+        console.log('Duracion:', duracion);
         
         const modal = document.getElementById('modal-edit-service');
         const form = document.getElementById('editServiceForm');
@@ -270,9 +275,14 @@
         // Seteamos los campos del formulario
         document.getElementById('edit_id').value = id;
         document.getElementById('edit_nombre').value = nombre;
-        document.getElementById('edit_descripcion').value = descripcion;
+        document.getElementById('edit_descripcion').value = descripcion || '';
         document.getElementById('edit_precio').value = precio;
         document.getElementById('edit_duracion').value = duracion;
+        
+        // Verificar después de asignar
+        console.log('Input nombre valor:', document.getElementById('edit_nombre').value);
+        console.log('Input precio valor:', document.getElementById('edit_precio').value);
+        console.log('Input duracion valor:', document.getElementById('edit_duracion').value);
         
         // Manejo de la previsualización de imagen
         const previewImg = document.getElementById('edit_imagen_preview');
