@@ -58,28 +58,24 @@ class BusinessProfileController extends Controller
                 if (isset($item['imagen']) && $item['imagen']) {
                     $imagenUrl = rtrim(config('services.api.url'), '/') . '/' . ltrim($item['imagen'], '/');
                 }
-                return [
-                    'id' => $item['id'] ?? ($item['id_servicio'] ?? null),
-                    'nombre' => $item['nombre'] ?? '',
-                    'descripcion' => $item['descripcion'] ?? '',
-                    'precio' => $item['precio'] ?? 0,
-                    'duracion' => $item['duracion'] ?? 0,
-                    'imagen' => $imagenUrl,
-                ];
+                
+                $item['id'] = $item['id'] ?? ($item['id_servicio'] ?? null);
+                $item['precio'] = $item['precio'] ?? 0;
+                $item['duracion'] = $item['duracion'] ?? 0;
+                $item['imagen'] = $imagenUrl;
+                
+                return $item;
             })->toArray();
 
             // 3. Obtener empleados del negocio autenticado (sin pasar negocio_id)
             $responseEmployees = $this->httpClient->get('/api/mis-empleados');
             $employees = collect($responseEmployees['data'] ?? [])->map(function ($emp) {
-                return [
-                    'id_empleado' => $emp['id_empleado'] ?? null,
-                    'nombre' => $emp['nombre'] ?? '',
-                    'app_paterno' => $emp['app_paterno'] ?? '',
-                    'app_materno' => $emp['app_materno'] ?? '',
-                    'correo' => $emp['correo'] ?? '',
-                    'comision' => $emp['comision'] ?? 0,
-                    'estado' => $emp['estado'] ?? 'activo',
-                ];
+                // Asegurar que ciertos campos existan con valores por defecto
+                $emp['comision'] = $emp['comision'] ?? 0;
+                $emp['total_servicios'] = $emp['total_servicios'] ?? 0;
+                $emp['estado'] = $emp['estado'] ?? 'activo';
+                
+                return $emp; // Devolver el array completo
             })->toArray();
 
             // 4. Obtener finanzas
