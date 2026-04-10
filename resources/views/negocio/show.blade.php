@@ -5,7 +5,7 @@
 @section('content')
 <div class="bg-[#1a1a1a] min-h-screen">
     <!-- Hero Section con imagen de fondo -->
-       <div class="relative min-h-[24rem] md:min-h-[28rem] flex flex-col justify-end overflow-hidden">
+    <div class="relative h-80 md:h-96 overflow-hidden">
         <div class="absolute inset-0 z-0">
             @if(isset($negocio['banner']) && $negocio['banner'])
                 <img src="{{ $negocio['banner'] }}" 
@@ -174,6 +174,7 @@
                 </div>
                 
                 <!-- Nuestros Trabajos (Evidencias) -->
+                @if(count($evidencias) > 0)
                 <div id="evidencias-section" class="bg-[#262626] border border-[#374151] rounded-sm p-6">
                     <div class="flex justify-between items-center mb-6">
                         <h3 class="text-xl font-bold uppercase tracking-widest text-white flex items-center gap-3">
@@ -183,13 +184,10 @@
                     </div>
                     
                     <div id="evidencias-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                        <!-- Evidencias loader here -->
-                        <div class="col-span-full text-center py-8 text-[#9CA3AF]">
-                            <i class="fas fa-spinner fa-spin text-3xl mb-3"></i>
-                            <p class="text-sm">Cargando trabajos...</p>
-                        </div>
+                        <!-- Las evidencias se cargarán con JavaScript -->
                     </div>
                 </div>
+                @endif
 
                 <!-- Reseñas -->
                 <div id="resenas-section" class="bg-[#262626] border border-[#374151] rounded-sm p-6">
@@ -414,44 +412,13 @@
 </div>
 
 <script>
-    let evidenciasData = [];
+    let evidenciasData = @json($evidencias);
     let currentEvidenciaIndex = 0;
 
     document.addEventListener('DOMContentLoaded', () => {
-        const negocioId = "{{ $negocio['id_negocio'] ?? $negocio['id'] }}";
-        fetch(`/api-proxy/negocios/${negocioId}/evidencias`, {
-            headers: {
-                'Accept': 'application/json'
-            }
-        })
-            .then(response => response.json())
-            .then(res => {
-                if(res.success && res.data && res.data.length > 0) {
-                    evidenciasData = res.data;
-                    renderEvidenciasPublic(evidenciasData);
-                } else {
-                    const grid = document.getElementById('evidencias-grid');
-                    if (grid) {
-                        grid.innerHTML = `
-                            <div class="col-span-full text-center py-8">
-                                <i class="fas fa-images text-4xl text-[#374151] mb-4"></i>
-                                <p class="text-[#9CA3AF] text-xs">Aún no hay trabajos en la galería.</p>
-                            </div>
-                        `;
-                    }
-                }
-            })
-            .catch(err => {
-                console.error('Error al cargar evidencias:', err);
-                const grid = document.getElementById('evidencias-grid');
-                if (grid) {
-                    grid.innerHTML = `
-                        <div class="col-span-full text-center py-8">
-                            <p class="text-red-400 text-xs">Error al cargar la galería.</p>
-                        </div>
-                    `;
-                }
-            });
+        if (evidenciasData.length > 0) {
+            renderEvidenciasPublic(evidenciasData);
+        }
             
         // Key bindings para navegación modal
         document.addEventListener('keydown', (e) => {

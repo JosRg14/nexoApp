@@ -112,7 +112,10 @@ class NegocioController extends Controller
                 // Si no hay reseñas, continuar con array vacío
             }
             
-            return view('negocio.show', compact('negocio', 'servicios', 'empleados', 'resenas', 'horariosFormateados'));
+            // Obtener evidencias
+            $evidencias = $this->httpClient->getPublic("/api/negocios/{$id}/evidencias")['data'] ?? [];
+            
+            return view('negocio.show', compact('negocio', 'servicios', 'empleados', 'resenas', 'horariosFormateados', 'evidencias'));
             
         } catch (\Exception $e) {
             \Log::error('Error en NegocioController: ' . $e->getMessage());
