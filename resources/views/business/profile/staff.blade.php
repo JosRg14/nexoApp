@@ -70,7 +70,8 @@
       Nuevo Empleado
     </h3>
     <form method="POST" action="{{ url('/api-proxy/api/admin/register/empleado') }}"
-    data-redirect="{{ route('business.profile') }}">
+    data-redirect="{{ route('business.profile') }}"
+    data-custom-handler="false">
       @csrf
       <input type="text" name="nombre" placeholder="Nombre" id="create_nombre"
       class="w-full mb-3 bg-transparent border-b border-gray-600 text-white">
@@ -191,12 +192,9 @@
       const redirectUrl = form.getAttribute('data-redirect') || window.location.href;
       const token = getCsrfToken();
       
-      // Obtener el método correcto (_method)
-      let method = 'POST';
-      const methodInput = form.querySelector('input[name="_method"]');
-      if (methodInput) {
-          method = methodInput.value;
-      }
+      // Siempre POST: PHP no parsea body multipart en PUT/PATCH.
+      // El campo _method=PUT en el FormData hace el spoofing para Laravel.
+      const method = 'POST';
       
       if (typeof showLoader === 'function') showLoader();
       
@@ -212,7 +210,7 @@
           
           const data = await response.json();
           
-          if (response.ok && data.success !== false) {
+          if (response.ok) {
               if (typeof showToast === 'function') showToast(data.message || 'Operación exitosa', 'success');
               setTimeout(() => {
                   window.location.href = redirectUrl;

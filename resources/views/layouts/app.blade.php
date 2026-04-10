@@ -69,14 +69,12 @@
             const form = e.target;
             const action = form.getAttribute('action');
 
-            if (action && action.includes('/api-proxy/') && form.getAttribute('data-custom-handler') !== 'true') {
+            if (action && action.includes('/api-proxy/') && form.getAttribute('data-custom-handler') === 'false') {
                 e.preventDefault();
 
-                let method = form.getAttribute('method') || 'POST';
-                const methodOverride = form.querySelector('input[name="_method"]');
-                if (methodOverride) {
-                    method = methodOverride.value;
-                }
+                // Siempre POST: PHP no parsea body multipart en PUT/PATCH.
+                // El campo _method en el FormData hace el spoofing para Laravel.
+                const method = 'POST';
 
                 const submitBtn = form.querySelector('button[type="submit"]');
                 let originalBtnContent = '';
@@ -91,7 +89,7 @@
 
                 try {
                     const response = await fetch(action, {
-                        method: method, // Usamos el método detectado (POST, PUT, DELETE, etc.)
+                        method: method,
                         headers: {
                             'Accept': 'application/json',
                             'X-CSRF-TOKEN': getCsrfToken()
