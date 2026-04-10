@@ -208,7 +208,7 @@
 @endphp
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-16">
         <div class="space-y-8">
-            <form method="POST" id="editNegocioForm" action="{{ url('/api-proxy/api/negocios/mi-negocio') }}" data-redirect="{{ route('business.profile') }}" class="space-y-8" enctype="multipart/form-data" data-custom-handler="true">
+            <form method="POST" id="editNegocioForm" action="{{ url('/api-proxy/api/negocios/mi-negocio') }}" data-redirect="{{ route('business.profile') }}" class="space-y-8" enctype="multipart/form-data" data-custom-handler="false">
                 @csrf
                 @method('PUT')
                 

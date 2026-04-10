@@ -230,7 +230,7 @@
     <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-[#1a1a1a] border border-[#374151] p-8 w-full max-w-md">
         <h3 class="text-red-500 font-bold mb-4 uppercase">Confirmar eliminación</h3>
         <p class="text-white text-sm mb-6">¿Estás seguro que deseas eliminar <span id="deleteServiceName" class="font-bold"></span>?</p>
-        <form method="POST" id="deleteServiceForm" data-custom-handler="true">
+        <form method="POST" id="deleteServiceForm" data-custom-handler="false">
             @csrf
             @method('DELETE')
             <div class="flex gap-4">

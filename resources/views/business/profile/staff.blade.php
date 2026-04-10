@@ -103,7 +103,7 @@
     <h3 class="text-white font-bold mb-6">
       Editar empleado
     </h3>
-    <form method="POST" id="editEmployeeForm">
+    <form method="POST" id="editEmployeeForm" data-custom-handler="false" data-redirect="{{ route('business.profile') }}">
       @csrf @method('PUT')
       <input type="hidden" id="edit_id">
       <input type="text" name="nombre" id="edit_nombre_empleado" placeholder="Nombre"
