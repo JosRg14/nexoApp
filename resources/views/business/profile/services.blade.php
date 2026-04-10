@@ -240,6 +240,7 @@
     </div>
 </div>
 
+<script>
     // --- CIERRE CORRECTO DE openDeleteModal ---
     function openDeleteModal(id, nombre) 
     {
