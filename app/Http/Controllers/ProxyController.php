@@ -85,7 +85,10 @@ class ProxyController extends Controller
 
                 // Construir request base
                 $pendingRequest = Http::withHeaders($headers)
-                    ->withOptions(['verify' => false])
+                    ->withOptions([
+                        'verify' => false,
+                        'http_errors' => false
+                    ])
                     ->timeout(30);
 
                 // Adjuntar cada archivo con fopen (evita cargar en memoria)
@@ -133,7 +136,10 @@ class ProxyController extends Controller
                 $data = $request->except(['_token', '_method']);
 
                 $pendingRequest = Http::withHeaders($headers)
-                    ->withOptions(['verify' => false])
+                    ->withOptions([
+                        'verify' => false,
+                        'http_errors' => false
+                    ])
                     ->timeout(15)
                     ->retry(2, 500);
 
@@ -144,14 +150,7 @@ class ProxyController extends Controller
                 }
             }
 
-            if ($response->status() >= 400) {
-                Log::warning('Proxy: respuesta de error', [
-                    'url'      => $url,
-                    'method'   => strtoupper($method),
-                    'status'   => $response->status(),
-                    'response' => $response->body(),
-                ]);
-            }
+
 
             // Respuesta transparente (JSON, imágenes, binarios, etc.)
             return response($response->body(), $response->status(), [
@@ -163,7 +162,11 @@ class ProxyController extends Controller
                 'url'   => $url,
                 'error' => $e->getMessage(),
             ]);
-            return response()->json(['message' => 'Error interno conectando con el servicio.'], 500);
+            return response()->json([
+                'success' => false,
+                'message' => 'Error de conexión con el servicio API.',
+                'error'   => $e->getMessage()
+            ], 502);
         }
     }
 }
