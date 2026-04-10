@@ -237,19 +237,34 @@ class BusinessProfileController extends Controller
 
     public function obtenerEvidenciasNegocio()
     {
-        $response = $this->httpClient->get('/api/evidencias');
-        return response()->json($response);
+        try {
+            $response = $this->httpClient->get('/api/evidencias');
+            return response()->json($response);
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Error en proxy obtenerEvidenciasNegocio: ' . $e->getMessage());
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+        }
     }
 
     public function toggleEvidenciaPublica($id, Request $request)
     {
-        $response = $this->httpClient->patch("/api/evidencias/{$id}/publica", $request->all());
-        return response()->json($response);
+        try {
+            $response = $this->httpClient->patch("/api/evidencias/{$id}/publica", $request->all());
+            return response()->json($response);
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Error en proxy toggleEvidenciaPublica: ' . $e->getMessage());
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+        }
     }
 
     public function eliminarEvidencia($id)
     {
-        $response = $this->httpClient->delete("/api/evidencias/{$id}");
-        return response()->json($response);
+        try {
+            $response = $this->httpClient->delete("/api/evidencias/{$id}");
+            return response()->json($response);
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Error en proxy eliminarEvidencia: ' . $e->getMessage());
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+        }
     }
 }

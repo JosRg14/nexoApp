@@ -173,6 +173,24 @@
                     @endif
                 </div>
                 
+                <!-- Nuestros Trabajos (Evidencias) -->
+                <div id="evidencias-section" class="bg-[#262626] border border-[#374151] rounded-sm p-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-xl font-bold uppercase tracking-widest text-white flex items-center gap-3">
+                            <i class="fas fa-camera text-2xl text-[#25B5DA]"></i> 
+                            Nuestros Trabajos
+                        </h3>
+                    </div>
+                    
+                    <div id="evidencias-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                        <!-- Evidencias loader here -->
+                        <div class="col-span-full text-center py-8 text-[#9CA3AF]">
+                            <i class="fas fa-spinner fa-spin text-3xl mb-3"></i>
+                            <p class="text-sm">Cargando trabajos...</p>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Reseñas -->
                 <div id="resenas-section" class="bg-[#262626] border border-[#374151] rounded-sm p-6">
                     <h3 class="text-sm font-bold uppercase tracking-widest text-white mb-4 flex items-center gap-2">
@@ -222,24 +240,7 @@
                     </div>
                 </div>
 
-                <!-- Nuestros Trabajos (Evidencias) -->
-                <div id="evidencias-section" class="bg-[#262626] border border-[#374151] rounded-sm p-6 hidden">
-                    <div class="flex justify-between items-center mb-6">
-                        <h3 class="text-xl font-bold uppercase tracking-widest text-white flex items-center gap-3">
-                            <i class="fas fa-camera text-2xl text-[#25B5DA]"></i> 
-                            Nuestros Trabajos
-                        </h3>
-                    </div>
-                    
-                    <div id="evidencias-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                        <!-- Evidencias loader here -->
-                        <div class="col-span-full text-center py-8 text-[#9CA3AF]">
-                            <i class="fas fa-spinner fa-spin text-3xl mb-3"></i>
-                            <p class="text-sm">Cargando trabajos...</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+
             
             <!-- Columna derecha -->
             <div class="lg:w-1/3 flex flex-col gap-6">
@@ -418,20 +419,38 @@
 
     document.addEventListener('DOMContentLoaded', () => {
         const negocioId = "{{ $negocio['id_negocio'] ?? $negocio['id'] }}";
-        fetch(`/api-proxy/negocios/${negocioId}/evidencias`)
+        fetch(`/api-proxy/negocios/${negocioId}/evidencias`, {
+            headers: {
+                'Accept': 'application/json'
+            }
+        })
             .then(response => response.json())
             .then(res => {
                 if(res.success && res.data && res.data.length > 0) {
                     evidenciasData = res.data;
                     renderEvidenciasPublic(evidenciasData);
-                    document.getElementById('evidencias-section').classList.remove('hidden');
                 } else {
-                    document.getElementById('evidencias-section').remove();
+                    const grid = document.getElementById('evidencias-grid');
+                    if (grid) {
+                        grid.innerHTML = `
+                            <div class="col-span-full text-center py-8">
+                                <i class="fas fa-images text-4xl text-[#374151] mb-4"></i>
+                                <p class="text-[#9CA3AF] text-xs">Aún no hay trabajos en la galería.</p>
+                            </div>
+                        `;
+                    }
                 }
             })
             .catch(err => {
                 console.error('Error al cargar evidencias:', err);
-                document.getElementById('evidencias-section').remove();
+                const grid = document.getElementById('evidencias-grid');
+                if (grid) {
+                    grid.innerHTML = `
+                        <div class="col-span-full text-center py-8">
+                            <p class="text-red-400 text-xs">Error al cargar la galería.</p>
+                        </div>
+                    `;
+                }
             });
             
         // Key bindings para navegación modal
