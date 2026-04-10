@@ -178,6 +178,7 @@
         <h3 id="editModalTitle" class="text-white font-bold mb-6 uppercase">Editar Servicio</h3>
         <form method="POST" id="editServiceForm" data-redirect="{{ route('business.profile') }}" enctype="multipart/form-data" data-custom-handler="false">
             @csrf
+            @method('PUT')
             <input type="hidden" name="id" id="edit_id">
             <div class="space-y-5">
                 <div>

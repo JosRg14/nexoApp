@@ -91,7 +91,7 @@
 
                 try {
                     const response = await fetch(action, {
-                        method: 'POST', // Usamos POST siempre; Laravel detecta el spoofing con _method en FormData.
+                        method: method, // Usamos el método detectado (POST, PUT, DELETE, etc.)
                         headers: {
                             'Accept': 'application/json',
                             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || form.querySelector('input[name="_token"]')?.value
