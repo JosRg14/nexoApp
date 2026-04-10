@@ -152,21 +152,42 @@ class ProxyController extends Controller
 
 
 
-            // Respuesta transparente (JSON, imágenes, binarios, etc.)
-            return response($response->body(), $response->status(), [
-                'Content-Type' => $response->header('Content-Type') ?? 'application/json',
+            $body = $response->body();
+            $statusCode = $response->status();
+            $contentType = $response->header('Content-Type');
+
+            // 1. Verificar si la respuesta es JSON
+            if ($contentType && strpos($contentType, 'application/json') === 0) {
+                return response($body, $statusCode)->header('Content-Type', 'application/json');
+            }
+
+            // 2. Permitir recursos en storage si la petición fue exitosa (imágenes, etc.)
+            if (str_starts_with($path, 'storage/') && $response->successful()) {
+                return response($body, $statusCode)->header('Content-Type', $contentType ?? 'application/octet-stream');
+            }
+
+            // 3. Si no es JSON (o es un error de storage), devolver error estructurado
+            Log::warning('Proxy: respuesta no JSON', [
+                'url'          => $url,
+                'status'       => $statusCode,
+                'content_type' => $contentType
             ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Error en el servidor externo'
+            ], $statusCode);
 
         } catch (\Exception $e) {
             Log::error('Proxy: fallo de conexión', [
                 'url'   => $url,
                 'error' => $e->getMessage(),
             ]);
+
             return response()->json([
                 'success' => false,
-                'message' => 'Error de conexión con el servicio API.',
-                'error'   => $e->getMessage()
-            ], 502);
+                'message' => 'Error de conexión con el servidor'
+            ], 503);
         }
     }
 }
