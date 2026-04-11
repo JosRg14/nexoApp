@@ -36,6 +36,17 @@
                                 <p class="text-[#9CA3AF] text-[10px] mt-1">
                                     {{ $service['descripcion'] ?? 'Sin descripción' }}
                                 </p>
+                                <div class="mt-2 text-left">
+                                    @if(isset($service['comision']) && $service['comision']['tipo'] !== 'ninguna')
+                                        <span class="inline-block px-2 py-0.5 bg-[#25B5DA]/10 text-[#25B5DA] text-[9px] uppercase tracking-widest font-bold border border-[#25B5DA]/30 rounded-sm">
+                                            <i class="fas fa-hand-holding-dollar mr-1"></i> {{ $service['comision']['descripcion'] ?? 'Con comisión' }}
+                                        </span>
+                                    @else
+                                        <span class="inline-block px-2 py-0.5 bg-[#374151]/30 text-[#9CA3AF] text-[9px] uppercase tracking-widest font-bold border border-[#374151] rounded-sm">
+                                            Sin comisión
+                                        </span>
+                                    @endif
+                                </div>
                             </div>
                             <span class="text-lg font-bold text-white">
                                 ${{ $service['precio'] }}
@@ -50,7 +61,9 @@
                                     @json($service["descripcion"] ?? ""),
                                     @json($service["precio"]),
                                     @json($service["duracion"] ?? 0),
-                                    @json($service["imagen"] ?? null)
+                                    @json($service["imagen"] ?? null),
+                                    @json($service["comision"]["tipo"] ?? "ninguna"),
+                                    @json($service["comision"]["porcentaje"] ?? $service["comision"]["monto_fijo"] ?? null)
                                 )'
                                 class="text-[10px] uppercase tracking-widest text-[#9CA3AF] hover:text-white">
                                 Editar
@@ -129,13 +142,35 @@
 
                 {{-- PRECIO --}}
                 <div class="group/input relative">
-                    <input type="number" name="precio" value="{{ old('precio') }}" min="1" max="10000" step="0.01" required class="peer w-full bg-transparent border-b border-[#374151] py-3 text-white focus:border-white focus:outline-none transition-colors placeholder-transparent" placeholder="Precio" />
+                    <input type="number" id="create_precio" name="precio" value="{{ old('precio') }}" min="1" max="10000" step="0.01" required class="peer w-full bg-transparent border-b border-[#374151] py-3 text-white focus:border-white focus:outline-none transition-colors placeholder-transparent" placeholder="Precio" />
                     <label class="absolute left-0 -top-3.5 text-[#9CA3AF] text-xs transition-all peer-placeholder-shown:text-base peer-placeholder-shown:top-3 peer-focus:-top-3.5 peer-focus:text-xs peer-focus:text-white">
                         Precio
                     </label>
                     @error('precio')
                         <p class="text-red-400 text-xs mt-1">{{ $message }}</p>
                     @enderror
+                </div>
+
+                {{-- TIPO DE COMISIÓN --}}
+                <div class="mt-4">
+                    <label class="block text-xs text-[#9CA3AF] uppercase tracking-widest mb-2">Comisión para el empleado</label>
+                    <select name="tipo_comision" id="create_tipo_comision" class="w-full bg-[#1a1a1a] border-b border-[#374151] py-3 text-white focus:border-white focus:outline-none transition-colors appearance-none">
+                        <option value="ninguna">Sin comisión</option>
+                        <option value="porcentaje">Porcentaje (%)</option>
+                        <option value="fijo">Monto Fijo ($)</option>
+                    </select>
+                </div>
+                
+                {{-- VALOR COMISIÓN --}}
+                <div class="group/input relative hidden mt-6" id="create_valor_comision_container">
+                    <input type="number" id="create_valor_comision" name="valor_comision" min="0" step="0.01" class="peer w-full bg-transparent border-b border-[#374151] py-3 text-white focus:border-white focus:outline-none transition-colors placeholder-transparent" placeholder="Valor de comisión" />
+                    <label class="absolute left-0 -top-3.5 text-[#9CA3AF] text-xs transition-all peer-placeholder-shown:text-base peer-placeholder-shown:top-3 peer-focus:-top-3.5 peer-focus:text-xs peer-focus:text-white">
+                        Valor de comisión
+                    </label>
+                </div>
+                
+                <div id="create_preview_comision" class="text-xs text-emerald-500 hidden mt-2 font-bold uppercase tracking-widest">
+                    El empleado ganará: $0.00
                 </div>
 
                 {{-- DURACIÓN --}}
@@ -215,6 +250,23 @@
                     <label class="block text-xs text-[#9CA3AF] uppercase tracking-widest mb-1">Precio ($)</label>
                     <input type="number" name="precio" id="edit_precio" min="1" max="10000" step="0.01" required class="w-full bg-transparent border-b border-[#374151] py-2 text-white focus:border-white outline-none">
                 </div>
+
+                <!-- COMISIÓN EDIT -->
+                <div>
+                    <label class="block text-xs text-[#9CA3AF] uppercase tracking-widest mb-1">Tipo de comisión</label>
+                    <select name="tipo_comision" id="edit_tipo_comision" class="w-full bg-[#1a1a1a] border-b border-[#374151] py-2 text-white focus:border-white outline-none">
+                        <option value="ninguna">Sin comisión</option>
+                        <option value="porcentaje">Porcentaje (%)</option>
+                        <option value="fijo">Monto Fijo ($)</option>
+                    </select>
+                </div>
+                <div id="edit_valor_comision_container" class="hidden mt-2">
+                    <label class="block text-xs text-[#9CA3AF] uppercase tracking-widest mb-1">Valor de comisión</label>
+                    <input type="number" name="valor_comision" id="edit_valor_comision" min="0" step="0.01" class="w-full bg-transparent border-b border-[#374151] py-2 text-white focus:border-white outline-none">
+                </div>
+                <div id="edit_preview_comision" class="text-xs text-emerald-500 hidden font-bold uppercase tracking-widest mt-2">
+                    El empleado ganará: $0.00
+                </div>
                 <div>
                     <label class="block text-xs text-[#9CA3AF] uppercase tracking-widest mb-1">Duración (minutos)</label>
                     <input type="number" name="duracion_estimada" id="edit_duracion" min="5" max="480" required class="w-full bg-transparent border-b border-[#374151] py-2 text-white focus:border-white outline-none">
@@ -247,6 +299,56 @@
                document.querySelector('input[name="_token"]')?.value;
     }
 
+    // --- LOGICA DE COMISIONES ---
+    function calculateCommission(priceInput, typeInput, valueInput, previewDiv) {
+        if(!priceInput || !typeInput || !valueInput || !previewDiv) return;
+        
+        const type = typeInput.value;
+        const container = valueInput.parentElement;
+        if (type === 'ninguna') {
+            if(container) container.classList.add('hidden');
+            previewDiv.classList.add('hidden');
+            return;
+        }
+        
+        if(container) container.classList.remove('hidden');
+        previewDiv.classList.remove('hidden');
+        
+        const price = parseFloat(priceInput.value) || 0;
+        const val = parseFloat(valueInput.value) || 0;
+        let result = 0;
+        
+        if (type === 'porcentaje') {
+            result = price * (val / 100);
+        } else if (type === 'fijo') {
+            result = val;
+        }
+        
+        previewDiv.innerText = 'El empleado ganará: $' + result.toFixed(2);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const cPrice = document.getElementById('create_precio');
+        const cType = document.getElementById('create_tipo_comision');
+        const cVal = document.getElementById('create_valor_comision');
+        const cPrev = document.getElementById('create_preview_comision');
+        
+        [cPrice, cType, cVal].forEach(el => {
+            el?.addEventListener('input', () => calculateCommission(cPrice, cType, cVal, cPrev));
+            el?.addEventListener('change', () => calculateCommission(cPrice, cType, cVal, cPrev));
+        });
+
+        const ePrice = document.getElementById('edit_precio');
+        const eType = document.getElementById('edit_tipo_comision');
+        const eVal = document.getElementById('edit_valor_comision');
+        const ePrev = document.getElementById('edit_preview_comision');
+        
+        [ePrice, eType, eVal].forEach(el => {
+            el?.addEventListener('input', () => calculateCommission(ePrice, eType, eVal, ePrev));
+            el?.addEventListener('change', () => calculateCommission(ePrice, eType, eVal, ePrev));
+        });
+    });
+
     // --- CIERRE CORRECTO DE openDeleteModal ---
     function openDeleteModal(id, nombre) 
     {
@@ -261,13 +363,15 @@
         document.getElementById('modal-delete-service').classList.add('hidden');
     }
 
-    function openEditModal(id, nombre, descripcion, precio, duracion, imagen) {
+    function openEditModal(id, nombre, descripcion, precio, duracion, imagen, tipo_comision = 'ninguna', valor_comision = null) {
         console.log('=== openEditModal DEBUG ===');
         console.log('ID:', id);
         console.log('Nombre:', nombre);
         console.log('Descripcion:', descripcion);
         console.log('Precio:', precio);
         console.log('Duracion:', duracion);
+        console.log('Comision Tipo:', tipo_comision);
+        console.log('Comision Valor:', valor_comision);
         
         const modal = document.getElementById('modal-edit-service');
         const form = document.getElementById('editServiceForm');
@@ -278,11 +382,16 @@
         document.getElementById('edit_descripcion').value = descripcion || '';
         document.getElementById('edit_precio').value = precio;
         document.getElementById('edit_duracion').value = duracion;
+        document.getElementById('edit_tipo_comision').value = tipo_comision;
+        document.getElementById('edit_valor_comision').value = valor_comision || '';
         
-        // Verificar después de asignar
-        console.log('Input nombre valor:', document.getElementById('edit_nombre').value);
-        console.log('Input precio valor:', document.getElementById('edit_precio').value);
-        console.log('Input duracion valor:', document.getElementById('edit_duracion').value);
+        // Disparar actualización de preview
+        calculateCommission(
+            document.getElementById('edit_precio'), 
+            document.getElementById('edit_tipo_comision'), 
+            document.getElementById('edit_valor_comision'), 
+            document.getElementById('edit_preview_comision')
+        );
         
         // Manejo de la previsualización de imagen
         const previewImg = document.getElementById('edit_imagen_preview');

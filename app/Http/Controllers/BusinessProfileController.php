@@ -64,6 +64,15 @@ class BusinessProfileController extends Controller
                 $item['duracion'] = $item['duracion'] ?? 0;
                 $item['imagen'] = $imagenUrl;
                 
+                // Aseguramos que existe el objeto comision
+                $item['comision'] = $item['comision'] ?? [
+                    'tipo' => 'ninguna',
+                    'porcentaje' => null,
+                    'monto_fijo' => null,
+                    'calculada' => 0,
+                    'descripcion' => 'Sin comisión'
+                ];
+                
                 return $item;
             })->toArray();
 
@@ -74,6 +83,13 @@ class BusinessProfileController extends Controller
                 $emp['comision'] = $emp['comision'] ?? 0;
                 $emp['total_servicios'] = $emp['total_servicios'] ?? 0;
                 $emp['estado'] = $emp['estado'] ?? 'activo';
+                
+                // Nuevos campos estadísticos
+                $emp['ingresos_totales'] = $emp['ingresos_totales'] ?? 0;
+                $emp['total_comision'] = $emp['total_comision'] ?? 0;
+                $emp['comision_mes'] = $emp['comision_mes'] ?? 0;
+                $emp['servicios_mes'] = $emp['servicios_mes'] ?? 0;
+                $emp['promedio_comision'] = $emp['promedio_comision'] ?? 0;
                 
                 return $emp; // Devolver el array completo
             })->toArray();

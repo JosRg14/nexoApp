@@ -158,6 +158,23 @@
         </div>
     </div>
     @endforeach
+
+    <!-- Staff Commissions Section -->
+    <div class="border border-[#374151] bg-[#1a1a1a] p-5 rounded-sm mt-5 mb-8">
+        <div class="flex justify-between items-center mb-5">
+            <h2 class="text-xl font-bold uppercase tracking-wide text-white">Comisiones del Personal (Esta Semana)</h2>
+            <button onclick="loadCommissions()" class="text-[#9CA3AF] hover:text-[#25B5DA] transition-colors" title="Actualizar">
+                <i class="fas fa-sync-alt" id="commissions-sync-icon"></i>
+            </button>
+        </div>
+        
+        <div id="commissions-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="col-span-full py-8 text-center text-[#9CA3AF]">
+                <i class="fas fa-spinner fa-spin text-2xl mb-2"></i>
+                <p class="text-xs uppercase tracking-widest">Cargando comisiones...</p>
+            </div>
+        </div>
+    </div>
 </section>
 
 <!-- Chart.js Support for finances tab -->
@@ -270,5 +287,78 @@
                 initChart(target);
             });
         });
+
+        // Initialize empty commissions on load
+        loadCommissions();
     });
+
+    async function loadCommissions() {
+        const container = document.getElementById('commissions-container');
+        const icon = document.getElementById('commissions-sync-icon');
+        
+        if(!container) return;
+        
+        if(icon) icon.classList.add('fa-spin');
+        
+        try {
+            const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || document.querySelector('input[name="_token"]')?.value;
+            const res = await fetch('/api-proxy/api/empleados/comisiones?periodo=semana', {
+                headers: {
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': token || ''
+                }
+            });
+            
+            const json = await res.json();
+            // La API puede devolver { success: true, data: [...] } o directamente el array
+            const data = json.data || (Array.isArray(json) ? json : []);
+            
+            container.innerHTML = '';
+            
+            if(!Array.isArray(data) || data.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-full py-6 text-center text-[#9CA3AF]">
+                        <p class="text-xs uppercase tracking-widest">No hay datos de comisiones esta semana.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            data.forEach(emp => {
+                const monto = parseFloat(emp.total_comision || emp.comision_semana || emp.total_comisiones || 0);
+                const nombre = emp.nombre_completo || emp.nombre || 'Empleado';
+                const servicios = emp.total_servicios || emp.cantidad_servicios || 0;
+                const badgeExtra = monto > 0 ? 'text-emerald-500' : 'text-[#6B7280]';
+                const inicial = nombre.charAt(0).toUpperCase();
+                
+                container.innerHTML += `
+                    <div class="bg-[#262626] border border-[#374151]/50 p-4 rounded-sm flex justify-between items-center group hover:border-[#F3F4F6]/30 transition-all">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full bg-[#1a1a1a] flex items-center justify-center text-white font-bold text-xs border border-[#374151]">
+                                ${inicial}
+                            </div>
+                            <div>
+                                <h4 class="text-white font-bold text-sm uppercase tracking-wide">${nombre}</h4>
+                                <p class="text-[#9CA3AF] text-[10px] mt-0.5">${servicios} servicios realizados</p>
+                            </div>
+                        </div>
+                        <div class="text-right flex flex-col justify-center">
+                            <p class="text-xl font-bold leading-none mb-1 ${badgeExtra}">$${monto.toFixed(2)}</p>
+                            <p class="text-[9px] text-[#9CA3AF] uppercase tracking-widest font-bold">A pagar</p>
+                        </div>
+                    </div>
+                `;
+            });
+            
+        } catch (error) {
+            console.error('Error fetching commissions:', error);
+            container.innerHTML = `
+                <div class="col-span-full py-6 text-center text-red-400">
+                    <p class="text-xs uppercase tracking-widest">Error al cargar comisiones.</p>
+                </div>
+            `;
+        } finally {
+            if(icon) icon.classList.remove('fa-spin');
+        }
+    }
 </script>

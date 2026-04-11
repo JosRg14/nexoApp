@@ -37,19 +37,33 @@
         <hr class="border-[#374151]/50">
 
         <!-- Métricas -->
-        <div class="grid grid-cols-2 gap-4">
-            <!-- Servicios -->
-            <div class="bg-[#262626] rounded p-3 flex flex-col items-center justify-center text-center">
-                <span class="text-2xl font-bold text-white leading-none mb-1">{{ $emp['total_servicios'] ?? 0 }}</span>
-                <span class="text-[10px] text-[#9CA3AF] uppercase tracking-widest font-bold">Servicios completados</span>
+        <div class="grid grid-cols-2 gap-3 mt-2">
+            <!-- Servicios Totales -->
+            <div class="bg-[#262626] border border-[#374151]/50 rounded p-3 flex flex-col justify-center text-center">
+                <span class="text-xl font-bold text-white leading-none mb-1">{{ $emp['total_servicios'] ?? 0 }}</span>
+                <span class="text-[9px] text-[#9CA3AF] uppercase tracking-widest font-bold">Servicios (Total)</span>
             </div>
             
-            <!-- Comisión -->
-            <div class="bg-[#262626] rounded p-3 flex flex-col items-center justify-center text-center">
-                <span class="text-xl font-bold leading-none mb-1 {{ ($emp['comision'] ?? 0) > 0 ? 'text-emerald-500' : 'text-[#6B7280]' }}">
-                    {{ number_format(floatval($emp['comision'] ?? 0), 0) }}%
+            <!-- Comisión Total -->
+            <div class="bg-[#262626] border border-[#374151]/50 rounded p-3 flex flex-col justify-center text-center">
+                <span class="text-xl font-bold leading-none mb-1 text-emerald-500">
+                    ${{ number_format(floatval($emp['total_comision'] ?? 0), 2) }}
                 </span>
-                <span class="text-[10px] text-[#9CA3AF] uppercase tracking-widest font-bold">Comisión</span>
+                <span class="text-[9px] text-[#9CA3AF] uppercase tracking-widest font-bold">Comisión (Total)</span>
+            </div>
+
+            <!-- Servicios Mes -->
+            <div class="bg-[#262626] border border-[#374151]/50 rounded p-3 flex flex-col justify-center text-center">
+                <span class="text-xl font-bold text-white leading-none mb-1">{{ $emp['servicios_mes'] ?? 0 }}</span>
+                <span class="text-[9px] text-[#9CA3AF] uppercase tracking-widest font-bold">Servicios (Mes)</span>
+            </div>
+            
+            <!-- Comisión Mes -->
+            <div class="bg-[#262626] border border-[#374151]/50 rounded p-3 flex flex-col justify-center text-center">
+                <span class="text-xl font-bold leading-none mb-1 text-emerald-500">
+                    ${{ number_format(floatval($emp['comision_mes'] ?? 0), 2) }}
+                </span>
+                <span class="text-[9px] text-[#9CA3AF] uppercase tracking-widest font-bold">Comisión (Mes)</span>
             </div>
         </div>
 
