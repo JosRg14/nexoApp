@@ -161,17 +161,52 @@
 
     <!-- Staff Commissions Section -->
     <div class="border border-[#374151] bg-[#1a1a1a] p-5 rounded-sm mt-5 mb-8">
-        <div class="flex justify-between items-center mb-5">
-            <h2 class="text-xl font-bold uppercase tracking-wide text-white">Comisiones del Personal (Esta Semana)</h2>
-            <button onclick="loadCommissions()" class="text-[#9CA3AF] hover:text-[#25B5DA] transition-colors" title="Actualizar">
-                <i class="fas fa-sync-alt" id="commissions-sync-icon"></i>
-            </button>
+        <div class="flex flex-col xl:flex-row justify-between items-start xl:items-center mb-5 gap-4">
+            <h2 class="text-xl font-bold uppercase tracking-wide text-white">Comisiones del Personal</h2>
+            
+            <div class="flex flex-col sm:flex-row gap-3 items-start sm:items-center w-full xl:w-auto">
+                <div class="flex gap-2">
+                    <button onclick="loadCommissions({ periodo: 'semana' })" class="px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest rounded border border-[#374151] hover:border-[#25B5DA] hover:text-[#25B5DA] transition-colors bg-[#262626] text-[#9CA3AF]">
+                        Esta Semana
+                    </button>
+                    <button onclick="loadCommissions({ periodo: 'mes' })" class="px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest rounded border border-[#374151] hover:border-[#25B5DA] hover:text-[#25B5DA] transition-colors bg-[#262626] text-[#9CA3AF]">
+                        Este Mes
+                    </button>
+                </div>
+                
+                <div class="flex items-center gap-2 bg-[#262626] border border-[#374151] rounded px-3 py-1 flex-1 sm:flex-none">
+                    <input type="date" id="comision_fecha_inicio" class="bg-transparent text-[#9CA3AF] text-xs focus:outline-none focus:text-white appearance-none h-6">
+                    <span class="text-[#374151]">-</span>
+                    <input type="date" id="comision_fecha_fin" class="bg-transparent text-[#9CA3AF] text-xs focus:outline-none focus:text-white appearance-none h-6">
+                    <button onclick="loadCommissions({ customDates: true })" class="ml-2 text-[#9CA3AF] hover:text-[#25B5DA] transition-colors" title="Aplicar Rango">
+                        <i class="fas fa-search" id="commissions-sync-icon"></i>
+                    </button>
+                </div>
+            </div>
         </div>
         
         <div id="commissions-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div class="col-span-full py-8 text-center text-[#9CA3AF]">
                 <i class="fas fa-spinner fa-spin text-2xl mb-2"></i>
                 <p class="text-xs uppercase tracking-widest">Cargando comisiones...</p>
+            </div>
+        </div>
+
+        <div id="totales-generales-container" class="mt-5 border-t border-[#374151] pt-5 hidden">
+            <h3 class="text-sm font-bold uppercase tracking-widest text-[#9CA3AF] mb-4">Resumen del Período</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="bg-[#262626] border border-[#374151]/50 p-4 rounded-sm flex flex-col justify-center items-center text-center">
+                    <span class="text-2xl font-bold text-white leading-none mb-1" id="tg-servicios">0</span>
+                    <span class="text-[9px] text-[#9CA3AF] uppercase tracking-widest font-bold">Total Servicios</span>
+                </div>
+                <div class="bg-[#262626] border border-[#374151]/50 p-4 rounded-sm flex flex-col justify-center items-center text-center">
+                    <span class="text-2xl font-bold text-white leading-none mb-1" id="tg-ingresos">$0.00</span>
+                    <span class="text-[9px] text-[#9CA3AF] uppercase tracking-widest font-bold">Ingresos del Negocio</span>
+                </div>
+                <div class="bg-[#262626] border border-[#374151]/50 p-4 rounded-sm flex flex-col justify-center items-center text-center">
+                    <span class="text-2xl font-bold text-emerald-500 leading-none mb-1" id="tg-comisiones">$0.00</span>
+                    <span class="text-[9px] text-[#9CA3AF] uppercase tracking-widest font-bold">Total a Pagar</span>
+                </div>
             </div>
         </div>
     </div>
@@ -289,20 +324,38 @@
         });
 
         // Initialize empty commissions on load
-        loadCommissions();
+        loadCommissions({ periodo: 'semana' });
     });
 
-    async function loadCommissions() {
+    async function loadCommissions(options = {}) {
         const container = document.getElementById('commissions-container');
         const icon = document.getElementById('commissions-sync-icon');
+        const totalesContainer = document.getElementById('totales-generales-container');
         
         if(!container) return;
+        
+        let queryParams = '?periodo=semana';
+        
+        if (options.customDates) {
+            const fi = document.getElementById('comision_fecha_inicio')?.value;
+            const ff = document.getElementById('comision_fecha_fin')?.value;
+            if (fi && ff) {
+                queryParams = `?fecha_inicio=${fi}&fecha_fin=${ff}`;
+            } else if (fi) {
+                queryParams = `?fecha_inicio=${fi}&fecha_fin=${fi}`;
+            } else {
+                if (typeof showToast === 'function') showToast('Selecciona ambas fechas', 'warning');
+                return;
+            }
+        } else if (options.periodo) {
+            queryParams = `?periodo=${options.periodo}`;
+        }
         
         if(icon) icon.classList.add('fa-spin');
         
         try {
             const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || document.querySelector('input[name="_token"]')?.value;
-            const res = await fetch('/api-proxy/api/empleados/comisiones?periodo=semana', {
+            const res = await fetch('/api-proxy/api/empleados/comisiones' + queryParams, {
                 headers: {
                     'Accept': 'application/json',
                     'X-CSRF-TOKEN': token || ''
@@ -310,8 +363,32 @@
             });
             
             const json = await res.json();
-            // La API puede devolver { success: true, data: [...] } o directamente el array
-            const data = json.data || (Array.isArray(json) ? json : []);
+            
+            let data = [];
+            let totales = null;
+            
+            if (Array.isArray(json)) {
+                data = json;
+            } else if (json.data && Array.isArray(json.data)) {
+                data = json.data;
+                totales = json.totales_generales || null;
+            } else if (json.data) {
+                data = Object.values(json.data); // in case data is object holding list
+                totales = json.totales_generales || null;
+            } else {
+                data = json;
+                totales = json.totales_generales || null;
+            }
+
+            // Actualizar Totales Generales
+            if (totalesContainer && totales) {
+                document.getElementById('tg-servicios').innerText = totales.total_servicios_citas || totales.total_servicios || 0;
+                document.getElementById('tg-ingresos').innerText = '$' + parseFloat(totales.total_ingresos || 0).toFixed(2);
+                document.getElementById('tg-comisiones').innerText = '$' + parseFloat(totales.total_comisiones || 0).toFixed(2);
+                totalesContainer.classList.remove('hidden');
+            } else if (totalesContainer) {
+                totalesContainer.classList.add('hidden');
+            }
             
             container.innerHTML = '';
             
