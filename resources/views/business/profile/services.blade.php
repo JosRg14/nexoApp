@@ -157,7 +157,7 @@
                     <select name="tipo_comision" id="create_tipo_comision" class="w-full bg-[#1a1a1a] border-b border-[#374151] py-3 text-white focus:border-white focus:outline-none transition-colors appearance-none">
                         <option value="ninguna">Sin comisión</option>
                         <option value="porcentaje">Porcentaje (%)</option>
-                        <option value="fijo">Monto Fijo ($)</option>
+                        <option value="fija">Monto Fijo ($)</option>
                     </select>
                 </div>
                 
@@ -257,7 +257,7 @@
                     <select name="tipo_comision" id="edit_tipo_comision" class="w-full bg-[#1a1a1a] border-b border-[#374151] py-2 text-white focus:border-white outline-none">
                         <option value="ninguna">Sin comisión</option>
                         <option value="porcentaje">Porcentaje (%)</option>
-                        <option value="fijo">Monto Fijo ($)</option>
+                        <option value="fija">Monto Fijo ($)</option>
                     </select>
                 </div>
                 <div id="edit_valor_comision_container" class="hidden mt-2">
@@ -320,7 +320,7 @@
         
         if (type === 'porcentaje') {
             result = price * (val / 100);
-        } else if (type === 'fijo') {
+        } else if (type === 'fijo' || type === 'fija') {
             result = val;
         }
         
@@ -620,6 +620,23 @@
         const redirectUrl = form.getAttribute('data-redirect') || window.location.href;
         const token = getCsrfToken();
         
+        const tipoComision = formData.get('tipo_comision');
+        if (!tipoComision || tipoComision === 'ninguna' || tipoComision === '' || tipoComision === 'null') {
+            formData.delete('tipo_comision');
+            formData.delete('valor_comision');
+            formData.delete('comision_porcentaje');
+            formData.delete('comision_fija');
+        } else if (tipoComision === 'porcentaje') {
+            formData.set('comision_porcentaje', formData.get('valor_comision'));
+            formData.delete('valor_comision');
+            formData.delete('comision_fija');
+        } else if (tipoComision === 'fijo' || tipoComision === 'fija') {
+            formData.set('comision_fija', formData.get('valor_comision'));
+            formData.delete('valor_comision');
+            formData.delete('comision_porcentaje');
+            formData.set('tipo_comision', 'fija');
+        }
+        
         if (typeof showLoader === 'function') showLoader();
         
         try {
@@ -653,6 +670,23 @@
         const formData = new FormData(form);
         const action = form.action;
         const token = getCsrfToken();
+        
+        const tipoComision = formData.get('tipo_comision');
+        if (!tipoComision || tipoComision === 'ninguna' || tipoComision === '' || tipoComision === 'null') {
+            formData.delete('tipo_comision');
+            formData.delete('valor_comision');
+            formData.delete('comision_porcentaje');
+            formData.delete('comision_fija');
+        } else if (tipoComision === 'porcentaje') {
+            formData.set('comision_porcentaje', formData.get('valor_comision'));
+            formData.delete('valor_comision');
+            formData.delete('comision_fija');
+        } else if (tipoComision === 'fijo' || tipoComision === 'fija') {
+            formData.set('comision_fija', formData.get('valor_comision'));
+            formData.delete('valor_comision');
+            formData.delete('comision_porcentaje');
+            formData.set('tipo_comision', 'fija');
+        }
         
         // 🔥 LOG DE DEPURACIÓN: verificar qué campos contiene el FormData
         console.log('=== FORMULARIO EDITAR SERVICIO ===');
