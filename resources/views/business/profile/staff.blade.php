@@ -103,7 +103,7 @@
     <h3 class="text-white font-bold mb-6">
       Nuevo Empleado
     </h3>
-    <form method="POST" action="{{ url('/api-proxy/api/admin/register/empleado') }}"
+    <form method="POST" id="addEmployeeForm" action="{{ url('/api-proxy/api/admin/register/empleado') }}"
     data-redirect="{{ route('business.profile') }}"
     data-custom-handler="false">
       @csrf
@@ -237,6 +237,60 @@
   };
 
   // --- CONTROLADORES DE SUBMIT DIRECTOS ---
+
+  // Para el formulario de crear empleado
+  document.getElementById('addEmployeeForm')?.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      const form = this;
+      const action = form.action;
+      const formData = new FormData(form);
+      const redirectUrl = form.getAttribute('data-redirect') || window.location.href;
+      const token = getCsrfToken();
+      
+      const method = 'POST';
+      
+      const submitBtn = form.querySelector('button[type="submit"]') || form.querySelector('button');
+      let originalBtnContent = '';
+      if (submitBtn) {
+          originalBtnContent = submitBtn.innerHTML;
+          submitBtn.disabled = true;
+          submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Cargando...';
+      }
+
+      if (typeof showLoader === 'function') showLoader();
+      
+      try {
+          const response = await fetch(action, {
+              method: method,
+              headers: {
+                  'Accept': 'application/json',
+                  'X-CSRF-TOKEN': token
+              },
+              body: formData
+          });
+          
+          const data = await response.json();
+          
+          if (response.ok) {
+              if (typeof showToast === 'function') showToast(data.message || 'Operación exitosa', 'success');
+              setTimeout(() => {
+                  window.location.href = redirectUrl;
+              }, 1000);
+          } else {
+              if (typeof showToast === 'function') showToast(data.message || 'Error en la operación', 'error');
+          }
+      } catch (error) {
+          console.error(error);
+          if (typeof showToast === 'function') showToast('Error de conexión', 'error');
+      } finally {
+          if (submitBtn) {
+              submitBtn.disabled = false;
+              submitBtn.innerHTML = originalBtnContent;
+          }
+          if (typeof hideLoader === 'function') hideLoader();
+      }
+  });
 
   // Para el formulario de editar empleado
   document.getElementById('editEmployeeForm')?.addEventListener('submit', async function(e) {
