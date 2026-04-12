@@ -48,8 +48,15 @@ class BookingController extends Controller
         } catch (\Exception $e) {
             Log::error('Error al obtener empleados: ' . $e->getMessage());
         }
+
+        // Obtener ID de cliente de la sesión
+        $usuario = session('usuario');
+        $clienteId = null;
+        if (isset($usuario['rol']) && $usuario['rol'] === 'cliente') {
+            $clienteId = $usuario['cliente']['id_cliente'] ?? $usuario['id'] ?? null;
+        }
         
-        return view('booking.create', compact('servicios', 'empleados', 'negocioId'));
+        return view('booking.create', compact('servicios', 'empleados', 'negocioId', 'clienteId'));
     }
     
     /**

@@ -64,7 +64,10 @@
                             <td class="p-4 font-bold text-[#F3F4F6]" x-text="cliente.total_visitas || 0"></td>
                             <td class="p-4 text-[#25B5DA] font-medium whitespace-nowrap" x-text="formatearMoneda(cliente.gasto_total)"></td>
                             <td class="p-4 text-[#9CA3AF] whitespace-nowrap" x-text="cliente.ultima_visita ? new Date(cliente.ultima_visita).toLocaleDateString('es-ES') : 'N/A'"></td>
-                            <td class="p-4 text-right">
+                            <td class="p-4 text-right flex items-center justify-end gap-3 flex-wrap">
+                                <button @click="abrirModalHistorial(cliente)" class="text-[#9CA3AF] hover:text-white transition-colors" title="Ver Historial de Promociones">
+                                    <i class="fa-solid fa-clock-rotate-left"></i>
+                                </button>
                                 <button @click="abrirModalAsignar(cliente)" class="text-[#25B5DA] font-bold text-[10px] uppercase tracking-widest hover:text-white transition-colors">
                                     Asignar Promoción
                                 </button>
@@ -290,6 +293,122 @@
         </div>
     </div>
 
+    <!-- Modal Historial Promociones -->
+    <div x-show="modales.historial" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 px-4" style="display: none;">
+        <div class="bg-[#1a1a1a] border border-[#374151] rounded-lg shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col" @click.away="modales.historial = false">
+            <div class="px-6 py-4 border-b border-[#374151] flex justify-between items-center bg-[#0f0f0f] shrink-0">
+                <h3 class="text-lg font-bold text-white uppercase tracking-widest">
+                    Promociones de <span class="text-[#25B5DA]" x-text="historialClienteNombre"></span>
+                </h3>
+                <button @click="modales.historial = false" class="text-[#9CA3AF] hover:text-white">
+                    <i class="fa-solid fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="flex-1 overflow-y-auto p-0">
+                <!-- TABS -->
+                <div class="flex border-b border-[#374151]">
+                    <button @click="historialTab = 'disponibles'" 
+                            :class="historialTab === 'disponibles' ? 'border-[#25B5DA] text-white' : 'border-transparent text-[#9CA3AF] hover:text-gray-300'"
+                            class="px-6 py-3 font-bold text-xs uppercase tracking-widest border-b-2 transition-colors">
+                        Disponibles (<span x-text="historialDisponibles.length"></span>)
+                    </button>
+                    <button @click="historialTab = 'historial'" 
+                            :class="historialTab === 'historial' ? 'border-[#25B5DA] text-white' : 'border-transparent text-[#9CA3AF] hover:text-gray-300'"
+                            class="px-6 py-3 font-bold text-xs uppercase tracking-widest border-b-2 transition-colors">
+                        Historial Uso (<span x-text="historialUsadas.length"></span>)
+                    </button>
+                </div>
+
+                <div class="p-6">
+                    <template x-if="loading.historial">
+                        <div class="text-center py-8">
+                            <i class="fas fa-spinner fa-spin text-[#25B5DA] text-2xl mb-2"></i>
+                            <p class="text-[#9CA3AF] text-xs uppercase tracking-widest">Cargando...</p>
+                        </div>
+                    </template>
+
+                    <template x-if="!loading.historial">
+                        <div>
+                            <!-- TAB DISPONIBLES -->
+                            <div x-show="historialTab === 'disponibles'">
+                                <template x-if="historialDisponibles.length === 0">
+                                    <div class="text-center py-8 text-[#9CA3AF] text-sm bg-[#1e1e1e] rounded-lg border border-[#374151]">
+                                        El cliente no tiene promociones disponibles.
+                                    </div>
+                                </template>
+                                
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4" x-show="historialDisponibles.length > 0">
+                                    <template x-for="promo in historialDisponibles" :key="promo.id">
+                                        <div class="bg-[#262626] border border-[#374151] rounded-lg p-4 flex justify-between items-start">
+                                            <div>
+                                                <h4 class="text-white font-bold text-sm mb-1" x-text="promo.titulo || promo.promocion?.nombre"></h4>
+                                                <div class="flex gap-2">
+                                                    <span class="inline-block px-2 py-0.5 rounded-full text-[10px] uppercase font-bold tracking-widest bg-[#25B5DA]/20 text-[#25B5DA]" 
+                                                          x-text="(promo.beneficio_tipo === 'descuento' ? promo.beneficio_valor + '% OFF' : 'GRATIS')">
+                                                    </span>
+                                                    <span class="inline-block px-2 py-0.5 rounded-full text-[10px] uppercase font-bold tracking-widest bg-green-500/10 text-green-500">
+                                                        Disponible
+                                                    </span>
+                                                </div>
+                                                <p class="text-[10px] text-[#9CA3AF] mt-2">
+                                                    Asignada el: <span x-text="new Date(promo.created_at).toLocaleDateString()"></span>
+                                                    <template x-if="promo.vigencia">
+                                                        <span> • Vence: <span x-text="new Date(promo.vigencia).toLocaleDateString()"></span></span>
+                                                    </template>
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
+
+                            <!-- TAB HISTORIAL -->
+                            <div x-show="historialTab === 'historial'">
+                                <template x-if="historialUsadas.length === 0">
+                                    <div class="text-center py-8 text-[#9CA3AF] text-sm bg-[#1e1e1e] rounded-lg border border-[#374151]">
+                                        El cliente no tiene un historial de uso.
+                                    </div>
+                                </template>
+
+                                <div class="overflow-x-auto border border-[#374151] rounded-lg" x-show="historialUsadas.length > 0">
+                                    <table class="w-full text-left border-collapse min-w-[600px]">
+                                        <thead>
+                                            <tr class="bg-[#0f0f0f] border-b border-[#374151]">
+                                                <th class="p-3 text-[10px] uppercase tracking-widest font-bold text-[#F3F4F6]">Promoción</th>
+                                                <th class="p-3 text-[10px] uppercase tracking-widest font-bold text-[#F3F4F6]">Beneficio</th>
+                                                <th class="p-3 text-[10px] uppercase tracking-widest font-bold text-[#F3F4F6]">Cita Fecha</th>
+                                                <th class="p-3 text-[10px] uppercase tracking-widest font-bold text-[#F3F4F6]">Estado Cita</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="text-sm">
+                                            <template x-for="uso in historialUsadas" :key="uso.id">
+                                                <tr class="border-b border-[#374151]/50 hover:bg-[#262626] transition-colors">
+                                                    <td class="p-3 font-semibold text-white">
+                                                        <div x-text="uso.promocion?.titulo || uso.promocion?.promocion?.nombre || 'Promoción'"></div>
+                                                        <div class="text-[10px] text-[#9CA3AF] font-normal" x-text="'Usada: ' + new Date(uso.created_at).toLocaleDateString()"></div>
+                                                    </td>
+                                                    <td class="p-3 text-[#25B5DA]" x-text="'-$' + (uso.descuento_aplicado || 0)"></td>
+                                                    <td class="p-3 text-[#9CA3AF]" x-text="uso.cita ? new Date(uso.cita.fecha).toLocaleDateString() + ' ' + uso.cita.hora_inicio : 'N/A'"></td>
+                                                    <td class="p-3">
+                                                        <span class="text-[10px] uppercase font-bold tracking-widest" 
+                                                              :class="uso.cita?.estado === 'completada' ? 'text-green-400' : 'text-orange-400'" 
+                                                              x-text="uso.cita ? (uso.cita.estado || 'agendada') : 'Uso registrado'">
+                                                        </span>
+                                                    </td>
+                                                </tr>
+                                            </template>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </div>
 
 <script>
@@ -306,7 +425,8 @@ function clientesPromociones() {
         
         loading: {
             clientes: false,
-            promociones: false
+            promociones: false,
+            historial: false
         },
         
         filtros: {
@@ -318,8 +438,14 @@ function clientesPromociones() {
         modales: {
             formulario: false,
             eliminar: false,
-            asignar: false
+            asignar: false,
+            historial: false
         },
+
+        historialClienteNombre: '',
+        historialDisponibles: [],
+        historialUsadas: [],
+        historialTab: 'disponibles',
 
         formPromo: {
             id_promocion: null,
@@ -526,7 +652,44 @@ function clientesPromociones() {
             return 'Servicio Gratis';
         },
 
-        // --- ASIGNACIONES ---
+        // --- ASIGNACIONES E HISTORIAL ---
+
+        async abrirModalHistorial(cliente) {
+            const cid = cliente.cliente_id || cliente.id_cliente || cliente.id_usuario || cliente.id;
+            if (!cid) return;
+            
+            this.historialClienteNombre = cliente.nombre_completo || 'Cliente Frecuente';
+            this.historialTab = 'disponibles';
+            this.modales.historial = true;
+            this.loading.historial = true;
+            this.historialDisponibles = [];
+            this.historialUsadas = [];
+
+            try {
+                // Fetch disponibles
+                const resDisp = await fetch(`/api-proxy/api/clientes/${cid}/promociones/disponibles`, {
+                    headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' }
+                });
+                if (resDisp.ok) {
+                    const data = await resDisp.json();
+                    this.historialDisponibles = data.data || [];
+                }
+
+                // Fetch historial
+                const resHist = await fetch(`/api-proxy/api/clientes/${cid}/promociones/historial`, {
+                    headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' }
+                });
+                if (resHist.ok) {
+                    const data = await resHist.json();
+                    this.historialUsadas = data.data || [];
+                }
+            } catch (e) {
+                console.error(e);
+                if (typeof showToast !== 'undefined') showToast('Error al cargar historial', 'error');
+            } finally {
+                this.loading.historial = false;
+            }
+        },
 
         abrirModalAsignar(cliente) {
             // Usar el campo correcto según la estructura de datos

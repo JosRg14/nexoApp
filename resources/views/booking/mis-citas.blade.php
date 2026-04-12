@@ -44,9 +44,29 @@
                         <i class="fas fa-user w-4"></i>
                         <span>{{ $cita['empleado']['nombre'] ?? 'Empleado' }}</span>
                     </div>
+                    
+                    @if(isset($cita['promocion_aplicada']))
+                    <div class="flex flex-col gap-1 mt-2 p-3 bg-[#25B5DA]/10 border border-[#25B5DA]/30 rounded-lg">
+                        <div class="flex justify-between text-xs text-[#9CA3AF]">
+                            <span>Precio original:</span>
+                            <span class="line-through">${{ number_format($cita['precio_original'] ?? $cita['servicio']['precio'] ?? 0, 2) }}</span>
+                        </div>
+                        <div class="flex justify-between items-center text-xs">
+                            <span class="text-[#25B5DA] flex items-center gap-1">
+                                <i class="fas fa-tag"></i> {{ $cita['promocion_aplicada']['descripcion'] ?? 'Promoción aplicada' }}
+                            </span>
+                            <span class="text-[#25B5DA] font-medium">-${{ number_format($cita['promocion_aplicada']['descuento_aplicado'] ?? 0, 2) }}</span>
+                        </div>
+                        <div class="flex justify-between items-center text-sm mt-1 pt-1 border-t border-[#25B5DA]/20">
+                            <span class="font-bold text-white">Precio final:</span>
+                            <span class="font-bold text-[#25B5DA]">${{ number_format($cita['precio_final'] ?? (($cita['precio_original'] ?? $cita['servicio']['precio'] ?? 0) - ($cita['promocion_aplicada']['descuento_aplicado'] ?? 0)), 2) }}</span>
+                        </div>
+                    </div>
+                    @else
                     <div class="flex items-center gap-2 text-[#25B5DA]">
                         <span class="font-medium">${{ number_format($cita['servicio']['precio'] ?? 0, 2) }}</span>
                     </div>
+                    @endif
                 </div>
                 
                 @if(!in_array($cita['estado'], ['completada', 'cancelada', 'no_asistio']))

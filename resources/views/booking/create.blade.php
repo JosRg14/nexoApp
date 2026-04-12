@@ -158,6 +158,22 @@
                 </div>
             </div>
 
+            <!-- Promociones -->
+            <div class="bg-[#262626] border border-[#374151] rounded-sm p-6" id="promociones-container" style="display: none;">
+                <h3 class="text-sm font-bold uppercase tracking-widest text-white mb-4 flex items-center gap-2">
+                    <i class="fas fa-tag text-[#25B5DA]"></i>
+                    ¿Tienes una promoción disponible?
+                </h3>
+                <div>
+                    <select id="promocion-select" class="w-full bg-[#1a1a1a] border border-[#374151] rounded-lg p-3 text-white focus:outline-none focus:border-[#25B5DA] transition-colors appearance-none">
+                        <option value="">No usar promoción</option>
+                    </select>
+                    <div id="promo-loading" class="text-xs text-[#9CA3AF] mt-2 hidden">
+                        <i class="fas fa-spinner fa-spin mr-1"></i> Cargando promociones...
+                    </div>
+                </div>
+            </div>
+
             <!-- Resumen -->
             <div class="bg-[#262626] border border-[#374151] rounded-sm p-6">
                 <h3 class="text-sm font-bold uppercase tracking-widest text-white mb-4">Resumen de cita</h3>
@@ -179,9 +195,19 @@
                         <p id="resumen-hora" class="text-white font-medium mt-1">-</p>
                     </div>
                 </div>
-                <div class="mt-4 pt-4 border-t border-[#374151] flex justify-between items-center">
-                    <span class="text-xs font-bold uppercase text-white">Total</span>
-                    <span id="resumen-total" class="text-xl font-bold text-[#25B5DA]">$0</span>
+                <div class="mt-4 pt-4 border-t border-[#374151]">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-xs uppercase text-[#9CA3AF]">Subtotal</span>
+                        <span id="resumen-subtotal" class="text-white font-medium">$0</span>
+                    </div>
+                    <div id="resumen-descuento-row" class="flex justify-between items-center mb-2 hidden">
+                        <span class="text-xs uppercase text-[#25B5DA]">Promoción (<span id="resumen-promo-desc">-</span>)</span>
+                        <span id="resumen-descuento" class="text-[#25B5DA] font-medium">-$0</span>
+                    </div>
+                    <div class="flex justify-between items-center pt-2 border-t border-[#374151]">
+                        <span class="text-xs font-bold uppercase text-white">Total</span>
+                        <span id="resumen-total" class="text-xl font-bold text-[#25B5DA]">$0</span>
+                    </div>
                 </div>
             </div>
 
@@ -199,11 +225,22 @@
 // ============================================================
 // ESTADO DE LA CITA
 // ============================================================
+const clienteId = {{ $clienteId ?? 'null' }};
+let promocionesDisponibles = [];
+let promocionSeleccionada = null;
+
 let servicioSeleccionado = null;
 let empleadoSeleccionado = null;
 let horaSeleccionada = null;
 
 // Elementos DOM
+const promocionSelect = document.getElementById('promocion-select');
+const promoLoading = document.getElementById('promo-loading');
+const resumenSubtotal = document.getElementById('resumen-subtotal');
+const resumenDescuentoRow = document.getElementById('resumen-descuento-row');
+const resumenPromoDesc = document.getElementById('resumen-promo-desc');
+const resumenDescuento = document.getElementById('resumen-descuento');
+
 const btnSubmit       = document.getElementById('btn-submit');
 const fechaHidden     = document.getElementById('fecha');       // <input type="hidden">
 const horaHidden      = document.getElementById('hora');        // <input type="hidden">
@@ -241,12 +278,120 @@ document.querySelectorAll('.servicio-card').forEach(card => {
 
         document.getElementById('servicio_id').value = servicioSeleccionado.id;
         resumenServicio.textContent = servicioSeleccionado.nombre;
-        resumenTotal.textContent = '$' + parseInt(servicioSeleccionado.precio).toLocaleString('es-CL');
+        
+        actualizarResumenPrecios();
+        filtrarPromociones();
 
         if (empleadoSeleccionado && fechaHidden.value) cargarHorarios();
         checkFormComplete();
     });
 });
+
+// ============================================================
+// LOGICA DE PROMOCIONES
+// ============================================================
+
+async function cargarPromociones() {
+    if (!clienteId) return;
+    
+    promoLoading.classList.remove('hidden');
+    promocionSelect.disabled = true;
+    
+    try {
+        const response = await fetch(`/api-proxy/api/clientes/${clienteId}/promociones/disponibles`, {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json'
+            }
+        });
+        
+        if (response.ok) {
+            const data = await response.json();
+            promocionesDisponibles = data.data || [];
+            if (promocionesDisponibles.length > 0) {
+                document.getElementById('promociones-container').style.display = 'block';
+                filtrarPromociones();
+            }
+        }
+    } catch (e) {
+        console.error('Error cargando promociones:', e);
+    } finally {
+        promoLoading.classList.add('hidden');
+        promocionSelect.disabled = false;
+    }
+}
+
+function filtrarPromociones() {
+    // Resetear select
+    promocionSelect.innerHTML = '<option value="">No usar promoción</option>';
+    promocionSeleccionada = null;
+    
+    if (promocionesDisponibles.length === 0) return;
+    
+    const sid = servicioSeleccionado ? parseInt(servicioSeleccionado.id) : null;
+    
+    // Filtrar promociones aplicables al servicio actual (o aplicables a todos)
+    const aplicables = promocionesDisponibles.filter(p => !p.servicio_id || p.servicio_id == sid);
+    
+    aplicables.forEach(promo => {
+        const option = document.createElement('option');
+        option.value = promo.id; // id de la relación cliente-promocion
+        
+        let desc = promo.titulo || promo.promocion?.nombre || 'Promoción';
+        let beneficio = promo.beneficio_tipo === 'descuento' ? `${promo.beneficio_valor}% OFF` : 'Servicio Gratis';
+        
+        // Formato para mostrar: "20% OFF en Corte Clásico"
+        option.textContent = `${desc} (${beneficio})`;
+        promocionSelect.appendChild(option);
+    });
+    
+    actualizarResumenPrecios();
+}
+
+promocionSelect.addEventListener('change', function() {
+    const promoId = this.value;
+    if (!promoId) {
+        promocionSeleccionada = null;
+    } else {
+        promocionSeleccionada = promocionesDisponibles.find(p => p.id == promoId);
+    }
+    actualizarResumenPrecios();
+});
+
+function actualizarResumenPrecios() {
+    if (!servicioSeleccionado) {
+        resumenSubtotal.textContent = '$0';
+        resumenTotal.textContent = '$0';
+        resumenDescuentoRow.classList.add('hidden');
+        return;
+    }
+    
+    let subtotal = parseInt(servicioSeleccionado.precio);
+    let descuento = 0;
+    
+    if (promocionSeleccionada) {
+        if (promocionSeleccionada.beneficio_tipo === 'descuento') {
+            descuento = subtotal * (parseInt(promocionSeleccionada.beneficio_valor) / 100);
+        } else if (promocionSeleccionada.beneficio_tipo === 'servicio_gratis') {
+            descuento = subtotal;
+        }
+        resumenPromoDesc.textContent = promocionSeleccionada.beneficio_tipo === 'descuento' ? `${promocionSeleccionada.beneficio_valor}%` : 'Gratis';
+        resumenDescuento.textContent = '-$' + descuento.toLocaleString('es-CL', { maximumFractionDigits: 0 });
+        resumenDescuentoRow.classList.remove('hidden');
+    } else {
+        resumenDescuentoRow.classList.add('hidden');
+    }
+    
+    let total = Math.max(0, subtotal - descuento);
+    
+    resumenSubtotal.textContent = '$' + subtotal.toLocaleString('es-CL');
+    resumenTotal.textContent = '$' + total.toLocaleString('es-CL');
+}
+
+// Inicializar carga de promociones
+if (clienteId) {
+    cargarPromociones();
+}
 
 // ============================================================
 // SELECCIÓN DE EMPLEADO
@@ -494,6 +639,18 @@ document.getElementById('cita-form').addEventListener('submit', async function(e
                       document.querySelector('input[name="_token"]')?.value;
 
     try {
+        const payload = {
+            servicio_id: servicioId,
+            empleado_id: empleadoId,
+            fecha:       fecha,
+            hora_inicio: hora,
+            negocio_id:  negocioId
+        };
+        
+        if (promocionSeleccionada && promocionSelect.value) {
+            payload.promocion_cliente_id = promocionSelect.value;
+        }
+
         const response = await fetch('/api-proxy/citas', {
             method: 'POST',
             headers: {
@@ -501,13 +658,7 @@ document.getElementById('cita-form').addEventListener('submit', async function(e
                 'Content-Type': 'application/json',
                 'Accept': 'application/json'
             },
-            body: JSON.stringify({
-                servicio_id: servicioId,
-                empleado_id: empleadoId,
-                fecha:       fecha,
-                hora_inicio: hora,
-                negocio_id:  negocioId
-            })
+            body: JSON.stringify(payload)
         });
 
         let data = {};
