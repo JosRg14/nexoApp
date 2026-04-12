@@ -159,7 +159,7 @@
             </div>
 
             <!-- Promociones -->
-            <div class="bg-[#262626] border border-[#374151] rounded-sm p-6" id="promociones-container" style="display: none;">
+            <div class="bg-[#262626] border border-[#374151] rounded-sm p-6 {{ $clienteId ? '' : 'hidden' }}" id="promociones-container">
                 <h3 class="text-sm font-bold uppercase tracking-widest text-white mb-4 flex items-center gap-2">
                     <i class="fas fa-tag text-[#25B5DA]"></i>
                     ¿Tienes una promoción disponible?
@@ -298,7 +298,8 @@ async function cargarPromociones() {
     promocionSelect.disabled = true;
     
     try {
-        const response = await fetch(`/api-proxy/api/clientes/${clienteId}/promociones/disponibles`, {
+        const negocioId = document.getElementById('negocio_id').value;
+        const response = await fetch(`/api-proxy/api/clientes/${clienteId}/promociones/disponibles?negocio_id=${negocioId}`, {
             headers: {
                 'X-Requested-With': 'XMLHttpRequest',
                 'Accept': 'application/json'
@@ -308,42 +309,51 @@ async function cargarPromociones() {
         if (response.ok) {
             const data = await response.json();
             promocionesDisponibles = data.data || [];
-            if (promocionesDisponibles.length > 0) {
-                document.getElementById('promociones-container').style.display = 'block';
-                filtrarPromociones();
-            }
         }
     } catch (e) {
         console.error('Error cargando promociones:', e);
     } finally {
         promoLoading.classList.add('hidden');
-        promocionSelect.disabled = false;
+        filtrarPromociones();
     }
 }
 
 function filtrarPromociones() {
     // Resetear select
-    promocionSelect.innerHTML = '<option value="">No usar promoción</option>';
+    promocionSelect.innerHTML = '';
     promocionSeleccionada = null;
-    
-    if (promocionesDisponibles.length === 0) return;
     
     const sid = servicioSeleccionado ? parseInt(servicioSeleccionado.id) : null;
     
     // Filtrar promociones aplicables al servicio actual (o aplicables a todos)
     const aplicables = promocionesDisponibles.filter(p => !p.servicio_id || p.servicio_id == sid);
     
-    aplicables.forEach(promo => {
+    if (aplicables.length === 0) {
         const option = document.createElement('option');
-        option.value = promo.id; // id de la relación cliente-promocion
-        
-        let desc = promo.titulo || promo.promocion?.nombre || 'Promoción';
-        let beneficio = promo.beneficio_tipo === 'descuento' ? `${promo.beneficio_valor}% OFF` : 'Servicio Gratis';
-        
-        // Formato para mostrar: "20% OFF en Corte Clásico"
-        option.textContent = `${desc} (${beneficio})`;
+        option.value = "";
+        option.textContent = "Sin promociones disponibles";
         promocionSelect.appendChild(option);
-    });
+        promocionSelect.disabled = true;
+    } else {
+        // Opción por defecto
+        const defaultOption = document.createElement('option');
+        defaultOption.value = "";
+        defaultOption.textContent = "No usar promoción";
+        promocionSelect.appendChild(defaultOption);
+
+        aplicables.forEach(promo => {
+            const option = document.createElement('option');
+            option.value = promo.id_promocion_cliente || promo.id; // id de la relación cliente-promocion
+            
+            let desc = promo.titulo || promo.promocion?.nombre || 'Promoción';
+            let beneficio = promo.beneficio_tipo === 'descuento' ? `${promo.beneficio_valor}% OFF` : 'Servicio Gratis';
+            
+            // Formato para mostrar: "20% OFF en Corte Clásico"
+            option.textContent = `${desc} (${beneficio})`;
+            promocionSelect.appendChild(option);
+        });
+        promocionSelect.disabled = false;
+    }
     
     actualizarResumenPrecios();
 }
