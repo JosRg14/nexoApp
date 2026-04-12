@@ -207,73 +207,78 @@
 </section>
 
 <!-- Modales de Servicios -->
-<div id="modal-edit-service" class="fixed inset-0 hidden z-50">
-    <div class="absolute inset-0 bg-black/80" onclick="closeEditModal()"></div>
-    <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-[#1a1a1a] border border-[#374151] p-8 w-full max-w-md">
-        <h3 id="editModalTitle" class="text-white font-bold mb-6 uppercase">Editar Servicio</h3>
-        <form method="POST" id="editServiceForm" data-redirect="{{ route('business.profile') }}" enctype="multipart/form-data" data-custom-handler="false">
-            @csrf
-            @method('PUT')
-            <input type="hidden" name="id" id="edit_id">
-            <div class="space-y-5">
-                <div>
-                    <label class="block text-xs text-[#9CA3AF] uppercase tracking-widest mb-2">Imagen actual / Vista previa</label>
-                    <div class="relative">
-                        <img id="edit_imagen_preview" class="w-full h-40 object-cover rounded border border-[#374151] mb-3 hidden" alt="Imagen del servicio">
-                    </div>
-                    
-                    <label for="edit_imagen" class="flex flex-col items-center justify-center w-full h-24 border-2 border-[#374151] border-dashed rounded-lg cursor-pointer bg-[#1a1a1a] hover:bg-[#262626] hover:border-white transition-all group overflow-hidden">
-                        <div class="flex flex-col items-center justify-center pt-2 pb-2">
-                            <i class="fa-solid fa-cloud-arrow-up text-lg text-[#9CA3AF] mb-1 group-hover:text-white"></i>
-                            <p class="text-[10px] text-[#9CA3AF] font-bold group-hover:text-white uppercase">Cambiar imagen</p>
+<div id="modal-edit-service" class="fixed inset-0 hidden z-50 overflow-y-auto">
+    <div class="fixed inset-0 bg-black/80" onclick="closeEditModal()"></div>
+    
+    <div class="flex min-h-full items-center justify-center p-4">
+        
+        <div class="relative bg-[#1a1a1a] border border-[#374151] p-8 w-full max-w-md my-8">
+            <h3 id="editModalTitle" class="text-white font-bold mb-6 uppercase">Editar Servicio</h3>
+            
+            <form method="POST" id="editServiceForm" data-redirect="{{ route('business.profile') }}" enctype="multipart/form-data" data-custom-handler="false">
+                @csrf
+                @method('PUT')
+                <input type="hidden" name="id" id="edit_id">
+                
+                <div class="space-y-5">
+                    <div>
+                        <label class="block text-xs text-[#9CA3AF] uppercase tracking-widest mb-2">Imagen actual / Vista previa</label>
+                        <div class="relative">
+                            <img id="edit_imagen_preview" class="w-full h-40 object-cover rounded border border-[#374151] mb-3 hidden" alt="Imagen del servicio">
                         </div>
-                        <input id="edit_imagen" name="imagen" type="file" class="hidden" accept="image/png, image/jpeg, image/jpg" onchange="handleImagePreview(this, 'edit_preview_wrapper', 'edit_imagen_preview', true)" />
-                    </label>
+                        
+                        <label for="edit_imagen" class="flex flex-col items-center justify-center w-full h-24 border-2 border-[#374151] border-dashed rounded-lg cursor-pointer bg-[#1a1a1a] hover:bg-[#262626] hover:border-white transition-all group overflow-hidden">
+                            <div class="flex flex-col items-center justify-center pt-2 pb-2">
+                                <i class="fa-solid fa-cloud-arrow-up text-lg text-[#9CA3AF] mb-1 group-hover:text-white"></i>
+                                <p class="text-[10px] text-[#9CA3AF] font-bold group-hover:text-white uppercase">Cambiar imagen</p>
+                            </div>
+                            <input id="edit_imagen" name="imagen" type="file" class="hidden" accept="image/png, image/jpeg, image/jpg" onchange="handleImagePreview(this, 'edit_preview_wrapper', 'edit_imagen_preview', true)" />
+                        </label>
+                        <p id="edit-image-error" class="text-red-400 text-[10px] mt-2 hidden uppercase tracking-widest font-bold">
+                            <i class="fa-solid fa-circle-exclamation mr-1"></i> Archivo inválido.
+                        </p>
+                    </div>
 
-                    <p id="edit-image-error" class="text-red-400 text-[10px] mt-2 hidden uppercase tracking-widest font-bold">
-                        <i class="fa-solid fa-circle-exclamation mr-1"></i> Archivo inválido.
-                    </p>
+                    <div>
+                        <label class="block text-xs text-[#9CA3AF] uppercase tracking-widest mb-1">Nombre del servicio</label>
+                        <input type="text" name="nombre_servicio" id="edit_nombre" maxlength="100" required class="w-full bg-transparent border-b border-[#374151] py-2 text-white focus:border-white outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-[#9CA3AF] uppercase tracking-widest mb-1">Descripción</label>
+                        <input type="text" name="descripcion" id="edit_descripcion" maxlength="255" class="w-full bg-transparent border-b border-[#374151] py-2 text-white focus:border-white outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-[#9CA3AF] uppercase tracking-widest mb-1">Precio ($)</label>
+                        <input type="number" name="precio" id="edit_precio" min="1" max="10000" step="0.01" required class="w-full bg-transparent border-b border-[#374151] py-2 text-white focus:border-white outline-none">
+                    </div>
 
-                    <p class="text-[10px] text-[#9CA3AF] mt-2 uppercase tracking-widest">
-                        Formatos permitidos: PNG, JPG, JPEG
-                    </p>
-                </div>
-                <div>
-                    <label class="block text-xs text-[#9CA3AF] uppercase tracking-widest mb-1">Nombre del servicio</label>
-                    <input type="text" name="nombre_servicio" id="edit_nombre" maxlength="100" required class="w-full bg-transparent border-b border-[#374151] py-2 text-white focus:border-white outline-none">
-                </div>
-                <div>
-                    <label class="block text-xs text-[#9CA3AF] uppercase tracking-widest mb-1">Descripción</label>
-                    <input type="text" name="descripcion" id="edit_descripcion" maxlength="255" class="w-full bg-transparent border-b border-[#374151] py-2 text-white focus:border-white outline-none">
-                </div>
-                <div>
-                    <label class="block text-xs text-[#9CA3AF] uppercase tracking-widest mb-1">Precio ($)</label>
-                    <input type="number" name="precio" id="edit_precio" min="1" max="10000" step="0.01" required class="w-full bg-transparent border-b border-[#374151] py-2 text-white focus:border-white outline-none">
-                </div>
+                    <div>
+                        <label class="block text-xs text-[#9CA3AF] uppercase tracking-widest mb-1">Tipo de comisión</label>
+                        <select name="tipo_comision" id="edit_tipo_comision" class="w-full bg-[#1a1a1a] border-b border-[#374151] py-2 text-white focus:border-white outline-none">
+                            <option value="ninguna">Sin comisión</option>
+                            <option value="porcentaje">Porcentaje (%)</option>
+                            <option value="fija">Monto Fijo ($)</option>
+                        </select>
+                    </div>
+                    <div id="edit_valor_comision_container" class="hidden mt-2">
+                        <label class="block text-xs text-[#9CA3AF] uppercase tracking-widest mb-1">Valor de comisión</label>
+                        <input type="number" name="valor_comision" id="edit_valor_comision" min="0" step="0.01" class="w-full bg-transparent border-b border-[#374151] py-2 text-white focus:border-white outline-none">
+                    </div>
+                    <div id="edit_preview_comision" class="text-xs text-emerald-500 hidden font-bold uppercase tracking-widest mt-2">
+                        El empleado ganará: $0.00
+                    </div>
 
-                <!-- COMISIÓN EDIT -->
-                <div>
-                    <label class="block text-xs text-[#9CA3AF] uppercase tracking-widest mb-1">Tipo de comisión</label>
-                    <select name="tipo_comision" id="edit_tipo_comision" class="w-full bg-[#1a1a1a] border-b border-[#374151] py-2 text-white focus:border-white outline-none">
-                        <option value="ninguna">Sin comisión</option>
-                        <option value="porcentaje">Porcentaje (%)</option>
-                        <option value="fija">Monto Fijo ($)</option>
-                    </select>
+                    <div>
+                        <label class="block text-xs text-[#9CA3AF] uppercase tracking-widest mb-1">Duración (minutos)</label>
+                        <input type="number" name="duracion_estimada" id="edit_duracion" min="5" max="480" required class="w-full bg-transparent border-b border-[#374151] py-2 text-white focus:border-white outline-none">
+                    </div>
                 </div>
-                <div id="edit_valor_comision_container" class="hidden mt-2">
-                    <label class="block text-xs text-[#9CA3AF] uppercase tracking-widest mb-1">Valor de comisión</label>
-                    <input type="number" name="valor_comision" id="edit_valor_comision" min="0" step="0.01" class="w-full bg-transparent border-b border-[#374151] py-2 text-white focus:border-white outline-none">
-                </div>
-                <div id="edit_preview_comision" class="text-xs text-emerald-500 hidden font-bold uppercase tracking-widest mt-2">
-                    El empleado ganará: $0.00
-                </div>
-                <div>
-                    <label class="block text-xs text-[#9CA3AF] uppercase tracking-widest mb-1">Duración (minutos)</label>
-                    <input type="number" name="duracion_estimada" id="edit_duracion" min="5" max="480" required class="w-full bg-transparent border-b border-[#374151] py-2 text-white focus:border-white outline-none">
-                </div>
-            </div>
-            <button class="mt-6 w-full bg-white text-black py-2 uppercase text-xs font-bold">Guardar Cambios</button>
-        </form>
+                
+                <button type="submit" class="mt-6 w-full bg-white text-black py-2 uppercase text-xs font-bold hover:bg-gray-200 transition-colors">
+                    Guardar Cambios
+                </button>
+            </form>
+        </div>
     </div>
 </div>
 

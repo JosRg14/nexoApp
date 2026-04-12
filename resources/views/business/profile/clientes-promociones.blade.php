@@ -56,7 +56,7 @@
                     </template>
                     <template x-for="cliente in clientes" :key="cliente.id_usuario || cliente.cliente_id">
                         <tr class="border-b border-[#374151]/50 hover:bg-[#262626] transition-colors">
-                            <td class="p-4 font-semibold text-white whitespace-nowrap" x-text="cliente.nombre_completo || 'Desconocido'"></td>
+                            <td class="p-4 font-semibold text-white whitespace-nowrap" x-text="cliente.nombre ? `${cliente.nombre} ${cliente.app_paterno} ${cliente.app_materno}`.trim() : 'Desconocido'"></td>
                             <td class="p-4 text-[#9CA3AF] whitespace-nowrap">
                                 <div x-text="cliente.telefono || 'Sin teléfono'"></div>
                                 <div class="text-[10px] opacity-70" x-text="cliente.correo || ''"></div>
