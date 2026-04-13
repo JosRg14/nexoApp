@@ -38,9 +38,22 @@ class HomeController extends Controller
             $response = $this->httpClient->getPublic('/api/negocios', $params);
             $negocios = $response['data'] ?? [];
             $meta = $response['meta'] ?? null;
+
+            // Filtro manual (Fallback porque la API no filtra)
+            if ($categoria && $categoria !== 'todos') {
+                $negocios = array_filter($negocios, function($n) use ($categoria) {
+                    $tipo = strtolower($n['tipo_negocio'] ?? '');
+                    if ($categoria === 'otros') {
+                        return !in_array($tipo, ['barberia', 'salon', 'peluqueria', 'spa']);
+                    }
+                    return $tipo === strtolower($categoria);
+                });
+                $negocios = array_values($negocios);
+            }
             
-            \Log::info('HomeController API Response:', [
+            \Log::info('HomeController API Response (Filtered):', [
                 'count' => count($negocios),
+                'categoria' => $categoria,
                 'meta' => $meta
             ]);
             

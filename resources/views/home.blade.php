@@ -56,20 +56,89 @@
                 </div>
                 
                 <script>
-                    function filterBusinesses() {
+                    let currentCategory = '{{ $categoria ?? "todos" }}';
+
+                    function filterByCategory(category, event) {
+                        if (event) event.preventDefault();
+                        currentCategory = category;
+                        
+                        // Actualizar UI del menú de categorías
+                        document.querySelectorAll('.category-item').forEach(item => {
+                            const catId = item.getAttribute('data-id');
+                            const iconCircle = item.querySelector('.icon-circle');
+                            const label = item.querySelector('.cat-label');
+                            
+                            if (catId === category) {
+                                // Estilo activo
+                                iconCircle.classList.remove('bg-[#262626]', 'border-[#374151]', 'text-[#9CA3AF]');
+                                iconCircle.classList.add('bg-gradient-to-br', 'from-[#25B5DA]', 'to-[#1c8fb0]', 'text-black', 'shadow-lg', 'shadow-[#25B5DA]/40', 'scale-110');
+                                label.classList.remove('text-[#9CA3AF]');
+                                label.classList.add('text-[#25B5DA]');
+                            } else {
+                                // Estilo inactivo
+                                iconCircle.classList.add('bg-[#262626]', 'border-[#374151]', 'text-[#9CA3AF]');
+                                iconCircle.classList.remove('bg-gradient-to-br', 'from-[#25B5DA]', 'to-[#1c8fb0]', 'text-black', 'shadow-lg', 'shadow-[#25B5DA]/40', 'scale-110');
+                                label.classList.add('text-[#9CA3AF]');
+                                label.classList.remove('text-[#25B5DA]', 'group-hover:text-white'); // El hover lo maneja Tailwind
+                            }
+                        });
+
+                        applyFilters();
+                        
+                        // Actualizar URL sin recargar para mantener coherencia
+                        const url = new URL(window.location);
+                        url.searchParams.set('categoria', category);
+                        window.history.pushState({}, '', url);
+                    }
+
+                    function applyFilters() {
                         const input = document.getElementById('searchInput').value.toLowerCase();
                         const cards = document.querySelectorAll('.business-card');
+                        let visibleCount = 0;
                         
                         cards.forEach(card => {
                             const name = card.getAttribute('data-name').toLowerCase();
-                            if (name.includes(input)) {
-                                card.style.display = ''; // Restaurar display original
+                            const category = card.getAttribute('data-category').toLowerCase();
+                            
+                            const matchesSearch = name.includes(input);
+                            let matchesCategory = (currentCategory === 'todos');
+                            
+                            if (!matchesCategory) {
+                                if (currentCategory === 'otros') {
+                                    matchesCategory = !['barberia', 'salon', 'peluqueria', 'spa'].includes(category);
+                                } else {
+                                    matchesCategory = (category === currentCategory);
+                                }
+                            }
+
+                            if (matchesSearch && matchesCategory) {
+                                card.style.display = ''; 
                                 card.classList.remove('hidden');
+                                visibleCount++;
                             } else {
                                 card.style.display = 'none';
                                 card.classList.add('hidden');
                             }
                         });
+
+                        // Opcional: Mostrar mensaje si no hay resultados visibles
+                        const emptyState = document.getElementById('no-results-message');
+                        if (visibleCount === 0 && cards.length > 0) {
+                            if (!emptyState) {
+                                const msg = document.createElement('div');
+                                msg.id = 'no-results-message';
+                                msg.className = 'col-span-full py-10 text-center text-[#9CA3AF]';
+                                msg.innerHTML = '<i class="fas fa-search mb-3 text-2xl block"></i> Sin coincidencias para esta búsqueda o filtro.';
+                                document.querySelector('#resultados .grid').appendChild(msg);
+                            }
+                        } else if (emptyState) {
+                            emptyState.remove();
+                        }
+                    }
+
+                    // Función para el input de búsqueda
+                    function filterBusinesses() {
+                        applyFilters();
                     }
                 </script>
             </div>
@@ -91,11 +160,13 @@
                 @endphp
                 @foreach($cats as $cat)
                     <a href="{{ route('home') }}?categoria={{ $cat['id'] }}" 
-                       class="group min-w-[80px] flex flex-col items-center gap-3 transition-transform hover:scale-105">
-                        <div class="w-14 h-14 rounded-full flex items-center justify-center transition-all duration-300 {{ ($currentCat === $cat['id'] || (empty($categoria) && $cat['id'] === 'todos')) ? 'bg-gradient-to-br from-[#25B5DA] to-[#1c8fb0] text-black shadow-lg shadow-[#25B5DA]/40 scale-110' : 'bg-[#262626] border border-[#374151] text-[#9CA3AF] group-hover:bg-[#374151] group-hover:text-white group-hover:border-white/20' }}">
+                       onclick="filterByCategory('{{ $cat['id'] }}', event)"
+                       class="category-item group min-w-[80px] flex flex-col items-center gap-3 transition-transform hover:scale-105"
+                       data-id="{{ $cat['id'] }}">
+                        <div class="icon-circle w-14 h-14 rounded-full flex items-center justify-center transition-all duration-300 {{ ($currentCat === $cat['id'] || (empty($categoria) && $cat['id'] === 'todos')) ? 'bg-gradient-to-br from-[#25B5DA] to-[#1c8fb0] text-black shadow-lg shadow-[#25B5DA]/40 scale-110' : 'bg-[#262626] border border-[#374151] text-[#9CA3AF] group-hover:bg-[#374151] group-hover:text-white group-hover:border-white/20' }}">
                             <i class="fas {{ $cat['icon'] }} text-xl"></i>
                         </div>
-                        <span class="text-[10px] uppercase tracking-widest font-bold transition-colors {{ ($currentCat === $cat['id'] || (empty($categoria) && $cat['id'] === 'todos')) ? 'text-[#25B5DA]' : 'text-[#9CA3AF] group-hover:text-white' }}">
+                        <span class="cat-label text-[10px] uppercase tracking-widest font-bold transition-colors {{ ($currentCat === $cat['id'] || (empty($categoria) && $cat['id'] === 'todos')) ? 'text-[#25B5DA]' : 'text-[#9CA3AF] group-hover:text-white' }}">
                             {{ $cat['name'] }}
                         </span>
                     </a>
@@ -145,6 +216,7 @@
                     
                     <article class="business-card group relative bg-[#262626] rounded-xl overflow-hidden border border-[#374151] hover:border-[#25B5DA]/50 transition-all duration-500 hover:-translate-y-1 hover:shadow-2xl hover:shadow-[#25B5DA]/10 cursor-pointer animate-fade-in-up block"
                              data-name="{{ htmlspecialchars($negocio['nombre'], ENT_QUOTES) }}"
+                             data-category="{{ $negocio['tipo_negocio'] ?? '' }}"
                              onclick="window.location.href='/negocio/{{ $negocio['id_negocio'] ?? $negocio['id'] }}'"
                              style="animation-delay: {{ 300 + ($index * 100) }}ms;">
 
@@ -197,7 +269,7 @@
                                             class="flex-1 py-2.5 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white text-xs font-bold uppercase tracking-wider hover:bg-white hover:text-black transition-all duration-300">
                                         <i class="fas fa-eye mr-2"></i>Visitar
                                     </button>
-                                    <button onclick="event.stopPropagation(); window.location.href='/negocio/{{ $negocio['id_negocio'] ?? $negocio['id'] }}#agendar'"
+                                    <button onclick="event.stopPropagation(); window.location.href='/agendar-cita?negocio_id={{ $negocio['id_negocio'] ?? $negocio['id'] }}'"
                                             class="flex-1 py-2.5 bg-gradient-to-r from-[#25B5DA] to-[#1c8fb0] rounded-lg text-black text-xs font-bold uppercase tracking-wider hover:shadow-[0_0_15px_rgba(37,181,218,0.4)] transition-all duration-300">
                                         <i class="fas fa-calendar-check mr-2"></i>Reservar
                                     </button>
