@@ -189,6 +189,20 @@
                                     {{ ucfirst($negocio['tipo_negocio'] ?? 'Servicios') }}
                                 </span>
                             </div>
+
+                            <!-- Botones flotantes (solo visibles en hover) -->
+                            <div class="absolute inset-x-0 bottom-0 p-4 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none group-hover:pointer-events-auto z-20">
+                                <div class="flex gap-3">
+                                    <button onclick="event.stopPropagation(); window.location.href='/negocio/{{ $negocio['id_negocio'] ?? $negocio['id'] }}'"
+                                            class="flex-1 py-2.5 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white text-xs font-bold uppercase tracking-wider hover:bg-white hover:text-black transition-all duration-300">
+                                        <i class="fas fa-eye mr-2"></i>Visitar
+                                    </button>
+                                    <button onclick="event.stopPropagation(); window.location.href='/negocio/{{ $negocio['id_negocio'] ?? $negocio['id'] }}#agendar'"
+                                            class="flex-1 py-2.5 bg-gradient-to-r from-[#25B5DA] to-[#1c8fb0] rounded-lg text-black text-xs font-bold uppercase tracking-wider hover:shadow-[0_0_15px_rgba(37,181,218,0.4)] transition-all duration-300">
+                                        <i class="fas fa-calendar-check mr-2"></i>Reservar
+                                    </button>
+                                </div>
+                            </div>
                         </div>
 
                         <!-- Contenido -->
@@ -209,19 +223,7 @@
                                 <span class="truncate max-w-[150px]">{{ $ciudad }}</span>
                             </div>
 
-                            <!-- Botones en Hover -->
-                            <div class="mt-6 grid grid-cols-2 gap-3 opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all duration-300">
-                                <a href="/negocio/{{ $negocio['id_negocio'] ?? $negocio['id'] }}" 
-                                   class="flex items-center justify-center py-2.5 bg-[#1a1a1a] border border-[#374151] rounded-lg text-[#9CA3AF] text-[10px] font-black uppercase tracking-widest hover:border-white hover:text-white transition-colors"
-                                   onclick="event.stopPropagation();">
-                                    Visitar
-                                </a>
-                                <a href="/negocio/{{ $negocio['id_negocio'] ?? $negocio['id'] }}#agendar" 
-                                   class="flex items-center justify-center py-2.5 bg-gradient-to-r from-[#25B5DA] to-[#1c8fb0] rounded-lg text-black text-[10px] font-black uppercase tracking-widest hover:shadow-[0_0_15px_rgba(37,181,218,0.4)] transition-shadow"
-                                   onclick="event.stopPropagation();">
-                                    Reservar
-                                </a>
-                            </div>
+
                         </div>
 
                         <!-- Barra inferior animada -->
