@@ -434,5 +434,60 @@ document.addEventListener('DOMContentLoaded', function() {
 });
     </script>
 
+
+    <!-- Botón Flotante App Empleados -->
+    @if(session('rol') === 'admin')
+    <button onclick="toggleModal('modal-nexoapp-info', true)" 
+            class="fixed bottom-6 right-6 w-14 h-14 bg-[#262626] border border-[#374151] rounded-full flex items-center justify-center text-[#25B5DA] shadow-xl hover:scale-110 hover:shadow-[#25B5DA]/20 transition-all z-40 group"
+            title="Conoce NexoApp para Empleados">
+        <i class="fa-solid fa-mobile-screen-button text-xl group-hover:drop-shadow-[0_0_8px_rgba(37,181,218,0.5)]"></i>
+    </button>
+
+    <!-- Modal Informativo App Empleados -->
+    <div id="modal-nexoapp-info" class="fixed inset-0 hidden z-[60] flex items-center justify-center bg-black/80 backdrop-blur-sm px-4">
+        <div class="bg-[#262626] border border-[#374151] w-full max-w-md p-8 rounded-sm shadow-2xl relative">
+            <button onclick="toggleModal('modal-nexoapp-info', false)" class="absolute top-4 right-4 text-[#9CA3AF] hover:text-white transition-colors">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+
+            <div class="text-center mb-8">
+                <div class="w-20 h-20 bg-gradient-to-br from-[#25B5DA] to-[#1c8fb0] rounded-2xl flex items-center justify-center text-white text-4xl shadow-lg mx-auto mb-4">
+                    <i class="fa-solid fa-mobile-screen-button"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-white uppercase tracking-wider">NexoApp para Empleados</h3>
+                <p class="text-[#9CA3AF] text-[10px] mt-2 font-bold tracking-widest uppercase">La herramienta definitiva para tu equipo</p>
+            </div>
+
+            <div class="space-y-4 mb-8">
+                <div class="flex items-center gap-4 p-3 bg-[#1a1a1a] border border-[#374151]/50 rounded-sm group hover:border-[#25B5DA]/50 transition-colors">
+                    <div class="text-[#25B5DA] text-lg w-8 flex justify-center"><i class="fa-solid fa-calendar-check"></i></div>
+                    <p class="text-[10px] text-[#D1D5DB] font-bold uppercase tracking-widest text-left leading-tight">Gestionar citas asignadas</p>
+                </div>
+                <div class="flex items-center gap-4 p-3 bg-[#1a1a1a] border border-[#374151]/50 rounded-sm group hover:border-[#25B5DA]/50 transition-colors">
+                    <div class="text-[#25B5DA] text-lg w-8 flex justify-center"><i class="fa-solid fa-play"></i></div>
+                    <p class="text-[10px] text-[#D1D5DB] font-bold uppercase tracking-widest text-left leading-tight">Iniciar y completar servicios</p>
+                </div>
+                <div class="flex items-center gap-4 p-3 bg-[#1a1a1a] border border-[#374151]/50 rounded-sm group hover:border-[#25B5DA]/50 transition-colors">
+                    <div class="text-[#25B5DA] text-lg w-8 flex justify-center"><i class="fa-solid fa-user-plus"></i></div>
+                    <p class="text-[10px] text-[#D1D5DB] font-bold uppercase tracking-widest text-left leading-tight">Registrar servicios sin cita (walk-in)</p>
+                </div>
+                <div class="flex items-center gap-4 p-3 bg-[#1a1a1a] border border-[#374151]/50 rounded-sm group hover:border-[#25B5DA]/50 transition-colors">
+                    <div class="text-[#25B5DA] text-lg w-8 flex justify-center"><i class="fa-solid fa-chart-line"></i></div>
+                    <p class="text-[10px] text-[#D1D5DB] font-bold uppercase tracking-widest text-left leading-tight">Estadísticas personales de rendimiento</p>
+                </div>
+            </div>
+
+            <div class="flex flex-col gap-3">
+                <a href="https://goo.su/uZUQl6" target="_blank" class="w-full py-4 bg-gradient-to-r from-[#25B5DA] to-[#1c8fb0] text-white text-[10px] font-bold uppercase tracking-widest hover:opacity-90 transition-all rounded-sm shadow-md text-center">
+                    Descargar App
+                </a>
+                <button onclick="toggleModal('modal-nexoapp-info', false)" class="w-full py-4 border border-[#374151] text-[#9CA3AF] hover:text-white hover:border-white text-[10px] font-bold uppercase tracking-widest transition-all rounded-sm">
+                    Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+    @endif
+
 </body>
 </html>
