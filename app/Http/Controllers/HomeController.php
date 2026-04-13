@@ -21,30 +21,32 @@ class HomeController extends Controller
     {
         try {
             $categoria = $request->input('categoria', '');
+            $page = $request->input('page', 1);
+            $sort = $request->input('sort', 'recientes');
+            
+            $params = ['page' => $page];
+            if ($categoria && $categoria !== 'todos') {
+                $params['categoria'] = $categoria;
+            }
+            if ($sort) {
+                // If the backend doesn't support 'sort', it will ignore it. 
+                // But we pass it so it works if supported.
+                $params['sort'] = $sort;
+            }
+
             // Obtener negocios públicos usando HttpClient
-            $response = $this->httpClient->getPublic('/api/negocios');
+            $response = $this->httpClient->getPublic('/api/negocios', $params);
             $negocios = $response['data'] ?? [];
+            $meta = $response['meta'] ?? null;
             
             \Log::info('HomeController API Response:', [
                 'count' => count($negocios),
-                'primer_negocio_imagenes' => ($negocios[0]['imagenes'] ?? 'No tiene imagenes'),
-                'primer_negocio_foto' => ($negocios[0]['foto_perfil'] ?? 'No tiene foto_perfil directly')
+                'meta' => $meta
             ]);
             
-            \Log::info('=== ESTRUCTURA COMPLETA DEL PRIMER NEGOCIO ===', [
-                'negocio_completo' => $negocios[0] ?? 'No hay negocios'
-            ]);
-            
-            if ($categoria && $categoria !== 'todos') {
-                $negocios = array_filter($negocios, function($negocio) use ($categoria) {
-                    return ($negocio['tipo_negocio'] ?? '') === $categoria;
-                });
-                $negocios = array_values($negocios); // Reindexar array
-            }
             $apiBaseUrl = rtrim(config('services.api.url'), '/');
             // Completar URLs de imágenes estructurando la respuesta en forma de string final para la vista
             foreach ($negocios as &$negocio) {
-                
                 $fotoUrl = null;
 
                 // Lógica para procesar la imagen
@@ -75,22 +77,21 @@ class HomeController extends Controller
                 }
 
                 $negocio['foto_perfil'] = $fotoUrl;
-
-                // LOG DETALLADO
-                \Log::info('DEBUG NEGOCIO: ' . ($negocio['nombre'] ?? 'Sin nombre'), [
-                    'id' => $negocio['id_negocio'] ?? $negocio['id'] ?? null,
-                    'imagenes_raw' => $negocio['imagenes'] ?? 'NO EXISTE O ESTÁ VACÍO',
-                    'fotoUrl_generada' => $fotoUrl,
-                    'foto_perfil_final' => $negocio['foto_perfil']
-                ]);
             }
             unset($negocio);
+            
+            // Fetch planes from the API
+            $planesResponse = $this->httpClient->getPublic('/api/planes');
+            $planes = $planesResponse['data'] ?? [];
+            
         } catch (\Exception $e) {
             \Log::error('Error en HomeController: ' . $e->getMessage());
             $negocios = [];
+            $meta = null;
+            $planes = [];
         }
         
-        return view('home', compact('negocios', 'categoria'));
+        return view('home', compact('negocios', 'categoria', 'meta', 'planes', 'sort'));
     }
     
     /**
