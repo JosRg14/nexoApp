@@ -134,68 +134,98 @@
                         if(isset($negocio['created_at'])) {
                             $isNuevo = \Carbon\Carbon::parse($negocio['created_at'])->diffInDays(now()) <= 7;
                         }
+
+                        $ciudad = 'Ubicación no especificada';
+                        if (isset($negocio['direccion']) && is_array($negocio['direccion'])) {
+                            $ciudad = $negocio['direccion']['ciudad'] ?? 'Ubicación no especificada';
+                        } elseif (isset($negocio['ciudad'])) {
+                            $ciudad = $negocio['ciudad'];
+                        }
                     @endphp
                     
-                    <article class="business-card group relative bg-[#262626] rounded-2xl overflow-hidden border border-[#374151] transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_20px_40px_-15px_rgba(37,181,218,0.2)] hover:border-[#25B5DA]/40 flex flex-col animate-fade-in-up"
+                    <article class="business-card group relative bg-[#262626] rounded-xl overflow-hidden border border-[#374151] hover:border-[#25B5DA]/50 transition-all duration-500 hover:-translate-y-1 hover:shadow-2xl hover:shadow-[#25B5DA]/10 cursor-pointer animate-fade-in-up block"
                              data-name="{{ htmlspecialchars($negocio['nombre'], ENT_QUOTES) }}"
-                             style="animation-delay: {{ min(100 + ($index * 100), 500) }}ms;">
-                        
-                        <!-- Imagen Contenedor -->
-                        <div class="relative aspect-[4/3] overflow-hidden bg-black cursor-pointer group" onclick="window.location.href='/negocio/{{ $negocio['id_negocio'] ?? $negocio['id'] }}'">
+                             onclick="window.location.href='/negocio/{{ $negocio['id_negocio'] ?? $negocio['id'] }}'"
+                             style="animation-delay: {{ 300 + ($index * 100) }}ms;">
+
+                        <!-- Imagen con overlay -->
+                        <div class="relative aspect-[4/5] overflow-hidden">
                             @if(!empty($negocio['foto_perfil']))
-                                <img src="{{ $negocio['foto_perfil'] }}" alt="{{ $negocio['nombre'] }}"
-                                     class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out opacity-90 group-hover:opacity-100">
+                                <img src="{{ $negocio['foto_perfil'] }}" 
+                                     alt="{{ $negocio['nombre'] }}"
+                                     class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
                             @else
-                                <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#1a1a1a] to-[#262626] group-hover:scale-105 transition-transform duration-700 ease-out">
-                                    <i class="fas fa-store text-5xl text-[#374151] group-hover:text-[#25B5DA] transition-colors duration-500"></i>
+                                <div class="w-full h-full bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center group-hover:scale-110 transition-transform duration-700">
+                                    <svg class="w-16 h-16 text-[#374151]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="0.5" d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"></path>
+                                    </svg>
                                 </div>
                             @endif
-                            <!-- Overlay Gradiente -->
-                            <div class="absolute inset-0 bg-gradient-to-t from-[#1a1a1a] via-[#1a1a1a]/20 to-transparent opacity-90"></div>
-                            
-                            <!-- Rating / Nuevo -->
-                            <div class="absolute top-4 right-4 bg-black/80 backdrop-blur-md px-3 py-1.5 rounded-lg border border-white/10 flex items-center gap-1.5 shadow-lg">
-                                @if(isset($negocio['calificacion']) && $negocio['calificacion'] > 0)
-                                    <i class="fas fa-star text-[#25B5DA] text-xs"></i>
-                                    <span class="text-white text-sm font-bold">{{ number_format($negocio['calificacion'], 1) }}</span>
-                                @else
-                                    <span class="text-[#25B5DA] text-xs font-black uppercase tracking-widest"><i class="fas fa-sparkles mr-1"></i>Nuevo</span>
-                                @endif
+                            <div class="absolute inset-0 bg-gradient-to-t from-[#1a1a1a] via-[#1a1a1a]/40 to-transparent opacity-90 group-hover:opacity-80 transition-opacity duration-300"></div>
+
+                            <!-- Badge calificación -->
+                            <div class="absolute top-3 right-3 bg-black/60 backdrop-blur-sm px-2.5 py-1 rounded-full border border-white/10 shadow-lg z-10">
+                                <span class="text-[#25B5DA] text-xs font-bold flex items-center gap-1">
+                                    @if(isset($negocio['calificacion']) && $negocio['calificacion'] > 0)
+                                        <i class="fas fa-star text-[10px]"></i>
+                                        {{ number_format($negocio['calificacion'], 1) }}
+                                    @else
+                                        <i class="fas fa-star text-[10px]"></i>
+                                        Sin reseñas
+                                    @endif
+                                </span>
                             </div>
 
-                            @if($isNuevo && (isset($negocio['calificacion']) && $negocio['calificacion'] > 0))
-                                <!-- Etiqueta Nuevo si ya tiene calificacion -->
-                                <div class="absolute top-4 left-4 bg-[#25B5DA]/20 backdrop-blur-md px-2.5 py-1 rounded-lg border border-[#25B5DA]/50 shadow-lg">
-                                    <span class="text-[#25B5DA] text-[10px] font-black uppercase tracking-wider">Nuevo</span>
+                            @if($isNuevo)
+                                <!-- Badge NUEVO -->
+                                <div class="absolute top-3 left-3 bg-[#25B5DA] text-black px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-widest shadow-lg z-10 animate-pulse">
+                                    Nuevo
                                 </div>
                             @endif
+
+                            <!-- Badge tipo de negocio -->
+                            <div class="absolute bottom-4 left-4 bg-[#25B5DA]/20 backdrop-blur-sm px-3 py-1.5 rounded-full border border-[#25B5DA]/30 z-10 transition-transform group-hover:scale-105">
+                                <span class="text-[#25B5DA] text-[10px] font-bold uppercase tracking-wider">
+                                    {{ ucfirst($negocio['tipo_negocio'] ?? 'Servicios') }}
+                                </span>
+                            </div>
                         </div>
-                        
-                        <!-- Cuerpo Card -->
-                        <div class="p-8 flex-grow flex flex-col relative z-10 bg-[#262626]">
-                            <h3 class="text-white font-black text-xl leading-tight group-hover:text-[#25B5DA] transition-colors line-clamp-1 cursor-pointer truncate mb-2" onclick="window.location.href='/negocio/{{ $negocio['id_negocio'] ?? $negocio['id'] }}'">
+
+                        <!-- Contenido -->
+                        <div class="p-5 flex flex-col h-full relative">
+                            <h3 class="text-white font-bold text-base uppercase tracking-wide group-hover:text-[#25B5DA] transition-colors line-clamp-1">
                                 {{ $negocio['nombre'] }}
                             </h3>
-                            
-                            <div class="text-[#9CA3AF] text-xs font-bold uppercase tracking-widest flex items-center gap-2 mb-4">
-                                <span class="text-[#25B5DA]">{{ ucfirst($negocio['tipo_negocio'] ?? 'Servicios') }}</span>
-                                <span class="w-1 h-1 rounded-full bg-[#374151]"></span>
-                                @php
-                                    $ciudad = $negocio['direccion']['ciudad'] ?? $negocio['ciudad'] ?? 'Ubicación no especificada';
-                                @endphp
-                                <span class="truncate">{{ $ciudad }}</span>
+
+                            <p class="text-[#9CA3AF] text-xs mt-2 line-clamp-2 leading-relaxed min-h-[2.5rem]">
+                                {{ $negocio['acerca_de'] ?? 'Descubre los mejores servicios en ' . $negocio['nombre'] }}
+                            </p>
+
+                            <div class="flex items-center gap-1.5 mt-4 text-[10px] text-[#9CA3AF] uppercase tracking-wider bg-[#1a1a1a] rounded px-2 py-1.5 w-max">
+                                <svg class="w-3.5 h-3.5 text-[#25B5DA]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                </svg>
+                                <span class="truncate max-w-[150px]">{{ $ciudad }}</span>
                             </div>
 
-                            <!-- Acciones -->
-                            <div class="mt-auto pt-4 grid grid-cols-2 gap-3">
-                                <a href="/negocio/{{ $negocio['id_negocio'] ?? $negocio['id'] }}" class="flex items-center justify-center py-3 bg-[#1a1a1a] border border-[#374151] rounded-xl text-[#9CA3AF] text-xs font-black uppercase tracking-widest hover:border-white hover:text-white transition-colors">
+                            <!-- Botones en Hover -->
+                            <div class="mt-6 grid grid-cols-2 gap-3 opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all duration-300">
+                                <a href="/negocio/{{ $negocio['id_negocio'] ?? $negocio['id'] }}" 
+                                   class="flex items-center justify-center py-2.5 bg-[#1a1a1a] border border-[#374151] rounded-lg text-[#9CA3AF] text-[10px] font-black uppercase tracking-widest hover:border-white hover:text-white transition-colors"
+                                   onclick="event.stopPropagation();">
                                     Visitar
                                 </a>
-                                <a href="/negocio/{{ $negocio['id_negocio'] ?? $negocio['id'] }}#agendar" class="flex items-center justify-center py-3 bg-gradient-to-r from-[#25B5DA] to-[#1c8fb0] rounded-xl text-black text-xs font-black uppercase tracking-widest hover:shadow-[0_0_15px_rgba(37,181,218,0.4)] transition-shadow">
+                                <a href="/negocio/{{ $negocio['id_negocio'] ?? $negocio['id'] }}#agendar" 
+                                   class="flex items-center justify-center py-2.5 bg-gradient-to-r from-[#25B5DA] to-[#1c8fb0] rounded-lg text-black text-[10px] font-black uppercase tracking-widest hover:shadow-[0_0_15px_rgba(37,181,218,0.4)] transition-shadow"
+                                   onclick="event.stopPropagation();">
                                     Reservar
                                 </a>
                             </div>
                         </div>
+
+                        <!-- Barra inferior animada -->
+                        <div class="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-[#25B5DA] to-[#1c8fb0] transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
                     </article>
                     @endforeach
                 </div>
