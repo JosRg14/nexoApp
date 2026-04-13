@@ -87,6 +87,38 @@ class="w-full text-left px-4 py-2 text-xs text-red-400 hover:text-red-300 hover:
     <!-- Main Content -->
     <main class="flex-grow max-w-7xl mx-auto w-full px-6 py-12">
         
+        <!-- banner descarga app empleados -->
+        @if(session('rol') === 'admin')
+        <div id="nexoapp-promo-banner" class="hidden mb-12 p-6 bg-[#262626] border border-[#374151] rounded-sm relative overflow-hidden group">
+            <div class="flex flex-col md:flex-row items-start justify-between gap-6">
+                <div class="flex items-start gap-4">
+                    <div class="shrink-0 h-14 w-14 bg-gradient-to-br from-[#25B5DA] to-[#1c8fb0] rounded-sm flex items-center justify-center text-white text-2xl shadow-lg">
+                        <i class="fa-solid fa-mobile-screen-button"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-white mb-1 uppercase tracking-wide">📱 Descarga NexoApp para tus empleados</h3>
+                        <p class="text-[#9CA3AF] text-sm max-w-2xl leading-relaxed">
+                            Optimiza la gestión de tu negocio. Tus empleados pueden gestionar sus citas, registrar servicios realizados y visualizar su rendimiento diario directamente desde la aplicación móvil de NexoApp.
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="flex flex-col sm:flex-row items-center gap-4 w-full md:w-auto">
+                    <a href="https://goo.su/uZUQl6" target="_blank" class="w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-[#25B5DA] to-[#1c8fb0] text-white text-[10px] font-bold uppercase tracking-widest hover:opacity-90 transition-all rounded-sm shadow-md text-center">
+                        Descargar App
+                    </a>
+                    <a href="#app-info" class="w-full sm:w-auto px-6 py-3 border border-[#374151] text-[#9CA3AF] hover:text-white hover:border-white text-[10px] font-bold uppercase tracking-widest transition-all rounded-sm text-center">
+                        Saber más
+                    </a>
+                </div>
+
+                <button id="close-promo-banner" class="absolute top-4 right-4 text-[#4b5563] hover:text-white transition-colors duration-200">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+        </div>
+        @endif
+
         <!-- Header Section -->
         <div class="mb-12 flex flex-col md:flex-row justify-between items-start md:items-end gap-6 overflow-hidden">
             <div>
@@ -376,6 +408,30 @@ function showToast(message) {
         }, 300);
     }, 3000);
 }
+
+// Lógica para el banner de descarga de la App
+document.addEventListener('DOMContentLoaded', function() {
+    const banner = document.getElementById('nexoapp-promo-banner');
+    const closeBtn = document.getElementById('close-promo-banner');
+    
+    // Solo mostramos si no ha sido cerrado previamente
+    if (banner && !localStorage.getItem('nexoapp_banner_dismissed')) {
+        banner.classList.remove('hidden');
+    }
+
+    if (closeBtn && banner) {
+        closeBtn.addEventListener('click', function() {
+            banner.style.transition = 'all 0.3s ease';
+            banner.style.opacity = '0';
+            banner.style.transform = 'translateY(-10px)';
+            
+            setTimeout(() => {
+                banner.classList.add('hidden');
+                localStorage.setItem('nexoapp_banner_dismissed', 'true');
+            }, 300);
+        });
+    }
+});
     </script>
 
 </body>
