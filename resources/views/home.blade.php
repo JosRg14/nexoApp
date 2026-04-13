@@ -17,15 +17,17 @@
     <!-- Main Content -->
     <main class="flex-grow bg-[#1a1a1a]">
         
-        <!-- Hero Section -->
-        <section class="relative max-w-7xl mx-auto px-6 pt-16 md:pt-20 pb-8 md:pb-12 overflow-hidden rounded-b-3xl">
-            <!-- Background Decoration -->
-            <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full max-w-5xl opacity-20 pointer-events-none">
-                <div class="absolute top-[-100px] right-[-100px] w-96 h-96 bg-[#25B5DA] rounded-full mix-blend-screen filter blur-[100px] opacity-30"></div>
-                <div class="absolute bottom-[-50px] left-[-50px] w-72 h-72 bg-[#1c8fb0] rounded-full mix-blend-screen filter blur-[80px] opacity-20"></div>
+        <!-- Hero Section - Fondo de ancho completo -->
+        <section class="relative w-full overflow-hidden rounded-b-3xl">
+            <!-- Background Decoration - Cubre todo el ancho -->
+            <div class="absolute inset-0 pointer-events-none">
+                <div class="absolute top-[-100px] right-[10%] w-[600px] h-[600px] bg-[#25B5DA] rounded-full mix-blend-screen filter blur-[120px] opacity-25"></div>
+                <div class="absolute bottom-[-50px] left-[5%] w-[500px] h-[500px] bg-[#1c8fb0] rounded-full mix-blend-screen filter blur-[100px] opacity-20"></div>
+                <div class="absolute top-[30%] left-[15%] w-[300px] h-[300px] bg-[#25B5DA] rounded-full mix-blend-screen filter blur-[80px] opacity-10"></div>
             </div>
 
-            <div class="relative max-w-3xl space-y-8 animate-fade-in-up z-10 mx-auto text-center">
+            <div class="relative max-w-7xl mx-auto px-6 pt-16 md:pt-20 pb-8 md:pb-12 text-center animate-fade-in-up z-10">
+                <div class="max-w-3xl mx-auto space-y-8">
                 @if(session('rol') === 'cliente' && session()->has('usuario'))
                     <h1 class="text-4xl md:text-6xl font-black uppercase tracking-wide text-white leading-tight drop-shadow-lg">
                         Listo para tu cita, <br/>
@@ -142,7 +144,8 @@
                     }
                 </script>
             </div>
-        </section>
+        </div>
+    </section>
 
         <!-- Visual Categories Menu -->
         <section class="max-w-7xl mx-auto px-6 py-8 border-b border-[#374151]/50 sticky top-0 bg-[#1a1a1a]/95 backdrop-blur-md z-40">
