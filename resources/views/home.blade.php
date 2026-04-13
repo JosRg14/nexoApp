@@ -18,7 +18,7 @@
     <main class="flex-grow bg-[#1a1a1a]">
         
         <!-- Hero Section -->
-        <section class="relative max-w-7xl mx-auto px-6 py-20 md:py-28 overflow-hidden rounded-b-3xl">
+        <section class="relative max-w-7xl mx-auto px-6 pt-16 md:pt-20 pb-8 md:pb-12 overflow-hidden rounded-b-3xl">
             <!-- Background Decoration -->
             <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full max-w-5xl opacity-20 pointer-events-none">
                 <div class="absolute top-[-100px] right-[-100px] w-96 h-96 bg-[#25B5DA] rounded-full mix-blend-screen filter blur-[100px] opacity-30"></div>
@@ -127,7 +127,7 @@
             </div>
 
             @if(count($negocios) > 0)
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-8 md:gap-10">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-8">
                     @foreach ($negocios as $index => $negocio)
                     @php
                         $isNuevo = false;
@@ -172,7 +172,7 @@
                         </div>
                         
                         <!-- Cuerpo Card -->
-                        <div class="p-6 flex-grow flex flex-col relative z-10 bg-[#262626]">
+                        <div class="p-8 flex-grow flex flex-col relative z-10 bg-[#262626]">
                             <h3 class="text-white font-black text-xl leading-tight group-hover:text-[#25B5DA] transition-colors line-clamp-1 cursor-pointer truncate mb-2" onclick="window.location.href='/negocio/{{ $negocio['id_negocio'] ?? $negocio['id'] }}'">
                                 {{ $negocio['nombre'] }}
                             </h3>
@@ -290,7 +290,7 @@
                         <!-- Beneficio 1 -->
                         <div class="bg-[#262626] border border-[#374151] rounded-2xl p-8 hover:border-[#25B5DA] hover:-translate-y-1 transition-all">
                             <div class="w-12 h-12 bg-[#25B5DA]/10 rounded-xl flex items-center justify-center mb-6">
-                                <span class="text-2xl">📅</span>
+                                <i class="fas fa-calendar-check text-[#25B5DA] text-2xl"></i>
                             </div>
                             <h3 class="text-xl font-bold text-white mb-3">Gestión de Citas</h3>
                             <p class="text-[#9CA3AF] text-sm leading-relaxed">Olvídate del WhatsApp y la libreta. Permite que tus clientes agenden 24/7 de forma automática.</p>
@@ -299,7 +299,7 @@
                         <!-- Beneficio 2 -->
                         <div class="bg-[#262626] border border-[#374151] rounded-2xl p-8 hover:border-[#25B5DA] hover:-translate-y-1 transition-all">
                             <div class="w-12 h-12 bg-[#25B5DA]/10 rounded-xl flex items-center justify-center mb-6">
-                                <span class="text-2xl">👥</span>
+                                <i class="fas fa-users text-[#25B5DA] text-2xl"></i>
                             </div>
                             <h3 class="text-xl font-bold text-white mb-3">Gestión de Empleados</h3>
                             <p class="text-[#9CA3AF] text-sm leading-relaxed">Administra horarios, asigna comisiones por servicio y mide el rendimiento de tu equipo.</p>
@@ -308,7 +308,7 @@
                         <!-- Beneficio 3 -->
                         <div class="bg-[#262626] border border-[#374151] rounded-2xl p-8 hover:border-[#25B5DA] hover:-translate-y-1 transition-all">
                             <div class="w-12 h-12 bg-[#25B5DA]/10 rounded-xl flex items-center justify-center mb-6">
-                                <span class="text-2xl">📸</span>
+                                <i class="fas fa-images text-[#25B5DA] text-2xl"></i>
                             </div>
                             <h3 class="text-xl font-bold text-white mb-3">Galería de Trabajos</h3>
                             <p class="text-[#9CA3AF] text-sm leading-relaxed">Muestra tus mejores resultados. Construye un portafolio visual que atraiga a más clientes.</p>
@@ -317,7 +317,7 @@
                         <!-- Beneficio 4 -->
                         <div class="bg-[#262626] border border-[#374151] rounded-2xl p-8 hover:border-[#25B5DA] hover:-translate-y-1 transition-all">
                             <div class="w-12 h-12 bg-[#25B5DA]/10 rounded-xl flex items-center justify-center mb-6">
-                                <span class="text-2xl">🏷️</span>
+                                <i class="fas fa-tag text-[#25B5DA] text-2xl"></i>
                             </div>
                             <h3 class="text-xl font-bold text-white mb-3">Promociones y Descuentos</h3>
                             <p class="text-[#9CA3AF] text-sm leading-relaxed">Fideliza a tus clientes aplicando descuentos personalizados y campañas de temporada.</p>
@@ -326,7 +326,7 @@
                         <!-- Beneficio 5 -->
                         <div class="bg-[#262626] border border-[#374151] rounded-2xl p-8 hover:border-[#25B5DA] hover:-translate-y-1 transition-all">
                             <div class="w-12 h-12 bg-[#25B5DA]/10 rounded-xl flex items-center justify-center mb-6">
-                                <span class="text-2xl">📊</span>
+                                <i class="fas fa-chart-line text-[#25B5DA] text-2xl"></i>
                             </div>
                             <h3 class="text-xl font-bold text-white mb-3">Dashboard de Finanzas</h3>
                             <p class="text-[#9CA3AF] text-sm leading-relaxed">Conoce tus ingresos, servicios más rentables y estadísticas en tiempo real.</p>
@@ -335,7 +335,7 @@
                         <!-- Beneficio 6 -->
                         <div class="bg-[#262626] border border-[#374151] rounded-2xl p-8 hover:border-[#25B5DA] hover:-translate-y-1 transition-all">
                             <div class="w-12 h-12 bg-[#25B5DA]/10 rounded-xl flex items-center justify-center mb-6">
-                                <span class="text-2xl">⭐</span>
+                                <i class="fas fa-star text-[#25B5DA] text-2xl"></i>
                             </div>
                             <h3 class="text-xl font-bold text-white mb-3">Reseñas de Clientes</h3>
                             <p class="text-[#9CA3AF] text-sm leading-relaxed">Construye confianza digital con calificaciones verificadas de tus servicios.</p>
@@ -353,7 +353,7 @@
                     </div>
 
                     @if(isset($planes) && count($planes) > 0)
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-5xl mx-auto">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
                             @foreach($planes as $plan)
                             @php
                                 $isPopular = stripos($plan['tipo'], 'Estándar') !== false || stripos($plan['tipo'], 'Estandar') !== false;
