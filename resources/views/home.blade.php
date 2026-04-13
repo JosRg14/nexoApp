@@ -17,14 +17,13 @@
     <!-- Main Content -->
     <main class="flex-grow bg-[#1a1a1a]">
         
-        <!-- Hero Section - Fondo de ancho completo -->
-        <section class="relative w-full overflow-hidden rounded-b-3xl">
-            <!-- Background Decoration - Cubre todo el ancho -->
-            <div class="absolute inset-0 pointer-events-none">
-                <div class="absolute top-[-100px] right-[10%] w-[600px] h-[600px] bg-[#25B5DA] rounded-full mix-blend-screen filter blur-[120px] opacity-25"></div>
-                <div class="absolute bottom-[-50px] left-[5%] w-[500px] h-[500px] bg-[#1c8fb0] rounded-full mix-blend-screen filter blur-[100px] opacity-20"></div>
-                <div class="absolute top-[30%] left-[15%] w-[300px] h-[300px] bg-[#25B5DA] rounded-full mix-blend-screen filter blur-[80px] opacity-10"></div>
-            </div>
+        <!-- Hero Section - Sutil y Fluido -->
+        <section class="relative w-full">
+            <!-- Gradiente súper sutil que se funde con el fondo -->
+            <div class="absolute inset-0 bg-gradient-to-b from-[#25B5DA]/5 via-transparent to-transparent pointer-events-none"></div>
+            
+            <!-- Un solo punto de luz muy suave en la parte superior -->
+            <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[400px] bg-[#25B5DA] opacity-[0.03] blur-[150px] pointer-events-none"></div>
 
             <div class="relative max-w-7xl mx-auto px-6 pt-16 md:pt-20 pb-8 md:pb-12 text-center animate-fade-in-up z-10">
                 <div class="max-w-3xl mx-auto space-y-8">
