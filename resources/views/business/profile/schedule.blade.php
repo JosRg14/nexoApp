@@ -305,41 +305,39 @@
             <!-- Calendario & Lista -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <!-- Columna Izquierda: Calendario -->
-                <div class="flex justify-center lg:justify-start">
-                    <div class="w-full flex flex-col h-full">
-                        <h3 class="text-sm font-bold uppercase tracking-widest text-white mb-4 border-b border-[#374151]/50 pb-2">📅 Calendario</h3>
-                        <div class="bg-[#1a1a1a] border border-[#374151] rounded-lg p-4 select-none flex-grow">
-                            <!-- Navegación de mes -->
-                            <div class="flex justify-between items-center mb-4">
-                                <button type="button" id="prev-month"
-                                        class="w-8 h-8 flex items-center justify-center rounded-full text-[#9CA3AF] hover:text-white hover:bg-[#374151] transition-all">
-                                    <i class="fas fa-chevron-left text-xs"></i>
-                                </button>
-                                <h4 id="current-month" class="text-white font-bold text-sm uppercase tracking-widest"></h4>
-                                <button type="button" id="next-month"
-                                        class="w-8 h-8 flex items-center justify-center rounded-full text-[#9CA3AF] hover:text-white hover:bg-[#374151] transition-all">
-                                    <i class="fas fa-chevron-right text-xs"></i>
-                                </button>
-                            </div>
-                            <!-- Cabecera días de la semana -->
-                            <div class="grid grid-cols-7 gap-1 text-center mb-2">
-                                <div class="text-[10px] text-[#9CA3AF] uppercase tracking-wider py-1">Lun</div>
-                                <div class="text-[10px] text-[#9CA3AF] uppercase tracking-wider py-1">Mar</div>
-                                <div class="text-[10px] text-[#9CA3AF] uppercase tracking-wider py-1">Mié</div>
-                                <div class="text-[10px] text-[#9CA3AF] uppercase tracking-wider py-1">Jue</div>
-                                <div class="text-[10px] text-[#9CA3AF] uppercase tracking-wider py-1">Vie</div>
-                                <div class="text-[10px] text-[#9CA3AF] uppercase tracking-wider py-1">Sáb</div>
-                                <div class="text-[10px] text-[#9CA3AF] uppercase tracking-wider py-1">Dom</div>
-                            </div>
-                            <!-- Cuadrícula de días -->
-                            <div id="calendar-days" class="grid grid-cols-7 gap-1"></div>
+                <div class="bg-[#1a1a1a] border border-[#374151] rounded-lg p-4 flex flex-col h-full">
+                    <h3 class="text-sm font-bold uppercase tracking-widest text-white mb-4 border-b border-[#374151]/50 pb-2">Calendario</h3>
+                    <div id="calendar-container" class="flex-1 flex flex-col">
+                        <!-- Navegación de mes -->
+                        <div class="flex justify-between items-center mb-4">
+                            <button type="button" id="prev-month"
+                                    class="w-8 h-8 flex items-center justify-center rounded-full text-[#9CA3AF] hover:text-white hover:bg-[#374151] transition-all">
+                                <i class="fas fa-chevron-left text-xs"></i>
+                            </button>
+                            <h4 id="current-month" class="text-white font-bold text-sm uppercase tracking-widest"></h4>
+                            <button type="button" id="next-month"
+                                    class="w-8 h-8 flex items-center justify-center rounded-full text-[#9CA3AF] hover:text-white hover:bg-[#374151] transition-all">
+                                <i class="fas fa-chevron-right text-xs"></i>
+                            </button>
                         </div>
+                        <!-- Cabecera días de la semana -->
+                        <div class="grid grid-cols-7 gap-1 text-center mb-2">
+                            <div class="text-[10px] text-[#9CA3AF] uppercase tracking-wider py-1">Lun</div>
+                            <div class="text-[10px] text-[#9CA3AF] uppercase tracking-wider py-1">Mar</div>
+                            <div class="text-[10px] text-[#9CA3AF] uppercase tracking-wider py-1">Mié</div>
+                            <div class="text-[10px] text-[#9CA3AF] uppercase tracking-wider py-1">Jue</div>
+                            <div class="text-[10px] text-[#9CA3AF] uppercase tracking-wider py-1">Vie</div>
+                            <div class="text-[10px] text-[#9CA3AF] uppercase tracking-wider py-1">Sáb</div>
+                            <div class="text-[10px] text-[#9CA3AF] uppercase tracking-wider py-1">Dom</div>
+                        </div>
+                        <!-- Cuadrícula de días -->
+                        <div id="calendar-days" class="grid grid-cols-7 gap-1 flex-1"></div>
                     </div>
                 </div>
 
                 <!-- Columna Derecha: Lista max 10 -->
                 <div class="bg-[#1a1a1a] border border-[#374151] rounded-lg p-4 custom-scroll overflow-y-auto flex flex-col h-full">
-                    <h3 class="text-sm font-bold uppercase tracking-widest text-white mb-4 border-b border-[#374151]/50 pb-2">📋 Excepciones</h3>
+                    <h3 class="text-sm font-bold uppercase tracking-widest text-white mb-4 border-b border-[#374151]/50 pb-2">Excepciones</h3>
                     <div id="lista-excepciones" class="space-y-3">
                         <!-- Lista dinámica -->
                         <div class="text-center py-8 text-[#9CA3AF]">
