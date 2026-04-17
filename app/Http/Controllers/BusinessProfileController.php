@@ -279,4 +279,35 @@ class BusinessProfileController extends Controller
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
     }
+
+    public function listExceptions(Request $request)
+    {
+        $params = [
+            'empleado_id' => $request->empleado_id,
+            'fecha_inicio' => $request->fecha_inicio,
+            'fecha_fin' => $request->fecha_fin,
+            'tipo_excepcion' => $request->tipo_excepcion,
+        ];
+        
+        $response = $this->httpClient->get('/api/horario-excepciones', $params);
+        return response()->json($response);
+    }
+
+    public function storeException(Request $request)
+    {
+        $response = $this->httpClient->post('/api/horario-excepciones', $request->all());
+        return response()->json($response);
+    }
+
+    public function updateException(Request $request, $id)
+    {
+        $response = $this->httpClient->put("/api/horario-excepciones/{$id}", $request->all());
+        return response()->json($response);
+    }
+
+    public function destroyException($id)
+    {
+        $response = $this->httpClient->delete("/api/horario-excepciones/{$id}");
+        return response()->json($response);
+    }
 }

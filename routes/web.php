@@ -72,6 +72,12 @@ Route::middleware(['auth.session', 'inject.api.token', 'check.business'])->group
         Route::post('/employees', [EmployeeController::class, 'store'])->name('employees.store');
         Route::put('/employees/{id}', [EmployeeController::class, 'update'])->name('employees.update');
         Route::delete('/employees/{id}', [EmployeeController::class, 'destroy'])->name('employees.destroy');
+
+        // Excepciones de horario (proxy a API)
+        Route::get('/exceptions/list', [BusinessProfileController::class, 'listExceptions'])->name('exceptions.list');
+        Route::post('/exceptions', [BusinessProfileController::class, 'storeException'])->name('exceptions.store');
+        Route::put('/exceptions/{id}', [BusinessProfileController::class, 'updateException'])->name('exceptions.update');
+        Route::delete('/exceptions/{id}', [BusinessProfileController::class, 'destroyException'])->name('exceptions.destroy');
     });
 });
 
