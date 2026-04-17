@@ -306,7 +306,35 @@
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <!-- Columna Izquierda: Calendario -->
                 <div class="flex justify-center lg:justify-start">
-                    <div id="excepciones-calendario" class="w-full"></div>
+                    <div class="w-full">
+                        <p class="text-xs text-[#9CA3AF] uppercase tracking-widest mb-3">Fecha</p>
+                        <div class="bg-[#1a1a1a] border border-[#374151] rounded-lg p-4 select-none">
+                            <!-- Navegación de mes -->
+                            <div class="flex justify-between items-center mb-4">
+                                <button type="button" id="prev-month"
+                                        class="w-8 h-8 flex items-center justify-center rounded-full text-[#9CA3AF] hover:text-white hover:bg-[#374151] transition-all">
+                                    <i class="fas fa-chevron-left text-xs"></i>
+                                </button>
+                                <h4 id="current-month" class="text-white font-bold text-sm uppercase tracking-widest"></h4>
+                                <button type="button" id="next-month"
+                                        class="w-8 h-8 flex items-center justify-center rounded-full text-[#9CA3AF] hover:text-white hover:bg-[#374151] transition-all">
+                                    <i class="fas fa-chevron-right text-xs"></i>
+                                </button>
+                            </div>
+                            <!-- Cabecera días de la semana -->
+                            <div class="grid grid-cols-7 gap-1 text-center mb-2">
+                                <div class="text-[10px] text-[#9CA3AF] uppercase tracking-wider py-1">Lun</div>
+                                <div class="text-[10px] text-[#9CA3AF] uppercase tracking-wider py-1">Mar</div>
+                                <div class="text-[10px] text-[#9CA3AF] uppercase tracking-wider py-1">Mié</div>
+                                <div class="text-[10px] text-[#9CA3AF] uppercase tracking-wider py-1">Jue</div>
+                                <div class="text-[10px] text-[#9CA3AF] uppercase tracking-wider py-1">Vie</div>
+                                <div class="text-[10px] text-[#9CA3AF] uppercase tracking-wider py-1">Sáb</div>
+                                <div class="text-[10px] text-[#9CA3AF] uppercase tracking-wider py-1">Dom</div>
+                            </div>
+                            <!-- Cuadrícula de días -->
+                            <div id="calendar-days" class="grid grid-cols-7 gap-1"></div>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Columna Derecha: Lista max 10 -->
@@ -572,11 +600,11 @@
             <div class="grid grid-cols-2 gap-4">
                 <div>
                     <label class="block text-[#9CA3AF] text-xs font-bold uppercase tracking-widest mb-1">Desde</label>
-                    <input type="text" id="excepcion_fecha_inicio" required readonly class="w-full bg-[#262626] border border-[#374151] text-white text-sm rounded px-4 py-2 focus:outline-none focus:border-[#25B5DA]">
+                    <input type="date" id="excepcion_fecha_inicio" required class="w-full bg-[#262626] border border-[#374151] text-white text-sm rounded px-4 py-2 focus:outline-none focus:border-[#25B5DA]">
                 </div>
                 <div>
                     <label class="block text-[#9CA3AF] text-xs font-bold uppercase tracking-widest mb-1">Hasta (opcional)</label>
-                    <input type="text" id="excepcion_fecha_fin" readonly class="w-full bg-[#262626] border border-[#374151] text-white text-sm rounded px-4 py-2 focus:outline-none focus:border-[#25B5DA]">
+                    <input type="date" id="excepcion_fecha_fin" class="w-full bg-[#262626] border border-[#374151] text-white text-sm rounded px-4 py-2 focus:outline-none focus:border-[#25B5DA]">
                 </div>
             </div>
 
@@ -1313,7 +1341,7 @@ function toggleHorarioEspecial() {
     }
 }
 
-function abrirModalExcepcion(excepcion = null) {
+function abrirModalExcepcion(excepcion = null, defaultDate = null) {
     const modal = document.getElementById('modal-excepcion-horario');
     const form = document.getElementById('excepcion-form');
     form.reset();
@@ -1321,17 +1349,18 @@ function abrirModalExcepcion(excepcion = null) {
     document.getElementById('excepcion-modal-title').innerText = 'Nueva Excepción';
     toggleHorarioEspecial();
 
-    if (fhInicio) fhInicio.clear();
-    if (fhFin) fhFin.clear();
+    if (defaultDate) {
+        document.getElementById('excepcion_fecha_inicio').value = defaultDate;
+    }
 
     if (excepcion) {
         document.getElementById('excepcion-modal-title').innerText = 'Editar Excepción';
-        document.getElementById('excepcion_id_input').value = excepcion.id_horario_excepcion;
+        document.getElementById('excepcion_id_input').value = excepcion.id_excepcion;
         document.getElementById('excepcion_empleado_id').value = excepcion.empleado_id || '';
         document.getElementById('excepcion_tipo').value = excepcion.tipo_excepcion;
         
-        if (fhInicio) fhInicio.setDate(excepcion.fecha_inicio);
-        if (fhFin && excepcion.fecha_fin) fhFin.setDate(excepcion.fecha_fin);
+        document.getElementById('excepcion_fecha_inicio').value = excepcion.fecha_inicio || '';
+        document.getElementById('excepcion_fecha_fin').value = excepcion.fecha_fin || '';
         
         toggleHorarioEspecial();
         if (excepcion.tipo_excepcion === 'horario_especial') {
@@ -1364,10 +1393,11 @@ async function cargarExcepciones() {
         if (data && data.success && data.data) {
             excepcionesList = data.data;
             renderListaExcepciones();
-            actualizarCalendarioMarcas();
+            renderCalendar(currentDate, excepcionesList);
         } else {
             excepcionesList = [];
             renderListaExcepciones();
+            renderCalendar(currentDate, excepcionesList);
         }
     } catch (e) {
         console.error("Error cargando excepciones", e);
@@ -1417,38 +1447,100 @@ function renderListaExcepciones(filtroFecha = null) {
         `;
         
         item.querySelector('.edit-btn').onclick = () => abrirModalExcepcion(e);
-        item.querySelector('.del-btn').onclick = () => eliminarExcepcion(e.id_horario_excepcion);
+        item.querySelector('.del-btn').onclick = () => eliminarExcepcion(e.id_excepcion);
         
         lista.appendChild(item);
     });
 }
 
-function actualizarCalendarioMarcas() {
-    if (!fCalendario) return;
+// Variables globales para el calendario personalizado
+let currentDate = new Date();
+let excepcionesData = [];
+
+function renderCalendar(date, excepciones) {
+    const calendarDays = document.getElementById('calendar-days');
+    const monthEl = document.getElementById('current-month');
     
-    // Flatpickr no tiene un API "on the fly" sencillo para días pasados sin redraw o crear hooks onDayCreate,
-    // pero podemos hacer un hook
-    fCalendario.set('onDayCreate', function(dObj, dStr, fp, dayElem) {
-        const actDate = dayElem.dateObj;
-        // Ajuste zona horaria
-        const tzoffset = (new Date()).getTimezoneOffset() * 60000;
-        const localISOTime = (new Date(actDate - tzoffset)).toISOString().slice(0, 10);
+    if(!calendarDays || !monthEl) return;
+    calendarDays.innerHTML = '';
+    
+    const year = date.getFullYear();
+    const month = date.getMonth();
+    
+    // Nombres de meses simples
+    const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+    monthEl.textContent = `${monthNames[month]} ${year}`;
+    
+    // Primer día del mes
+    const firstDay = new Date(year, month, 1);
+    // Ajustar para que Lunes sea el primer día de la semana (0) en vez de Domingo (0) del getDay()
+    let startingDay = firstDay.getDay() - 1;
+    if (startingDay < 0) startingDay = 6;
+    
+    // Cantidad de días en el mes
+    const monthLength = new Date(year, month + 1, 0).getDate();
+    
+    // Días vacíos iniciales
+    for (let i = 0; i < startingDay; i++) {
+        const emptyDiv = document.createElement('div');
+        emptyDiv.className = 'py-2';
+        calendarDays.appendChild(emptyDiv);
+    }
+    
+    // Generar días
+    for (let day = 1; day <= monthLength; day++) {
+        // String fecha local
+        const currentLoopDateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
         
-        const tieneExcepcion = excepcionesList.find(e => {
+        const tieneExcepcion = excepciones.find(e => {
             const fi = e.fecha_inicio;
             const ff = e.fecha_fin || e.fecha_inicio;
-            return localISOTime >= fi && localISOTime <= ff;
+            return currentLoopDateStr >= fi && currentLoopDateStr <= ff;
         });
 
-        if (tieneExcepcion) {
-            dayElem.style.borderBottom = `2px solid ${getColorByType(tieneExcepcion.tipo_excepcion)}`;
-        } else {
-            dayElem.style.borderBottom = `none`;
+        const dayDiv = document.createElement('div');
+        dayDiv.className = `relative py-2 text-center text-xs rounded hover:bg-[#374151] cursor-pointer transition-colors ${tieneExcepcion ? 'font-bold': 'text-white'}`;
+        
+        // Si el día de hoy
+        const today = new Date();
+        if (day === today.getDate() && month === today.getMonth() && year === today.getFullYear()) {
+             dayDiv.classList.add('bg-[#262626]', 'border', 'border-[#374151]');
         }
-    });
+        
+        dayDiv.innerHTML = `<span class="text-white text-xs">${day}</span>`;
+        if (tieneExcepcion) {
+            dayDiv.innerHTML += `<span class="absolute bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full" style="background-color: ${getColorByType(tieneExcepcion.tipo_excepcion)}"></span>`;
+        }
 
-    fCalendario.redraw();
+        dayDiv.onclick = () => {
+             // Abrir modal con la fecha preseleccionada
+             abrirModalExcepcion(null, currentLoopDateStr);
+             renderListaExcepciones(currentLoopDateStr);
+        };
+        
+        calendarDays.appendChild(dayDiv);
+    }
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Configurar event listeners del calendario personalizado
+    const prevBtn = document.getElementById('prev-month');
+    const nextBtn = document.getElementById('next-month');
+    
+    if (prevBtn) {
+        prevBtn.addEventListener('click', () => {
+            currentDate.setMonth(currentDate.getMonth() - 1);
+            renderCalendar(currentDate, excepcionesList);
+        });
+    }
+    
+    if (nextBtn) {
+        nextBtn.addEventListener('click', () => {
+            currentDate.setMonth(currentDate.getMonth() + 1);
+            renderCalendar(currentDate, excepcionesList);
+        });
+    }
+});
 
 async function eliminarExcepcion(id) {
     if(!confirm('¿Seguro que deseas eliminar esta excepción?')) return;
@@ -1529,9 +1621,7 @@ document.getElementById('excepcion-form').addEventListener('submit', async funct
 document.addEventListener('DOMContentLoaded', function() {
     cargarHorariosNegocio();
     actualizarVistaPreviaNegocio();
-    
-    // Iniciar flatpickr (si existe) y subtab si venimos de url? ¿por ahora negocio es default?
-    initFlatpickr();
+    renderCalendar(currentDate, excepcionesList);
 });
 </script>
 
