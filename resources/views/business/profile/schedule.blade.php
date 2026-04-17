@@ -306,9 +306,9 @@
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <!-- Columna Izquierda: Calendario -->
                 <div class="flex justify-center lg:justify-start">
-                    <div class="w-full">
-                        <p class="text-xs text-[#9CA3AF] uppercase tracking-widest mb-3">Fecha</p>
-                        <div class="bg-[#1a1a1a] border border-[#374151] rounded-lg p-4 select-none">
+                    <div class="w-full flex flex-col h-full">
+                        <h3 class="text-sm font-bold uppercase tracking-widest text-white mb-4 border-b border-[#374151]/50 pb-2">📅 Calendario</h3>
+                        <div class="bg-[#1a1a1a] border border-[#374151] rounded-lg p-4 select-none flex-grow">
                             <!-- Navegación de mes -->
                             <div class="flex justify-between items-center mb-4">
                                 <button type="button" id="prev-month"
@@ -338,8 +338,8 @@
                 </div>
 
                 <!-- Columna Derecha: Lista max 10 -->
-                <div class="bg-[#1a1a1a] border border-[#374151] rounded-lg p-4 custom-scroll max-h-[400px] overflow-y-auto">
-                    <h3 class="text-sm font-bold uppercase tracking-widest text-white mb-4 border-b border-[#374151]/50 pb-2">Lista de Excepciones</h3>
+                <div class="bg-[#1a1a1a] border border-[#374151] rounded-lg p-4 custom-scroll overflow-y-auto flex flex-col h-full">
+                    <h3 class="text-sm font-bold uppercase tracking-widest text-white mb-4 border-b border-[#374151]/50 pb-2">📋 Excepciones</h3>
                     <div id="lista-excepciones" class="space-y-3">
                         <!-- Lista dinámica -->
                         <div class="text-center py-8 text-[#9CA3AF]">
@@ -1359,13 +1359,13 @@ function abrirModalExcepcion(excepcion = null, defaultDate = null) {
         document.getElementById('excepcion_empleado_id').value = excepcion.empleado_id || '';
         document.getElementById('excepcion_tipo').value = excepcion.tipo_excepcion;
         
-        document.getElementById('excepcion_fecha_inicio').value = excepcion.fecha_inicio || '';
-        document.getElementById('excepcion_fecha_fin').value = excepcion.fecha_fin || '';
+        document.getElementById('excepcion_fecha_inicio').value = excepcion.fecha_inicio ? excepcion.fecha_inicio.substring(0, 10) : '';
+        document.getElementById('excepcion_fecha_fin').value = excepcion.fecha_fin ? excepcion.fecha_fin.substring(0, 10) : '';
         
         toggleHorarioEspecial();
         if (excepcion.tipo_excepcion === 'horario_especial') {
-            document.getElementById('excepcion_hora_inicio').value = excepcion.hora_inicio || '';
-            document.getElementById('excepcion_hora_fin').value = excepcion.hora_fin || '';
+            document.getElementById('excepcion_hora_inicio').value = excepcion.hora_inicio ? excepcion.hora_inicio.substring(0, 5) : '';
+            document.getElementById('excepcion_hora_fin').value = excepcion.hora_fin ? excepcion.hora_fin.substring(0, 5) : '';
         }
         
         document.getElementById('excepcion_descripcion').value = excepcion.descripcion || '';
@@ -1404,6 +1404,19 @@ async function cargarExcepciones() {
     }
 }
 
+function formatFechaLocal(isoString) {
+    if (!isoString) return '';
+    try {
+        const d = new Date(isoString);
+        if (isNaN(d.getTime())) return isoString.substring(0, 10);
+        const tzoffset = d.getTimezoneOffset() * 60000;
+        const local = new Date(d.getTime() + tzoffset);
+        return local.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    } catch(e) {
+        return isoString.substring(0, 10);
+    }
+}
+
 function renderListaExcepciones(filtroFecha = null) {
     const lista = document.getElementById('lista-excepciones');
     lista.innerHTML = '';
@@ -1411,8 +1424,8 @@ function renderListaExcepciones(filtroFecha = null) {
     let filtrados = excepcionesList;
     if (filtroFecha) {
         filtrados = filtrados.filter(e => {
-            const fi = e.fecha_inicio;
-            const ff = e.fecha_fin || e.fecha_inicio;
+            const fi = e.fecha_inicio.substring(0, 10);
+            const ff = (e.fecha_fin || e.fecha_inicio).substring(0, 10);
             return filtroFecha >= fi && filtroFecha <= ff;
         });
     }
@@ -1425,9 +1438,9 @@ function renderListaExcepciones(filtroFecha = null) {
     // Top 10
     filtrados.slice(0, 10).forEach(e => {
         const color = getColorByType(e.tipo_excepcion);
-        const fi = e.fecha_inicio;
-        const ff = e.fecha_fin ? ` al ${e.fecha_fin}` : '';
-        const hs = (e.tipo_excepcion === 'horario_especial') ? ` (${e.hora_inicio} a ${e.hora_fin})` : '';
+        const fi = formatFechaLocal(e.fecha_inicio);
+        const ff = e.fecha_fin ? ` - ${formatFechaLocal(e.fecha_fin)}` : '';
+        const hs = (e.tipo_excepcion === 'horario_especial') ? ` (${e.hora_inicio ? e.hora_inicio.substring(0,5) : ''} a ${e.hora_fin ? e.hora_fin.substring(0,5) : ''})` : '';
         const owner = e.empleado ? e.empleado.nombre : 'Todo el Negocio';
         
         const item = document.createElement('div');
@@ -1492,14 +1505,16 @@ function renderCalendar(date, excepciones) {
         // String fecha local
         const currentLoopDateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
         
-        const tieneExcepcion = excepciones.find(e => {
-            const fi = e.fecha_inicio;
-            const ff = e.fecha_fin || e.fecha_inicio;
+        const excepcionesDia = excepciones.filter(e => {
+            const fi = e.fecha_inicio.substring(0, 10);
+            const ff = (e.fecha_fin || e.fecha_inicio).substring(0, 10);
             return currentLoopDateStr >= fi && currentLoopDateStr <= ff;
         });
 
+        const tieneExcepcion = excepcionesDia.length > 0;
+
         const dayDiv = document.createElement('div');
-        dayDiv.className = `relative py-2 text-center text-xs rounded hover:bg-[#374151] cursor-pointer transition-colors ${tieneExcepcion ? 'font-bold': 'text-white'}`;
+        dayDiv.className = `group relative py-2 text-center text-xs rounded hover:bg-[#374151] cursor-pointer transition-colors ${tieneExcepcion ? 'font-bold': 'text-white'}`;
         
         // Si el día de hoy
         const today = new Date();
@@ -1509,7 +1524,23 @@ function renderCalendar(date, excepciones) {
         
         dayDiv.innerHTML = `<span class="text-white text-xs">${day}</span>`;
         if (tieneExcepcion) {
-            dayDiv.innerHTML += `<span class="absolute bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full" style="background-color: ${getColorByType(tieneExcepcion.tipo_excepcion)}"></span>`;
+            const primeraExcepcion = excepcionesDia[0];
+            const hasMultiple = excepcionesDia.length > 1;
+            const tooltipTitle = hasMultiple ? `${excepcionesDia.length} excepciones` : getLabelByType(primeraExcepcion.tipo_excepcion);
+            const tooltipDesc = hasMultiple ? 'Haz clic para ver la lista' : (primeraExcepcion.descripcion || '');
+            
+            dayDiv.innerHTML += `<span class="absolute bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full" style="background-color: ${getColorByType(primeraExcepcion.tipo_excepcion)}"></span>`;
+            
+            // Tooltip
+            dayDiv.innerHTML += `
+                <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-max max-w-[200px] z-[60] hidden group-hover:block bg-[#1a1a1a] border border-[#374151] p-2 rounded shadow-xl pointer-events-none">
+                    <div class="font-bold text-white flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full" style="background-color: ${getColorByType(primeraExcepcion.tipo_excepcion)}"></span>
+                        ${tooltipTitle}
+                    </div>
+                    ${tooltipDesc ? `<div class="text-[#9CA3AF] font-normal text-left whitespace-normal text-xs mt-1 leading-snug">${tooltipDesc}</div>` : ''}
+                </div>
+            `;
         }
 
         dayDiv.onclick = () => {
