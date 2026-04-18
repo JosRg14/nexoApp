@@ -445,7 +445,7 @@
             </section>
 
             <!-- CTA Negocios: Planes API -->
-            <section class="bg-[#1a1a1a] pb-24 relative">
+            <section class="bg-[#1a1a1a] pb-8 relative">
                 <div class="max-w-7xl mx-auto px-6">
                     <div class="text-center mb-16 animate-fade-in-up">
                         <h2 class="text-4xl text-white font-black tracking-tight mb-4">Planes que se ajustan a ti</h2>
@@ -503,7 +503,7 @@
 
         <!-- Call to Action Footer (Registrar negocio) -->
         @if(!session()->has('rol') && count($negocios) > 0)
-            <section class="max-w-7xl mx-auto px-6 pb-20 mt-10 animate-fade-in-up">
+            <section class="max-w-7xl mx-auto px-6 pb-20 mt-2 animate-fade-in-up">
                 <div class="bg-gradient-to-r from-[#262626] to-[#1a1a1a] border border-[#374151] rounded-[2rem] p-8 md:p-14 flex flex-col md:flex-row items-center justify-between gap-8 relative overflow-hidden shadow-2xl">
                     <div class="absolute -top-32 -right-32 w-80 h-80 bg-[#25B5DA] rounded-full filter blur-[100px] opacity-10"></div>
                     <div class="absolute -bottom-32 -left-32 w-80 h-80 bg-[#1c8fb0] rounded-full filter blur-[100px] opacity-10"></div>
