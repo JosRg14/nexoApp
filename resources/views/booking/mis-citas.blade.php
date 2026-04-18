@@ -12,9 +12,37 @@
         </div>
         
         @if(count($citas) > 0)
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        @php
+            $pendientesCount = collect($citas)->whereIn('estado', ['pendiente', 'confirmada', 'en_proceso'])->count();
+            $completadasCount = collect($citas)->whereIn('estado', ['completada'])->count();
+            $canceladasCount = collect($citas)->whereIn('estado', ['cancelada', 'no_asistio'])->count();
+        @endphp
+
+        <!-- Filtros -->
+        <div class="flex flex-wrap gap-2 mb-8">
+            <button class="filter-btn active px-4 py-2 rounded-full text-[10px] md:text-xs font-bold uppercase tracking-widest transition-all bg-[#25B5DA] text-black" data-filter="todas">
+                Todas ({{ count($citas) }})
+            </button>
+            <button class="filter-btn px-4 py-2 rounded-full text-[10px] md:text-xs font-bold uppercase tracking-widest transition-all bg-[#262626] border border-[#374151] text-[#9CA3AF] hover:border-[#25B5DA] hover:text-white" data-filter="pendiente">
+                Pendientes ({{ $pendientesCount }})
+            </button>
+            <button class="filter-btn px-4 py-2 rounded-full text-[10px] md:text-xs font-bold uppercase tracking-widest transition-all bg-[#262626] border border-[#374151] text-[#9CA3AF] hover:border-[#25B5DA] hover:text-white" data-filter="completada">
+                Completadas ({{ $completadasCount }})
+            </button>
+            <button class="filter-btn px-4 py-2 rounded-full text-[10px] md:text-xs font-bold uppercase tracking-widest transition-all bg-[#262626] border border-[#374151] text-[#9CA3AF] hover:border-[#25B5DA] hover:text-white" data-filter="cancelada">
+                Canceladas ({{ $canceladasCount }})
+            </button>
+        </div>
+
+        <div class="citas-container grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             @foreach($citas as $cita)
-            <div class="bg-[#262626] border border-[#374151] rounded-lg p-6 hover:border-[#25B5DA] transition-all">
+            @php
+                $categoria_estado = 'pendiente';
+                if(in_array($cita['estado'], ['completada'])) $categoria_estado = 'completada';
+                if(in_array($cita['estado'], ['cancelada', 'no_asistio'])) $categoria_estado = 'cancelada';
+                if(in_array($cita['estado'], ['pendiente', 'confirmada', 'en_proceso'])) $categoria_estado = 'pendiente';
+            @endphp
+            <div class="cita-card bg-[#262626] border border-[#374151] rounded-lg p-6 hover:border-[#25B5DA] transition-all" data-estado="{{ $categoria_estado }}">
                 <div class="flex justify-between items-start mb-4">
                     <div>
                         <h3 class="font-bold text-white text-lg">{{ $cita['servicio']['nombre'] ?? 'Servicio' }}</h3>
@@ -393,6 +421,71 @@ async function eliminarResena(resenaId) {
         hideLoader();
     }
 }
+
+// Lógica de Filtros
+document.addEventListener('DOMContentLoaded', function() {
+    const filterButtons = document.querySelectorAll('.filter-btn');
+    const citasCards = document.querySelectorAll('.cita-card');
+    const container = document.querySelector('.citas-container');
+    
+    filterButtons.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const filter = this.dataset.filter;
+            
+            // Actualizar botones activos
+            filterButtons.forEach(b => {
+                b.classList.remove('active', 'bg-[#25B5DA]', 'text-black');
+                b.classList.add('bg-[#262626]', 'border', 'border-[#374151]', 'text-[#9CA3AF]');
+            });
+            
+            this.classList.add('active', 'bg-[#25B5DA]', 'text-black');
+            this.classList.remove('bg-[#262626]', 'border', 'border-[#374151]', 'text-[#9CA3AF]');
+            
+            // Filtrar cards
+            citasCards.forEach(card => {
+                const estado = card.dataset.estado;
+                
+                if (filter === 'todas' || estado === filter) {
+                    card.style.display = '';
+                    card.classList.remove('hidden');
+                } else {
+                    card.style.display = 'none';
+                    card.classList.add('hidden');
+                }
+            });
+            
+            // Mostrar mensaje si no hay resultados
+            const visibleCards = document.querySelectorAll('.cita-card:not(.hidden)');
+            let emptyMessage = document.getElementById('empty-filter-message');
+            
+            if (visibleCards.length === 0) {
+                if (!emptyMessage) {
+                    emptyMessage = document.createElement('div');
+                    emptyMessage.id = 'empty-filter-message';
+                    emptyMessage.className = 'col-span-full py-20 text-center animate-fade-in';
+                    
+                    const filterName = this.innerText.split('(')[0].trim().toLowerCase();
+                    
+                    emptyMessage.innerHTML = `
+                        <div class="flex flex-col items-center justify-center">
+                            <div class="w-16 h-16 bg-[#262626] rounded-full flex items-center justify-center mb-4 border border-[#374151]">
+                                <i class="fas fa-calendar-times text-2xl text-[#9CA3AF]"></i>
+                            </div>
+                            <h3 class="text-white font-medium text-lg">No tienes citas ${filterName}</h3>
+                            <p class="text-[#9CA3AF] text-sm mt-1 mb-6">Parece que no hay nada por aquí.</p>
+                            <a href="/" class="px-6 py-2 bg-[#25B5DA] text-black font-bold rounded-lg hover:bg-[#1c8fb0] transition-all text-sm uppercase tracking-wider">
+                                Agendar una cita
+                            </a>
+                        </div>
+                    `;
+                    container.appendChild(emptyMessage);
+                }
+            } else if (emptyMessage) {
+                emptyMessage.remove();
+            }
+        });
+    });
+});
 </script>
 
 <!-- Script de Confetti CDN -->
