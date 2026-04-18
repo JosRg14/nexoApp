@@ -501,6 +501,26 @@
             </section>
         @endif
 
+        <!-- Call to Action Footer (Registrar negocio) -->
+        @if(!session()->has('rol') && count($negocios) > 0)
+            <section class="max-w-7xl mx-auto px-6 pb-20 mt-10 animate-fade-in-up">
+                <div class="bg-gradient-to-r from-[#262626] to-[#1a1a1a] border border-[#374151] rounded-[2rem] p-8 md:p-14 flex flex-col md:flex-row items-center justify-between gap-8 relative overflow-hidden shadow-2xl">
+                    <div class="absolute -top-32 -right-32 w-80 h-80 bg-[#25B5DA] rounded-full filter blur-[100px] opacity-10"></div>
+                    <div class="absolute -bottom-32 -left-32 w-80 h-80 bg-[#1c8fb0] rounded-full filter blur-[100px] opacity-10"></div>
+                    
+                    <div class="relative z-10 max-w-xl text-center md:text-left">
+                        <span class="text-[#25B5DA] text-[10px] font-black uppercase tracking-widest mb-2 block">Haz crecer tu marca</span>
+                        <h3 class="text-3xl md:text-4xl font-black text-white uppercase tracking-wide mb-4 leading-tight">Impulsa tu negocio al siguiente nivel</h3>
+                        <p class="text-[#9CA3AF] text-sm md:text-base leading-relaxed">Únete a la plataforma elegida por los mejores profesionales. Gestiona citas, aumenta visibilidad y mejora tus ingresos hoy.</p>
+                    </div>
+                    <a href="/register" class="relative z-10 flex items-center justify-center gap-3 whitespace-nowrap py-4 px-10 bg-white text-black font-black text-xs uppercase tracking-widest rounded-full hover:bg-[#25B5DA] transition-colors duration-300 group">
+                        Unirse a Nexo App
+                        <i class="fas fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+                    </a>
+                </div>
+            </section>
+        @endif
+
     </main>
 
 @endsection
