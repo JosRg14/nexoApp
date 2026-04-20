@@ -316,7 +316,7 @@
                     <button @click="historialTab = 'historial'" 
                             :class="historialTab === 'historial' ? 'border-[#25B5DA] text-white' : 'border-transparent text-[#9CA3AF] hover:text-gray-300'"
                             class="px-6 py-3 font-bold text-xs uppercase tracking-widest border-b-2 transition-colors">
-                        Historial Uso (<span x-text="historialUsadas.length"></span>)
+                        Canjeadas (<span x-text="historialUsadas.length"></span>)
                     </button>
                 </div>
 
@@ -385,16 +385,23 @@
                                             <template x-for="uso in historialUsadas" :key="uso.id">
                                                 <tr class="border-b border-[#374151]/50 hover:bg-[#262626] transition-colors">
                                                     <td class="p-3 font-semibold text-white">
-                                                        <div x-text="uso.promocion?.titulo || uso.promocion?.promocion?.nombre || 'Promoción'"></div>
-                                                        <div class="text-[10px] text-[#9CA3AF] font-normal" x-text="'Usada: ' + new Date(uso.created_at).toLocaleDateString()"></div>
+                                                        <div x-text="uso.descripcion || 'Promoción'"></div>
+                                                        <div class="text-[10px] text-[#9CA3AF] font-normal" x-text="'Canjeada el: ' + new Date(uso.canjeada_en).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })"></div>
                                                     </td>
-                                                    <td class="p-3 text-[#25B5DA]" x-text="'-$' + (uso.descuento_aplicado || 0)"></td>
-                                                    <td class="p-3 text-[#9CA3AF]" x-text="uso.cita ? new Date(uso.cita.fecha).toLocaleDateString() + ' ' + uso.cita.hora_inicio : 'N/A'"></td>
                                                     <td class="p-3">
-                                                        <span class="text-[10px] uppercase font-bold tracking-widest" 
-                                                              :class="uso.cita?.estado === 'completada' ? 'text-green-400' : 'text-orange-400'" 
-                                                              x-text="uso.cita ? (uso.cita.estado || 'agendada') : 'Uso registrado'">
+                                                        <span class="inline-block px-2 py-0.5 rounded-full text-[10px] uppercase font-bold tracking-widest"
+                                                              :class="uso.beneficio_tipo === 'descuento' ? 'bg-[#25B5DA]/10 text-[#25B5DA]' : 'bg-emerald-500/10 text-emerald-500'"
+                                                              x-text="uso.beneficio_tipo === 'descuento' ? (uso.beneficio_valor + '% DESC') : 'GRATIS'">
                                                         </span>
+                                                    </td>
+                                                    <td class="p-3 text-[#9CA3AF]">
+                                                        <div class="flex items-center gap-1">
+                                                            <i class="fa-solid fa-hashtag text-[10px] opacity-50"></i>
+                                                            <span x-text="uso.cita_id"></span>
+                                                        </div>
+                                                    </td>
+                                                    <td class="p-3 text-right">
+                                                        <div class="w-2 h-2 rounded-full bg-green-500 inline-block" title="Canjeada correctamente"></div>
                                                     </td>
                                                 </tr>
                                             </template>

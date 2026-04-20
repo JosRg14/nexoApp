@@ -74,25 +74,34 @@
                     </div>
                     
                     @if(isset($cita['promocion_aplicada']))
-                    <div class="flex flex-col gap-1 mt-2 p-3 bg-[#25B5DA]/10 border border-[#25B5DA]/30 rounded-lg">
-                        <div class="flex justify-between text-xs text-[#9CA3AF]">
-                            <span>Precio original:</span>
-                            <span class="line-through">${{ number_format($cita['precio_original'] ?? $cita['servicio']['precio'] ?? 0, 2) }}</span>
+                    <div class="mt-4 p-3 bg-[#25B5DA]/5 border border-[#25B5DA]/20 rounded-xl relative overflow-hidden group hover:bg-[#25B5DA]/10 transition-colors">
+                        <!-- Badge de Promoción -->
+                        <div class="absolute -right-8 -top-8 w-16 h-16 bg-[#25B5DA]/10 rotate-45 group-hover:bg-[#25B5DA]/20 transition-all"></div>
+                        
+                        <div class="flex justify-between items-start mb-2 relative z-10">
+                            <div>
+                                <span class="bg-[#25B5DA] text-black text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-tighter">
+                                    Promoción Aplicada
+                                </span>
+                                <p class="text-xs text-[#25B5DA] mt-1 font-medium italic">
+                                    <i class="fas fa-magic mr-1"></i>{{ $cita['promocion_aplicada']['descripcion'] ?? 'Descuento especial' }}
+                                </p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-[10px] text-[#9CA3AF] line-through">${{ number_format($cita['precio_original'] ?? 0, 2) }}</p>
+                                <p class="text-sm font-bold text-white">${{ number_format($cita['precio_final'] ?? 0, 2) }}</p>
+                            </div>
                         </div>
-                        <div class="flex justify-between items-center text-xs">
-                            <span class="text-[#25B5DA] flex items-center gap-1">
-                                <i class="fas fa-tag"></i> {{ $cita['promocion_aplicada']['descripcion'] ?? 'Promoción aplicada' }}
-                            </span>
-                            <span class="text-[#25B5DA] font-medium">-${{ number_format($cita['promocion_aplicada']['descuento_aplicado'] ?? 0, 2) }}</span>
-                        </div>
-                        <div class="flex justify-between items-center text-sm mt-1 pt-1 border-t border-[#25B5DA]/20">
-                            <span class="font-bold text-white">Precio final:</span>
-                            <span class="font-bold text-[#25B5DA]">${{ number_format($cita['precio_final'] ?? (($cita['precio_original'] ?? $cita['servicio']['precio'] ?? 0) - ($cita['promocion_aplicada']['descuento_aplicado'] ?? 0)), 2) }}</span>
+
+                        <div class="flex justify-between items-center pt-2 border-t border-[#25B5DA]/10 text-[10px] relative z-10">
+                            <span class="text-[#9CA3AF]">Ahorraste</span>
+                            <span class="text-[#25B5DA] font-bold">-${{ number_format($cita['promocion_aplicada']['descuento_aplicado'] ?? 0, 2) }}</span>
                         </div>
                     </div>
                     @else
-                    <div class="flex items-center gap-2 text-[#25B5DA]">
-                        <span class="font-medium">${{ number_format($cita['servicio']['precio'] ?? 0, 2) }}</span>
+                    <div class="flex items-center justify-between mt-4 p-3 bg-[#374151]/10 border border-[#374151]/20 rounded-xl">
+                        <span class="text-xs text-[#9CA3AF]">Precio del servicio</span>
+                        <span class="text-sm font-bold text-[#25B5DA]">${{ number_format($cita['servicio']['precio'] ?? 0, 2) }}</span>
                     </div>
                     @endif
                 </div>
