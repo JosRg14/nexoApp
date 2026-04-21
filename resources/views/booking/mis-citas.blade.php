@@ -6,10 +6,24 @@
 
 <div class="bg-[#1a1a1a] min-h-screen pt-12 py-12">
     <div class="max-w-6xl mx-auto px-6">
-        <div class="mb-8">
+        <div class="mb-4">
             <h1 class="text-3xl font-bold uppercase tracking-wide text-white">Mis Citas</h1>
-            <p class="text-[#9CA3AF] text-sm mt-2">Historial de tus citas agendadas</p>
+            <p class="text-[#9CA3AF] text-sm mt-2">Historial de tus citas agendadas y promociones</p>
         </div>
+        
+        <!-- Tabs -->
+        <div class="flex border-b border-[#374151] mb-6">
+            <button class="tab-btn active px-6 py-3 text-xs uppercase tracking-widest text-[#25B5DA] border-b-2 border-[#25B5DA]"
+                    data-tab="citas">
+                <i class="fas fa-calendar-alt mr-2"></i>Mis Citas
+            </button>
+            <button class="tab-btn px-6 py-3 text-xs uppercase tracking-widest text-[#9CA3AF] hover:text-white"
+                    data-tab="promociones">
+                <i class="fas fa-ticket-alt mr-2"></i>Mis Promociones
+            </button>
+        </div>
+
+        <div id="tab-citas">
         
         @if(count($citas) > 0)
         @php
@@ -145,13 +159,30 @@
             </div>
             @endforeach
         </div>
-        @else
-        <div class="text-center py-16">
-            <i class="fas fa-calendar-alt text-6xl text-[#374151] mb-4"></i>
-            <p class="text-[#9CA3AF] text-lg">No tienes citas agendadas</p>
-            <a href="/" class="inline-block mt-4 text-[#25B5DA] hover:text-[#1c8fb0]">Explorar negocios</a>
-        </div>
         @endif
+        </div> <!-- Fin tab-citas -->
+
+        <!-- Contenedor Promociones -->
+        <div id="tab-promociones" class="hidden">
+            <div class="mb-6 flex justify-between items-center">
+                <h2 class="text-xl font-bold text-white"><span id="promos-count">0</span> promociones activas</h2>
+            </div>
+            
+            <div id="promos-loading" class="text-center py-12 hidden">
+                <i class="fas fa-spinner fa-spin text-4xl text-[#25B5DA] mb-4 block"></i>
+                <p class="text-[#9CA3AF]">Cargando promociones...</p>
+            </div>
+            
+            <div id="promos-empty" class="text-center py-16 hidden">
+                <i class="fas fa-ticket-alt text-6xl text-[#374151] mb-4 block"></i>
+                <p class="text-[#9CA3AF] text-lg">No tienes promociones registradas</p>
+            </div>
+
+            <div id="promos-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6 hidden">
+                <!-- Se llena con JS -->
+            </div>
+        </div>
+
     </div>
 </div>
 
@@ -495,6 +526,150 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
+
+// Lógica de Tabs y Promociones
+let promocionesCargadas = false;
+
+document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const tab = this.dataset.tab;
+        
+        // Actualizar botones
+        document.querySelectorAll('.tab-btn').forEach(b => {
+            b.classList.remove('text-[#25B5DA]', 'border-b-2', 'border-[#25B5DA]');
+            b.classList.add('text-[#9CA3AF]');
+        });
+        this.classList.add('text-[#25B5DA]', 'border-b-2', 'border-[#25B5DA]');
+        this.classList.remove('text-[#9CA3AF]');
+        
+        // Mostrar contenido
+        document.getElementById('tab-citas').classList.toggle('hidden', tab !== 'citas');
+        document.getElementById('tab-promociones').classList.toggle('hidden', tab !== 'promociones');
+        
+        // Cargar promociones
+        if (tab === 'promociones' && !promocionesCargadas) {
+            cargarPromociones();
+        }
+    });
+});
+
+async function cargarPromociones() {
+    const loading = document.getElementById('promos-loading');
+    const empty = document.getElementById('promos-empty');
+    const grid = document.getElementById('promos-grid');
+    const countLabel = document.getElementById('promos-count');
+    
+    loading.classList.remove('hidden');
+    empty.classList.add('hidden');
+    grid.classList.add('hidden');
+    
+    try {
+        const response = await fetch('/api-proxy/api/mis-promociones', {
+            headers: { 'Accept': 'application/json' }
+        });
+        
+        if (response.ok) {
+            const data = await response.json();
+            const promos = data.data || [];
+            
+            promocionesCargadas = true;
+            
+            if (promos.length === 0) {
+                loading.classList.add('hidden');
+                empty.classList.remove('hidden');
+                return;
+            }
+            
+            const activas = promos.filter(p => !p.usada).length;
+            countLabel.textContent = activas;
+            
+            grid.innerHTML = promos.map(promo => {
+                const desc = promo.descripcion || promo.titulo || promo.promocion?.nombre || 'Promoción';
+                const beneficio = promo.beneficio_tipo === 'descuento' ? `${promo.beneficio_valor}% de descuento` : 'Servicio gratis';
+                let fechaVenceStr = '';
+                let vencida = false;
+                
+                const fechaVence = promo.vigencia || promo.fecha_vencimiento || promo.vigencia_fin;
+                if (fechaVence) {
+                    const d = new Date(fechaVence);
+                    d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
+                    
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0);
+                    if (d < today) vencida = true;
+
+                    fechaVenceStr = `
+                    <p class="text-[#6B7280] text-xs mt-1">
+                        <i class="fas fa-calendar-alt mr-1"></i>
+                        Vence: ${d.toLocaleDateString('es-CL', { day: '2-digit', month: '2-digit', year: 'numeric' })}
+                    </p>`;
+                }
+
+                let badgeClass = '';
+                let badgeText = '';
+                let puedeAgendar = false;
+
+                if (promo.usada) {
+                    badgeClass = 'bg-gray-500/20 text-gray-400';
+                    badgeText = 'Usada';
+                } else if (vencida) {
+                     badgeClass = 'bg-red-500/20 text-red-500';
+                     badgeText = 'Expirada';
+                } else {
+                    badgeClass = 'bg-green-500/20 text-green-400';
+                    badgeText = 'Disponible';
+                    puedeAgendar = true;
+                }
+                
+                const negocioNombre = promo.negocio?.nombre || promo.negocio_nombre || 'Negocio';
+                const negocioId = promo.negocio_id || promo.negocio?.id;
+
+                let btnHTML = '';
+                if (puedeAgendar && negocioId) {
+                    const sId = promo.servicio_id ? `&servicio_id=${promo.servicio_id}` : '';
+                    btnHTML = `
+                    <a href="/agendar-cita?negocio_id=${negocioId}${sId}" 
+                       class="block w-full text-center bg-gradient-to-r from-[#25B5DA] to-[#1c8fb0] text-black text-xs font-bold uppercase tracking-wider py-2 rounded-lg hover:shadow-[0_0_15px_rgba(37,181,218,0.4)] transition-all mt-4">
+                        Agendar ahora
+                    </a>
+                    `;
+                }
+
+                return `
+                <div class="bg-[#262626] border border-[#374151] rounded-xl p-5 hover:border-[#25B5DA] transition-all flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-start justify-between mb-3">
+                            <div>
+                                <p class="text-white font-bold">${negocioNombre}</p>
+                                <p class="text-[#9CA3AF] text-sm">${desc}</p>
+                            </div>
+                            <span class="px-2 py-1 rounded-full text-[10px] uppercase font-bold tracking-widest ${badgeClass}">
+                                ${badgeText}
+                            </span>
+                        </div>
+                        
+                        <div class="mb-2">
+                            <p class="text-[#25B5DA] text-sm font-medium">
+                                ${beneficio}
+                            </p>
+                            ${fechaVenceStr}
+                        </div>
+                    </div>
+                    
+                    ${btnHTML}
+                </div>
+                `;
+            }).join('');
+            
+            loading.classList.add('hidden');
+            grid.classList.remove('hidden');
+        }
+    } catch (e) {
+        console.error('Error cargando promociones:', e);
+        loading.classList.add('hidden');
+        empty.classList.remove('hidden');
+    }
+}
 </script>
 
 <!-- Script de Confetti CDN -->
