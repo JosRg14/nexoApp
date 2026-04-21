@@ -593,6 +593,18 @@ async function cargarPromociones() {
             promos.forEach(promo => {
                 const desc = promo.descripcion || promo.titulo || promo.promocion?.nombre || 'Promoción';
                 const beneficio = promo.beneficio_tipo === 'descuento' ? `${promo.beneficio_valor}% de descuento` : 'Servicio gratis';
+                
+                let applyToText = '';
+                if (!promo.servicio_id) {
+                    applyToText = 'Aplica a: <span class="text-white">Cualquier servicio</span>';
+                } else {
+                    applyToText = `Aplica solo a: <span class="text-white">${promo.servicio_nombre || promo.servicio?.nombre || 'Servicio específico'}</span>`;
+                }
+                const serviceInfoStr = `
+                <p class="text-[#9CA3AF] text-xs mt-1 flex items-center gap-1 mb-1">
+                    <i class="fas fa-cut text-[10px]"></i>
+                    ${applyToText}
+                </p>`;
                 let fechaVenceStr = '';
                 let vencida = false;
                 
@@ -660,6 +672,7 @@ async function cargarPromociones() {
                             <p class="text-[#25B5DA] text-sm font-medium">
                                 ${beneficio}
                             </p>
+                            ${serviceInfoStr}
                             ${fechaVenceStr}
                         </div>
                     </div>
