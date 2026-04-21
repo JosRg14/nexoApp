@@ -282,10 +282,11 @@ async function obtenerClienteId() {
         const data = await response.json();
         
         // Intentar varias rutas posibles para obtener el ID del cliente
-        clienteId = data.cliente?.id_cliente 
-                 || data.id_cliente 
-                 || data.cliente_id 
-                 || data.id;
+        const usuario = data.data?.usuario || data.usuario || data;
+        clienteId = usuario?.cliente?.id_cliente 
+                 || usuario?.id_cliente 
+                 || usuario?.cliente_id 
+                 || null;
         
         console.log('[OBTENER CLIENTE ID] clienteId resuelto:', clienteId);
         
