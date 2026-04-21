@@ -227,12 +227,16 @@
                     </div>
                 </div>
                 <div class="mt-4 pt-4 border-t border-[#374151]">
+                    <div id="resumen-promo-aplicada" class="hidden mb-3 flex items-center gap-2 px-2 py-1.5 bg-[#25B5DA]/10 rounded-lg border border-[#25B5DA]/20">
+                        <i class="fas fa-tag text-[#25B5DA] text-xs"></i>
+                        <span class="text-[#25B5DA] text-xs font-medium" id="resumen-promo-nombre">--</span>
+                    </div>
                     <div class="flex justify-between items-center mb-2">
                         <span class="text-xs uppercase text-[#9CA3AF]">Subtotal</span>
                         <span id="resumen-subtotal" class="text-white font-medium">$0</span>
                     </div>
                     <div id="resumen-descuento-row" class="flex justify-between items-center mb-2 hidden">
-                        <span class="text-xs uppercase text-[#25B5DA]">Promoción (<span id="resumen-promo-desc">-</span>)</span>
+                        <span class="text-xs uppercase text-[#25B5DA]">Descuento (<span id="resumen-promo-desc">-</span>)</span>
                         <span id="resumen-descuento" class="text-[#25B5DA] font-medium">-$0</span>
                     </div>
                     <div class="flex justify-between items-center pt-2 border-t border-[#374151]">
@@ -392,6 +396,18 @@ function filtrarPromociones() {
             promocionSelect.appendChild(option);
         });
         promocionSelect.disabled = false;
+
+        // ── Preselección por promocion_id en la URL ──
+        const urlPromoId = new URLSearchParams(window.location.search).get('promocion_id');
+        if (urlPromoId) {
+            // Verificar que el option realmente existe (puede no pasar el filtro de servicio)
+            const optionExiste = [...promocionSelect.options].some(o => o.value == urlPromoId);
+            if (optionExiste) {
+                promocionSelect.value = urlPromoId;
+                // Sincronizar estado interno
+                promocionSeleccionada = promocionesDisponibles.find(p => (p.id_promocion_cliente || p.id) == urlPromoId);
+            }
+        }
     }
     
     actualizarResumenPrecios();
@@ -448,13 +464,24 @@ function actualizarResumenPrecios() {
         
         promoDetailCard.classList.remove('hidden');
 
+        // Actualizar badge de promoción aplicada en el resumen
+        const resumenPromoAplicada = document.getElementById('resumen-promo-aplicada');
+        const resumenPromoNombre   = document.getElementById('resumen-promo-nombre');
+
         // Actualizar fila en el resumen lateral
         resumenPromoDesc.textContent = promoDesc;
         resumenDescuento.textContent = '-$' + descuento.toLocaleString('es-CL', { maximumFractionDigits: 0 });
         resumenDescuentoRow.classList.remove('hidden');
+
+        if (resumenPromoAplicada && resumenPromoNombre) {
+            resumenPromoNombre.textContent = promocionSeleccionada.descripcion || promocionSeleccionada.titulo || promocionSeleccionada.promocion?.nombre || 'Promoción aplicada';
+            resumenPromoAplicada.classList.remove('hidden');
+        }
     } else {
         resumenDescuentoRow.classList.add('hidden');
         promoDetailCard.classList.add('hidden');
+        const resumenPromoAplicada = document.getElementById('resumen-promo-aplicada');
+        if (resumenPromoAplicada) resumenPromoAplicada.classList.add('hidden');
     }
     
     let total = Math.max(0, subtotal - descuento);

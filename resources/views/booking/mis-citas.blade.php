@@ -626,11 +626,12 @@ async function cargarPromociones() {
 
                 let btnHTML = '';
                 if (puedeAgendar && negocioId) {
+                    const promoClienteId = promo.id_promocion_cliente || promo.id;
                     const sId = promo.servicio_id ? `&servicio_id=${promo.servicio_id}` : '';
                     btnHTML = `
-                    <a href="/agendar-cita?negocio_id=${negocioId}${sId}" 
-                       class="block w-full text-center bg-gradient-to-r from-[#25B5DA] to-[#1c8fb0] text-black text-xs font-bold uppercase tracking-wider py-2 rounded-lg hover:shadow-[0_0_15px_rgba(37,181,218,0.4)] transition-all mt-4">
-                        Agendar ahora
+                    <a href="/agendar-cita?negocio_id=${negocioId}&promocion_id=${promoClienteId}${sId}" 
+                       class="block w-full text-center bg-gradient-to-r from-[#25B5DA] to-[#1c8fb0] text-black text-xs font-bold uppercase tracking-wider py-2.5 rounded-lg hover:shadow-[0_0_15px_rgba(37,181,218,0.4)] transition-all mt-4">
+                        <i class="fas fa-bolt mr-1"></i> Usar ahora
                     </a>
                     `;
                 }
