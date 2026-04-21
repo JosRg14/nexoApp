@@ -63,17 +63,33 @@
             const clienteId = @json(session('usuario.cliente.id_cliente') ?? session('usuario.id'));
             if (!clienteId) return;
 
+            // ── Opción A: el banner solo aparece cuando hay un negocio_id en contexto ──
+            // 1) Variable inyectada por Blade (disponible en negocio/show.blade.php)
+            // 2) Query param de la URL (ej: /agendar-cita?negocio_id=5)
+            const negocioIdBlade = @json(isset($negocio) ? ($negocio['id_negocio'] ?? $negocio['id'] ?? null) : null);
+            const negocioIdUrl   = new URLSearchParams(window.location.search).get('negocio_id');
+            const negocioId      = negocioIdBlade || negocioIdUrl;
+
+            // Sin contexto de negocio → no mostrar el banner
+            if (!negocioId) return;
+
             const banner = document.getElementById('promo-banner');
             const list = document.getElementById('promo-banner-list');
             const title = document.getElementById('promo-banner-title');
             const closeBtn = document.getElementById('close-promo-banner');
-            const bannerKey = `promo_banner_closed_${clienteId}`;
+            const bannerKey = `promo_banner_closed_${clienteId}_${negocioId}`;
 
-            // Si ya lo cerró en esta sesión/estado, no mostrar
+            // Si ya lo cerró para este negocio, no mostrar
             if (localStorage.getItem(bannerKey)) return;
 
+            // Actualizar el enlace "Agendar ahora" para incluir el negocio_id
+            const agendarLink = banner.querySelector('a[href^="/agendar-cita"]');
+            if (agendarLink) {
+                agendarLink.href = `/agendar-cita?negocio_id=${negocioId}`;
+            }
+
             try {
-                const response = await fetch('/api-proxy/api/mis-promociones', {
+                const response = await fetch(`/api-proxy/api/mis-promociones?negocio_id=${negocioId}`, {
                     headers: { 'Accept': 'application/json' }
                 });
 
