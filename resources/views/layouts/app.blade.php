@@ -88,10 +88,12 @@
                         title.textContent = `¡Tienes ${activePromos.length} ${activePromos.length === 1 ? 'promoción activa' : 'promociones activas'}!`;
                         
                         list.innerHTML = activePromos.slice(0, 2).map(p => {
-                            const desc = p.titulo || p.promocion?.nombre || 'Promoción Especial';
-                            let fechaVence = p.fecha_vencimiento || p.vigencia_fin || '';
+                            const desc = p.descripcion || p.titulo || p.promocion?.nombre || 'Promoción Especial';
+                            let fechaVence = p.vigencia || p.fecha_vencimiento || p.vigencia_fin || '';
                             if (fechaVence) {
                                 const d = new Date(fechaVence);
+                                // Ajustar fecha para evitar desfase por zona horaria al parsear YYYY-MM-DD
+                                d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
                                 fechaVence = `(vence: ${d.toLocaleDateString('es-CL', { day: '2-digit', month: '2-digit', year: 'numeric' })})`;
                             }
                             const beneficio = p.beneficio_tipo === 'descuento' ? `${p.beneficio_valor}% OFF` : 'Servicio Gratis';

@@ -384,7 +384,7 @@ function filtrarPromociones() {
             const option = document.createElement('option');
             option.value = promo.id_promocion_cliente || promo.id; // id de la relación cliente-promocion
             
-            let desc = promo.titulo || promo.promocion?.nombre || 'Promoción';
+            let desc = promo.descripcion || promo.titulo || promo.promocion?.nombre || 'Promoción';
             let beneficio = promo.beneficio_tipo === 'descuento' ? `${promo.beneficio_valor}% OFF` : 'Servicio Gratis';
             
             // Formato para mostrar: "20% OFF en Corte Clásico"
@@ -431,11 +431,13 @@ function actualizarResumenPrecios() {
         }
 
         // Actualizar tarjeta de detalles
-        promoDetailTitle.textContent = promocionSeleccionada.titulo || promocionSeleccionada.promocion?.nombre || 'Promoción';
+        promoDetailTitle.textContent = promocionSeleccionada.descripcion || promocionSeleccionada.titulo || promocionSeleccionada.promocion?.nombre || 'Promoción';
         
-        let fechaVence = promocionSeleccionada.fecha_vencimiento || promocionSeleccionada.vigencia_fin || '--';
+        let fechaVence = promocionSeleccionada.vigencia || promocionSeleccionada.fecha_vencimiento || promocionSeleccionada.vigencia_fin || '--';
         if (fechaVence !== '--') {
             const dateObj = new Date(fechaVence);
+            // Ajustar fecha para evitar desfase por zona horaria al parsear YYYY-MM-DD
+            dateObj.setMinutes(dateObj.getMinutes() + dateObj.getTimezoneOffset());
             fechaVence = dateObj.toLocaleDateString('es-CL', { day: '2-digit', month: '2-digit', year: 'numeric' });
         }
         promoDetailExpiry.textContent = `Vence: ${fechaVence}`;
@@ -721,7 +723,7 @@ document.getElementById('cita-form').addEventListener('submit', async function(e
         };
         
         if (promocionSeleccionada && promocionSelect.value) {
-            payload.promocion_cliente_id = promocionSelect.value;
+            payload.id_promocion_cliente = promocionSelect.value;
         }
 
         const response = await fetch('/api-proxy/citas', {
