@@ -29,24 +29,39 @@ class HttpClient
     /** Build the request with common headers */
     protected function request(string $method, string $uri, array $payload = []): Response
     {
+        // Fallback: si no se inyectó token vía middleware, intentar obtenerlo de la sesión
+        $effectiveToken = $this->token ?? session('auth_token');
+
         $headers = [
             'Accept' => 'application/json',
-            'ngrok-skip-browser-warning' => 'true', // 🔥 evita bloqueo ngrok
-            'User-Agent' => 'Mozilla/5.0', // 🔥 evita empty reply
+            'ngrok-skip-browser-warning' => 'true', 
+            'User-Agent' => 'Mozilla/5.0', 
         ];
 
-        if ($this->token) {
-            $headers['Authorization'] = "Bearer {$this->token}";
+        if ($effectiveToken) {
+            $headers['Authorization'] = "Bearer {$effectiveToken}";
+            
+            // Log de depuración solo en desarrollo
+            if (config('app.debug')) {
+                Log::debug('HttpClient: Usando token en petición', [
+                    'source' => $this->token ? 'middleware' : 'session_fallback',
+                    'token_prefix' => substr($effectiveToken, 0, 10) . '...',
+                    'uri' => $uri
+                ]);
+            }
+        } else {
+            if (config('app.debug')) {
+                Log::warning('HttpClient: Petición sin token de autenticación', ['uri' => $uri]);
+            }
         }
 
         $url = rtrim($this->baseUrl, '/') . '/' . ltrim($uri, '/');
 
         $request = Http::withHeaders($headers)
             ->timeout($this->timeout)
-            ->retry(2, 500); // 🔥 reintenta si ngrok corta conexión
+            ->retry(2, 500);
 
         try {
-
             if ($method === 'GET') {
                 return $request->get($url, $payload);
             }
@@ -56,11 +71,24 @@ class HttpClient
             ]);
 
         } catch (\Exception $e) {
+            // Manejar errores de conexión o excepciones del cliente (como 4xx/5xx si throw() está activo o por defecto)
+            $statusCode = 0;
+            if (method_exists($e, 'getResponse') && $e->getResponse()) {
+                $statusCode = $e->getResponse()->getStatusCode();
+            }
 
-            Log::error('External API connection failed', [
-                'url' => $url,
-                'error' => $e->getMessage(),
-            ]);
+            if (config('app.debug')) {
+                Log::error('External API connection failed', [
+                    'url' => $url,
+                    'status' => $statusCode,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+
+            // Si es 401, lanzamos un mensaje específico que el controlador pueda identificar
+            if ($statusCode === 401 || str_contains($e->getMessage(), '401')) {
+                throw new RuntimeException('UNAUTHORIZED_API_TOKEN', 401);
+            }
 
             throw new RuntimeException('No se pudo conectar con el servidor externo.');
         }

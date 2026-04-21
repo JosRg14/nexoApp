@@ -134,15 +134,19 @@ class BookingController extends Controller
     public function misCitas()
     {
         try {
-            $hasToken = session()->has('auth_token');
-            Log::info('BookingController@misCitas - Verificando token antes de petición', [
-                'has_token' => $hasToken, 
-                'token_length' => $hasToken ? strlen(session('auth_token')) : 0
-            ]);
-
             $response = $this->httpClient->get('/api/citas/miscitas');
             $citas = $response['data'] ?? [];
         } catch (\Exception $e) {
+            // Si el token no es válido o expiró, redirigir al login
+            if ($e->getCode() === 401 || $e->getMessage() === 'UNAUTHORIZED_API_TOKEN') {
+                Log::warning('BookingController@misCitas: Sesión de API expirada. Redirigiendo a login.');
+                
+                // Limpiar sesión local
+                session()->flush();
+                
+                return redirect()->route('login')->with('error', 'Tu sesión ha expirado, por favor inicia sesión nuevamente');
+            }
+
             Log::error('Error al obtener citas en misCitas: ' . $e->getMessage());
             $citas = [];
         }
