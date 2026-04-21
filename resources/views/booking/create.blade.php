@@ -262,11 +262,10 @@
 // ============================================================
 const clienteId = {{ $clienteId ?? 'null' }};
 let promocionesDisponibles = [];
-window.promocionesDisponibles = promocionesDisponibles;
 let promocionSeleccionada = null;
 
-// Leer el promocion_id de la URL
-let promoPendienteUrl = new URLSearchParams(window.location.search).get('promocion_id');
+// Leer el promocion_id de la URL una sola vez al cargar la página
+const URL_PROMO_ID = new URLSearchParams(window.location.search).get('promocion_id');
 
 let servicioSeleccionado = null;
 let empleadoSeleccionado = null;
@@ -341,21 +340,13 @@ document.querySelectorAll('.servicio-card').forEach(card => {
 // ============================================================
 
 async function cargarPromociones() {
-    console.log('[cargarPromociones] Iniciando...');
-    console.log('[cargarPromociones] clienteId:', clienteId);
-    
-    if (!clienteId || clienteId === 'null') {
-        console.log('[cargarPromociones] Abortando: clienteId no válido.');
-        return;
-    }
+    if (!clienteId) return;
     
     promoLoading.classList.remove('hidden');
     promocionSelect.disabled = true;
     
     try {
         const negocioId = document.getElementById('negocio_id').value;
-        console.log('[cargarPromociones] negocioId:', negocioId);
-        
         const response = await fetch(`/api-proxy/api/clientes/${clienteId}/promociones/disponibles?negocio_id=${negocioId}`, {
             headers: {
                 'X-Requested-With': 'XMLHttpRequest',
@@ -366,13 +357,9 @@ async function cargarPromociones() {
         if (response.ok) {
             const data = await response.json();
             promocionesDisponibles = data.data || [];
-            window.promocionesDisponibles = promocionesDisponibles; // sync wrapper
-            console.log('[cargarPromociones] Promociones cargadas:', promocionesDisponibles);
-        } else {
-            console.error('[cargarPromociones] HTTP status:', response.status);
         }
     } catch (e) {
-        console.error('[cargarPromociones] Error:', e);
+        console.error('Error cargando promociones:', e);
     } finally {
         promoLoading.classList.add('hidden');
         filtrarPromociones();
@@ -415,11 +402,11 @@ function filtrarPromociones() {
         promocionSelect.disabled = false;
 
         // Determinar qué ID usar como candidato:
-        // 1º prioridad: la promo original de la URL si aún no la hemos procesado/descartado intencionalmente
-        // 2º prioridad: la selección actual (antes de reconstruir), o nada
-        const candidato = promoPendienteUrl || promoIdAnterior || null;
+        // 1º prioridad absoluta: el param de la URL (leido una sola vez, constante URL_PROMO_ID)
+        // 2º prioridad: la selección anterior del usuario
+        const candidato = URL_PROMO_ID || promoIdAnterior || null;
         
-        console.log('[filtrarPromociones] candidato actual:', candidato, '| pendiente URL:', promoPendienteUrl);
+        console.log('[filtrarPromociones] candidato:', candidato, '| URL_PROMO_ID:', URL_PROMO_ID, '| anterior:', promoIdAnterior);
         console.log('[filtrarPromociones] opciones disponibles:', [...promocionSelect.options].map(o => o.value));
 
         if (candidato) {
@@ -446,18 +433,12 @@ function filtrarPromociones() {
 
 promocionSelect.addEventListener('change', function() {
     const promoId = this.value;
-    
-    // Si el usuario cambia manualmente la promo, cancelamos cualquier intento de forzar la de la URL para el futuro
-    promoPendienteUrl = null; 
-    
     if (!promoId) {
         promocionSeleccionada = null;
     } else {
         // Buscar por id_promocion_cliente que es el valor usado en el option
-        promocionSeleccionada = promocionesDisponibles.find(p => String(p.id_promocion_cliente || p.id) === String(promoId));
+        promocionSeleccionada = promocionesDisponibles.find(p => (p.id_promocion_cliente || p.id) == promoId);
     }
-    
-    console.log('[Cambio Select] Nueva promo seleccionada:', promocionSeleccionada);
     actualizarResumenPrecios();
 });
 
@@ -531,15 +512,10 @@ function actualizarResumenPrecios() {
     resumenTotal.textContent = '$' + total.toLocaleString('es-CL');
 }
 
+// Inicializar carga de promociones
+if (clienteId) {
+    cargarPromociones();
 }
-
-// Inicializar carga de promociones dentro de DOMContentLoaded
-document.addEventListener('DOMContentLoaded', () => {
-    console.log('[DOMContentLoaded] Verificando clienteId para iniciar carga...');
-    if (clienteId && clienteId !== 'null') {
-        cargarPromociones();
-    }
-});
 
 // ============================================================
 // SELECCIÓN DE EMPLEADO
