@@ -93,17 +93,25 @@ class BookingController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'servicio_id' => 'required|integer',
-            'empleado_id' => 'required|integer',
-            'fecha' => 'required|date',
-            'hora_inicio' => 'required|string',
-            'negocio_id' => 'required|integer',
-            'id_promocion_cliente' => 'nullable|integer'
+            'servicio_id'          => 'required|integer',
+            'empleado_id'          => 'required|integer',
+            'fecha'                => 'required|date',
+            'hora_inicio'          => 'required|string',
+            'negocio_id'           => 'required|integer',
+            'id_promocion_cliente' => 'nullable|integer',
         ]);
         
         try {
-            // Preparar el payload filtrando valores null para evitar problemas con la API si no los espera
+            // Preparar el payload filtrando valores null para evitar problemas con la API
             $payload = array_filter($validated, fn($value) => !is_null($value));
+
+            // Ajustar nombre de campo id_promocion_cliente -> promocion_cliente_id para la API
+            if (isset($payload['id_promocion_cliente'])) {
+                $payload['promocion_cliente_id'] = $payload['id_promocion_cliente'];
+                unset($payload['id_promocion_cliente']);
+            }
+
+            Log::info('BookingController@store - payload enviado a API:', $payload);
             
             // Verificar si el cliente tiene citas activas primero
             $checkCitas = $this->httpClient->get('/api/clientes/me/citas-activas');
