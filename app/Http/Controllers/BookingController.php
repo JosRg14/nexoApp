@@ -49,14 +49,15 @@ class BookingController extends Controller
             Log::error('Error al obtener empleados: ' . $e->getMessage());
         }
 
-        // Obtener ID de cliente desde la sesión de la API (patrón consistente con el resto de la app)
-        $usuario = session('usuario');
-        $clienteId = null;
-        if (isset($usuario['rol']) && $usuario['rol'] === 'cliente') {
-            $clienteId = $usuario['cliente']['id_cliente'] ?? $usuario['id_cliente'] ?? $usuario['id'] ?? null;
+        // Obtener ID de cliente desde la sesión — mismo patrón que app.blade.php línea 63:
+        // session('usuario.cliente.id_cliente') ?? session('usuario.id')
+        $clienteId = session('usuario.cliente.id_cliente') ?? session('usuario.id');
+        // Solo exponerlo si el rol es cliente (no admin, no superusuario)
+        if (session('rol') !== 'cliente') {
+            $clienteId = null;
         }
 
-        Log::info('Booking@create - clienteId resuelto: ' . ($clienteId ?? 'null'));
+        Log::info('Booking@create - clienteId resuelto: ' . ($clienteId ?? 'null') . ' | rol: ' . (session('rol') ?? 'sin rol'));
         
         return view('booking.create', compact('servicios', 'empleados', 'negocioId', 'clienteId'));
     }
