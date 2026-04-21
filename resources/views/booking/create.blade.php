@@ -264,6 +264,9 @@ const clienteId = {{ $clienteId ?? 'null' }};
 let promocionesDisponibles = [];
 let promocionSeleccionada = null;
 
+// Leer el promocion_id de la URL una sola vez al cargar la página
+const URL_PROMO_ID = new URLSearchParams(window.location.search).get('promocion_id');
+
 let servicioSeleccionado = null;
 let empleadoSeleccionado = null;
 let horaSeleccionada = null;
@@ -322,8 +325,10 @@ document.querySelectorAll('.servicio-card').forEach(card => {
         document.getElementById('servicio_id').value = servicioSeleccionado.id;
         resumenServicio.textContent = servicioSeleccionado.nombre;
         
-        actualizarResumenPrecios();
+        // IMPORTANTE: filtrarPromociones() primero (asigna promocionSeleccionada),
+        // luego actualizarResumenPrecios() (lee promocionSeleccionada ya correcto).
         filtrarPromociones();
+        // actualizarResumenPrecios() ya es llamado al final de filtrarPromociones()
 
         if (empleadoSeleccionado && fechaHidden.value) cargarHorarios();
         checkFormComplete();
@@ -376,7 +381,7 @@ function filtrarPromociones() {
         option.textContent = "Sin promociones disponibles";
         promocionSelect.appendChild(option);
         promocionSelect.disabled = true;
-        promocionSeleccionada = null; // ya no hay nada seleccionable
+        promocionSeleccionada = null;
     } else {
         // Opción por defecto
         const defaultOption = document.createElement('option');
@@ -396,21 +401,25 @@ function filtrarPromociones() {
         });
         promocionSelect.disabled = false;
 
-        // 1º prioridad: URL param (solo la primera vez que se cargan promociones)
-        const urlPromoId = new URLSearchParams(window.location.search).get('promocion_id');
+        // Determinar qué ID usar como candidato:
+        // 1º prioridad absoluta: el param de la URL (leido una sola vez, constante URL_PROMO_ID)
+        // 2º prioridad: la selección anterior del usuario
+        const candidato = URL_PROMO_ID || promoIdAnterior || null;
         
-        // 2º prioridad: mantener la selección anterior si sigue siendo válida
-        const candidato = urlPromoId || promoIdAnterior;
-        
+        console.log('[filtrarPromociones] candidato:', candidato, '| URL_PROMO_ID:', URL_PROMO_ID, '| anterior:', promoIdAnterior);
+        console.log('[filtrarPromociones] opciones disponibles:', [...promocionSelect.options].map(o => o.value));
+
         if (candidato) {
             const optionExiste = [...promocionSelect.options].some(o => o.value == candidato);
             if (optionExiste) {
                 promocionSelect.value = candidato;
+                // Buscar en promocionesDisponibles (no solo en aplicables) con comparación laxa
                 promocionSeleccionada = promocionesDisponibles.find(
-                    p => (p.id_promocion_cliente || p.id) == candidato
+                    p => String(p.id_promocion_cliente || p.id) === String(candidato)
                 ) || null;
+                console.log('[filtrarPromociones] ✅ promo encontrada:', promocionSeleccionada);
             } else {
-                // La promo anterior ya no aplica a este servicio
+                console.log('[filtrarPromociones] ⚠️ candidato', candidato, 'no existe en las opciones del select filtrado');
                 promocionSeleccionada = null;
             }
         } else {
@@ -418,7 +427,7 @@ function filtrarPromociones() {
         }
     }
 
-    console.log('[filtrarPromociones] promocionSeleccionada:', promocionSeleccionada);
+    console.log('[filtrarPromociones] promocionSeleccionada final:', promocionSeleccionada);
     actualizarResumenPrecios();
 }
 
