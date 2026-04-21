@@ -114,7 +114,7 @@
                         @if(isset($cita['promocion_aplicada']) && $cita['promocion_aplicada'])
                             <div class="flex items-center gap-2">
                                 <span class="text-[#9CA3AF] text-sm line-through">
-                                    ${{ number_format($cita['precio'] ?? 0, 2) }}
+                                    ${{ number_format($cita['servicio']['precio'] ?? 0, 2) }}
                                 </span>
                                 <span class="text-[#25B5DA] text-lg font-bold">
                                     ${{ number_format($cita['precio_final'] ?? 0, 2) }}
