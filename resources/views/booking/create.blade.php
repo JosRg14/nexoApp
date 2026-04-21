@@ -260,7 +260,7 @@
 // ============================================================
 // ESTADO DE LA CITA
 // ============================================================
-let clienteId = @json(session('usuario.cliente.id_cliente') ?? session('usuario.id') ?? null);
+let clienteId = null;
 let promocionesDisponibles = [];
 let promocionSeleccionada = null;
 
@@ -271,10 +271,39 @@ let servicioSeleccionado = null;
 let empleadoSeleccionado = null;
 let horaSeleccionada = null;
 
-// DIAGNÓSTICO: Verificar carga inicial
+async function obtenerClienteId() {
+    try {
+        const response = await fetch('/api-proxy/api/me', {
+            headers: {
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content
+            }
+        });
+        const data = await response.json();
+        
+        // Intentar varias rutas posibles para obtener el ID del cliente
+        clienteId = data.cliente?.id_cliente 
+                 || data.id_cliente 
+                 || data.cliente_id 
+                 || data.id;
+        
+        console.log('[OBTENER CLIENTE ID] clienteId resuelto:', clienteId);
+        
+        // Una vez que tenemos el clienteId, cargar las promociones
+        if (clienteId) {
+            cargarPromociones();
+        } else {
+            console.warn('[OBTENER CLIENTE ID] No se pudo obtener clienteId');
+        }
+    } catch (error) {
+        console.error('[OBTENER CLIENTE ID] Error:', error);
+    }
+}
+
+// Ejecutar al cargar la página
 document.addEventListener('DOMContentLoaded', function() {
     console.log('[DIAGNÓSTICO] DOMContentLoaded ejecutado');
-    console.log('[DIAGNÓSTICO] ¿Existe clienteId?', typeof clienteId !== 'undefined' ? clienteId : 'no definido');
+    obtenerClienteId();
 });
 
 // Elementos DOM
@@ -524,10 +553,7 @@ function actualizarResumenPrecios() {
     resumenTotal.textContent = '$' + total.toLocaleString('es-CL');
 }
 
-// Inicializar carga de promociones
-if (clienteId) {
-    cargarPromociones();
-}
+// La carga de promociones ahora se inicia desde obtenerClienteId()
 
 // ============================================================
 // SELECCIÓN DE EMPLEADO
