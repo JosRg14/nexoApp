@@ -260,7 +260,8 @@
 // ============================================================
 // ESTADO DE LA CITA
 // ============================================================
-const clienteId = {{ $clienteId ?? 'null' }};
+// FORZAR clienteId para prueba
+let clienteId = 16; // ← Valor fijo para probar
 let promocionesDisponibles = [];
 let promocionSeleccionada = null;
 
