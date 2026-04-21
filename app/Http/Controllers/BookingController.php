@@ -95,7 +95,7 @@ class BookingController extends Controller
             'fecha' => 'required|date',
             'hora_inicio' => 'required|string',
             'negocio_id' => 'required|integer',
-            'promocion_cliente_id' => 'nullable|integer'
+            'id_promocion_cliente' => 'nullable|integer'
         ]);
         
         try {
