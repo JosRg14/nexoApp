@@ -54,9 +54,9 @@
                             <td colspan="6" class="p-8 text-center text-[#9CA3AF]">No se encontraron clientes con esos filtros.</td>
                         </tr>
                     </template>
-                    <template x-for="cliente in clientes" :key="cliente.id_usuario || cliente.cliente_id">
+                    <template x-for="cliente in clientes" :key="cliente.id_cliente || cliente.cliente_id || cliente.id_usuario">
                         <tr class="border-b border-[#374151]/50 hover:bg-[#262626] transition-colors">
-                            <td class="p-4 font-semibold text-white whitespace-nowrap" x-text="cliente.nombre ? `${cliente.nombre} ${cliente.app_paterno} ${cliente.app_materno}`.trim() : 'Desconocido'"></td>
+                            <td class="p-4 font-semibold text-white whitespace-nowrap" x-text="cliente.nombre ? `${cliente.nombre} ${cliente.app_paterno || ''} ${cliente.app_materno || ''}`.trim() : 'Desconocido'"></td>
                             <td class="p-4 text-[#9CA3AF] whitespace-nowrap">
                                 <div x-text="cliente.telefono || 'Sin teléfono'"></div>
                                 <div class="text-[10px] opacity-70" x-text="cliente.correo || ''"></div>
@@ -495,6 +495,7 @@ function clientesPromociones() {
                 
                 if (response.ok) {
                     const res = await response.json();
+                    console.log('Clientes recibidos:', res.data);
                     this.clientes = res.data || [];
                     this.cargarAsignacionesRecientes(this.clientes);
                 }
