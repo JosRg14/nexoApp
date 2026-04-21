@@ -440,10 +440,10 @@ function actualizarResumenPrecios() {
     if (promocionSeleccionada) {
         if (promocionSeleccionada.beneficio_tipo === 'descuento') {
             descuento = subtotal * (parseInt(promocionSeleccionada.beneficio_valor) / 100);
-            promoDesc = `${promocionSeleccionada.beneficio_valor}%`;
+            promoDesc = `${promocionSeleccionada.beneficio_valor}% de descuento`;
         } else if (promocionSeleccionada.beneficio_tipo === 'servicio_gratis') {
             descuento = subtotal;
-            promoDesc = 'Gratis';
+            promoDesc = 'Servicio gratis (100%)';
         }
 
         // Actualizar tarjeta de detalles

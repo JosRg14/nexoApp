@@ -580,10 +580,15 @@ async function cargarPromociones() {
                 return;
             }
             
-            const activas = promos.filter(p => !p.usada).length;
+            const activas = promos.filter(p => !p.usada && (!p.vigencia && !p.fecha_vencimiento && !p.vigencia_fin || new Date(p.vigencia || p.fecha_vencimiento || p.vigencia_fin).setMinutes(new Date(p.vigencia || p.fecha_vencimiento || p.vigencia_fin).getMinutes() + new Date(p.vigencia || p.fecha_vencimiento || p.vigencia_fin).getTimezoneOffset()) >= new Date().setHours(0,0,0,0))).length;
             countLabel.textContent = activas;
             
-            grid.innerHTML = promos.map(promo => {
+            let htmlDisponibles = '';
+            let htmlHistorial = '';
+            let countDisponibles = 0;
+            let countHistorial = 0;
+
+            promos.forEach(promo => {
                 const desc = promo.descripcion || promo.titulo || promo.promocion?.nombre || 'Promoción';
                 const beneficio = promo.beneficio_tipo === 'descuento' ? `${promo.beneficio_valor}% de descuento` : 'Servicio gratis';
                 let fechaVenceStr = '';
@@ -636,7 +641,7 @@ async function cargarPromociones() {
                     `;
                 }
 
-                return `
+                const cardHTML = `
                 <div class="bg-[#262626] border border-[#374151] rounded-xl p-5 hover:border-[#25B5DA] transition-all flex flex-col justify-between">
                     <div>
                         <div class="flex items-start justify-between mb-3">
@@ -660,10 +665,48 @@ async function cargarPromociones() {
                     ${btnHTML}
                 </div>
                 `;
-            }).join('');
+
+                if (!promo.usada && !vencida) {
+                    htmlDisponibles += cardHTML;
+                    countDisponibles++;
+                } else {
+                    htmlHistorial += cardHTML;
+                    countHistorial++;
+                }
+            });
+
+            let finalHTML = '';
             
-            loading.classList.add('hidden');
+            if (countDisponibles > 0) {
+                finalHTML += `
+                <div class="mb-6 mt-2">
+                    <h3 class="text-white font-bold uppercase tracking-widest text-sm flex items-center gap-2 mb-4">
+                        <i class="fas fa-ticket-alt text-[#25B5DA]"></i> Disponibles (${countDisponibles})
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        ${htmlDisponibles}
+                    </div>
+                </div>
+                `;
+            }
+
+            if (countHistorial > 0) {
+                finalHTML += `
+                <div class="mt-8 mb-6">
+                    <h3 class="text-white font-bold uppercase tracking-widest text-sm flex items-center gap-2 mb-4">
+                        <i class="fas fa-history text-[#9CA3AF]"></i> Historial (${countHistorial})
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 opacity-80">
+                        ${htmlHistorial}
+                    </div>
+                </div>
+                `;
+            }
+
+            grid.innerHTML = finalHTML;
             grid.classList.remove('hidden');
+            // Quitar las clases de grid sobre el contenedor principal para que las secciones se vean correctamente
+            grid.classList.remove('grid', 'grid-cols-1', 'md:grid-cols-2', 'gap-6');
         }
     } catch (e) {
         console.error('Error cargando promociones:', e);
