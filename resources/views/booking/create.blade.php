@@ -271,6 +271,12 @@ let servicioSeleccionado = null;
 let empleadoSeleccionado = null;
 let horaSeleccionada = null;
 
+// DIAGNÓSTICO: Verificar carga inicial
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('[DIAGNÓSTICO] DOMContentLoaded ejecutado');
+    console.log('[DIAGNÓSTICO] ¿Existe clienteId?', typeof clienteId !== 'undefined' ? clienteId : 'no definido');
+});
+
 // Elementos DOM
 const promocionSelect = document.getElementById('promocion-select');
 const promoLoading = document.getElementById('promo-loading');
@@ -340,6 +346,12 @@ document.querySelectorAll('.servicio-card').forEach(card => {
 // ============================================================
 
 async function cargarPromociones() {
+    console.log('[DIAGNÓSTICO] cargarPromociones() ejecutada');
+    console.log('[DIAGNÓSTICO] clienteId:', clienteId);
+    if (document.getElementById('negocio_id')) {
+        console.log('[DIAGNÓSTICO] negocioId:', document.getElementById('negocio_id').value);
+    }
+
     if (!clienteId) return;
     
     promoLoading.classList.remove('hidden');
