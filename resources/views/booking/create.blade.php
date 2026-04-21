@@ -362,9 +362,8 @@ async function cargarPromociones() {
 }
 
 function filtrarPromociones() {
-    // Resetear select
+    const promoIdAnterior = promocionSelect.value; // guardar valor actual antes de reconstruir
     promocionSelect.innerHTML = '';
-    promocionSeleccionada = null;
     
     const sid = servicioSeleccionado ? parseInt(servicioSeleccionado.id) : null;
     
@@ -377,6 +376,7 @@ function filtrarPromociones() {
         option.textContent = "Sin promociones disponibles";
         promocionSelect.appendChild(option);
         promocionSelect.disabled = true;
+        promocionSeleccionada = null; // ya no hay nada seleccionable
     } else {
         // Opción por defecto
         const defaultOption = document.createElement('option');
@@ -386,30 +386,39 @@ function filtrarPromociones() {
 
         aplicables.forEach(promo => {
             const option = document.createElement('option');
-            option.value = promo.id_promocion_cliente || promo.id; // id de la relación cliente-promocion
+            option.value = promo.id_promocion_cliente || promo.id;
             
             let desc = promo.descripcion || promo.titulo || promo.promocion?.nombre || 'Promoción';
             let beneficio = promo.beneficio_tipo === 'descuento' ? `${promo.beneficio_valor}% OFF` : 'Servicio Gratis';
             
-            // Formato para mostrar: "20% OFF en Corte Clásico"
             option.textContent = `${desc} (${beneficio})`;
             promocionSelect.appendChild(option);
         });
         promocionSelect.disabled = false;
 
-        // ── Preselección por promocion_id en la URL ──
+        // 1º prioridad: URL param (solo la primera vez que se cargan promociones)
         const urlPromoId = new URLSearchParams(window.location.search).get('promocion_id');
-        if (urlPromoId) {
-            // Verificar que el option realmente existe (puede no pasar el filtro de servicio)
-            const optionExiste = [...promocionSelect.options].some(o => o.value == urlPromoId);
+        
+        // 2º prioridad: mantener la selección anterior si sigue siendo válida
+        const candidato = urlPromoId || promoIdAnterior;
+        
+        if (candidato) {
+            const optionExiste = [...promocionSelect.options].some(o => o.value == candidato);
             if (optionExiste) {
-                promocionSelect.value = urlPromoId;
-                // Sincronizar estado interno
-                promocionSeleccionada = promocionesDisponibles.find(p => (p.id_promocion_cliente || p.id) == urlPromoId);
+                promocionSelect.value = candidato;
+                promocionSeleccionada = promocionesDisponibles.find(
+                    p => (p.id_promocion_cliente || p.id) == candidato
+                ) || null;
+            } else {
+                // La promo anterior ya no aplica a este servicio
+                promocionSeleccionada = null;
             }
+        } else {
+            promocionSeleccionada = null;
         }
     }
-    
+
+    console.log('[filtrarPromociones] promocionSeleccionada:', promocionSeleccionada);
     actualizarResumenPrecios();
 }
 
@@ -433,18 +442,24 @@ function actualizarResumenPrecios() {
         return;
     }
     
-    let subtotal = parseInt(servicioSeleccionado.precio);
+    let subtotal = parseFloat(servicioSeleccionado.precio);
     let descuento = 0;
     let promoDesc = '';
+
+    console.log('[actualizarResumenPrecios] servicio:', servicioSeleccionado);
+    console.log('[actualizarResumenPrecios] promoción:', promocionSeleccionada);
+    console.log('[actualizarResumenPrecios] precio base:', subtotal);
     
     if (promocionSeleccionada) {
         if (promocionSeleccionada.beneficio_tipo === 'descuento') {
-            descuento = subtotal * (parseInt(promocionSeleccionada.beneficio_valor) / 100);
+            descuento = subtotal * (parseFloat(promocionSeleccionada.beneficio_valor) / 100);
             promoDesc = `${promocionSeleccionada.beneficio_valor}% de descuento`;
         } else if (promocionSeleccionada.beneficio_tipo === 'servicio_gratis') {
             descuento = subtotal;
             promoDesc = 'Servicio gratis (100%)';
         }
+
+        console.log('[actualizarResumenPrecios] descuento:', descuento, '| total:', subtotal - descuento);
 
         // Actualizar tarjeta de detalles
         promoDetailTitle.textContent = promocionSeleccionada.descripcion || promocionSeleccionada.titulo || promocionSeleccionada.promocion?.nombre || 'Promoción';
@@ -452,7 +467,6 @@ function actualizarResumenPrecios() {
         let fechaVence = promocionSeleccionada.vigencia || promocionSeleccionada.fecha_vencimiento || promocionSeleccionada.vigencia_fin || '--';
         if (fechaVence !== '--') {
             const dateObj = new Date(fechaVence);
-            // Ajustar fecha para evitar desfase por zona horaria al parsear YYYY-MM-DD
             dateObj.setMinutes(dateObj.getMinutes() + dateObj.getTimezoneOffset());
             fechaVence = dateObj.toLocaleDateString('es-CL', { day: '2-digit', month: '2-digit', year: 'numeric' });
         }
@@ -468,7 +482,6 @@ function actualizarResumenPrecios() {
         const resumenPromoAplicada = document.getElementById('resumen-promo-aplicada');
         const resumenPromoNombre   = document.getElementById('resumen-promo-nombre');
 
-        // Actualizar fila en el resumen lateral
         resumenPromoDesc.textContent = promoDesc;
         resumenDescuento.textContent = '-$' + descuento.toLocaleString('es-CL', { maximumFractionDigits: 0 });
         resumenDescuentoRow.classList.remove('hidden');

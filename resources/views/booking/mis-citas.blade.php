@@ -529,6 +529,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Lógica de Tabs y Promociones
 let promocionesCargadas = false;
+let promocionesLoading   = false; // guard contra llamadas paralelas
 
 document.querySelectorAll('.tab-btn').forEach(btn => {
     btn.addEventListener('click', function() {
@@ -546,8 +547,8 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
         document.getElementById('tab-citas').classList.toggle('hidden', tab !== 'citas');
         document.getElementById('tab-promociones').classList.toggle('hidden', tab !== 'promociones');
         
-        // Cargar promociones
-        if (tab === 'promociones' && !promocionesCargadas) {
+        // Cargar promociones (solo una vez y solo si no hay otra petición en curso)
+        if (tab === 'promociones' && !promocionesCargadas && !promocionesLoading) {
             cargarPromociones();
         }
     });
@@ -558,7 +559,8 @@ async function cargarPromociones() {
     const empty = document.getElementById('promos-empty');
     const grid = document.getElementById('promos-grid');
     const countLabel = document.getElementById('promos-count');
-    
+
+    promocionesLoading = true;
     loading.classList.remove('hidden');
     empty.classList.add('hidden');
     grid.classList.add('hidden');
@@ -705,13 +707,19 @@ async function cargarPromociones() {
 
             grid.innerHTML = finalHTML;
             grid.classList.remove('hidden');
-            // Quitar las clases de grid sobre el contenedor principal para que las secciones se vean correctamente
+            // Quitar clases de grid del contenedor padre para que las secciones se apilen verticalmente
             grid.classList.remove('grid', 'grid-cols-1', 'md:grid-cols-2', 'gap-6');
+        } else {
+            // Respuesta no-ok: mostrar estado vacío
+            empty.classList.remove('hidden');
         }
     } catch (e) {
         console.error('Error cargando promociones:', e);
-        loading.classList.add('hidden');
         empty.classList.remove('hidden');
+    } finally {
+        // Siempre ocultar el loader, sin importar el resultado
+        loading.classList.add('hidden');
+        promocionesLoading = false;
     }
 }
 </script>
