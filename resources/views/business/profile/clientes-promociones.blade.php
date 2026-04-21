@@ -51,7 +51,7 @@
                     </template>
                     <template x-if="!loading.clientes && clientes.length === 0">
                         <tr>
-                            <td colspan="6" class="p-8 text-center text-[#9CA3AF]">No se encontraron clientes frecuentes.</td>
+                            <td colspan="6" class="p-8 text-center text-[#9CA3AF]">No se encontraron clientes con esos filtros.</td>
                         </tr>
                     </template>
                     <template x-for="cliente in clientes" :key="cliente.id_usuario || cliente.cliente_id">
@@ -475,10 +475,8 @@ function clientesPromociones() {
         promoSeleccionada: null,
 
         async initData() {
-            await Promise.all([
-                this.fetchClientes(),
-                this.fetchPromociones()
-            ]);
+            await this.fetchClientes();
+            await this.fetchPromociones();
         },
 
         // --- CLIENTES ---
