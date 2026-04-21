@@ -260,8 +260,7 @@
 // ============================================================
 // ESTADO DE LA CITA
 // ============================================================
-// FORZAR clienteId para prueba
-let clienteId = 16; // ← Valor fijo para probar
+let clienteId = @json(session('usuario.cliente.id_cliente') ?? session('usuario.id') ?? null);
 let promocionesDisponibles = [];
 let promocionSeleccionada = null;
 
