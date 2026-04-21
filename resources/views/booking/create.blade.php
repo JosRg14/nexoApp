@@ -164,12 +164,43 @@
                     <i class="fas fa-tag text-[#25B5DA]"></i>
                     ¿Tienes una promoción disponible?
                 </h3>
-                <div>
+                <div class="space-y-4">
                     <select id="promocion-select" class="w-full bg-[#1a1a1a] border border-[#374151] rounded-lg p-3 text-white focus:outline-none focus:border-[#25B5DA] transition-colors appearance-none">
                         <option value="">No usar promoción</option>
                     </select>
+                    
                     <div id="promo-loading" class="text-xs text-[#9CA3AF] mt-2 hidden">
                         <i class="fas fa-spinner fa-spin mr-1"></i> Cargando promociones...
+                    </div>
+
+                    <!-- Tarjeta de Detalle de Promoción -->
+                    <div id="promo-detail-card" class="hidden border border-[#25B5DA] bg-[#25B5DA]/5 rounded-lg p-4 animate-in fade-in slide-in-from-top-2 duration-300">
+                        <div class="flex items-center gap-2 text-[#25B5DA] mb-3">
+                            <i class="fas fa-ticket-alt"></i>
+                            <span class="text-xs font-bold uppercase tracking-widest">Promoción Seleccionada</span>
+                        </div>
+                        
+                        <div class="space-y-3">
+                            <div>
+                                <h4 id="promo-detail-title" class="text-white font-bold text-sm">--</h4>
+                                <p id="promo-detail-expiry" class="text-[#9CA3AF] text-[10px] mt-1 uppercase">Vence: --</p>
+                            </div>
+
+                            <div class="pt-3 border-t border-[#374151]/50 space-y-2">
+                                <div class="flex justify-between items-center text-xs">
+                                    <span class="text-[#9CA3AF]">Precio original</span>
+                                    <span id="promo-detail-original" class="text-white font-medium line-through decoration-red-500">$0</span>
+                                </div>
+                                <div class="flex justify-between items-center text-xs">
+                                    <span class="text-[#9CA3AF]">Descuento</span>
+                                    <span id="promo-detail-amount" class="text-[#25B5DA] font-bold">-$0</span>
+                                </div>
+                                <div class="flex justify-between items-center pt-2 border-t border-[#374151]/50">
+                                    <span class="text-white font-bold">Total a pagar</span>
+                                    <span id="promo-detail-total" class="text-[#25B5DA] text-lg font-bold">$0</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -236,10 +267,18 @@ let horaSeleccionada = null;
 // Elementos DOM
 const promocionSelect = document.getElementById('promocion-select');
 const promoLoading = document.getElementById('promo-loading');
-const resumenSubtotal = document.getElementById('resumen-subtotal');
-const resumenDescuentoRow = document.getElementById('resumen-descuento-row');
-const resumenPromoDesc = document.getElementById('resumen-promo-desc');
-const resumenDescuento = document.getElementById('resumen-descuento');
+const resumenSubtotal         = document.getElementById('resumen-subtotal');
+const resumenDescuentoRow     = document.getElementById('resumen-descuento-row');
+const resumenPromoDesc        = document.getElementById('resumen-promo-desc');
+const resumenDescuento        = document.getElementById('resumen-descuento');
+
+// Elementos del detalle de promoción
+const promoDetailCard         = document.getElementById('promo-detail-card');
+const promoDetailTitle        = document.getElementById('promo-detail-title');
+const promoDetailExpiry       = document.getElementById('promo-detail-expiry');
+const promoDetailOriginal     = document.getElementById('promo-detail-original');
+const promoDetailAmount       = document.getElementById('promo-detail-amount');
+const promoDetailTotal        = document.getElementById('promo-detail-total');
 
 const btnSubmit       = document.getElementById('btn-submit');
 const fechaHidden     = document.getElementById('fecha');       // <input type="hidden">
@@ -363,7 +402,8 @@ promocionSelect.addEventListener('change', function() {
     if (!promoId) {
         promocionSeleccionada = null;
     } else {
-        promocionSeleccionada = promocionesDisponibles.find(p => p.id == promoId);
+        // Buscar por id_promocion_cliente que es el valor usado en el option
+        promocionSeleccionada = promocionesDisponibles.find(p => (p.id_promocion_cliente || p.id) == promoId);
     }
     actualizarResumenPrecios();
 });
@@ -373,23 +413,46 @@ function actualizarResumenPrecios() {
         resumenSubtotal.textContent = '$0';
         resumenTotal.textContent = '$0';
         resumenDescuentoRow.classList.add('hidden');
+        promoDetailCard.classList.add('hidden');
         return;
     }
     
     let subtotal = parseInt(servicioSeleccionado.precio);
     let descuento = 0;
+    let promoDesc = '';
     
     if (promocionSeleccionada) {
         if (promocionSeleccionada.beneficio_tipo === 'descuento') {
             descuento = subtotal * (parseInt(promocionSeleccionada.beneficio_valor) / 100);
+            promoDesc = `${promocionSeleccionada.beneficio_valor}%`;
         } else if (promocionSeleccionada.beneficio_tipo === 'servicio_gratis') {
             descuento = subtotal;
+            promoDesc = 'Gratis';
         }
-        resumenPromoDesc.textContent = promocionSeleccionada.beneficio_tipo === 'descuento' ? `${promocionSeleccionada.beneficio_valor}%` : 'Gratis';
+
+        // Actualizar tarjeta de detalles
+        promoDetailTitle.textContent = promocionSeleccionada.titulo || promocionSeleccionada.promocion?.nombre || 'Promoción';
+        
+        let fechaVence = promocionSeleccionada.fecha_vencimiento || promocionSeleccionada.vigencia_fin || '--';
+        if (fechaVence !== '--') {
+            const dateObj = new Date(fechaVence);
+            fechaVence = dateObj.toLocaleDateString('es-CL', { day: '2-digit', month: '2-digit', year: 'numeric' });
+        }
+        promoDetailExpiry.textContent = `Vence: ${fechaVence}`;
+        
+        promoDetailOriginal.textContent = '$' + subtotal.toLocaleString('es-CL');
+        promoDetailAmount.textContent   = '-$' + descuento.toLocaleString('es-CL', { maximumFractionDigits: 0 });
+        promoDetailTotal.textContent    = '$' + Math.max(0, subtotal - descuento).toLocaleString('es-CL');
+        
+        promoDetailCard.classList.remove('hidden');
+
+        // Actualizar fila en el resumen lateral
+        resumenPromoDesc.textContent = promoDesc;
         resumenDescuento.textContent = '-$' + descuento.toLocaleString('es-CL', { maximumFractionDigits: 0 });
         resumenDescuentoRow.classList.remove('hidden');
     } else {
         resumenDescuentoRow.classList.add('hidden');
+        promoDetailCard.classList.add('hidden');
     }
     
     let total = Math.max(0, subtotal - descuento);

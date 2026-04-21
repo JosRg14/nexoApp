@@ -94,10 +94,14 @@ class BookingController extends Controller
             'empleado_id' => 'required|integer',
             'fecha' => 'required|date',
             'hora_inicio' => 'required|string',
-            'negocio_id' => 'required|integer'
+            'negocio_id' => 'required|integer',
+            'promocion_cliente_id' => 'nullable|integer'
         ]);
         
         try {
+            // Preparar el payload filtrando valores null para evitar problemas con la API si no los espera
+            $payload = array_filter($validated, fn($value) => !is_null($value));
+            
             // Verificar si el cliente tiene citas activas primero
             $checkCitas = $this->httpClient->get('/api/clientes/me/citas-activas');
             if (isset($checkCitas['data']['tiene_citas_activas']) && $checkCitas['data']['tiene_citas_activas']) {
@@ -108,7 +112,7 @@ class BookingController extends Controller
             }
 
             // Proceder con la creación si no tiene citas activas
-            $response = $this->httpClient->post('/api/citas', $validated);
+            $response = $this->httpClient->post('/api/citas', $payload);
             return response()->json($response, 201);
         } catch (\Exception $e) {
             Log::error('Error al crear cita: ' . $e->getMessage());
