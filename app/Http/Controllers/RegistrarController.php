@@ -181,6 +181,12 @@ class RegistrarController extends Controller
             'registro_negocio_tipo'   => $request->tipo_negocio,
         ]);
 
+        // Agregar al request para que PaymentController los envíe a la API
+        $request->merge([
+            'pendiente_nombre' => $request->nombre,
+            'pendiente_tipo'   => $request->tipo_negocio,
+        ]);
+
         return app(PaymentController::class)->checkout($request);
     }
 }

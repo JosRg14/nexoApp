@@ -39,9 +39,11 @@ class PaymentController extends Controller
 
         try {
             $response = $this->httpClient->post('/api/pagos/checkout', [
-                'price_id'    => $request->price_id,
-                'success_url' => route('payment.success'),
-                'cancel_url'  => route('payment.cancel'),
+                'price_id'          => $request->price_id,
+                'success_url'       => route('payment.success'),
+                'cancel_url'        => route('payment.cancel'),
+                'pendiente_nombre'  => $request->pendiente_nombre ?? null,
+                'pendiente_tipo'    => $request->pendiente_tipo ?? null,
             ]);
 
             $url = $response['url'] ?? ($response['data']['url'] ?? null);
@@ -62,22 +64,9 @@ class PaymentController extends Controller
      */
     public function success()
     {
-        if (session('registro_negocio_nombre')) {
-            try {
-                $this->httpClient->post('/api/negocio/completar', [
-                    'nombre'      => session('registro_negocio_nombre'),
-                    'tipo_negocio'=> session('registro_negocio_tipo'),
-                    'estado'      => 'activo',
-                    'metodo_pago' => 'stripe',
-                ]);
-            } catch (RuntimeException $e) {
-                // El negocio puede haberse creado igualmente vía webhook
-            }
-
-            session()->flash('nombre_negocio', session('registro_negocio_nombre'));
-            session()->forget(['registro_negocio_nombre', 'registro_negocio_tipo']);
-        }
-
+        // El webhook ya creó el negocio, solo limpiamos la sesión
+        session()->forget(['registro_negocio_nombre', 'registro_negocio_tipo']);
+        
         return view('payment.success');
     }
 
