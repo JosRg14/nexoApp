@@ -11,55 +11,99 @@
 
   </div>
 
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
     @foreach($employees ?? [] as $emp)
-    <div class="bg-[#262626] border border-[#374151]/50 p-6 flex items-center justify-between">
-      <div class="flex items-center gap-4">
-        <div class="w-12 h-12 rounded-full bg-[#374151] flex items-center justify-center text-white font-bold text-lg border border-[#4B5563]">
-          {{ strtoupper(substr($emp['nombre'] ?? '',0,1)) }}
+    <div class="bg-[#1a1a1a] border border-[#374151] rounded-lg p-5 flex flex-col gap-4 relative group hover:border-[#25B5DA]/50 transition-all">
+        <!-- Encabezado -->
+        <div class="flex items-center gap-4">
+            <!-- Avatar -->
+            <div class="w-12 h-12 rounded-full bg-[#262626] flex items-center justify-center text-white font-bold text-lg border border-[#374151] shrink-0">
+                {{ strtoupper(substr($emp['nombre'] ?? '',0,1)) }}
+            </div>
+            <!-- Info Principal -->
+            <div class="flex-1 min-w-0">
+                <h3 class="text-white font-semibold text-[1.1rem] truncate flex items-center gap-2">
+                    <i class="fas fa-user text-[#25B5DA] text-sm"></i>
+                    {{ trim(($emp['nombre'] ?? '').' '.($emp['app_paterno'] ?? '')) }}
+                </h3>
+                <p class="text-[#6B7280] text-sm truncate flex items-center gap-1.5 mt-0.5">
+                    <i class="fas fa-envelope text-xs"></i>
+                    {{ $emp['correo'] ?? 'Sin correo' }}
+                </p>
+            </div>
         </div>
-        <div>
-          <h3 class="text-white font-bold text-sm">
-            {{ trim(($emp['nombre'] ?? '').' '.($emp['app_paterno'] ?? '').' '.($emp['app_materno']
-            ?? '')) }}
-          </h3>
-          <p class="text-[#9CA3AF] text-xs">
-            {{ $emp['correo'] ?? '' }} • Comisión: {{ $emp['comision'] ?? '0' }}%
-          </p>
+        
+        <!-- División -->
+        <hr class="border-[#374151]/50">
+
+        <!-- Métricas -->
+        <div class="grid grid-cols-2 gap-3 mt-2">
+            <!-- Servicios Totales -->
+            <div class="bg-[#262626] border border-[#374151]/50 rounded p-3 flex flex-col justify-center text-center">
+                <span class="text-xl font-bold text-white leading-none mb-1">{{ $emp['total_servicios'] ?? 0 }}</span>
+                <span class="text-[9px] text-[#9CA3AF] uppercase tracking-widest font-bold">Servicios (Total)</span>
+            </div>
+            
+            <!-- Comisión Total -->
+            <div class="bg-[#262626] border border-[#374151]/50 rounded p-3 flex flex-col justify-center text-center">
+                <span class="text-xl font-bold leading-none mb-1 text-emerald-500">
+                    ${{ number_format(floatval($emp['total_comision'] ?? 0), 2) }}
+                </span>
+                <span class="text-[9px] text-[#9CA3AF] uppercase tracking-widest font-bold">Comisión (Total)</span>
+            </div>
+
+            <!-- Servicios Mes -->
+            <div class="bg-[#262626] border border-[#374151]/50 rounded p-3 flex flex-col justify-center text-center">
+                <span class="text-xl font-bold text-white leading-none mb-1">{{ $emp['servicios_mes'] ?? 0 }}</span>
+                <span class="text-[9px] text-[#9CA3AF] uppercase tracking-widest font-bold">Servicios (Mes)</span>
+            </div>
+            
+            <!-- Comisión Mes -->
+            <div class="bg-[#262626] border border-[#374151]/50 rounded p-3 flex flex-col justify-center text-center">
+                <span class="text-xl font-bold leading-none mb-1 text-emerald-500">
+                    ${{ number_format(floatval($emp['comision_mes'] ?? 0), 2) }}
+                </span>
+                <span class="text-[9px] text-[#9CA3AF] uppercase tracking-widest font-bold">Comisión (Mes)</span>
+            </div>
         </div>
-      </div>
-      <div class="flex flex-col items-end gap-2">
-        @if(strtolower($emp['estado'] ?? '') === 'activo')
-        <span class="bg-emerald-500/10 text-emerald-500 px-2 py-0.5 text-xs border border-emerald-500/20">
-          Activo
-        </span>
-        @else
-        <span class="bg-red-500/10 text-red-500 px-2 py-0.5 text-xs border border-red-500/20">
-          Inactivo
-        </span>
-        @endif
-        <div class="flex gap-3">
-          <button type="button" onclick='openEditEmployee(
-          @json($emp["id_empleado"]),
-          @json($emp["nombre"]),
-          @json($emp["app_paterno"]),
-          @json($emp["app_materno"]),
-          @json($emp["correo"]),
-          @json($emp["comision"]),
-          @json($emp["estado"])
-          )' class="text-blue-400 text-xs hover:text-blue-300">
-            Editar
-          </button>
-          <form method="POST" action="{{ url('/api-proxy/api/empleados/'.$emp['id_empleado']) }}"
-          data-redirect="{{ route('business.profile') }}">
-            @csrf @method('DELETE')
-            <button type="submit" onclick="return confirm('¿Eliminar empleado?')"
-            class="text-red-400 text-xs hover:text-red-300">
-              Eliminar
+
+        <!-- Acciones (Toggle + Editar) -->
+        <div class="flex items-center justify-between mt-2">
+            <!-- Toggle Estado -->
+            <label class="flex items-center cursor-pointer">
+                <div class="relative">
+                    <input type="checkbox" class="sr-only peer status-toggle-input" 
+                        onchange='toggleEmployeeStatus(
+                        @json($emp["id_empleado"]),
+                        @json($emp["nombre"]),
+                        @json($emp["app_paterno"]),
+                        @json($emp["app_materno"]),
+                        @json($emp["correo"]),
+                        @json($emp["comision"]),
+                        this.checked
+                        )' 
+                        {{ strtolower($emp['estado'] ?? '') === 'activo' ? 'checked' : '' }}>
+                    <div class="block w-10 h-6 bg-[#374151] rounded-full peer-checked:bg-emerald-500 transition-colors"></div>
+                    <div class="dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform peer-checked:translate-x-4"></div>
+                </div>
+                <span class="ml-3 text-xs font-bold uppercase tracking-widest {{ strtolower($emp['estado'] ?? '') === 'activo' ? 'text-emerald-500' : 'text-[#6B7280]' }} status-text-{{ $emp['id_empleado'] }}">
+                    {{ strtolower($emp['estado'] ?? '') === 'activo' ? 'Activo' : 'Inactivo' }}
+                </span>
+            </label>
+
+            <!-- Editar -->
+            <button type="button" onclick='openEditEmployee(
+              @json($emp["id_empleado"]),
+              @json($emp["nombre"]),
+              @json($emp["app_paterno"]),
+              @json($emp["app_materno"]),
+              @json($emp["correo"]),
+              @json($emp["comision"]),
+              @json($emp["estado"])
+              )' class="text-xs text-[#9CA3AF] hover:text-[#25B5DA] uppercase tracking-widest font-bold flex items-center gap-1.5 transition-colors">
+                <i class="fas fa-edit"></i> Editar
             </button>
-          </form>
         </div>
-      </div>
     </div>
     @endforeach
   </div>
@@ -73,8 +117,9 @@
     <h3 class="text-white font-bold mb-6">
       Nuevo Empleado
     </h3>
-    <form method="POST" action="{{ url('/api-proxy/api/admin/register/empleado') }}"
-    data-redirect="{{ route('business.profile') }}">
+    <form method="POST" id="addEmployeeForm" action="{{ url('/api-proxy/api/admin/register/empleado') }}"
+    data-redirect="{{ route('business.profile') }}"
+    data-custom-handler="false">
       @csrf
       <input type="text" name="nombre" placeholder="Nombre" id="create_nombre"
       class="w-full mb-3 bg-transparent border-b border-gray-600 text-white">
@@ -103,7 +148,7 @@
     <h3 class="text-white font-bold mb-6">
       Editar empleado
     </h3>
-    <form method="POST" id="editEmployeeForm">
+    <form method="POST" id="editEmployeeForm" data-custom-handler="false" data-redirect="{{ route('business.profile') }}">
       @csrf @method('PUT')
       <input type="hidden" id="edit_id">
       <input type="text" name="nombre" id="edit_nombre_empleado" placeholder="Nombre"
@@ -130,7 +175,14 @@
     </form>
   </div>
 </div>
+
+
 <script>
+  function getCsrfToken() {
+      return document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ||
+             document.querySelector('input[name="_token"]')?.value;
+  }
+
   window.openEditEmployee = function(id, nombre, app_paterno, app_materno, correo, comision, estado) {
     console.log({
       nombre,
@@ -149,4 +201,154 @@
     document.getElementById("editEmployeeForm").setAttribute("data-redirect", "{{ route('business.profile') }}");
     toggleModal("modal-edit-employee", true)
   }
+
+
+
+  window.toggleEmployeeStatus = async function(id, nombre, app_paterno, app_materno, correo, comision, isChecked) {
+      const newStatus = isChecked ? 'activo' : 'inactivo';
+      const statusTextParams = document.querySelectorAll('.status-text-' + id);
+      
+      // Update UI optimistically
+      statusTextParams.forEach(el => {
+          el.innerText = newStatus.toUpperCase();
+          if (isChecked) {
+              el.classList.remove('text-[#6B7280]', 'text-red-500');
+              el.classList.add('text-emerald-500');
+          } else {
+              el.classList.remove('text-emerald-500', 'text-red-500');
+              el.classList.add('text-[#6B7280]');
+          }
+      });
+      
+      const token = getCsrfToken();
+      const formData = new FormData();
+      formData.append('_method', 'PUT');
+      formData.append('estado', newStatus);
+      if (nombre) formData.append('nombre', nombre);
+      if (app_paterno) formData.append('app_paterno', app_paterno);
+      if (app_materno) formData.append('app_materno', app_materno);
+      if (comision) formData.append('comision', comision);
+      
+      try {
+          const response = await fetch(`/api-proxy/api/empleados/${id}`, {
+              method: 'POST', // Spoofed to PUT
+              headers: {
+                  'Accept': 'application/json',
+                  'X-CSRF-TOKEN': token
+              },
+              body: formData
+          });
+          
+          if (!response.ok) {
+              throw new Error('Error al actualizar estado');
+          }
+          if (typeof showToast === 'function') showToast(`Estado actualizado: ${newStatus}`, 'success');
+      } catch (error) {
+          console.error(error);
+          if (typeof showToast === 'function') showToast('Error al actualizar estado', 'error');
+          // Nota: Aquí se podría revertir el checkbox si falla la llamada
+      }
+  };
+
+  // --- CONTROLADORES DE SUBMIT DIRECTOS ---
+
+  // Para el formulario de crear empleado
+  document.getElementById('addEmployeeForm')?.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      const form = this;
+      const action = form.action;
+      const formData = new FormData(form);
+      const redirectUrl = form.getAttribute('data-redirect') || window.location.href;
+      const token = getCsrfToken();
+      
+      const method = 'POST';
+      
+      const submitBtn = form.querySelector('button[type="submit"]') || form.querySelector('button');
+      let originalBtnContent = '';
+      if (submitBtn) {
+          originalBtnContent = submitBtn.innerHTML;
+          submitBtn.disabled = true;
+          submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Cargando...';
+      }
+
+      if (typeof showLoader === 'function') showLoader();
+      
+      try {
+          const response = await fetch(action, {
+              method: method,
+              headers: {
+                  'Accept': 'application/json',
+                  'X-CSRF-TOKEN': token
+              },
+              body: formData
+          });
+          
+          const data = await response.json();
+          
+          if (response.ok) {
+              if (typeof showToast === 'function') showToast(data.message || 'Operación exitosa', 'success');
+              setTimeout(() => {
+                  window.location.href = redirectUrl;
+              }, 1000);
+          } else {
+              if (typeof showToast === 'function') showToast(data.message || 'Error en la operación', 'error');
+          }
+      } catch (error) {
+          console.error(error);
+          if (typeof showToast === 'function') showToast('Error de conexión', 'error');
+      } finally {
+          if (submitBtn) {
+              submitBtn.disabled = false;
+              submitBtn.innerHTML = originalBtnContent;
+          }
+          if (typeof hideLoader === 'function') hideLoader();
+      }
+  });
+
+  // Para el formulario de editar empleado
+  document.getElementById('editEmployeeForm')?.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      const form = this;
+      const action = form.action;
+      const formData = new FormData(form);
+      const redirectUrl = form.getAttribute('data-redirect') || window.location.href;
+      const token = getCsrfToken();
+      
+      // Siempre POST: PHP no parsea body multipart en PUT/PATCH.
+      // El campo _method=PUT en el FormData hace el spoofing para Laravel.
+      const method = 'POST';
+      
+      if (typeof showLoader === 'function') showLoader();
+      
+      try {
+          const response = await fetch(action, {
+              method: method,
+              headers: {
+                  'Accept': 'application/json',
+                  'X-CSRF-TOKEN': token
+              },
+              body: formData
+          });
+          
+          const data = await response.json();
+          
+          if (response.ok) {
+              if (typeof showToast === 'function') showToast(data.message || 'Operación exitosa', 'success');
+              setTimeout(() => {
+                  window.location.href = redirectUrl;
+              }, 1000);
+          } else {
+              if (typeof showToast === 'function') showToast(data.message || 'Error en la operación', 'error');
+          }
+      } catch (error) {
+          console.error(error);
+          if (typeof showToast === 'function') showToast('Error de conexión', 'error');
+      } finally {
+          if (typeof hideLoader === 'function') hideLoader();
+      }
+  });
+
+
 </script>

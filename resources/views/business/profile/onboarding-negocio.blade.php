@@ -24,22 +24,28 @@
                 <p class="text-[#9CA3AF] mt-2 uppercase text-xs tracking-[0.2em]">Paso 2 de 2: Detalles y Plan</p>
             </div>
 
-            <form action="{{ route('registro.negocio.save') }}" method="POST" class="space-y-10">
+            <form id="onboarding-form" action="{{ route('payment.checkout.from.register.process') }}" method="POST" class="space-y-10">
                 @csrf
 
-                <!-- Nombre del Negocio (Mismo estilo que tu código) -->
+                {{-- Campos ocultos de sincronización --}}
+                <input type="hidden" name="nombre" id="nombre_hidden">
+                <input type="hidden" name="tipo_negocio" id="tipo_hidden">
+                <input type="hidden" name="metodo_pago" id="metodo_pago_hidden" value="stripe">
+                <input type="hidden" name="price_id" id="price_id_hidden">
+
+                <!-- Nombre del Negocio -->
                 <div class="group/input relative">
-                    <input type="text" name="nombre" id="nombre" required placeholder="Nombre del Negocio"
+                    <input type="text" id="nombre_visible" required placeholder="Nombre del Negocio"
                         class="peer w-full bg-transparent border-b border-[#374151] py-3 text-white focus:border-white focus:outline-none transition-colors placeholder-transparent" />
-                    <label for="nombre"
+                    <label for="nombre_visible"
                         class="absolute left-0 -top-3.5 text-[#9CA3AF] text-xs transition-all peer-placeholder-shown:text-base peer-placeholder-shown:top-3 peer-focus:-top-3.5 peer-focus:text-xs peer-focus:text-white">
                         Nombre del Negocio *
                     </label>
                 </div>
 
-                <!-- Tipo de Negocio (Mismo estilo que tu código) -->
+                <!-- Tipo de Negocio -->
                 <div class="group/input relative">
-                    <select name="tipo_negocio" id="tipo_negocio" required
+                    <select id="tipo_visible" required
                         class="peer w-full bg-transparent border-b border-[#374151] py-3 text-white focus:border-white focus:outline-none transition-colors appearance-none cursor-pointer">
                         <option value="" disabled selected class="bg-[#1a1a1a]">Selecciona un tipo</option>
                         <option value="barberia" class="bg-[#1a1a1a]">Barbería</option>
@@ -47,7 +53,7 @@
                         <option value="spa" class="bg-[#1a1a1a]">Spa</option>
                         <option value="otros" class="bg-[#1a1a1a]">Otros</option>
                     </select>
-                    <label for="tipo_negocio" class="absolute left-0 -top-3.5 text-[#9CA3AF] text-xs">
+                    <label for="tipo_visible" class="absolute left-0 -top-3.5 text-[#9CA3AF] text-xs">
                         Tipo de Negocio *
                     </label>
                     <div class="absolute right-0 top-3.5 pointer-events-none text-[#9CA3AF]">
@@ -55,49 +61,187 @@
                     </div>
                 </div>
 
-                <!-- SELECCIÓN DE PLANES -->
-                <div class="space-y-4">
+                <!-- ── MÉTODO DE PAGO ───────────────────────── -->
+                <div class="space-y-3">
+                    <label class="text-xs uppercase tracking-widest text-[#9CA3AF]">Método de Pago</label>
+                    <div class="grid grid-cols-2 gap-3">
+
+                        {{-- Opción: Stripe --}}
+                        <label id="opt-stripe" class="relative cursor-pointer group">
+                            <input type="radio" name="metodo_ui" value="stripe" class="peer sr-only" checked>
+                            <div class="p-4 bg-[#1a1a1a] border border-white/80 transition-all duration-300 group-hover:border-white">
+                                <div class="flex items-center gap-3 mb-2">
+                                    <i class="fab fa-stripe text-[#635bff] text-xl"></i>
+                                    <span class="text-xs font-black uppercase tracking-wider">Stripe</span>
+                                </div>
+                                <p class="text-[10px] text-[#9CA3AF] leading-relaxed">Pago en línea seguro. Tarjeta de crédito o débito.</p>
+                            </div>
+                        </label>
+
+                        {{-- Opción: Efectivo / Manual --}}
+                        <label id="opt-manual" class="relative cursor-pointer group">
+                            <input type="radio" name="metodo_ui" value="manual" class="peer sr-only">
+                            <div class="p-4 bg-[#1a1a1a] border border-[#374151]/50 transition-all duration-300 group-hover:border-gray-500">
+                                <div class="flex items-center gap-3 mb-2">
+                                    <i class="fas fa-money-bill-wave text-green-400 text-xl"></i>
+                                    <span class="text-xs font-black uppercase tracking-wider">Efectivo</span>
+                                </div>
+                                <p class="text-[10px] text-[#9CA3AF] leading-relaxed">Pago manual. Un administrador validará tu cuenta.</p>
+                            </div>
+                        </label>
+
+                    </div>
+                </div>
+
+                <!-- ── SELECCIÓN DE PLAN (solo Stripe) ────────── -->
+                <div id="plan-selector" class="space-y-3">
                     <label class="text-xs uppercase tracking-widest text-[#9CA3AF]">Selecciona tu Plan</label>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         @forelse($planes as $plan)
-                            <label class="relative cursor-pointer group">
-                                <!-- Usamos 'id' porque así viene de tu map en el controlador -->
-                                <input type="radio" name="plan_id" value="{{ $plan['id'] }}" class="peer sr-only"
-                                    {{ $loop->first ? 'checked' : '' }}>
-
-                                <div
-                                    class="p-4 bg-[#1a1a1a] border border-[#374151]/50 transition-all duration-300 peer-checked:border-white peer-checked:bg-[#222] group-hover:border-gray-500">
-                                    <div class="flex justify-between items-center mb-1">
-                                        <!-- CAMBIO: 'nombre' por 'tipo' -->
-                                        <span
-                                            class="text-xs font-bold uppercase tracking-tighter">{{ $plan['tipo'] }}</span>
-                                        <div
-                                            class="w-2 h-2 rounded-full border border-[#374151] peer-checked:bg-white bg-transparent">
-                                        </div>
-                                    </div>
-                                    <div class="text-xl font-black italic">
-                                        <!-- CAMBIO: 'precio' por 'costo' -->
-                                        ${{ number_format($plan['costo'], 0) }}
-                                        <!-- Agregamos la duración que también viene en tu API -->
-                                        <span class="text-[10px] text-gray-500 not-italic uppercase tracking-tighter">/
-                                            {{ $plan['duracion'] }}</span>
-                                    </div>
+                        @php $stripeId = $plan['stripe_price_id'] ?? ''; @endphp
+                        <label class="relative cursor-pointer group">
+                            <input type="radio" name="plan_id" value="{{ $plan['id'] ?? '' }}"
+                                data-price-id="{{ $stripeId }}"
+                                data-stripe-price-id="{{ $plan['stripe_price_id'] ?? '' }}"
+                                class="plan-radio peer sr-only" {{ $loop->first ? 'checked' : '' }}>
+                            <div class="p-4 bg-[#1a1a1a] border border-[#374151]/50 transition-all duration-300 peer-checked:border-white peer-checked:bg-[#222] group-hover:border-gray-500">
+                                <div class="flex justify-between items-center mb-1">
+                                    <span class="text-xs font-bold uppercase tracking-tighter">{{ $plan['tipo'] }}</span>
+                                    <div class="w-2 h-2 rounded-full border border-[#374151] peer-checked:bg-white bg-transparent"></div>
                                 </div>
-                            </label>
+                                <div class="text-xl font-black italic">
+                                    ${{ number_format($plan['costo'], 0) }}
+                                    <span class="text-[10px] text-gray-500 not-italic uppercase tracking-tighter">/ {{ $plan['duracion'] ?? ($plan['duracion_meses'] ?? '') }}</span>
+                                </div>
+                                @if($stripeId)
+                                <p class="text-[10px] text-[#635bff] mt-1 font-bold">Pago via Stripe</p>
+                                @else
+                                <p class="text-[10px] text-yellow-500 mt-1">Sin precio Stripe configurado</p>
+                                @endif
+                            </div>
+                        </label>
                         @empty
-                            <p class="text-xs text-red-500 uppercase">No hay planes disponibles.</p>
+                        <p class="text-xs text-red-500 uppercase">No hay planes disponibles.</p>
                         @endforelse
                     </div>
                 </div>
 
-                <!-- BOTÓN (Mismo estilo que tu botón "Guardar Cambios") -->
+                <!-- ── AVISO PAGO MANUAL ───────────────────────── -->
+                <div id="manual-notice" class="hidden p-4 border border-yellow-500/30 bg-yellow-500/5 rounded">
+                    <div class="flex items-start gap-3">
+                        <i class="fas fa-clock text-yellow-400 mt-0.5 shrink-0"></i>
+                        <div>
+                            <p class="text-xs font-bold text-yellow-300 uppercase tracking-widest mb-1">Validación pendiente</p>
+                            <p class="text-[11px] text-[#9CA3AF] leading-relaxed">
+                                Tu negocio quedará en estado <strong class="text-white">pendiente de pago</strong>. Un administrador revisará y activará tu cuenta una vez confirmado el pago.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- BOTÓN SUBMIT -->
                 <div class="pt-4">
-                    <button type="submit"
-                        class="w-full py-4 px-6 bg-[#F3F4F6] text-[#1a1a1a] font-bold tracking-[0.2em] uppercase text-sm border border-transparent transition-all duration-300 hover:bg-white hover:shadow-[0_0_20px_rgba(255,255,255,0.2)]">
-                        Finalizar Registro
+                    <button type="submit" id="btn-submit-onboarding"
+                        class="w-full py-4 px-6 bg-[#F3F4F6] text-[#1a1a1a] font-bold tracking-[0.2em] uppercase text-sm border border-transparent transition-all duration-300 hover:bg-white hover:shadow-[0_0_20px_rgba(255,255,255,0.2)] flex items-center justify-center gap-3">
+                        <i id="btn-icon" class="fab fa-stripe text-lg"></i>
+                        <span id="btn-label">Continuar con Stripe</span>
                     </button>
                 </div>
             </form>
+
+            <script>
+            (function () {
+                const form          = document.getElementById('onboarding-form');
+                const nombreVisible = document.getElementById('nombre_visible');
+                const tipoVisible   = document.getElementById('tipo_visible');
+                const nombreHidden  = document.getElementById('nombre_hidden');
+                const tipoHidden    = document.getElementById('tipo_hidden');
+                const metodoPagoH   = document.getElementById('metodo_pago_hidden');
+                const priceIdH      = document.getElementById('price_id_hidden');
+
+                const planSelector  = document.getElementById('plan-selector');
+                const manualNotice  = document.getElementById('manual-notice');
+                const btnIcon       = document.getElementById('btn-icon');
+                const btnLabel      = document.getElementById('btn-label');
+
+                const optStripe     = document.querySelector('input[name="metodo_ui"][value="stripe"]');
+                const optManual     = document.querySelector('input[name="metodo_ui"][value="manual"]');
+
+                // ── Tarjetas de selección ──────────────────────────────────
+                function updateCardStyles() {
+                    const isStripe = optStripe.checked;
+
+                    // Borde activo / inactivo en las tarjetas de método de pago
+                    document.getElementById('opt-stripe').querySelector('div')
+                        .classList.toggle('border-white/80', isStripe);
+                    document.getElementById('opt-stripe').querySelector('div')
+                        .classList.toggle('border-[#374151]/50', !isStripe);
+
+                    document.getElementById('opt-manual').querySelector('div')
+                        .classList.toggle('border-white/80', !isStripe);
+                    document.getElementById('opt-manual').querySelector('div')
+                        .classList.toggle('border-[#374151]/50', isStripe);
+
+                    // Mostrar / ocultar secciones
+                    planSelector.classList.toggle('hidden', !isStripe);
+                    manualNotice.classList.toggle('hidden', isStripe);
+
+                    // Sincronizar campo oculto
+                    metodoPagoH.value = isStripe ? 'stripe' : 'manual';
+
+                    // Cambiar botón
+                    if (isStripe) {
+                        btnIcon.className  = 'fab fa-stripe text-lg';
+                        btnLabel.textContent = 'Continuar con Stripe';
+                    } else {
+                        btnIcon.className  = 'fas fa-money-bill-wave text-lg';
+                        btnLabel.textContent = 'Registrar (Pago Manual)';
+                    }
+                }
+
+                // ── Sincronizar price_id al seleccionar plan ───────────────
+                function syncPriceId() {
+                    const checked = document.querySelector('.plan-radio:checked');
+                    priceIdH.value = checked ? (checked.dataset.priceId || '') : '';
+                }
+
+                // ── Listeners ─────────────────────────────────────────────
+                [optStripe, optManual].forEach(r => r.addEventListener('change', updateCardStyles));
+
+                document.querySelectorAll('.plan-radio').forEach(r =>
+                    r.addEventListener('change', syncPriceId));
+
+                // ── Sincronizar nombre y tipo antes del submit ─────────────
+                form.addEventListener('submit', function (e) {
+                    nombreHidden.value = nombreVisible.value.trim();
+                    tipoHidden.value   = tipoVisible.value;
+
+                    if (!nombreHidden.value) {
+                        e.preventDefault();
+                        nombreVisible.focus();
+                        return;
+                    }
+                    if (!tipoHidden.value) {
+                        e.preventDefault();
+                        tipoVisible.focus();
+                        return;
+                    }
+
+                    if (optStripe.checked) {
+                        syncPriceId();
+                        if (!priceIdH.value) {
+                            e.preventDefault();
+                            alert('El plan seleccionado no tiene precio Stripe configurado.');
+                            return;
+                        }
+                    }
+                });
+
+                // Inicializar
+                updateCardStyles();
+                syncPriceId();
+            })();
+            </script>
         </div>
 
         <!-- LADO DERECHO: DECORATIVO (Estilo NEXOAPP) -->

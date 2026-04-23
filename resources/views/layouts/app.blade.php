@@ -24,6 +24,124 @@
     {{-- Navbar --}}
     @include('partials.navbar')
 
+    {{-- Banner de Promociones (Solo para Clientes) --}}
+    @if(session('rol') === 'cliente')
+    <div id="promo-banner" class="hidden max-w-7xl mx-auto px-6 mt-4">
+        <div class="bg-[#262626] border border-[#25B5DA] rounded-lg p-5 shadow-2xl relative overflow-hidden">
+            {{-- Fondo decorativo --}}
+            <div class="absolute -right-4 -top-4 w-24 h-24 bg-[#25B5DA]/10 rounded-full blur-2xl"></div>
+            
+            <div class="flex justify-between items-start mb-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-[#25B5DA]/20 rounded-full flex items-center justify-center text-[#25B5DA]">
+                        <i class="fas fa-tags text-lg"></i>
+                    </div>
+                    <div>
+                        <h3 id="promo-banner-title" class="text-white font-bold tracking-wide">¡Tienes promociones activas!</h3>
+                        <p class="text-[#9CA3AF] text-xs mt-0.5">Aprovecha estos beneficios exclusivos antes de que venzan.</p>
+                    </div>
+                </div>
+                <button id="close-promo-banner" class="text-[#9CA3AF] hover:text-white transition-colors p-1">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div id="promo-banner-list" class="space-y-2 mb-5">
+                {{-- Se llena vía JS --}}
+            </div>
+
+            <div class="flex">
+                <a href="/agendar-cita" class="bg-[#25B5DA] hover:bg-[#1c8fb0] text-black text-xs font-bold uppercase tracking-widest px-6 py-2.5 rounded-md transition-all shadow-lg hover:shadow-[#25B5DA]/20">
+                    Agendar ahora
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async function() {
+            const clienteId = @json(session('usuario.cliente.id_cliente') ?? session('usuario.id'));
+            if (!clienteId) return;
+
+            // ── Opción A: el banner solo aparece cuando hay un negocio_id en contexto ──
+            // 1) Variable inyectada por Blade (disponible en negocio/show.blade.php)
+            // 2) Query param de la URL (ej: /agendar-cita?negocio_id=5)
+            const negocioIdBlade = @json(isset($negocio) ? ($negocio['id_negocio'] ?? $negocio['id'] ?? null) : null);
+            const negocioIdUrl   = new URLSearchParams(window.location.search).get('negocio_id');
+            const negocioId      = negocioIdBlade || negocioIdUrl;
+
+            // Sin contexto de negocio → no mostrar el banner
+            if (!negocioId) return;
+
+            const banner = document.getElementById('promo-banner');
+            const list = document.getElementById('promo-banner-list');
+            const title = document.getElementById('promo-banner-title');
+            const closeBtn = document.getElementById('close-promo-banner');
+            const bannerKey = `promo_banner_closed_${clienteId}_${negocioId}`;
+
+            // Si ya lo cerró para este negocio, no mostrar
+            if (localStorage.getItem(bannerKey)) return;
+
+            // Actualizar el enlace "Agendar ahora" para incluir el negocio_id
+            const agendarLink = banner.querySelector('a[href^="/agendar-cita"]');
+            if (agendarLink) {
+                agendarLink.href = `/agendar-cita?negocio_id=${negocioId}`;
+            }
+
+            try {
+                const response = await fetch(`/api-proxy/api/mis-promociones?negocio_id=${negocioId}`, {
+                    headers: { 'Accept': 'application/json' }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    const promos = data.data || [];
+                    
+                    // Filtrar solo promociones no usadas y vigentes
+                    const activePromos = promos.filter(p => !p.usada);
+
+                    if (activePromos.length > 0) {
+                        title.textContent = `¡Tienes ${activePromos.length} ${activePromos.length === 1 ? 'promoción activa' : 'promociones activas'}!`;
+                        
+                        list.innerHTML = activePromos.slice(0, 2).map(p => {
+                            const desc = p.descripcion || p.titulo || p.promocion?.nombre || 'Promoción Especial';
+                            let fechaVence = p.vigencia || p.fecha_vencimiento || p.vigencia_fin || '';
+                            if (fechaVence) {
+                                const d = new Date(fechaVence);
+                                // Ajustar fecha para evitar desfase por zona horaria al parsear YYYY-MM-DD
+                                d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
+                                fechaVence = `(vence: ${d.toLocaleDateString('es-CL', { day: '2-digit', month: '2-digit', year: 'numeric' })})`;
+                            }
+                            const beneficio = p.beneficio_tipo === 'descuento' ? `${p.beneficio_valor}% OFF` : 'Servicio Gratis';
+                            
+                            return `
+                                <div class="flex items-center gap-2 text-sm">
+                                    <div class="w-1.5 h-1.5 rounded-full bg-[#25B5DA]"></div>
+                                    <span class="text-white font-medium">${beneficio}</span>
+                                    <span class="text-[#9CA3AF] text-xs">en ${desc} ${fechaVence}</span>
+                                </div>
+                            `;
+                        }).join('');
+
+                        if (activePromos.length > 2) {
+                            list.insertAdjacentHTML('beforeend', `<p class="text-[10px] text-[#9CA3AF] italic pl-3">+ ${activePromos.length - 2} más disponibles</p>`);
+                        }
+
+                        banner.classList.remove('hidden');
+                    }
+                }
+            } catch (e) {
+                console.error('Error fetching promos for banner:', e);
+            }
+
+            closeBtn.addEventListener('click', () => {
+                banner.classList.add('hidden');
+                localStorage.setItem(bannerKey, 'true');
+            });
+        });
+    </script>
+    @endif
+
     {{-- Contenido dinámico --}}
     <main class="flex-grow">
         @yield('content')
@@ -69,14 +187,12 @@
             const form = e.target;
             const action = form.getAttribute('action');
 
-            if (action && action.includes('/api-proxy/') && !form.hasAttribute('data-custom-handler')) {
+            if (action && action.includes('/api-proxy/') && form.getAttribute('data-custom-handler') === 'false') {
                 e.preventDefault();
 
-                let method = form.getAttribute('method') || 'POST';
-                const methodOverride = form.querySelector('input[name="_method"]');
-                if (methodOverride) {
-                    method = methodOverride.value;
-                }
+                // Siempre POST: PHP no parsea body multipart en PUT/PATCH.
+                // El campo _method en el FormData hace el spoofing para Laravel.
+                const method = 'POST';
 
                 const submitBtn = form.querySelector('button[type="submit"]');
                 let originalBtnContent = '';
@@ -91,33 +207,40 @@
 
                 try {
                     const response = await fetch(action, {
-                        method: 'POST', // Usamos POST siempre; Laravel detecta el spoofing con _method en FormData.
+                        method: method,
                         headers: {
                             'Accept': 'application/json',
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || form.querySelector('input[name="_token"]')?.value
+                            'X-CSRF-TOKEN': getCsrfToken()
                         },
                         body: formData
                     });
 
-                    // Intentar parsear JSON
-                    let data = {};
-                    try {
-                        data = await response.json();
-                    } catch (parseErr) {
-                        data = { message: 'Error procesando respuesta del servidor' };
-                    }
-
                     if (response.ok) {
-                        // Success
-                        sessionStorage.setItem('success_message', data.message || 'Operación exitosa');
+                        // Éxito: redirigir o recargar
+                        const data = await response.json();
+                        if (typeof showToast === 'function') {
+                            showToast(data.message || 'Operación exitosa', 'success');
+                        }
                         if (redirectUrl) {
-                            window.location.href = redirectUrl;
+                            setTimeout(() => { window.location.href = redirectUrl; }, 1000);
                         } else {
-                            window.location.reload();
+                            setTimeout(() => { window.location.reload(); }, 1000);
                         }
                     } else {
-                        // Error
-                        showToast(data.message || 'Ocurrió un error en la solicitud.', 'error');
+                        // Error: NUNCA mostrar JSON en la página
+                        let errorMessage = 'Error en la solicitud';
+                        try {
+                            const data = await response.json();
+                            errorMessage = data.message || errorMessage;
+                        } catch (e) {
+                            errorMessage = `Error ${response.status}: ${response.statusText}`;
+                        }
+                        // SOLO mostrar toast, NADA más
+                        if (typeof showToast === 'function') {
+                            showToast(errorMessage, 'error');
+                        } else {
+                            alert(errorMessage);
+                        }
                     }
                 } catch (error) {
                     console.error('Submission error:', error);

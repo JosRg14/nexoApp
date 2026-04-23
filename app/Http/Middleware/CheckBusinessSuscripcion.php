@@ -32,23 +32,30 @@ class CheckBusinessSuscripcion
                 return $next($request);
             }
 
-            // --- CASO 2: TIENE NEGOCIO PERO SIN PLAN ACTIVO (VALIDACIÓN) ---
-            // La API devuelve success: true Y data: null
-            if ($res['success'] === true && is_null($negocio)) {
-                // Si no está ya en la vista de espera, lo mandamos allá
+            // --- CASO 2: NEGOCIO EN ESPERA O PENDIENTE ---
+            if ($negocio && isset($negocio['estado']) && in_array($negocio['estado'], ['pendiente_pago', 'en_revision'])) {
                 if (!$request->routeIs('registro.negocio.espera')) {
                     return redirect()->route('registro.negocio.espera');
                 }
                 return $next($request);
             }
 
-            // --- CASO 3: PLAN ACTIVO ---
-            // La API devuelve data con estado => 'activo'
+            // --- CASO 3: NEGOCIO ACTIVO ---
             if ($negocio && isset($negocio['estado']) && $negocio['estado'] === 'activo') {
                 // Si intenta volver atrás al registro o a la espera, lo mandamos al profile
                 if ($request->routeIs('registro.negocio.paso2') || $request->routeIs('registro.negocio.espera')) {
                     return redirect()->route('business.profile');
                 }
+                return $next($request);
+            }
+
+            // --- CASO 4: TIENE NEGOCIO PERO SIN PLAN ACTIVO (VALIDACIÓN FALLBACK) ---
+            // La API devuelve success: true Y data: null
+            if (isset($res['success']) && $res['success'] === true && is_null($negocio)) {
+                if (!$request->routeIs('registro.negocio.espera')) {
+                    return redirect()->route('registro.negocio.espera');
+                }
+                return $next($request);
             }
 
         } catch (\Exception $e) {

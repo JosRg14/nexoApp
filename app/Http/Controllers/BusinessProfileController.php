@@ -29,11 +29,20 @@ class BusinessProfileController extends Controller
         $employees = [];
         $negocio = [];
         $finanzas = [
-            'ingresos_hoy' => ['total' => 0, 'variacion' => 0],
-            'citas_hoy' => ['total' => 0, 'confirmadas' => 0, 'en_proceso' => 0, 'variacion' => 0],
-            'ingresos_mes' => ['total' => 0, 'variacion' => 0],
-            'ingresos_semanales' => ['dias' => [], 'ingresos' => []],
-            'servicios_top' => []
+            'con_cita' => [
+                'ingresos_hoy' => ['total' => 0, 'variacion' => 0],
+                'citas_hoy' => ['total' => 0, 'completadas' => 0, 'en_proceso' => 0, 'pendientes' => 0, 'canceladas' => 0, 'variacion' => 0],
+                'ingresos_mes' => ['total' => 0, 'variacion' => 0],
+                'ingresos_semanales' => ['dias' => [], 'ingresos' => []],
+                'servicios_top' => []
+            ],
+            'sin_cita' => [
+                'ingresos_hoy' => ['total' => 0, 'variacion' => 0],
+                'citas_hoy' => ['total' => 0, 'completadas' => 0, 'en_proceso' => 0, 'pendientes' => 0, 'canceladas' => 0, 'variacion' => 0],
+                'ingresos_mes' => ['total' => 0, 'variacion' => 0],
+                'ingresos_semanales' => ['dias' => [], 'ingresos' => []],
+                'servicios_top' => []
+            ]
         ];
 
         try {
@@ -49,49 +58,84 @@ class BusinessProfileController extends Controller
                 if (isset($item['imagen']) && $item['imagen']) {
                     $imagenUrl = rtrim(config('services.api.url'), '/') . '/' . ltrim($item['imagen'], '/');
                 }
-                return [
-                    'id' => $item['id'] ?? ($item['id_servicio'] ?? null),
-                    'nombre' => $item['nombre'] ?? '',
-                    'descripcion' => $item['descripcion'] ?? '',
-                    'precio' => $item['precio'] ?? 0,
-                    'duracion' => $item['duracion'] ?? 0,
-                    'imagen' => $imagenUrl,
+                
+                $item['id'] = $item['id'] ?? ($item['id_servicio'] ?? null);
+                $item['precio'] = $item['precio'] ?? 0;
+                $item['duracion'] = $item['duracion'] ?? 0;
+                $item['imagen'] = $imagenUrl;
+                
+                // Aseguramos que existe el objeto comision
+                $item['comision'] = $item['comision'] ?? [
+                    'tipo' => 'ninguna',
+                    'porcentaje' => null,
+                    'monto_fijo' => null,
+                    'calculada' => 0,
+                    'descripcion' => 'Sin comisión'
                 ];
+                
+                return $item;
             })->toArray();
 
             // 3. Obtener empleados del negocio autenticado (sin pasar negocio_id)
             $responseEmployees = $this->httpClient->get('/api/mis-empleados');
             $employees = collect($responseEmployees['data'] ?? [])->map(function ($emp) {
-                return [
-                    'id_empleado' => $emp['id_empleado'] ?? null,
-                    'nombre' => $emp['nombre'] ?? '',
-                    'app_paterno' => $emp['app_paterno'] ?? '',
-                    'app_materno' => $emp['app_materno'] ?? '',
-                    'correo' => $emp['correo'] ?? '',
-                    'comision' => $emp['comision'] ?? 0,
-                    'estado' => $emp['estado'] ?? 'activo',
-                ];
+                // Asegurar que ciertos campos existan con valores por defecto
+                $emp['comision'] = $emp['comision'] ?? 0;
+                $emp['total_servicios'] = $emp['total_servicios'] ?? 0;
+                $emp['estado'] = $emp['estado'] ?? 'activo';
+                
+                // Nuevos campos estadísticos
+                $emp['ingresos_totales'] = $emp['ingresos_totales'] ?? 0;
+                $emp['total_comision'] = $emp['total_comision'] ?? 0;
+                $emp['comision_mes'] = $emp['comision_mes'] ?? 0;
+                $emp['servicios_mes'] = $emp['servicios_mes'] ?? 0;
+                $emp['promedio_comision'] = $emp['promedio_comision'] ?? 0;
+                
+                return $emp; // Devolver el array completo
             })->toArray();
 
             // 4. Obtener finanzas
-            try {
-                $resHoy = $this->httpClient->get('/api/finanzas/ingresos-hoy');
-                $finanzas['ingresos_hoy'] = $resHoy['data'] ?? $resHoy['ingresos_hoy'] ?? $resHoy;
-                
-                $resCitas = $this->httpClient->get('/api/finanzas/citas-hoy');
-                $finanzas['citas_hoy'] = $resCitas['data'] ?? $resCitas['citas_hoy'] ?? $resCitas;
-                
-                $resMes = $this->httpClient->get('/api/finanzas/ingresos-mes');
-                $finanzas['ingresos_mes'] = $resMes['data'] ?? $resMes['ingresos_mes'] ?? $resMes;
-                
-                $resSem = $this->httpClient->get('/api/finanzas/ingresos-semanales');
-                $finanzas['ingresos_semanales'] = $resSem['data'] ?? $resSem['ingresos_semanales'] ?? $resSem;
-                
-                $resTop = $this->httpClient->get('/api/finanzas/servicios-top', ['limite' => 5]);
-                $finanzas['servicios_top'] = $resTop['data'] ?? $resTop['servicios_top'] ?? $resTop;
-            } catch (\Exception $e) {
-                \Log::warning('No se pudieron cargar las finanzas: ' . $e->getMessage());
+            $tipos = ['con_cita', 'sin_cita'];
+            foreach ($tipos as $tipo) {
+                try {
+                    $queryParams = ['tipo' => $tipo];
+
+                    $resHoy = $this->httpClient->get('/api/finanzas/ingresos-hoy', $queryParams);
+                    $dataHoy = $resHoy['data'] ?? [];
+                    $finanzas[$tipo]['ingresos_hoy'] = [
+                        'total'     => $dataHoy['ingresos_hoy'] ?? 0,
+                        'variacion' => $dataHoy['variacion']    ?? 0,
+                    ];
+                    
+                    $resCitas = $this->httpClient->get('/api/finanzas/citas-hoy', $queryParams);
+                    $dataCitas = $resCitas['data'] ?? [];
+                    $finanzas[$tipo]['citas_hoy'] = [
+                        'total'       => $dataCitas['total_citas'] ?? 0,
+                        'completadas' => $dataCitas['completadas'] ?? 0,
+                        'pendientes'  => $dataCitas['pendientes']  ?? 0,
+                        'en_proceso'  => $dataCitas['en_proceso']  ?? 0,
+                        'canceladas'  => $dataCitas['canceladas']  ?? 0,
+                        'variacion'   => $dataCitas['variacion']   ?? 0,
+                    ];
+                    
+                    $resMes = $this->httpClient->get('/api/finanzas/ingresos-mes', $queryParams);
+                    $dataMes = $resMes['data'] ?? [];
+                    $finanzas[$tipo]['ingresos_mes'] = [
+                        'total'     => $dataMes['ingresos_mes'] ?? 0,
+                        'variacion' => $dataMes['variacion']    ?? 0,
+                    ];
+                    
+                    $resSem = $this->httpClient->get('/api/finanzas/ingresos-semanales', $queryParams);
+                    $finanzas[$tipo]['ingresos_semanales'] = $resSem['data'] ?? ['dias' => [], 'ingresos' => []];
+                    
+                    $resTop = $this->httpClient->get('/api/finanzas/servicios-top', array_merge($queryParams, ['limite' => 5]));
+                    $finanzas[$tipo]['servicios_top'] = $resTop['data'] ?? [];
+                } catch (\Exception $e) {
+                    \Log::warning("No se pudieron cargar las finanzas tipo {$tipo}: " . $e->getMessage());
+                }
             }
+
+
 
         } catch (\Exception $e) {
             $negocio = [];
@@ -142,5 +186,128 @@ class BusinessProfileController extends Controller
                 ->withInput()
                 ->with('error', 'Error al actualizar el negocio: ' . $e->getMessage());
         }
+    }
+
+    public function clientesFrecuentes(Request $request)
+    {
+        $limit = $request->get('limit', 20);
+        $desde = $request->get('desde');
+        $hasta = $request->get('hasta');
+        
+        $response = $this->httpClient->get('/api/clientes-frecuentes', [
+            'limit' => $limit,
+            'desde' => $desde,
+            'hasta' => $hasta
+        ]);
+        
+        return response()->json($response);
+    }
+
+    public function listarPromociones()
+    {
+        $response = $this->httpClient->get('/api/promociones');
+        return response()->json($response);
+    }
+
+    public function crearPromocion(Request $request)
+    {
+        $response = $this->httpClient->post('/api/promociones', $request->all());
+        return response()->json($response);
+    }
+
+    public function actualizarPromocion(Request $request, $id)
+    {
+        // El framework Laravel podría enviar un _method=PUT o hacer un PUT real
+        // HttpClient suele soportar put directo.
+        $response = $this->httpClient->put("/api/promociones/{$id}", $request->all());
+        return response()->json($response);
+    }
+
+    public function eliminarPromocion($id)
+    {
+        $response = $this->httpClient->delete("/api/promociones/{$id}");
+        return response()->json($response);
+    }
+
+    public function listarPromocionesCliente($clienteId)
+    {
+        $response = $this->httpClient->get("/api/clientes/{$clienteId}/promociones");
+        return response()->json($response);
+    }
+
+    public function asignarPromocionCliente(Request $request, $clienteId)
+    {
+        $response = $this->httpClient->post("/api/clientes/{$clienteId}/promociones", $request->all());
+        return response()->json($response);
+    }
+
+    public function eliminarPromocionCliente($clienteId, $promoId)
+    {
+        $response = $this->httpClient->delete("/api/clientes/{$clienteId}/promociones/{$promoId}");
+        return response()->json($response);
+    }
+
+    public function obtenerEvidenciasNegocio()
+    {
+        try {
+            $response = $this->httpClient->get('/api/evidencias');
+            return response()->json($response);
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Error en proxy obtenerEvidenciasNegocio: ' . $e->getMessage());
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+        }
+    }
+
+    public function toggleEvidenciaPublica($id, Request $request)
+    {
+        try {
+            $response = $this->httpClient->patch("/api/evidencias/{$id}/publica", $request->all());
+            return response()->json($response);
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Error en proxy toggleEvidenciaPublica: ' . $e->getMessage());
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+        }
+    }
+
+    public function eliminarEvidencia($id)
+    {
+        try {
+            $response = $this->httpClient->delete("/api/evidencias/{$id}");
+            return response()->json($response);
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Error en proxy eliminarEvidencia: ' . $e->getMessage());
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+        }
+    }
+
+    public function listExceptions(Request $request)
+    {
+        $params = [
+            'empleado_id' => $request->empleado_id,
+            'fecha_inicio' => $request->fecha_inicio,
+            'fecha_fin' => $request->fecha_fin,
+            'tipo_excepcion' => $request->tipo_excepcion,
+        ];
+        
+        $response = $this->httpClient->get('/api/horario-excepciones', $params);
+        return response()->json($response);
+    }
+
+    public function storeException(Request $request)
+    {
+        $response = $this->httpClient->post('/api/horario-excepciones', $request->all());
+        return response()->json($response);
+    }
+
+    public function updateException(Request $request, $id)
+    {
+        $response = $this->httpClient->put("/api/horario-excepciones/{$id}", $request->all());
+        return response()->json($response);
+    }
+
+    public function destroyException($id)
+    {
+        $response = $this->httpClient->delete("/api/horario-excepciones/{$id}");
+        return response()->json($response);
     }
 }

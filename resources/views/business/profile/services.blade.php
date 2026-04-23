@@ -36,6 +36,17 @@
                                 <p class="text-[#9CA3AF] text-[10px] mt-1">
                                     {{ $service['descripcion'] ?? 'Sin descripción' }}
                                 </p>
+                                <div class="mt-2 text-left">
+                                    @if(isset($service['comision']) && $service['comision']['tipo'] !== 'ninguna')
+                                        <span class="inline-block px-2 py-0.5 bg-[#25B5DA]/10 text-[#25B5DA] text-[9px] uppercase tracking-widest font-bold border border-[#25B5DA]/30 rounded-sm">
+                                            <i class="fas fa-hand-holding-dollar mr-1"></i> {{ $service['comision']['descripcion'] ?? 'Con comisión' }}
+                                        </span>
+                                    @else
+                                        <span class="inline-block px-2 py-0.5 bg-[#374151]/30 text-[#9CA3AF] text-[9px] uppercase tracking-widest font-bold border border-[#374151] rounded-sm">
+                                            Sin comisión
+                                        </span>
+                                    @endif
+                                </div>
                             </div>
                             <span class="text-lg font-bold text-white">
                                 ${{ $service['precio'] }}
@@ -50,7 +61,9 @@
                                     @json($service["descripcion"] ?? ""),
                                     @json($service["precio"]),
                                     @json($service["duracion"] ?? 0),
-                                    @json($service["imagen"] ?? null)
+                                    @json($service["imagen"] ?? null),
+                                    @json($service["comision"]["tipo"] ?? "ninguna"),
+                                    @json($service["comision"]["porcentaje"] ?? $service["comision"]["monto_fijo"] ?? null)
                                 )'
                                 class="text-[10px] uppercase tracking-widest text-[#9CA3AF] hover:text-white">
                                 Editar
@@ -76,7 +89,7 @@
                 </p>
             </div>
 
-            <form method="POST" action="{{ url('/api-proxy/api/servicios') }}" data-redirect="{{ route('business.profile') }}" enctype="multipart/form-data" class="space-y-6">
+            <form method="POST" action="{{ url('/api-proxy/api/servicios') }}" data-redirect="{{ route('business.profile') }}" enctype="multipart/form-data" class="space-y-6" data-custom-handler="false">
                 @csrf
                 {{-- NOMBRE --}}
                 <div class="group/input relative">
@@ -129,13 +142,35 @@
 
                 {{-- PRECIO --}}
                 <div class="group/input relative">
-                    <input type="number" name="precio" value="{{ old('precio') }}" min="1" max="10000" step="0.01" required class="peer w-full bg-transparent border-b border-[#374151] py-3 text-white focus:border-white focus:outline-none transition-colors placeholder-transparent" placeholder="Precio" />
+                    <input type="number" id="create_precio" name="precio" value="{{ old('precio') }}" min="1" max="10000" step="0.01" required class="peer w-full bg-transparent border-b border-[#374151] py-3 text-white focus:border-white focus:outline-none transition-colors placeholder-transparent" placeholder="Precio" />
                     <label class="absolute left-0 -top-3.5 text-[#9CA3AF] text-xs transition-all peer-placeholder-shown:text-base peer-placeholder-shown:top-3 peer-focus:-top-3.5 peer-focus:text-xs peer-focus:text-white">
                         Precio
                     </label>
                     @error('precio')
                         <p class="text-red-400 text-xs mt-1">{{ $message }}</p>
                     @enderror
+                </div>
+
+                {{-- TIPO DE COMISIÓN --}}
+                <div class="mt-4">
+                    <label class="block text-xs text-[#9CA3AF] uppercase tracking-widest mb-2">Comisión para el empleado</label>
+                    <select name="tipo_comision" id="create_tipo_comision" class="w-full bg-[#1a1a1a] border-b border-[#374151] py-3 text-white focus:border-white focus:outline-none transition-colors appearance-none">
+                        <option value="ninguna">Sin comisión</option>
+                        <option value="porcentaje">Porcentaje (%)</option>
+                        <option value="fija">Monto Fijo ($)</option>
+                    </select>
+                </div>
+                
+                {{-- VALOR COMISIÓN --}}
+                <div class="group/input relative hidden mt-6" id="create_valor_comision_container">
+                    <input type="number" id="create_valor_comision" name="valor_comision" min="0" step="0.01" class="peer w-full bg-transparent border-b border-[#374151] py-3 text-white focus:border-white focus:outline-none transition-colors placeholder-transparent" placeholder="Valor de comisión" />
+                    <label class="absolute left-0 -top-3.5 text-[#9CA3AF] text-xs transition-all peer-placeholder-shown:text-base peer-placeholder-shown:top-3 peer-focus:-top-3.5 peer-focus:text-xs peer-focus:text-white">
+                        Valor de comisión
+                    </label>
+                </div>
+                
+                <div id="create_preview_comision" class="text-xs text-emerald-500 hidden mt-2 font-bold uppercase tracking-widest">
+                    El empleado ganará: $0.00
                 </div>
 
                 {{-- DURACIÓN --}}
@@ -155,58 +190,95 @@
             </form>
         </div>
     </div>
+
+    <!-- Gestión de Evidencias -->
+    <div class="mt-12 pt-8 border-t border-[#374151] w-full">
+        <h3 class="text-xl font-bold uppercase tracking-widest text-white mb-6 flex items-center gap-2">
+            <i class="fas fa-camera text-[#25B5DA]"></i>
+            Galería de Trabajos (Evidencias)
+        </h3>
+        <div id="admin-evidencias-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+            <div class="col-span-full py-8 text-center text-[#9CA3AF]">
+                <i class="fas fa-spinner fa-spin text-2xl mb-2"></i>
+                <p class="text-xs uppercase tracking-widest">Cargando galería...</p>
+            </div>
+        </div>
+    </div>
 </section>
 
 <!-- Modales de Servicios -->
-<div id="modal-edit-service" class="fixed inset-0 hidden z-50">
-    <div class="absolute inset-0 bg-black/80" onclick="closeEditModal()"></div>
-    <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-[#1a1a1a] border border-[#374151] p-8 w-full max-w-md">
-        <h3 id="editModalTitle" class="text-white font-bold mb-6 uppercase">Editar Servicio</h3>
-        <form method="POST" id="editServiceForm" data-redirect="{{ route('business.profile') }}" enctype="multipart/form-data" data-custom-handler="true">
-            @csrf
-            <input type="hidden" name="id" id="edit_id">
-            <div class="space-y-5">
-                <div>
-                    <label class="block text-xs text-[#9CA3AF] uppercase tracking-widest mb-2">Imagen actual / Vista previa</label>
-                    <div class="relative">
-                        <img id="edit_imagen_preview" class="w-full h-40 object-cover rounded border border-[#374151] mb-3 hidden" alt="Imagen del servicio">
-                    </div>
-                    
-                    <label for="edit_imagen" class="flex flex-col items-center justify-center w-full h-24 border-2 border-[#374151] border-dashed rounded-lg cursor-pointer bg-[#1a1a1a] hover:bg-[#262626] hover:border-white transition-all group overflow-hidden">
-                        <div class="flex flex-col items-center justify-center pt-2 pb-2">
-                            <i class="fa-solid fa-cloud-arrow-up text-lg text-[#9CA3AF] mb-1 group-hover:text-white"></i>
-                            <p class="text-[10px] text-[#9CA3AF] font-bold group-hover:text-white uppercase">Cambiar imagen</p>
+<div id="modal-edit-service" class="fixed inset-0 hidden z-50 overflow-y-auto">
+    <div class="fixed inset-0 bg-black/80" onclick="closeEditModal()"></div>
+    
+    <div class="flex min-h-full items-center justify-center p-4">
+        
+        <div class="relative bg-[#1a1a1a] border border-[#374151] p-8 w-full max-w-md my-8">
+            <h3 id="editModalTitle" class="text-white font-bold mb-6 uppercase">Editar Servicio</h3>
+            
+            <form method="POST" id="editServiceForm" data-redirect="{{ route('business.profile') }}" enctype="multipart/form-data" data-custom-handler="false">
+                @csrf
+                @method('PUT')
+                <input type="hidden" name="id" id="edit_id">
+                
+                <div class="space-y-5">
+                    <div>
+                        <label class="block text-xs text-[#9CA3AF] uppercase tracking-widest mb-2">Imagen actual / Vista previa</label>
+                        <div class="relative">
+                            <img id="edit_imagen_preview" class="w-full h-40 object-cover rounded border border-[#374151] mb-3 hidden" alt="Imagen del servicio">
                         </div>
-                        <input id="edit_imagen" name="imagen" type="file" class="hidden" accept="image/png, image/jpeg, image/jpg" onchange="handleImagePreview(this, 'edit_preview_wrapper', 'edit_imagen_preview', true)" />
-                    </label>
+                        
+                        <label for="edit_imagen" class="flex flex-col items-center justify-center w-full h-24 border-2 border-[#374151] border-dashed rounded-lg cursor-pointer bg-[#1a1a1a] hover:bg-[#262626] hover:border-white transition-all group overflow-hidden">
+                            <div class="flex flex-col items-center justify-center pt-2 pb-2">
+                                <i class="fa-solid fa-cloud-arrow-up text-lg text-[#9CA3AF] mb-1 group-hover:text-white"></i>
+                                <p class="text-[10px] text-[#9CA3AF] font-bold group-hover:text-white uppercase">Cambiar imagen</p>
+                            </div>
+                            <input id="edit_imagen" name="imagen" type="file" class="hidden" accept="image/png, image/jpeg, image/jpg" onchange="handleImagePreview(this, 'edit_preview_wrapper', 'edit_imagen_preview', true)" />
+                        </label>
+                        <p id="edit-image-error" class="text-red-400 text-[10px] mt-2 hidden uppercase tracking-widest font-bold">
+                            <i class="fa-solid fa-circle-exclamation mr-1"></i> Archivo inválido.
+                        </p>
+                    </div>
 
-                    <p id="edit-image-error" class="text-red-400 text-[10px] mt-2 hidden uppercase tracking-widest font-bold">
-                        <i class="fa-solid fa-circle-exclamation mr-1"></i> Archivo inválido.
-                    </p>
+                    <div>
+                        <label class="block text-xs text-[#9CA3AF] uppercase tracking-widest mb-1">Nombre del servicio</label>
+                        <input type="text" name="nombre_servicio" id="edit_nombre" maxlength="100" required class="w-full bg-transparent border-b border-[#374151] py-2 text-white focus:border-white outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-[#9CA3AF] uppercase tracking-widest mb-1">Descripción</label>
+                        <input type="text" name="descripcion" id="edit_descripcion" maxlength="255" class="w-full bg-transparent border-b border-[#374151] py-2 text-white focus:border-white outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-[#9CA3AF] uppercase tracking-widest mb-1">Precio ($)</label>
+                        <input type="number" name="precio" id="edit_precio" min="1" max="10000" step="0.01" required class="w-full bg-transparent border-b border-[#374151] py-2 text-white focus:border-white outline-none">
+                    </div>
 
-                    <p class="text-[10px] text-[#9CA3AF] mt-2 uppercase tracking-widest">
-                        Formatos permitidos: PNG, JPG, JPEG
-                    </p>
+                    <div>
+                        <label class="block text-xs text-[#9CA3AF] uppercase tracking-widest mb-1">Tipo de comisión</label>
+                        <select name="tipo_comision" id="edit_tipo_comision" class="w-full bg-[#1a1a1a] border-b border-[#374151] py-2 text-white focus:border-white outline-none">
+                            <option value="ninguna">Sin comisión</option>
+                            <option value="porcentaje">Porcentaje (%)</option>
+                            <option value="fija">Monto Fijo ($)</option>
+                        </select>
+                    </div>
+                    <div id="edit_valor_comision_container" class="hidden mt-2">
+                        <label class="block text-xs text-[#9CA3AF] uppercase tracking-widest mb-1">Valor de comisión</label>
+                        <input type="number" name="valor_comision" id="edit_valor_comision" min="0" step="0.01" class="w-full bg-transparent border-b border-[#374151] py-2 text-white focus:border-white outline-none">
+                    </div>
+                    <div id="edit_preview_comision" class="text-xs text-emerald-500 hidden font-bold uppercase tracking-widest mt-2">
+                        El empleado ganará: $0.00
+                    </div>
+
+                    <div>
+                        <label class="block text-xs text-[#9CA3AF] uppercase tracking-widest mb-1">Duración (minutos)</label>
+                        <input type="number" name="duracion_estimada" id="edit_duracion" min="5" max="480" required class="w-full bg-transparent border-b border-[#374151] py-2 text-white focus:border-white outline-none">
+                    </div>
                 </div>
-                <div>
-                    <label class="block text-xs text-[#9CA3AF] uppercase tracking-widest mb-1">Nombre del servicio</label>
-                    <input type="text" name="nombre_servicio" id="edit_nombre" maxlength="100" required class="w-full bg-transparent border-b border-[#374151] py-2 text-white focus:border-white outline-none">
-                </div>
-                <div>
-                    <label class="block text-xs text-[#9CA3AF] uppercase tracking-widest mb-1">Descripción</label>
-                    <input type="text" name="descripcion" id="edit_descripcion" maxlength="255" class="w-full bg-transparent border-b border-[#374151] py-2 text-white focus:border-white outline-none">
-                </div>
-                <div>
-                    <label class="block text-xs text-[#9CA3AF] uppercase tracking-widest mb-1">Precio ($)</label>
-                    <input type="number" name="precio" id="edit_precio" min="1" max="10000" step="0.01" required class="w-full bg-transparent border-b border-[#374151] py-2 text-white focus:border-white outline-none">
-                </div>
-                <div>
-                    <label class="block text-xs text-[#9CA3AF] uppercase tracking-widest mb-1">Duración (minutos)</label>
-                    <input type="number" name="duracion_estimada" id="edit_duracion" min="5" max="480" required class="w-full bg-transparent border-b border-[#374151] py-2 text-white focus:border-white outline-none">
-                </div>
-            </div>
-            <button class="mt-6 w-full bg-white text-black py-2 uppercase text-xs font-bold">Guardar Cambios</button>
-        </form>
+                
+                <button type="submit" class="mt-6 w-full bg-white text-black py-2 uppercase text-xs font-bold hover:bg-gray-200 transition-colors">
+                    Guardar Cambios
+                </button>
+            </form>
+        </div>
     </div>
 </div>
 
@@ -215,8 +287,9 @@
     <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-[#1a1a1a] border border-[#374151] p-8 w-full max-w-md">
         <h3 class="text-red-500 font-bold mb-4 uppercase">Confirmar eliminación</h3>
         <p class="text-white text-sm mb-6">¿Estás seguro que deseas eliminar <span id="deleteServiceName" class="font-bold"></span>?</p>
-        <form method="POST" id="deleteServiceForm" data-custom-handler="true">
+        <form method="POST" id="deleteServiceForm" data-custom-handler="false">
             @csrf
+            @method('DELETE')
             <div class="flex gap-4">
                 <button type="button" onclick="closeDeleteModal()" class="w-1/2 py-2 border border-[#374151] text-white text-xs uppercase">Cancelar</button>
                 <button type="submit" class="w-1/2 py-2 bg-red-600 text-white text-xs uppercase font-bold hover:bg-red-700">Eliminar</button>
@@ -226,154 +299,124 @@
 </div>
 
 <script>
-    // --- INTERCEPTOR PARA AGREGAR SERVICIOS ---
-    document.addEventListener('submit', async function(e) {
-        const form = e.target;
+    function getCsrfToken() {
+        return document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ||
+               document.querySelector('input[name="_token"]')?.value;
+    }
+
+    // --- LOGICA DE COMISIONES ---
+    function calculateCommission(priceInput, typeInput, valueInput, previewDiv) {
+        if(!priceInput || !typeInput || !valueInput || !previewDiv) return;
         
-        // ============================================
-        // SOLO para el formulario de agregar servicio
-        // ============================================
-        const action = form.getAttribute('action') || '';
-        
-        if (action.includes('/api-proxy/')) {
-            console.log('🔄 Interceptando formulario de AGREGAR servicio');
-            e.preventDefault();
-            
-            if (typeof showLoader === 'function') showLoader();
-
-            const formData = new FormData(form);
-            const redirectUrl = form.getAttribute('data-redirect') || window.location.href;
-
-            // Si no hay archivo en el campo imagen, lo eliminamos del FormData
-            const fileInput = form.querySelector('input[name="imagen"]');
-            if (fileInput && !fileInput.files.length) {
-                formData.delete('imagen');
-            }
-          
-            try {
-                const response = await fetch(action, {
-                    method: 'POST',
-                    headers: {
-                        'Accept': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value
-                    },
-                    body: formData
-                });
-
-                const data = await response.json();
-                
-                console.log('Respuesta:', data);
-
-                if (response.ok) {
-                    if (typeof showToast === 'function') {
-                        showToast(data.message || "¡Servicio agregado exitosamente!");
-                    } else {
-                        showToast(data.message || "¡Servicio agregado exitosamente!", "success");
-                    }
-                    setTimeout(() => {
-                        window.location.href = redirectUrl;
-                    }, 1000);
-                } else {
-                    if (typeof hideLoader === 'function') hideLoader();
-                    if (data.errors) {
-                        let errorMsg = "Errores de validación:\n";
-                        for (const [field, errors] of Object.entries(data.errors)) {
-                            errorMsg += `${field}: ${errors.join(', ')}\n`;
-                        }
-                        showToast(errorMsg, "error");
-                    } else {
-                        showToast(data.message || "Error al procesar la solicitud.", "error");
-                    }
-                }
-            } catch (error) {
-                if (typeof hideLoader === 'function') hideLoader();
-                console.error("Error:", error);
-                showToast("Error de conexión con el servidor", "error");
-            }
+        const type = typeInput.value;
+        const container = valueInput.parentElement;
+        if (type === 'ninguna') {
+            if(container) container.classList.add('hidden');
+            previewDiv.classList.add('hidden');
+            return;
         }
+        
+        if(container) container.classList.remove('hidden');
+        previewDiv.classList.remove('hidden');
+        
+        const price = parseFloat(priceInput.value) || 0;
+        const val = parseFloat(valueInput.value) || 0;
+        let result = 0;
+        
+        if (type === 'porcentaje') {
+            result = price * (val / 100);
+        } else if (type === 'fijo' || type === 'fija') {
+            result = val;
+        }
+        
+        previewDiv.innerText = 'El empleado ganará: $' + result.toFixed(2);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const cPrice = document.getElementById('create_precio');
+        const cType = document.getElementById('create_tipo_comision');
+        const cVal = document.getElementById('create_valor_comision');
+        const cPrev = document.getElementById('create_preview_comision');
+        
+        [cPrice, cType, cVal].forEach(el => {
+            el?.addEventListener('input', () => calculateCommission(cPrice, cType, cVal, cPrev));
+            el?.addEventListener('change', () => calculateCommission(cPrice, cType, cVal, cPrev));
+        });
+
+        const ePrice = document.getElementById('edit_precio');
+        const eType = document.getElementById('edit_tipo_comision');
+        const eVal = document.getElementById('edit_valor_comision');
+        const ePrev = document.getElementById('edit_preview_comision');
+        
+        [ePrice, eType, eVal].forEach(el => {
+            el?.addEventListener('input', () => calculateCommission(ePrice, eType, eVal, ePrev));
+            el?.addEventListener('change', () => calculateCommission(ePrice, eType, eVal, ePrev));
+        });
     });
 
-    function openEditModal(id, nombre, descripcion, precio, duracion, imagen) 
-    {
-        console.log('📝 Abriendo modal de edición para servicio ID:', id);
-        
-        // Setear valores en los campos
-        document.getElementById('edit_id').value = id;
-        document.getElementById('edit_nombre').value = nombre;
-        document.getElementById('edit_descripcion').value = descripcion;
-        document.getElementById('edit_precio').value = precio;
-        document.getElementById('edit_duracion').value = duracion;
-        
-       //CAMBIO IMPORTANTE: Usar el proxy API en lugar de la ruta directa
-        const form = document.getElementById('editServiceForm');
-        // ANTES: form.action = '/business/services/' + id;
-        // AHORA: Usar el proxy API con POST
-        form.action = '/api-proxy/api/servicios/' + id;
-        
-        console.log('📝 Action del formulario de edición (proxy):', form.action);
-        console.log('📝 El formulario tiene data-custom-handler:', form.getAttribute('data-custom-handler'));
-        
-        // Resto del código igual...
-        // Manejar la imagen
-        const previewImg = document.getElementById('edit_imagen_preview');
-        if (imagen && imagen !== 'null' && imagen !== '') {
-            previewImg.src = imagen + '?v=' + Date.now();
-            previewImg.classList.remove('hidden');
-        } else {
-            previewImg.classList.add('hidden');
-        }
-        
-        // Limpiar el campo de archivo
-        const fileInput = document.getElementById('edit_imagen');
-        if (fileInput) {
-            fileInput.value = '';
-        }
-        
-        // Limpiar mensajes de error
-        const errorElement = document.getElementById('edit-image-error');
-        if (errorElement) {
-            errorElement.classList.add('hidden');
-        }
-        
-        // Mostrar el modal
-        const modal = document.getElementById('modal-edit-service');
-        if (modal) {
-            modal.classList.remove('hidden');
-        }
-    }
-
-    function closeEditModal() {
-        const modal = document.getElementById('modal-edit-service');
-        if (modal) {
-            modal.classList.add('hidden');
-        }
-    }
-
+    // --- CIERRE CORRECTO DE openDeleteModal ---
     function openDeleteModal(id, nombre) 
     {
         console.log('🗑️ Abriendo modal de eliminación para servicio ID:', id);
         document.getElementById('deleteServiceName').innerText = nombre;
         const form = document.getElementById('deleteServiceForm');
-        // Usar el proxy API para eliminar
         form.action = '/api-proxy/api/servicios/' + id;
-        
-        // Agregar método DELETE como campo oculto
-        // Primero eliminar si existe
-        let methodInput = form.querySelector('input[name="_method"]');
-        if (!methodInput) {
-            methodInput = document.createElement('input');
-            methodInput.type = 'hidden';
-            methodInput.name = '_method';
-            form.appendChild(methodInput);
-        }
-        methodInput.value = 'DELETE';
-        
-        console.log('🗑️ Action del formulario de eliminación:', form.action);
         document.getElementById('modal-delete-service').classList.remove('hidden');
     }
 
     function closeDeleteModal() {
         document.getElementById('modal-delete-service').classList.add('hidden');
+    }
+
+    function openEditModal(id, nombre, descripcion, precio, duracion, imagen, tipo_comision = 'ninguna', valor_comision = null) {
+        console.log('=== openEditModal DEBUG ===');
+        console.log('ID:', id);
+        console.log('Nombre:', nombre);
+        console.log('Descripcion:', descripcion);
+        console.log('Precio:', precio);
+        console.log('Duracion:', duracion);
+        console.log('Comision Tipo:', tipo_comision);
+        console.log('Comision Valor:', valor_comision);
+        
+        const modal = document.getElementById('modal-edit-service');
+        const form = document.getElementById('editServiceForm');
+        
+        // Seteamos los campos del formulario
+        document.getElementById('edit_id').value = id;
+        document.getElementById('edit_nombre').value = nombre;
+        document.getElementById('edit_descripcion').value = descripcion || '';
+        document.getElementById('edit_precio').value = precio;
+        document.getElementById('edit_duracion').value = duracion;
+        document.getElementById('edit_tipo_comision').value = tipo_comision;
+        document.getElementById('edit_valor_comision').value = valor_comision || '';
+        
+        // Disparar actualización de preview
+        calculateCommission(
+            document.getElementById('edit_precio'), 
+            document.getElementById('edit_tipo_comision'), 
+            document.getElementById('edit_valor_comision'), 
+            document.getElementById('edit_preview_comision')
+        );
+        
+        // Manejo de la previsualización de imagen
+        const previewImg = document.getElementById('edit_imagen_preview');
+        if (imagen) {
+            previewImg.src = imagen;
+            previewImg.classList.remove('hidden');
+        } else {
+            previewImg.src = '';
+            previewImg.classList.add('hidden');
+        }
+        
+        // CORRECCIÓN: Setear el action correctamente para la API
+        form.action = '/api-proxy/api/servicios/' + id;
+        
+        // Mostramos el modal
+        modal.classList.remove('hidden');
+    }
+
+    function closeEditModal() {
+        document.getElementById('modal-edit-service').classList.add('hidden');
     }
 
     function handleImagePreview(input, containerId, imgId, isEdit = false) {
@@ -405,4 +448,322 @@
             reader.readAsDataURL(file);
         }
     }
+
+    // --- LOGICA DE EVIDENCIAS EN EL PANEL ADMIN ---
+    let adminEvidenciasData = [];
+
+    document.addEventListener('DOMContentLoaded', () => {
+        cargarEvidenciasAdmin();
+    });
+
+    async function cargarEvidenciasAdmin() {
+        const grid = document.getElementById('admin-evidencias-grid');
+        if (!grid) return;
+        
+        grid.innerHTML = `
+            <div class="col-span-full py-8 text-center text-[#9CA3AF]">
+                <i class="fas fa-spinner fa-spin text-2xl mb-2"></i>
+                <p class="text-xs uppercase tracking-widest">Cargando galería...</p>
+            </div>
+        `;
+        
+        try {
+            const res = await fetch('/api-proxy/evidencias', {
+                headers: { 'Accept': 'application/json' }
+            });
+            
+            if (!res.ok) {
+                throw new Error(`HTTP ${res.status}`);
+            }
+            
+            const json = await res.json();
+            
+            if (json.success && json.data) {
+                renderAdminEvidencias(json.data);
+            } else {
+                renderAdminEvidencias([]);
+            }
+        } catch (error) {
+            console.error("Error cargando evidencias:", error);
+            renderAdminEvidencias([]);
+        }
+    }
+
+    function renderAdminEvidencias(evidencias) {
+        adminEvidenciasData = evidencias;
+        const grid = document.getElementById('admin-evidencias-grid');
+        
+        if (!grid) return;
+        grid.innerHTML = '';
+
+        if (evidencias.length === 0) {
+            grid.innerHTML = `
+                <div class="col-span-full py-12 text-center text-[#9CA3AF]">
+                    <i class="fas fa-images text-4xl mb-3 opacity-50"></i>
+                    <p class="text-sm">No hay evidencias registradas en tu negocio.</p>
+                </div>
+            `;
+            return;
+        }
+
+        // Usar la URL base desde un meta tag o definirla manualmente
+        const baseUrl = "https://devlink-servidorapi.td60xq.easypanel.host";
+
+        evidencias.forEach(ev => {
+            const isPublic = ev.publica === true || ev.publica === 1;
+            let imgUrl = ev.url_imagen;
+            if (imgUrl && !imgUrl.startsWith('http')) {
+                imgUrl = baseUrl + (imgUrl.startsWith('/') ? '' : '/') + imgUrl;
+            }
+
+            const nombreServicio = ev.servicio_nombre || 'General';
+            const idItem = ev.id_evidencia || ev.id;
+
+            const card = document.createElement('div');
+            card.className = 'bg-[#262626] border border-[#374151] rounded-lg overflow-hidden flex flex-col group transition-colors hover:border-[#F3F4F6]/50';
+            card.innerHTML = `
+                <div class="relative h-32 overflow-hidden bg-[#1a1a1a]">
+                    <img src="${imgUrl}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 ${!isPublic ? 'opacity-60' : ''}" alt="${nombreServicio}">
+                </div>
+                <div class="p-3 flex flex-col flex-grow justify-between">
+                    <div>
+                        <p class="text-white text-xs font-bold truncate uppercase tracking-widest mb-1" title="${nombreServicio}">${nombreServicio}</p>
+                        ${ev.descripcion ? `<p class="text-[10px] text-[#9CA3AF] line-clamp-2 leading-tight">${ev.descripcion}</p>` : ''}
+                    </div>
+                    <div class="flex justify-between items-center mt-3 pt-2 border-t border-[#374151]">
+                        <button onclick="toggleEvidenciaState(${idItem}, ${!isPublic})" class="text-[10px] font-bold uppercase ${isPublic ? 'text-[#25B5DA]' : 'text-[#9CA3AF]'} hover:brightness-125 transition-all flex items-center gap-1">
+                            <i class="fas ${isPublic ? 'fa-eye' : 'fa-eye-slash'}"></i> ${isPublic ? 'Pública' : 'Privada'}
+                        </button>
+                        <button onclick="deleteEvidenciaItem(${idItem})" class="text-red-500 hover:text-red-400 text-xs transition-colors">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+            grid.appendChild(card);
+        });
+    }
+
+    async function toggleEvidenciaState(id, makePublic) {
+        if (typeof showLoader === 'function') showLoader();
+        try {
+            const token = document.querySelector('input[name="_token"]')?.value || 
+                          document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+                          
+            const res = await fetch(`/api-proxy/evidencias/${id}/publica`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': token
+                },
+                body: JSON.stringify({ publica: makePublic })
+            });
+
+            const data = await res.json();
+            
+            if (data.success || res.ok) {
+                const evIndex = adminEvidenciasData.findIndex(e => (e.id_evidencia || e.id) === id);
+                if (evIndex !== -1) {
+                    adminEvidenciasData[evIndex].publica = makePublic;
+                    renderAdminEvidencias(adminEvidenciasData);
+                    if (typeof showToast === 'function') showToast(`Evidencia ${makePublic ? 'publicada' : 'privada'}`, 'success');
+                }
+            } else {
+                if (typeof showToast === 'function') showToast(data.message || 'Error al cambiar visibilidad', 'error');
+            }
+        } catch (error) {
+            console.error(error);
+            if (typeof showToast === 'function') showToast('Error de conexión', 'error');
+        } finally {
+            if (typeof hideLoader === 'function') hideLoader();
+        }
+    }
+
+    async function deleteEvidenciaItem(id) {
+        if (!confirm('¿Estás seguro de eliminar esta evidencia permanentemente?')) return;
+        
+        if (typeof showLoader === 'function') showLoader();
+        try {
+            const token = document.querySelector('input[name="_token"]')?.value || 
+                          document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+                          
+            const res = await fetch(`/api-proxy/evidencias/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': token
+                }
+            });
+
+            const data = await res.json();
+            
+            if (data.success || res.ok) {
+                adminEvidenciasData = adminEvidenciasData.filter(e => (e.id_evidencia || e.id) !== id);
+                renderAdminEvidencias(adminEvidenciasData);
+                if (typeof showToast === 'function') showToast('Evidencia eliminada', 'success');
+            } else {
+                if (typeof showToast === 'function') showToast(data.message || 'Error al eliminar', 'error');
+            }
+        } catch (error) {
+            console.error(error);
+            if (typeof showToast === 'function') showToast('Error de conexión', 'error');
+        } finally {
+            if (typeof hideLoader === 'function') hideLoader();
+        }
+    }
+
+    // --- CONTROLADORES DE SUBMIT DIRECTOS ---
+
+    // Para el formulario de agregar servicio (nuevo)
+    document.querySelector('form[action*="/api-proxy/api/servicios"]:not(#editServiceForm):not(#deleteServiceForm)')
+        ?.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const form = this;
+        const formData = new FormData(form);
+        const redirectUrl = form.getAttribute('data-redirect') || window.location.href;
+        const token = getCsrfToken();
+        
+        const tipoComision = formData.get('tipo_comision');
+        if (!tipoComision || tipoComision === 'ninguna' || tipoComision === '' || tipoComision === 'null') {
+            formData.delete('tipo_comision');
+            formData.delete('valor_comision');
+            formData.delete('comision_porcentaje');
+            formData.delete('comision_fija');
+        } else if (tipoComision === 'porcentaje') {
+            formData.set('comision_porcentaje', formData.get('valor_comision'));
+            formData.delete('valor_comision');
+            formData.delete('comision_fija');
+        } else if (tipoComision === 'fijo' || tipoComision === 'fija') {
+            formData.set('comision_fija', formData.get('valor_comision'));
+            formData.delete('valor_comision');
+            formData.delete('comision_porcentaje');
+            formData.set('tipo_comision', 'fija');
+        }
+        
+        if (typeof showLoader === 'function') showLoader();
+        
+        try {
+            const response = await fetch(form.action, {
+                method: 'POST',
+                headers: { 'X-CSRF-TOKEN': token },
+                body: formData
+            });
+            
+            const data = await response.json();
+            
+            if (response.ok) {
+                if (typeof showToast === 'function') showToast(data.message || 'Servicio creado', 'success');
+                setTimeout(() => { window.location.href = redirectUrl; }, 1000);
+            } else {
+                if (typeof showToast === 'function') showToast(data.message || 'Error al crear servicio', 'error');
+            }
+        } catch (error) {
+            console.error(error);
+            if (typeof showToast === 'function') showToast('Error de conexión', 'error');
+        } finally {
+            if (typeof hideLoader === 'function') hideLoader();
+        }
+    });
+
+    // Para el formulario de editar servicio
+    document.getElementById('editServiceForm')?.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const form = this;
+        const formData = new FormData(form);
+        const action = form.action;
+        const token = getCsrfToken();
+        
+        const tipoComision = formData.get('tipo_comision');
+        if (!tipoComision || tipoComision === 'ninguna' || tipoComision === '' || tipoComision === 'null') {
+            formData.delete('tipo_comision');
+            formData.delete('valor_comision');
+            formData.delete('comision_porcentaje');
+            formData.delete('comision_fija');
+        } else if (tipoComision === 'porcentaje') {
+            formData.set('comision_porcentaje', formData.get('valor_comision'));
+            formData.delete('valor_comision');
+            formData.delete('comision_fija');
+        } else if (tipoComision === 'fijo' || tipoComision === 'fija') {
+            formData.set('comision_fija', formData.get('valor_comision'));
+            formData.delete('valor_comision');
+            formData.delete('comision_porcentaje');
+            formData.set('tipo_comision', 'fija');
+        }
+        
+        // 🔥 LOG DE DEPURACIÓN: verificar qué campos contiene el FormData
+        console.log('=== FORMULARIO EDITAR SERVICIO ===');
+        console.log('Action:', action);
+        for (let [key, value] of formData.entries()) {
+            console.log(key, value);
+        }
+        
+        // ✅ SIEMPRE usar 'POST' en fetch — PHP no parsea body multipart en PUT/PATCH.
+        // El campo _method=PUT dentro del FormData hace el method spoofing de Laravel.
+        const method = 'POST';
+        
+        showLoader();
+        
+        try {
+            const response = await fetch(action, {
+                method: method,
+                headers: { 'X-CSRF-TOKEN': token },
+                body: formData
+            });
+            
+            const data = await response.json();
+            
+            if (response.ok) {
+                if (typeof showToast === 'function') showToast(data.message || 'Servicio actualizado', 'success');
+                setTimeout(() => window.location.reload(), 1000);
+            } else {
+                if (typeof showToast === 'function') showToast(data.message || 'Error', 'error');
+            }
+        } catch (error) {
+            console.error(error);
+            if (typeof showToast === 'function') showToast('Error de conexión', 'error');
+        } finally {
+            hideLoader();
+        }
+    });
+
+    // Para el formulario de eliminar servicio
+    document.getElementById('deleteServiceForm')?.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const form = this;
+        const action = form.action;
+        const token = getCsrfToken();
+        
+        if (typeof showLoader === 'function') showLoader();
+        
+        try {
+            const response = await fetch(action, {
+                method: 'DELETE',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': token
+                }
+            });
+            
+            const data = await response.json();
+            
+            if (response.ok && data.success !== false) {
+                if (typeof showToast === 'function') showToast(data.message || 'Servicio eliminado', 'success');
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1000);
+            } else {
+                if (typeof showToast === 'function') showToast(data.message || 'Error al eliminar', 'error');
+            }
+        } catch (error) {
+            console.error(error);
+            if (typeof showToast === 'function') showToast('Error de conexión', 'error');
+        } finally {
+            if (typeof hideLoader === 'function') hideLoader();
+            if (typeof closeDeleteModal === 'function') closeDeleteModal();
+        }
+    });
 </script>

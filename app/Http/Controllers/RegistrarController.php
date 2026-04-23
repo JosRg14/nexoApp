@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers; // <--- Revisa que esto esté escrito así
+namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
@@ -54,12 +54,30 @@ class RegistrarController extends Controller
         $token = session('auth_token');
 
         try {
-            $response = \Illuminate\Support\Facades\Http::withToken($token)
+            // Verificar si el usuario ya tiene un negocio activo
+            $suscripcionResponse = \Illuminate\Support\Facades\Http::withToken($token)
                 ->withoutVerifying()
-                ->get($this->baseUrl.'/planes');
+                ->get($this->baseUrl . '/mi-suscripcion');
 
-            // IMPORTANTE: Verifica que la API devuelva 'data'
-            $planes = $response->json()['data'] ?? [];
+            $suscripcionData = $suscripcionResponse->json()['data'] ?? null;
+
+            if ($suscripcionData && isset($suscripcionData['estado'])) {
+                if ($suscripcionData['estado'] === 'activo') {
+                    return redirect()->route('business.profile')
+                        ->with('info', 'Ya tienes un negocio activo registrado.');
+                }
+
+                if (in_array($suscripcionData['estado'], ['pendiente_pago', 'en_revision'])) {
+                    return redirect()->route('registro.negocio.espera');
+                }
+            }
+
+            // Si no tiene negocio, mostrar el formulario con los planes disponibles
+            $planesResponse = \Illuminate\Support\Facades\Http::withToken($token)
+                ->withoutVerifying()
+                ->get($this->baseUrl . '/planes');
+
+            $planes = $planesResponse->json()['data'] ?? [];
 
             return view('business.profile.onboarding-negocio', compact('planes'));
         } catch (\Exception $e) {
@@ -114,28 +132,80 @@ class RegistrarController extends Controller
     }
 }
 
-// Dentro de RegistrarController.php
+    public function showEsperandoValidacion()
+    {
+        $token = session('auth_token');
 
-public function showEsperandoValidacion()
-{
-    $token = session('auth_token');
+        try {
+            $response = \Illuminate\Support\Facades\Http::withToken($token)
+                ->withoutVerifying()
+                ->get($this->baseUrl . '/mi-suscripcion');
 
-    try {
-        $response = \Illuminate\Support\Facades\Http::withToken($token)
-            ->withoutVerifying()
-            ->get($this->baseUrl . '/mi-suscripcion');
+            $data = $response->json()['data'] ?? null;
 
-        $data = $response->json()['data'] ?? null;
+            $suscripcion = [
+                'negocio_nombre' => $data['nombre'] ?? 'Tu Negocio',
+                'plan_nombre'    => $data['plan'] ?? 'Seleccionado'
+            ];
 
-        $suscripcion = [
-            'negocio_nombre' => $data['nombre'] ?? 'Tu Negocio',
-            'plan_nombre'    => $data['plan'] ?? 'Seleccionado'
-        ];
+            return view('business.profile.waiting-validation', compact('suscripcion'));
+            
+        } catch (\Exception $e) {
+            return view('business.profile.waiting-validation', ['suscripcion' => null]);
+        }
+    }
 
-        return view('business.profile.waiting-validation', compact('suscripcion'));
-        
-    } catch (\Exception $e) {
-        return view('business.profile.waiting-validation', ['suscripcion' => null]);
+    /**
+     * Doble flujo: Stripe o pago manual desde el registro de negocio.
+     */
+    public function checkout(Request $request)
+    {
+        $request->validate([
+            'nombre'      => 'required|string|max:255',
+            'tipo_negocio'=> 'required|string',
+            'price_id'    => 'required_if:metodo_pago,stripe|nullable|string',
+            'metodo_pago' => 'required|in:stripe,manual',
+        ]);
+
+        // ── FLUJO MANUAL ──────────────────────────────────────────────
+        if ($request->metodo_pago === 'manual') {
+            try {
+                Http::withToken(session('auth_token'))
+                    ->withoutVerifying()
+                    ->post($this->baseUrl . '/negocio/completar', [
+                        'nombre_negocio' => $request->nombre,
+                        'tipo_negocio'   => $request->tipo_negocio,
+                        'estado'         => 'pendiente_pago',
+                        'metodo_pago'    => 'manual',
+                        'telefono'       => '0000000000',
+                        'calle'          => 'Pendiente',
+                        'numero'         => '0',
+                        'colonia'        => 'Pendiente',
+                        'ciudad'         => 'Pendiente',
+                        'estado_dir'     => 'Pendiente',
+                        'codigo_postal'  => '00000',
+                    ]);
+            } catch (\Exception $e) {
+                // Continúa aunque falle; el superusuario puede activarlo
+            }
+
+            return redirect()->route('registro.negocio.espera')
+                ->with('negocio_nombre', $request->nombre);
+        }
+
+        // ── FLUJO STRIPE ──────────────────────────────────────────────
+        session([
+            'registro_negocio_nombre' => $request->nombre,
+            'registro_negocio_tipo'   => $request->tipo_negocio,
+        ]);
+
+        // Agregar al request para que PaymentController los envíe a la API
+        $request->merge([
+            'pendiente_nombre' => $request->nombre,
+            'pendiente_tipo'   => $request->tipo_negocio,
+        ]);
+
+        return app(PaymentController::class)->checkout($request);
     }
 }
-}
+

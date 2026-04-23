@@ -1,4 +1,13 @@
 <section id="tab-info" class="animate-fade-in-up">
+@php
+    \Log::info('Negocio en vista profile.information:', [
+        'id' => $negocio['id_negocio'] ?? $negocio['id'] ?? null,
+        'tiene_imagenes' => isset($negocio['imagenes']),
+        'imagenes' => $negocio['imagenes'] ?? [],
+        'foto_perfil' => $negocio['foto_perfil'] ?? null,
+        'banner' => $negocio['banner'] ?? null
+    ]);
+@endphp
 
 @if(!$negocio || empty($negocio))
     <div class="flex flex-col items-center justify-center py-16 text-center">
@@ -174,9 +183,32 @@
     </div>
 
 @else
+@php
+    // Extraer imágenes desde el array 'imagenes' por tipo
+    $fotoPerfil = null;
+    $bannerImg  = null;
+    if (isset($negocio['imagenes']) && is_array($negocio['imagenes'])) {
+        foreach ($negocio['imagenes'] as $img) {
+            if (isset($img['tipo'])) {
+                if ($img['tipo'] === 'perfil_negocio' && !empty($img['url_imagen'])) {
+                    $fotoPerfil = $img['url_imagen'];
+                }
+                if ($img['tipo'] === 'banner_negocio' && !empty($img['url_imagen'])) {
+                    $bannerImg = $img['url_imagen'];
+                }
+            }
+        }
+    }
+    // Función helper para construir URL absoluta
+    $buildUrl = function(?string $url) {
+        if (!$url) return '';
+        if (\Illuminate\Support\Str::startsWith($url, 'http')) return $url;
+        return rtrim(config('services.api.url'), '/') . '/' . ltrim($url, '/');
+    };
+@endphp
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-16">
         <div class="space-y-8">
-            <form method="POST" id="editNegocioForm" action="{{ url('/api-proxy/api/negocios/mi-negocio') }}" data-redirect="{{ route('business.profile') }}" class="space-y-8" enctype="multipart/form-data" data-custom-handler="true">
+            <form method="POST" id="editNegocioForm" action="{{ url('/api-proxy/api/negocios/mi-negocio') }}" data-redirect="{{ route('business.profile') }}" class="space-y-8" enctype="multipart/form-data" data-custom-handler="false">
                 @csrf
                 @method('PUT')
                 
@@ -265,10 +297,21 @@
                             <!-- Foto Perfil -->
                             <div class="space-y-4">
                                 <label class="block text-xs text-[#9CA3AF] uppercase tracking-wider">Foto de Perfil</label>
+                                @php
+                                    // Priorizar imagen desde array 'imagenes', luego campo directo
+                                    $prevPerfil = $buildUrl($fotoPerfil);
+                                    if (!$prevPerfil) {
+                                        if (isset($negocio['foto_perfil']) && is_array($negocio['foto_perfil']) && isset($negocio['foto_perfil']['url_imagen'])) {
+                                            $prevPerfil = $buildUrl($negocio['foto_perfil']['url_imagen']);
+                                        } elseif (isset($negocio['foto_perfil']) && is_string($negocio['foto_perfil']) && !empty($negocio['foto_perfil'])) {
+                                            $prevPerfil = $buildUrl($negocio['foto_perfil']);
+                                        }
+                                    }
+                                @endphp
                                 <div class="flex items-center gap-4">
                                     <div class="w-16 h-16 rounded-full bg-[#1a1a1a] border border-[#374151] overflow-hidden flex-shrink-0 relative">
-                                        <img id="preview_img_perfil" src="{{ isset($negocio['foto_perfil']) ? (is_array($negocio['foto_perfil']) ? $negocio['foto_perfil']['url_imagen'] : (config('services.api.url') . '/' . ltrim($negocio['foto_perfil'], '/'))) : '' }}" class="w-full h-full object-cover {{ empty($negocio['foto_perfil']) ? 'hidden' : '' }}">
-                                        @if(empty($negocio['foto_perfil']))
+                                        <img id="preview_img_perfil" src="{{ $prevPerfil }}" class="w-full h-full object-cover {{ empty($prevPerfil) ? 'hidden' : '' }}">
+                                        @if(empty($prevPerfil))
                                             <div id="placeholder_perfil" class="absolute inset-0 flex items-center justify-center text-[#374151]"><i class="fas fa-store"></i></div>
                                         @endif
                                     </div>
@@ -281,10 +324,21 @@
                             <!-- Banner -->
                             <div class="space-y-4">
                                 <label class="block text-xs text-[#9CA3AF] uppercase tracking-wider">Banner Principal</label>
+                                @php
+                                    // Priorizar imagen desde array 'imagenes', luego campo directo
+                                    $prevBanner = $buildUrl($bannerImg);
+                                    if (!$prevBanner) {
+                                        if (isset($negocio['banner']) && is_array($negocio['banner']) && isset($negocio['banner']['url_imagen'])) {
+                                            $prevBanner = $buildUrl($negocio['banner']['url_imagen']);
+                                        } elseif (isset($negocio['banner']) && is_string($negocio['banner']) && !empty($negocio['banner'])) {
+                                            $prevBanner = $buildUrl($negocio['banner']);
+                                        }
+                                    }
+                                @endphp
                                 <div class="flex items-center gap-4">
                                     <div class="w-24 h-16 rounded bg-[#1a1a1a] border border-[#374151] overflow-hidden flex-shrink-0 relative">
-                                        <img id="preview_img_banner" src="{{ isset($negocio['banner']) ? (is_array($negocio['banner']) ? $negocio['banner']['url_imagen'] : (config('services.api.url') . '/' . ltrim($negocio['banner'], '/'))) : '' }}" class="w-full h-full object-cover {{ empty($negocio['banner']) ? 'hidden' : '' }}">
-                                        @if(empty($negocio['banner']))
+                                        <img id="preview_img_banner" src="{{ $prevBanner }}" class="w-full h-full object-cover {{ empty($prevBanner) ? 'hidden' : '' }}">
+                                        @if(empty($prevBanner))
                                             <div id="placeholder_banner" class="absolute inset-0 flex items-center justify-center text-[#374151]"><i class="fas fa-image"></i></div>
                                         @endif
                                     </div>
@@ -307,8 +361,19 @@
         <div class="flex flex-col items-center justify-center border border-[#374151]/30 bg-[#0f0f0f] p-12 relative overflow-hidden">
             <div class="relative z-10 text-center">
                 <div class="w-32 h-32 rounded-full bg-[#262626] border-2 border-[#374151] mx-auto mb-6 flex items-center justify-center overflow-hidden">
-                    @if(isset($negocio['foto_perfil']) && $negocio['foto_perfil'])
-                        <img id="side_preview_perfil" src="{{ is_array($negocio['foto_perfil']) ? $negocio['foto_perfil']['url_imagen'] : (config('services.api.url') . '/' . ltrim($negocio['foto_perfil'], '/')) }}" class="w-full h-full object-cover">
+                    @php
+                        // Priorizar imagen desde array 'imagenes', luego campo directo
+                        $sidePerfil = $buildUrl($fotoPerfil);
+                        if (!$sidePerfil) {
+                            if (isset($negocio['foto_perfil']) && is_array($negocio['foto_perfil']) && isset($negocio['foto_perfil']['url_imagen'])) {
+                                $sidePerfil = $buildUrl($negocio['foto_perfil']['url_imagen']);
+                            } elseif (isset($negocio['foto_perfil']) && is_string($negocio['foto_perfil']) && !empty($negocio['foto_perfil'])) {
+                                $sidePerfil = $buildUrl($negocio['foto_perfil']);
+                            }
+                        }
+                    @endphp
+                    @if($sidePerfil)
+                        <img id="side_preview_perfil" src="{{ $sidePerfil }}" class="w-full h-full object-cover">
                     @else
                         <img id="side_preview_perfil" src="" class="w-full h-full object-cover hidden">
                         <i id="side_placeholder_perfil" class="fas fa-store text-4xl text-[#9CA3AF]"></i>
@@ -324,6 +389,11 @@
 </section>
 
 <script>
+function getCsrfToken() {
+    return document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ||
+           document.querySelector('input[name="_token"]')?.value;
+}
+
 function mostrarFormularioRegistro() {
     const mensajeBienvenida = document.querySelector('#tab-info > .flex');
     if (mensajeBienvenida) mensajeBienvenida.classList.add('hidden');
@@ -347,7 +417,8 @@ if (registroForm) {
                 method: 'POST',
                 headers: {
                     'Authorization': 'Bearer ' + token,
-                    'Accept': 'application/json'
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': getCsrfToken()
                 },
                 body: formData
             });
@@ -420,7 +491,7 @@ if (registroForm) {
             const formData = new FormData(this);
             const action = this.getAttribute('action');
             const redirectUrl = this.getAttribute('data-redirect');
-            const csrfToken = document.querySelector('input[name="_token"]')?.value;
+            const csrfToken = getCsrfToken();
             const authToken = '{{ session("auth_token") }}';
 
             // Limpiar campos de archivo vacíos para no enviar límites multipart vacíos
@@ -431,9 +502,8 @@ if (registroForm) {
                 }
             });
 
-            // Eliminar campo 'estado' si existe, ya que colisiona con el estado geográfico
-            formData.delete('estado');
-
+         
+          
             // === DEBUG ===
             console.log('=== DEBUG ENVÍO NEGOCIO ===');
             console.log('URL:', action);

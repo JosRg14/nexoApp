@@ -21,15 +21,54 @@ class NegocioController extends Controller
             $response = $this->httpClient->getPublic('/api/negocios/' . $id);
             $negocio = $response['data'] ?? [];
             
-            // Completar URLs de imágenes del negocio
-            $apiBaseUrl = rtrim(config('services.api.url'), '/');
-            if (isset($negocio['foto_perfil']) && $negocio['foto_perfil']) {
-                $negocio['foto_perfil'] = $apiBaseUrl . $negocio['foto_perfil'];
-            }
-            if (isset($negocio['banner']) && $negocio['banner']) {
-                $negocio['banner'] = $apiBaseUrl . $negocio['banner'];
-            }
+            \Log::info('NegocioController API Response:', [
+                'id' => $id,
+                'tiene_imagenes' => isset($negocio['imagenes']),
+                'imagenes' => $negocio['imagenes'] ?? [],
+                'foto_perfil' => $negocio['foto_perfil'] ?? null,
+                'banner' => $negocio['banner'] ?? null
+            ]);
             
+            \Log::info('=== ESTRUCTURA COMPLETA DEL NEGOCIO (SHOW) ===', [
+                'negocio_completo' => $negocio ?? 'No hay datos'
+            ]);
+            
+            $apiBaseUrl = rtrim(config('services.api.url'), '/');
+            // Procesar foto_perfil
+            $fotoUrl = null;
+            if (isset($negocio['imagenes']) && is_array($negocio['imagenes'])) {
+                foreach ($negocio['imagenes'] as $img) {
+                    if (isset($img['tipo']) && $img['tipo'] === 'perfil_negocio') {
+                        $fotoUrl = $img['url_imagen'] ?? null;
+                        break;
+                    }
+                }
+            }
+            if (!$fotoUrl && isset($negocio['foto_perfil']) && $negocio['foto_perfil']) {
+                $fotoUrl = $negocio['foto_perfil'];
+            }
+            if ($fotoUrl && !\Illuminate\Support\Str::startsWith($fotoUrl, 'http')) {
+                $fotoUrl = $apiBaseUrl . (\Illuminate\Support\Str::startsWith($fotoUrl, '/') ? '' : '/') . $fotoUrl;
+            }
+            $negocio['foto_perfil'] = $fotoUrl;
+
+            // Misma lógica para banner
+            $bannerUrl = null;
+            if (isset($negocio['imagenes']) && is_array($negocio['imagenes'])) {
+                foreach ($negocio['imagenes'] as $img) {
+                    if (isset($img['tipo']) && $img['tipo'] === 'banner_negocio') {
+                        $bannerUrl = $img['url_imagen'] ?? null;
+                        break;
+                    }
+                }
+            }
+            if (!$bannerUrl && isset($negocio['banner']) && $negocio['banner']) {
+                $bannerUrl = $negocio['banner'];
+            }
+            if ($bannerUrl && !\Illuminate\Support\Str::startsWith($bannerUrl, 'http')) {
+                $bannerUrl = $apiBaseUrl . (\Illuminate\Support\Str::startsWith($bannerUrl, '/') ? '' : '/') . $bannerUrl;
+            }
+            $negocio['banner'] = $bannerUrl;
             // Obtener horarios del negocio
             $horariosResponse = $this->httpClient->getPublic('/api/negocios/' . $id . '/horarios');
             $horarios = [];
@@ -73,7 +112,10 @@ class NegocioController extends Controller
                 // Si no hay reseñas, continuar con array vacío
             }
             
-            return view('negocio.show', compact('negocio', 'servicios', 'empleados', 'resenas', 'horariosFormateados'));
+            // Obtener evidencias
+            $evidencias = $this->httpClient->getPublic("/api/negocios/{$id}/evidencias")['data'] ?? [];
+            
+            return view('negocio.show', compact('negocio', 'servicios', 'empleados', 'resenas', 'horariosFormateados', 'evidencias'));
             
         } catch (\Exception $e) {
             \Log::error('Error en NegocioController: ' . $e->getMessage());
@@ -146,5 +188,11 @@ class NegocioController extends Controller
         }
         
         return $bloques;
+    }
+
+    public function obtenerEvidenciasPublicas($id)
+    {
+        $response = $this->httpClient->getPublic("/api/negocios/{$id}/evidencias");
+        return response()->json($response);
     }
 }

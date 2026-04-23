@@ -48,8 +48,18 @@ class BookingController extends Controller
         } catch (\Exception $e) {
             Log::error('Error al obtener empleados: ' . $e->getMessage());
         }
+
+        // Obtener ID de cliente desde la sesión — mismo patrón que app.blade.php línea 63:
+        // session('usuario.cliente.id_cliente') ?? session('usuario.id')
+        $clienteId = session('usuario.cliente.id_cliente') ?? session('usuario.id');
+        // Solo exponerlo si el rol es cliente (no admin, no superusuario)
+        if (session('rol') !== 'cliente') {
+            $clienteId = null;
+        }
+
+        Log::info('Booking@create - clienteId resuelto: ' . ($clienteId ?? 'null') . ' | rol: ' . (session('rol') ?? 'sin rol'));
         
-        return view('booking.create', compact('servicios', 'empleados', 'negocioId'));
+        return view('booking.create', compact('servicios', 'empleados', 'negocioId', 'clienteId'));
     }
     
     /**
@@ -83,14 +93,26 @@ class BookingController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'servicio_id' => 'required|integer',
-            'empleado_id' => 'required|integer',
-            'fecha' => 'required|date',
-            'hora_inicio' => 'required|string',
-            'negocio_id' => 'required|integer'
+            'servicio_id'          => 'required|integer',
+            'empleado_id'          => 'required|integer',
+            'fecha'                => 'required|date',
+            'hora_inicio'          => 'required|string',
+            'negocio_id'           => 'required|integer',
+            'id_promocion_cliente' => 'nullable|integer',
         ]);
         
         try {
+            // Preparar el payload filtrando valores null para evitar problemas con la API
+            $payload = array_filter($validated, fn($value) => !is_null($value));
+
+            // Ajustar nombre de campo id_promocion_cliente -> promocion_cliente_id para la API
+            if (isset($payload['id_promocion_cliente'])) {
+                $payload['promocion_cliente_id'] = $payload['id_promocion_cliente'];
+                unset($payload['id_promocion_cliente']);
+            }
+
+            Log::info('BookingController@store - payload enviado a API:', $payload);
+            
             // Verificar si el cliente tiene citas activas primero
             $checkCitas = $this->httpClient->get('/api/clientes/me/citas-activas');
             if (isset($checkCitas['data']['tiene_citas_activas']) && $checkCitas['data']['tiene_citas_activas']) {
@@ -101,7 +123,7 @@ class BookingController extends Controller
             }
 
             // Proceder con la creación si no tiene citas activas
-            $response = $this->httpClient->post('/api/citas', $validated);
+            $response = $this->httpClient->post('/api/citas', $payload);
             return response()->json($response, 201);
         } catch (\Exception $e) {
             Log::error('Error al crear cita: ' . $e->getMessage());
@@ -123,15 +145,19 @@ class BookingController extends Controller
     public function misCitas()
     {
         try {
-            $hasToken = session()->has('auth_token');
-            Log::info('BookingController@misCitas - Verificando token antes de petición', [
-                'has_token' => $hasToken, 
-                'token_length' => $hasToken ? strlen(session('auth_token')) : 0
-            ]);
-
             $response = $this->httpClient->get('/api/citas/miscitas');
             $citas = $response['data'] ?? [];
         } catch (\Exception $e) {
+            // Si el token no es válido o expiró, redirigir al login
+            if ($e->getCode() === 401 || $e->getMessage() === 'UNAUTHORIZED_API_TOKEN') {
+                Log::warning('BookingController@misCitas: Sesión de API expirada. Redirigiendo a login.');
+                
+                // Limpiar sesión local
+                session()->flush();
+                
+                return redirect()->route('login')->with('error', 'Tu sesión ha expirado, por favor inicia sesión nuevamente');
+            }
+
             Log::error('Error al obtener citas en misCitas: ' . $e->getMessage());
             $citas = [];
         }
@@ -197,6 +223,57 @@ class BookingController extends Controller
                 'success' => false, 
                 'message' => $e->getMessage() ?: 'Error al cancelar la cita'
             ], $statusCode);
+        }
+    }
+
+    /**
+     * Crear reseña
+     */
+    public function crearResena(Request $request, $citaId)
+    {
+        try {
+            $response = $this->httpClient->post("/api/citas/{$citaId}/resena", [
+                'calificacion' => $request->calificacion,
+                'comentario' => $request->comentario
+            ]);
+            return response()->json($response);
+        } catch (\Exception $e) {
+            Log::error('Error al crear reseña: ' . $e->getMessage());
+            $statusCode = $e->getCode() && is_numeric($e->getCode()) && $e->getCode() >= 400 && $e->getCode() < 600 ? $e->getCode() : 500;
+            return response()->json(['success' => false, 'message' => 'Error al crear la reseña: ' . $e->getMessage()], $statusCode);
+        }
+    }
+
+    /**
+     * Editar reseña
+     */
+    public function editarResena(Request $request, $resenaId)
+    {
+        try {
+            $response = $this->httpClient->put("/api/resenas/cita/{$resenaId}", [
+                'calificacion' => $request->calificacion,
+                'comentario' => $request->comentario
+            ]);
+            return response()->json($response);
+        } catch (\Exception $e) {
+            Log::error('Error al editar reseña: ' . $e->getMessage());
+            $statusCode = $e->getCode() && is_numeric($e->getCode()) && $e->getCode() >= 400 && $e->getCode() < 600 ? $e->getCode() : 500;
+            return response()->json(['success' => false, 'message' => 'Error al editar la reseña: ' . $e->getMessage()], $statusCode);
+        }
+    }
+
+    /**
+     * Eliminar reseña
+     */
+    public function eliminarResena($resenaId)
+    {
+        try {
+            $response = $this->httpClient->delete("/api/resenas/cita/{$resenaId}");
+            return response()->json($response);
+        } catch (\Exception $e) {
+            Log::error('Error al eliminar reseña: ' . $e->getMessage());
+            $statusCode = $e->getCode() && is_numeric($e->getCode()) && $e->getCode() >= 400 && $e->getCode() < 600 ? $e->getCode() : 500;
+            return response()->json(['success' => false, 'message' => 'Error al eliminar la reseña: ' . $e->getMessage()], $statusCode);
         }
     }
 }

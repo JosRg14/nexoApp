@@ -85,7 +85,10 @@ class ProxyController extends Controller
 
                 // Construir request base
                 $pendingRequest = Http::withHeaders($headers)
-                    ->withOptions(['verify' => false])
+                    ->withOptions([
+                        'verify' => false,
+                        'http_errors' => false
+                    ])
                     ->timeout(30);
 
                 // Adjuntar cada archivo con fopen (evita cargar en memoria)
@@ -133,7 +136,10 @@ class ProxyController extends Controller
                 $data = $request->except(['_token', '_method']);
 
                 $pendingRequest = Http::withHeaders($headers)
-                    ->withOptions(['verify' => false])
+                    ->withOptions([
+                        'verify' => false,
+                        'http_errors' => false
+                    ])
                     ->timeout(15)
                     ->retry(2, 500);
 
@@ -144,26 +150,45 @@ class ProxyController extends Controller
                 }
             }
 
-            if ($response->status() >= 400) {
-                Log::warning('Proxy: respuesta de error', [
-                    'url'      => $url,
-                    'method'   => strtoupper($method),
-                    'status'   => $response->status(),
-                    'response' => $response->body(),
-                ]);
+
+
+            $body = $response->body();
+            $statusCode = $response->status();
+            $contentType = $response->header('Content-Type');
+
+            // 1. Verificar si la respuesta es JSON (más inclusivo)
+            if ($contentType && strpos($contentType, 'application/json') !== false) {
+                return response($body, $statusCode)->header('Content-Type', 'application/json');
             }
 
-            // Respuesta transparente (JSON, imágenes, binarios, etc.)
-            return response($response->body(), $response->status(), [
-                'Content-Type' => $response->header('Content-Type') ?? 'application/json',
+            // 2. Permitir recursos en storage si la petición fue exitosa (imágenes, etc.)
+            if (str_starts_with($path, 'storage/') && $response->successful()) {
+                return response($body, $statusCode)->header('Content-Type', $contentType ?? 'application/octet-stream');
+            }
+
+            // 3. Si no es JSON (o es un error de storage), devolver error estructurado
+            Log::warning('Proxy: respuesta no JSON', [
+                'url'          => $url,
+                'status'       => $statusCode,
+                'content_type' => $contentType
             ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Error en el servidor externo',
+                'status'  => $statusCode
+            ], $statusCode);
 
         } catch (\Exception $e) {
             Log::error('Proxy: fallo de conexión', [
                 'url'   => $url,
                 'error' => $e->getMessage(),
             ]);
-            return response()->json(['message' => 'Error interno conectando con el servicio.'], 500);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Error de conexión con el servidor: ' . $e->getMessage()
+            ], 503);
         }
     }
 }
