@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\ServiceController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BusinessProfileController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProfileController;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Route;
@@ -54,7 +55,6 @@ Route::middleware(['auth.session', 'inject.api.token'])->group(function () {
 
 Route::middleware(['auth.session', 'inject.api.token', 'check.business'])->group(function () {
 
-   
     // 2. Panel de Admin (Solo entran si el middleware CheckBusinessSuscripcion los deja pasar)
     Route::middleware(['role:admin'])
         ->prefix('business')
@@ -62,23 +62,45 @@ Route::middleware(['auth.session', 'inject.api.token', 'check.business'])->group
         ->group(function () {
             Route::get('/profile', [BusinessProfileController::class, 'index'])->name('profile');
             Route::post('/update', [BusinessProfileController::class, 'update'])->name('update');
-            
+
             // Servicios
-        Route::post('/services', [ServiceController::class, 'store'])->name('services.store');
-        Route::put('/services/{id}', [ServiceController::class, 'update'])->name('services.update');
-        Route::delete('/services/{id}', [ServiceController::class, 'destroy'])->name('services.destroy');
+            Route::post('/services', [ServiceController::class, 'store'])->name('services.store');
+            Route::put('/services/{id}', [ServiceController::class, 'update'])->name('services.update');
+            Route::delete('/services/{id}', [ServiceController::class, 'destroy'])->name('services.destroy');
 
-        // Empleados
-        Route::post('/employees', [EmployeeController::class, 'store'])->name('employees.store');
-        Route::put('/employees/{id}', [EmployeeController::class, 'update'])->name('employees.update');
-        Route::delete('/employees/{id}', [EmployeeController::class, 'destroy'])->name('employees.destroy');
+            // Empleados
+            Route::post('/employees', [EmployeeController::class, 'store'])->name('employees.store');
+            Route::put('/employees/{id}', [EmployeeController::class, 'update'])->name('employees.update');
+            Route::delete('/employees/{id}', [EmployeeController::class, 'destroy'])->name('employees.destroy');
 
-        // Excepciones de horario (proxy a API)
-        Route::get('/exceptions/list', [BusinessProfileController::class, 'listExceptions'])->name('exceptions.list');
-        Route::post('/exceptions', [BusinessProfileController::class, 'storeException'])->name('exceptions.store');
-        Route::put('/exceptions/{id}', [BusinessProfileController::class, 'updateException'])->name('exceptions.update');
-        Route::delete('/exceptions/{id}', [BusinessProfileController::class, 'destroyException'])->name('exceptions.destroy');
-    });
+            // Excepciones de horario (proxy a API)
+            Route::get('/exceptions/list', [BusinessProfileController::class, 'listExceptions'])->name('exceptions.list');
+            Route::post('/exceptions', [BusinessProfileController::class, 'storeException'])->name('exceptions.store');
+            Route::put('/exceptions/{id}', [BusinessProfileController::class, 'updateException'])->name('exceptions.update');
+            Route::delete('/exceptions/{id}', [BusinessProfileController::class, 'destroyException'])->name('exceptions.destroy');
+        });
+});
+
+/*
+|--------------------------------------------------------------------------
+| MÓDULO DE PAGOS — Stripe + Manual
+|--------------------------------------------------------------------------
+*/
+
+// Rutas de pago para admin autenticado (con negocio activo)
+Route::middleware(['auth.session', 'inject.api.token', 'role:admin'])->group(function () {
+    Route::get('/planes',              [PaymentController::class, 'planes'])->name('payment.plans');
+    Route::post('/checkout',           [PaymentController::class, 'checkout'])->name('payment.checkout');
+    Route::get('/payment/success',     [PaymentController::class, 'success'])->name('payment.success');
+    Route::get('/payment/cancel',      [PaymentController::class, 'cancel'])->name('payment.cancel');
+    Route::get('/mi-suscripcion',      [PaymentController::class, 'miSuscripcion'])->name('payment.mi-suscripcion');
+    Route::post('/suscripcion/cancelar',[PaymentController::class, 'cancelarSuscripcion'])->name('payment.cancelar');
+});
+
+// Checkout dual desde el flujo de registro (antes de tener negocio)
+Route::middleware(['auth.session'])->group(function () {
+    Route::post('/registro/checkout', [RegistrarController::class, 'checkout'])
+        ->name('payment.checkout.from.register.process');
 });
 
 /*
