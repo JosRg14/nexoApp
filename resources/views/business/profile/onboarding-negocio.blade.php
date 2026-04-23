@@ -100,8 +100,9 @@
                         @forelse($planes as $plan)
                         @php $stripeId = $plan['stripe_price_id'] ?? ''; @endphp
                         <label class="relative cursor-pointer group">
-                            <input type="radio" name="plan_ui" value="{{ $stripeId }}"
+                            <input type="radio" name="plan_id" value="{{ $plan['id'] ?? '' }}"
                                 data-price-id="{{ $stripeId }}"
+                                data-stripe-price-id="{{ $plan['stripe_price_id'] ?? '' }}"
                                 class="plan-radio peer sr-only" {{ $loop->first ? 'checked' : '' }}>
                             <div class="p-4 bg-[#1a1a1a] border border-[#374151]/50 transition-all duration-300 peer-checked:border-white peer-checked:bg-[#222] group-hover:border-gray-500">
                                 <div class="flex justify-between items-center mb-1">
