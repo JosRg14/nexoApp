@@ -502,9 +502,8 @@ if (registroForm) {
                 }
             });
 
-            // Eliminar campo 'estado' si existe, ya que colisiona con el estado geográfico
-            formData.delete('estado');
-
+         
+          
             // === DEBUG ===
             console.log('=== DEBUG ENVÍO NEGOCIO ===');
             console.log('URL:', action);
