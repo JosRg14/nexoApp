@@ -57,7 +57,7 @@
             </div>
 
             {{-- CTA --}}
-            <a href="/business/profile"
+            <a href="{{ route('business.profile') }}"
                id="btn-go-to-panel"
                class="block w-full py-4 bg-gradient-to-r from-[#25B5DA] to-[#1c8fb0] text-black font-black text-sm uppercase tracking-widest rounded-xl hover:shadow-[0_0_30px_rgba(37,181,218,0.35)] transition-all duration-300 mb-3">
                 <i class="fas fa-arrow-right mr-2"></i>

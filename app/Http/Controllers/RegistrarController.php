@@ -54,12 +54,30 @@ class RegistrarController extends Controller
         $token = session('auth_token');
 
         try {
-            $response = \Illuminate\Support\Facades\Http::withToken($token)
+            // Verificar si el usuario ya tiene un negocio activo
+            $suscripcionResponse = \Illuminate\Support\Facades\Http::withToken($token)
                 ->withoutVerifying()
-                ->get($this->baseUrl.'/planes');
+                ->get($this->baseUrl . '/mi-suscripcion');
 
-            // IMPORTANTE: Verifica que la API devuelva 'data'
-            $planes = $response->json()['data'] ?? [];
+            $suscripcionData = $suscripcionResponse->json()['data'] ?? null;
+
+            if ($suscripcionData && isset($suscripcionData['estado'])) {
+                if ($suscripcionData['estado'] === 'activo') {
+                    return redirect()->route('business.profile')
+                        ->with('info', 'Ya tienes un negocio activo registrado.');
+                }
+
+                if (in_array($suscripcionData['estado'], ['pendiente_pago', 'en_revision'])) {
+                    return redirect()->route('registro.negocio.espera');
+                }
+            }
+
+            // Si no tiene negocio, mostrar el formulario con los planes disponibles
+            $planesResponse = \Illuminate\Support\Facades\Http::withToken($token)
+                ->withoutVerifying()
+                ->get($this->baseUrl . '/planes');
+
+            $planes = $planesResponse->json()['data'] ?? [];
 
             return view('business.profile.onboarding-negocio', compact('planes'));
         } catch (\Exception $e) {
