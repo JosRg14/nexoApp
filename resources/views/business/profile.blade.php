@@ -196,8 +196,17 @@ class="w-full text-left px-4 py-2 text-xs text-red-400 hover:text-red-300 hover:
                     btn.classList.remove('bg-[#F3F4F6]', 'text-[#1a1a1a]');
                     btn.classList.add('text-[#9CA3AF]', 'hover:text-white');
                 }
-            });
         }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            if(window.location.hash) {
+                const tabId = window.location.hash.substring(1);
+                const tabs = ['info', 'services', 'schedule', 'finances', 'personnel', 'clientes-promociones'];
+                if(tabs.includes(tabId)) {
+                    switchTab(tabId);
+                }
+            }
+        });
 
         function openEditModal(id, nombre, descripcion, precio, duracion, imagen) {
 

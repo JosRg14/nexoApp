@@ -46,6 +46,7 @@ Route::get('/negocio/{id}', [NegocioController::class, 'show'])->name('negocio.s
 | RUTAS PROTEGIDAS POR ESTADO DE NEGOCIO
 |--------------------------------------------------------------------------
 */
+
 Route::middleware(['auth.session', 'inject.api.token'])->group(function () {
  // 1. Rutas de transición (Registro y Espera)
     Route::get('/completar-negocio', [RegistrarController::class, 'showRegistroNegocio'])->name('registro.negocio.paso2');
