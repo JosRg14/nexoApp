@@ -174,12 +174,15 @@
                     </button>
                 </div>
                 
-                <div class="flex items-center gap-2 bg-[#262626] border border-[#374151] rounded px-3 py-1 flex-1 sm:flex-none">
-                    <input type="date" id="comision_fecha_inicio" class="bg-transparent text-[#9CA3AF] text-xs focus:outline-none focus:text-white appearance-none h-6">
-                    <span class="text-[#374151]">-</span>
-                    <input type="date" id="comision_fecha_fin" class="bg-transparent text-[#9CA3AF] text-xs focus:outline-none focus:text-white appearance-none h-6">
-                    <button onclick="loadCommissions({ customDates: true })" class="ml-2 text-[#9CA3AF] hover:text-[#25B5DA] transition-colors" title="Aplicar Rango">
+                 <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 bg-transparent sm:bg-[#262626] sm:border sm:border-[#374151] rounded sm:px-3 sm:py-1 w-full sm:w-auto">
+                    <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-2 bg-[#262626] border border-[#374151] sm:border-0 p-2 sm:p-0 rounded">
+                        <input type="date" id="comision_fecha_inicio" class="w-full sm:w-auto bg-transparent text-[#9CA3AF] text-xs focus:outline-none focus:text-white appearance-none h-8 sm:h-6">
+                        <span class="text-[#374151] hidden sm:block">-</span>
+                        <input type="date" id="comision_fecha_fin" class="w-full sm:w-auto bg-transparent text-[#9CA3AF] text-xs focus:outline-none focus:text-white appearance-none h-8 sm:h-6 border-t border-[#374151]/50 sm:border-t-0 pt-2 sm:pt-0">
+                    </div>
+                    <button onclick="loadCommissions({ customDates: true })" class="w-full sm:w-auto sm:ml-2 bg-[#262626] sm:bg-transparent border border-[#374151] sm:border-0 p-2 sm:p-0 text-[#9CA3AF] hover:text-[#25B5DA] transition-colors rounded flex justify-center items-center" title="Aplicar Rango">
                         <i class="fas fa-search" id="commissions-sync-icon"></i>
+                        <span class="sm:hidden text-xs uppercase tracking-widest font-bold ml-2">Buscar</span>
                     </button>
                 </div>
             </div>
