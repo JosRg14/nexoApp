@@ -171,6 +171,7 @@ class="w-full text-left px-4 py-2 text-xs text-red-400 hover:text-red-300 hover:
 </div>
 
     <script>
+        
         function switchTab(tab) {
             const tabs = ['info', 'services', 'schedule', 'finances', 'personnel', 'clientes-promociones'];
             
@@ -180,23 +181,20 @@ class="w-full text-left px-4 py-2 text-xs text-red-400 hover:text-red-300 hover:
                 
                 if (t === tab) {
                     section.classList.remove('hidden');
-                    // Active Styles
                     btn.classList.add('bg-[#F3F4F6]', 'text-[#1a1a1a]');
                     btn.classList.remove('text-[#9CA3AF]', 'hover:text-white');
                     
-                    // Resize chart if finances tab is opened
                     if (t === 'finances' && window.myChart) {
                         setTimeout(() => {
-                           window.myChart.resize();
+                            window.myChart.resize();
                         }, 100);
                     }
                 } else {
                     section.classList.add('hidden');
-                    // Inactive Styles
                     btn.classList.remove('bg-[#F3F4F6]', 'text-[#1a1a1a]');
                     btn.classList.add('text-[#9CA3AF]', 'hover:text-white');
                 }
-            };
+            });
         }
 
          document.addEventListener('DOMContentLoaded', function() {
