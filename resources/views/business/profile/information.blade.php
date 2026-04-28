@@ -290,6 +290,34 @@
                         </div>
                     </div>
 
+                    <!-- CAMPOS: PREFERENCIAS DE AGENDA -->
+                    <div class="border-t border-[#374151] pt-6 mt-8">
+                        <h3 class="text-xs uppercase tracking-wider text-[#9CA3AF] mb-4">Preferencias de Agenda</h3>
+                        
+                        <div class="group/input relative">
+                            <label for="buffer_minutos" class="block text-xs text-[#9CA3AF] mb-2">
+                                Tiempo entre citas
+                            </label>
+                            <div class="relative">
+                                <select name="buffer_minutos" id="buffer_minutos" 
+                                        class="w-full bg-[#1a1a1a] border border-[#374151] rounded-lg px-4 py-3 text-white focus:border-[#25B5DA] focus:outline-none transition-colors appearance-none cursor-pointer">
+                                    <option value="0" {{ ($negocio['buffer_minutos'] ?? 0) == 0 ? 'selected' : '' }}>Sin pausa</option>
+                                    <option value="5" {{ ($negocio['buffer_minutos'] ?? 0) == 5 ? 'selected' : '' }}>5 minutos</option>
+                                    <option value="10" {{ ($negocio['buffer_minutos'] ?? 0) == 10 ? 'selected' : '' }}>10 minutos</option>
+                                    <option value="15" {{ ($negocio['buffer_minutos'] ?? 0) == 15 ? 'selected' : '' }}>15 minutos</option>
+                                    <option value="20" {{ ($negocio['buffer_minutos'] ?? 0) == 20 ? 'selected' : '' }}>20 minutos</option>
+                                    <option value="30" {{ ($negocio['buffer_minutos'] ?? 0) == 30 ? 'selected' : '' }}>30 minutos</option>
+                                </select>
+                                <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-[#9CA3AF]">
+                                    <i class="fa-solid fa-chevron-down text-xs"></i>
+                                </div>
+                            </div>
+                            <p class="text-[10px] text-[#6B7280] mt-1">
+                                <i class="fas fa-info-circle mr-1"></i>Tiempo extra para limpieza o preparación entre cada cita.
+                            </p>
+                        </div>
+                    </div>
+
                     <!-- CAMPOS: IMÁGENES -->
                     <div class="border-t border-[#374151] pt-6 mt-8">
                         <h3 class="text-xs uppercase tracking-wider text-[#9CA3AF] mb-6">Imágenes del Negocio</h3>
