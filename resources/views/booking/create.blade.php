@@ -27,7 +27,7 @@
             <p>No hay servicios disponibles para este negocio.</p>
         </div>
         @else
-        <form id="cita-form" class="space-y-8">
+        <form id="cita-form" class="space-y-8 pb-24">
             @csrf
             <input type="hidden" name="negocio_id" id="negocio_id" value="{{ $negocioId }}">
             <input type="hidden" name="servicio_id" id="servicio_id">
@@ -91,99 +91,115 @@
                 @endif
             </div>
 
-            <!-- Fecha y Hora -->
-            <div class="bg-[#262626] border border-[#374151] rounded-sm p-6">
-                <h3 class="text-sm font-bold uppercase tracking-widest text-white mb-6 flex items-center gap-2">
+            <!-- Fecha y Hora — Carrusel de días + Timeline -->
+            <div class="bg-[#262626] border border-[#374151] rounded-sm p-6 space-y-6">
+                <h3 class="text-sm font-bold uppercase tracking-widest text-white flex items-center gap-2">
                     <i class="fas fa-calendar-alt text-[#25B5DA]"></i>
                     Selecciona fecha y hora
                 </h3>
 
-                <!-- Hidden inputs para el formulario -->
                 <input type="hidden" id="fecha" name="fecha">
-                <input type="hidden" id="hora" name="hora_inicio">
+                <input type="hidden" id="hora"  name="hora_inicio">
 
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- ── CABECERA: mes/año + navegación ── -->
+                <div class="flex items-center justify-between gap-2">
+                    <!-- Mes anterior (salto de mes) -->
+                    <button type="button" id="btn-prev-month"
+                            class="w-8 h-8 shrink-0 flex items-center justify-center rounded-full bg-[#1a1a1a] border border-[#374151] text-[#9CA3AF] hover:text-white hover:border-[#25B5DA] transition-all"
+                            title="Mes anterior">
+                        <i class="fas fa-angle-double-left text-xs"></i>
+                    </button>
+                    <!-- 7 días atrás -->
+                    <button type="button" id="btn-prev-week"
+                            class="w-8 h-8 shrink-0 flex items-center justify-center rounded-full bg-[#1a1a1a] border border-[#374151] text-[#9CA3AF] hover:text-white hover:border-[#25B5DA] transition-all"
+                            title="Semana anterior">
+                        <i class="fas fa-chevron-left text-xs"></i>
+                    </button>
 
-                    <!-- Calendario visual -->
-                    <div>
-                        <p class="text-xs text-[#9CA3AF] uppercase tracking-widest mb-3">Fecha</p>
-                        <div class="bg-[#1a1a1a] border border-[#374151] rounded-lg p-4 select-none">
-                            <!-- Navegación de mes -->
-                            <div class="flex justify-between items-center mb-4">
-                                <button type="button" id="prev-month"
-                                        class="w-8 h-8 flex items-center justify-center rounded-full text-[#9CA3AF] hover:text-white hover:bg-[#374151] transition-all">
+                    <!-- Dropdown mes/año -->
+                    <div class="relative flex-1 flex justify-center">
+                        <button type="button" id="btn-month-picker"
+                                class="flex items-center gap-2 px-4 py-1.5 rounded-lg bg-[#1a1a1a] border border-[#374151] text-white text-sm font-bold uppercase tracking-widest hover:border-[#25B5DA] transition-all">
+                            <span id="carousel-month-label">—</span>
+                            <i class="fas fa-chevron-down text-xs text-[#9CA3AF]"></i>
+                        </button>
+
+                        <!-- Picker panel -->
+                        <div id="month-picker-panel"
+                             class="hidden absolute top-10 z-50 bg-[#1a1a1a] border border-[#374151] rounded-xl p-4 w-72 shadow-2xl">
+                            <!-- Selector de año -->
+                            <div class="flex items-center justify-between mb-4">
+                                <button type="button" id="picker-prev-year"
+                                        class="w-7 h-7 flex items-center justify-center rounded-full text-[#9CA3AF] hover:text-white hover:bg-[#374151] transition-all">
                                     <i class="fas fa-chevron-left text-xs"></i>
                                 </button>
-                                <h4 id="current-month" class="text-white font-bold text-sm uppercase tracking-widest"></h4>
-                                <button type="button" id="next-month"
-                                        class="w-8 h-8 flex items-center justify-center rounded-full text-[#9CA3AF] hover:text-white hover:bg-[#374151] transition-all">
+                                <span id="picker-year" class="text-white font-bold text-sm"></span>
+                                <button type="button" id="picker-next-year"
+                                        class="w-7 h-7 flex items-center justify-center rounded-full text-[#9CA3AF] hover:text-white hover:bg-[#374151] transition-all">
                                     <i class="fas fa-chevron-right text-xs"></i>
                                 </button>
                             </div>
-                            <!-- Cabecera días de la semana -->
-                            <div class="grid grid-cols-7 gap-1 text-center mb-2">
-                                <div class="text-[10px] text-[#9CA3AF] uppercase tracking-wider py-1">Lun</div>
-                                <div class="text-[10px] text-[#9CA3AF] uppercase tracking-wider py-1">Mar</div>
-                                <div class="text-[10px] text-[#9CA3AF] uppercase tracking-wider py-1">Mié</div>
-                                <div class="text-[10px] text-[#9CA3AF] uppercase tracking-wider py-1">Jue</div>
-                                <div class="text-[10px] text-[#9CA3AF] uppercase tracking-wider py-1">Vie</div>
-                                <div class="text-[10px] text-[#9CA3AF] uppercase tracking-wider py-1">Sáb</div>
-                                <div class="text-[10px] text-[#9CA3AF] uppercase tracking-wider py-1">Dom</div>
-                            </div>
-                            <!-- Cuadrícula de días -->
-                            <div id="calendar-days" class="grid grid-cols-7 gap-1"></div>
+                            <!-- Grid de meses -->
+                            <div id="picker-months-grid" class="grid grid-cols-4 gap-2"></div>
                         </div>
                     </div>
 
-                    <!-- Selector de horarios tipo pills por franja horaria -->
-                    <div>
-                        <p class="text-xs text-[#9CA3AF] uppercase tracking-widest mb-3">Horario disponible</p>
-                        <div id="horarios-container" class="bg-[#1a1a1a] border border-[#374151] rounded-lg p-4 min-h-[220px] max-h-[340px] overflow-y-auto flex flex-col justify-start">
-                            <!-- Estado: placeholder -->
-                            <div id="horarios-placeholder" class="flex flex-col items-center justify-center h-full py-8 text-center">
-                                <i class="far fa-clock text-[#374151] text-3xl mb-3 block"></i>
-                                <p class="text-[#9CA3AF] text-xs">Selecciona un servicio, empleado y fecha para ver los horarios disponibles</p>
+                    <!-- 7 días adelante -->
+                    <button type="button" id="btn-next-week"
+                            class="w-8 h-8 shrink-0 flex items-center justify-center rounded-full bg-[#1a1a1a] border border-[#374151] text-[#9CA3AF] hover:text-white hover:border-[#25B5DA] transition-all"
+                            title="Semana siguiente">
+                        <i class="fas fa-chevron-right text-xs"></i>
+                    </button>
+                    <!-- Mes siguiente (salto de mes) -->
+                    <button type="button" id="btn-next-month"
+                            class="w-8 h-8 shrink-0 flex items-center justify-center rounded-full bg-[#1a1a1a] border border-[#374151] text-[#9CA3AF] hover:text-white hover:border-[#25B5DA] transition-all"
+                            title="Mes siguiente">
+                        <i class="fas fa-angle-double-right text-xs"></i>
+                    </button>
+                </div>
+
+                <!-- ── CARRUSEL DE DÍAS ── -->
+                <div id="days-carousel" class="flex gap-2 overflow-x-auto pb-1" style="scrollbar-width:none;-ms-overflow-style:none;">
+                    <!-- generado por JS -->
+                </div>
+
+                <!-- ── SELECTOR DE HORARIOS ── -->
+                <div>
+                    <p class="text-xs text-[#9CA3AF] uppercase tracking-widest mb-3">Horario disponible</p>
+                    <div id="horarios-container" class="bg-[#1a1a1a] border border-[#374151] rounded-lg p-4 min-h-[180px] max-h-[320px] overflow-y-auto">
+                        <div id="horarios-placeholder" class="flex flex-col items-center justify-center py-8 text-center">
+                            <i class="far fa-clock text-[#374151] text-3xl mb-3 block"></i>
+                            <p class="text-[#9CA3AF] text-xs">Selecciona servicio, empleado y fecha para ver los horarios</p>
+                        </div>
+                        <div id="horarios-loading" class="hidden flex flex-col items-center justify-center py-8 text-center">
+                            <div class="inline-block w-6 h-6 border-2 border-[#25B5DA] border-t-transparent rounded-full animate-spin mb-3"></div>
+                            <p class="text-[#9CA3AF] text-xs">Cargando horarios...</p>
+                        </div>
+                        <div id="horarios-empty" class="hidden flex flex-col items-center justify-center py-8 text-center">
+                            <i class="fas fa-calendar-times text-[#374151] text-3xl mb-3 block"></i>
+                            <p class="text-[#9CA3AF] text-xs">No hay horarios disponibles para este día</p>
+                        </div>
+                        <div id="horarios-grid" class="hidden space-y-5">
+                            <div id="franja-manana" class="hidden">
+                                <p class="text-[10px] uppercase tracking-widest text-[#9CA3AF] mb-2 flex items-center gap-1">
+                                    <span>&#127749;</span> Mañana <span class="text-[#6B7280]">(antes de 12:00)</span>
+                                </p>
+                                <div id="slots-manana" class="flex flex-wrap gap-2"></div>
                             </div>
-                            <!-- Estado: loading -->
-                            <div id="horarios-loading" class="hidden flex flex-col items-center justify-center h-full py-8 text-center">
-                                <div class="inline-block w-6 h-6 border-2 border-[#25B5DA] border-t-transparent rounded-full animate-spin mb-3"></div>
-                                <p class="text-[#9CA3AF] text-xs">Cargando horarios...</p>
+                            <div id="franja-tarde" class="hidden">
+                                <p class="text-[10px] uppercase tracking-widest text-[#9CA3AF] mb-2 flex items-center gap-1">
+                                    <span>&#9728;&#65039;</span> Tarde <span class="text-[#6B7280]">(12:00 – 17:00)</span>
+                                </p>
+                                <div id="slots-tarde" class="flex flex-wrap gap-2"></div>
                             </div>
-                            <!-- Estado: sin horarios -->
-                            <div id="horarios-empty" class="hidden flex flex-col items-center justify-center h-full py-8 text-center">
-                                <i class="fas fa-calendar-times text-[#374151] text-3xl mb-3 block"></i>
-                                <p class="text-[#9CA3AF] text-xs">No hay horarios disponibles para este día</p>
-                            </div>
-                            <!-- Estado: horarios agrupados por franja -->
-                            <div id="horarios-grid" class="hidden space-y-5">
-                                <!-- Franja Mañana -->
-                                <div id="franja-manana" class="hidden">
-                                    <p class="text-[10px] uppercase tracking-widest text-[#9CA3AF] mb-2 flex items-center gap-1">
-                                        <span>&#127749;</span> Mañana
-                                        <span class="text-[#6B7280]">(antes de 12:00)</span>
-                                    </p>
-                                    <div id="slots-manana" class="flex flex-wrap gap-2"></div>
-                                </div>
-                                <!-- Franja Tarde -->
-                                <div id="franja-tarde" class="hidden">
-                                    <p class="text-[10px] uppercase tracking-widest text-[#9CA3AF] mb-2 flex items-center gap-1">
-                                        <span>&#9728;&#65039;</span> Tarde
-                                        <span class="text-[#6B7280]">(12:00 &#8211; 17:00)</span>
-                                    </p>
-                                    <div id="slots-tarde" class="flex flex-wrap gap-2"></div>
-                                </div>
-                                <!-- Franja Noche -->
-                                <div id="franja-noche" class="hidden">
-                                    <p class="text-[10px] uppercase tracking-widest text-[#9CA3AF] mb-2 flex items-center gap-1">
-                                        <span>&#127769;</span> Noche
-                                        <span class="text-[#6B7280]">(después de 17:00)</span>
-                                    </p>
-                                    <div id="slots-noche" class="flex flex-wrap gap-2"></div>
-                                </div>
+                            <div id="franja-noche" class="hidden">
+                                <p class="text-[10px] uppercase tracking-widest text-[#9CA3AF] mb-2 flex items-center gap-1">
+                                    <span>&#127769;</span> Noche <span class="text-[#6B7280]">(después de 17:00)</span>
+                                </p>
+                                <div id="slots-noche" class="flex flex-wrap gap-2"></div>
                             </div>
                         </div>
                     </div>
-
                 </div>
             </div>
 
@@ -275,13 +291,30 @@
                 </div>
             </div>
 
-            <button type="submit" 
-                    class="w-full py-4 bg-gradient-to-r from-[#25B5DA] to-[#1c8fb0] text-black font-bold uppercase tracking-wider rounded-lg hover:from-[#1c8fb0] hover:to-[#25B5DA] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                    id="btn-submit" disabled>
-                Confirmar Cita
-            </button>
+            <!-- Botón submit oculto — se dispara desde la barra flotante -->
+            <button type="submit" id="btn-submit" class="hidden" disabled></button>
         </form>
         @endif
+    </div>
+</div>
+
+<!-- ── BARRA FLOTANTE DE RESUMEN ── -->
+<div id="floating-bar"
+     class="hidden fixed bottom-0 left-0 right-0 z-40 bg-[#0f0f0f]/95 backdrop-blur border-t border-[#374151] px-4 py-3 shadow-2xl">
+    <div class="max-w-4xl mx-auto flex items-center justify-between gap-4">
+        <div class="flex items-center gap-4 overflow-hidden">
+            <div class="shrink-0 w-10 h-10 rounded-full bg-[#25B5DA]/20 text-[#25B5DA] flex items-center justify-center">
+                <i class="fas fa-calendar-check text-sm"></i>
+            </div>
+            <div class="min-w-0">
+                <p id="fb-resumen" class="text-white text-sm font-semibold truncate">—</p>
+                <p id="fb-precio" class="text-[#25B5DA] text-xs font-bold">$0</p>
+            </div>
+        </div>
+        <button type="button" id="btn-floating-confirm"
+                class="shrink-0 px-6 py-2.5 bg-gradient-to-r from-[#25B5DA] to-[#1c8fb0] text-black font-bold text-sm uppercase tracking-widest rounded-lg hover:from-[#1c8fb0] hover:to-[#25B5DA] transition-all">
+            Confirmar
+        </button>
     </div>
 </div>
 
@@ -592,134 +625,213 @@ document.querySelectorAll('.empleado-card').forEach(card => {
     card.addEventListener('click', function() {
         document.querySelectorAll('.empleado-card').forEach(c => c.classList.remove('border-[#25B5DA]', 'bg-[#25B5DA]/10'));
         this.classList.add('border-[#25B5DA]', 'bg-[#25B5DA]/10');
-
-        empleadoSeleccionado = {
-            id:     this.dataset.id,
-            nombre: this.dataset.nombre
-        };
-
+        empleadoSeleccionado = { id: this.dataset.id, nombre: this.dataset.nombre };
         document.getElementById('empleado_id').value = empleadoSeleccionado.id;
         resumenEmpleado.textContent = empleadoSeleccionado.nombre;
-
         if (servicioSeleccionado && fechaHidden.value) cargarHorarios();
         checkFormComplete();
     });
 });
 
 // ============================================================
-// CALENDARIO INTERACTIVO
+// CARRUSEL DE DÍAS — CONSTANTES Y ESTADO
 // ============================================================
-const calendarDays  = document.getElementById('calendar-days');
-const currentMonthEl = document.getElementById('current-month');
-const prevMonthBtn  = document.getElementById('prev-month');
-const nextMonthBtn  = document.getElementById('next-month');
+const MONTHS_ES  = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+const MONTHS_ABR = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+const DAYS_ABR   = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+const MAX_MONTHS_AHEAD = 6;
 
-const today       = new Date();
-today.setHours(0, 0, 0, 0);
-let viewYear  = today.getFullYear();
-let viewMonth = today.getMonth(); // 0-indexed
+const todayDate = new Date();
+todayDate.setHours(0,0,0,0);
 
-const MONTHS_ES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio',
-                   'Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+let carouselStartDate = new Date(todayDate); // primera fecha visible en el carrusel
+let pickerYear = todayDate.getFullYear();
 
-function pad2(n) { return String(n).padStart(2, '0'); }
+function pad2(n) { return String(n).padStart(2,'0'); }
+function toYMD(d) { return `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`; }
+function ymdToDate(ymd) { const [y,m,d] = ymd.split('-').map(Number); return new Date(y,m-1,d); }
 
-function toYMD(date) {
-    return `${date.getFullYear()}-${pad2(date.getMonth()+1)}-${pad2(date.getDate())}`;
-}
+const daysCarousel    = document.getElementById('days-carousel');
+const monthLabel      = document.getElementById('carousel-month-label');
+const pickerPanel     = document.getElementById('month-picker-panel');
+const pickerYearEl    = document.getElementById('picker-year');
+const pickerMonthsGrid= document.getElementById('picker-months-grid');
 
-function renderCalendar() {
-    currentMonthEl.textContent = `${MONTHS_ES[viewMonth]} ${viewYear}`;
-    calendarDays.innerHTML = '';
-
-    // Primer día del mes (0=Dom … 6=Sáb) → convertir a Lun=0
-    const firstDay = new Date(viewYear, viewMonth, 1);
-    const startOffset = (firstDay.getDay() + 6) % 7; // Monday-first
-
-    // Total de días en el mes
-    const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
-
-    // Celdas vacías al inicio
-    for (let i = 0; i < startOffset; i++) {
-        calendarDays.insertAdjacentHTML('beforeend', '<div></div>');
-    }
-
+// ── Renderizar carrusel ──
+function renderCarousel() {
+    daysCarousel.innerHTML = '';
     const selectedYMD = fechaHidden.value;
+    const maxDate = new Date(todayDate);
+    maxDate.setMonth(maxDate.getMonth() + MAX_MONTHS_AHEAD);
 
-    for (let d = 1; d <= daysInMonth; d++) {
-        const cellDate = new Date(viewYear, viewMonth, d);
-        const ymd      = toYMD(cellDate);
-        const isPast   = cellDate < today;
-        const isToday  = ymd === toYMD(today);
-        const isSelected = ymd === selectedYMD;
+    // Mostrar 14 días desde carouselStartDate
+    let dominantMonth = null;
+    for (let i = 0; i < 14; i++) {
+        const d = new Date(carouselStartDate);
+        d.setDate(d.getDate() + i);
+        if (d > maxDate) break;
 
-        let classes = 'relative flex items-center justify-center rounded-lg text-sm font-medium transition-all duration-150 aspect-square cursor-pointer ';
-        let attrs   = `data-date="${ymd}"`;
+        const ymd     = toYMD(d);
+        const isPast  = d < todayDate;
+        const isToday = ymd === toYMD(todayDate);
+        const isSel   = ymd === selectedYMD;
+        if (!dominantMonth) dominantMonth = d.getMonth();
 
-        if (isPast) {
-            classes += 'text-[#4B5563] cursor-not-allowed opacity-40';
-            attrs   += ' data-disabled="true"';
-        } else if (isSelected) {
-            classes += 'bg-[#25B5DA] text-black font-bold shadow-lg shadow-[#25B5DA]/30';
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.dataset.date = ymd;
+        btn.className = [
+            'shrink-0 w-14 flex flex-col items-center justify-center gap-0.5 py-2.5 rounded-xl border transition-all duration-150',
+            isSel  ? 'bg-[#25B5DA] border-[#25B5DA] text-black shadow-lg shadow-[#25B5DA]/30' :
+            isPast ? 'bg-transparent border-[#374151] text-[#4B5563] opacity-30 cursor-not-allowed' :
+                     'bg-[#1a1a1a] border-[#374151] text-[#9CA3AF] hover:border-[#25B5DA] hover:text-white'
+        ].join(' ');
+
+        const dayName = document.createElement('span');
+        dayName.className = 'text-[9px] uppercase tracking-widest font-semibold';
+        dayName.textContent = DAYS_ABR[d.getDay()];
+
+        const dayNum = document.createElement('span');
+        dayNum.className = 'text-lg font-bold leading-none';
+        dayNum.textContent = d.getDate();
+
+        // Badge "Hoy"
+        if (isToday && !isSel) {
+            const badge = document.createElement('span');
+            badge.className = 'text-[8px] font-bold uppercase text-[#25B5DA]';
+            badge.textContent = 'Hoy';
+            btn.appendChild(dayName); btn.appendChild(dayNum); btn.appendChild(badge);
         } else {
-            classes += 'text-white border border-[#374151] hover:border-[#25B5DA] hover:bg-[#25B5DA]/10';
+            btn.appendChild(dayName); btn.appendChild(dayNum);
         }
 
-        const todayDot = isToday && !isSelected
-            ? '<span class="absolute bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-[#25B5DA]"></span>'
-            : '';
-
-        calendarDays.insertAdjacentHTML('beforeend',
-            `<div class="${classes}" ${attrs}>${d}${todayDot}</div>`);
+        if (!isPast) {
+            btn.addEventListener('click', () => selectDate(ymd));
+        } else {
+            btn.disabled = true;
+        }
+        daysCarousel.appendChild(btn);
     }
 
-    // Listeners en celdas de día
-    calendarDays.querySelectorAll('[data-date]').forEach(cell => {
-        if (cell.dataset.disabled) return;
-        cell.addEventListener('click', () => selectDate(cell.dataset.date));
-    });
-
-    // Deshabilitar flecha si estamos en el mes/año actual
-    const isCurrentMonthYear = viewYear === today.getFullYear() && viewMonth === today.getMonth();
-    prevMonthBtn.disabled = isCurrentMonthYear;
-    prevMonthBtn.classList.toggle('opacity-30', isCurrentMonthYear);
-    prevMonthBtn.classList.toggle('cursor-not-allowed', isCurrentMonthYear);
+    // Actualizar label mes
+    const dm = dominantMonth !== null ? dominantMonth : carouselStartDate.getMonth();
+    const dy = carouselStartDate.getFullYear();
+    monthLabel.textContent = `${MONTHS_ES[dm]} ${dy}`;
 }
 
+// ── Navegación del carrusel ──
+document.getElementById('btn-prev-week').addEventListener('click', () => {
+    const minStart = new Date(todayDate);
+    carouselStartDate.setDate(carouselStartDate.getDate() - 7);
+    if (carouselStartDate < minStart) carouselStartDate = new Date(minStart);
+    renderCarousel();
+});
+document.getElementById('btn-next-week').addEventListener('click', () => {
+    carouselStartDate.setDate(carouselStartDate.getDate() + 7);
+    renderCarousel();
+});
+document.getElementById('btn-prev-month').addEventListener('click', () => {
+    carouselStartDate.setMonth(carouselStartDate.getMonth() - 1);
+    if (carouselStartDate < todayDate) carouselStartDate = new Date(todayDate);
+    renderCarousel();
+});
+document.getElementById('btn-next-month').addEventListener('click', () => {
+    carouselStartDate.setMonth(carouselStartDate.getMonth() + 1);
+    renderCarousel();
+});
+
+// ── Picker de mes/año ──
+function renderPicker() {
+    pickerYearEl.textContent = pickerYear;
+    pickerMonthsGrid.innerHTML = '';
+    const now = new Date();
+    const maxDate = new Date(todayDate);
+    maxDate.setMonth(maxDate.getMonth() + MAX_MONTHS_AHEAD);
+
+    for (let m = 0; m < 12; m++) {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        const mDate = new Date(pickerYear, m, 1);
+        const isPast = mDate < new Date(now.getFullYear(), now.getMonth(), 1);
+        const isFuture = mDate > new Date(maxDate.getFullYear(), maxDate.getMonth(), 1);
+        const isCurrent = pickerYear === now.getFullYear() && m === now.getMonth();
+
+        btn.className = [
+            'py-2 rounded-lg text-xs font-bold transition-all',
+            isCurrent ? 'bg-[#25B5DA] text-black' :
+            (isPast || isFuture) ? 'text-[#4B5563] cursor-not-allowed opacity-40' :
+            'bg-[#262626] border border-[#374151] text-white hover:border-[#25B5DA]'
+        ].join(' ');
+        btn.textContent = MONTHS_ABR[m];
+        btn.disabled = isPast || isFuture;
+        btn.addEventListener('click', () => {
+            carouselStartDate = new Date(pickerYear, m, 1);
+            if (carouselStartDate < todayDate) carouselStartDate = new Date(todayDate);
+            renderCarousel();
+            pickerPanel.classList.add('hidden');
+        });
+        pickerMonthsGrid.appendChild(btn);
+    }
+}
+
+document.getElementById('btn-month-picker').addEventListener('click', (e) => {
+    e.stopPropagation();
+    pickerYear = carouselStartDate.getFullYear();
+    renderPicker();
+    pickerPanel.classList.toggle('hidden');
+});
+document.getElementById('picker-prev-year').addEventListener('click', () => { pickerYear--; renderPicker(); });
+document.getElementById('picker-next-year').addEventListener('click', () => { pickerYear++; renderPicker(); });
+document.addEventListener('click', (e) => {
+    if (!pickerPanel.contains(e.target) && e.target.id !== 'btn-month-picker') {
+        pickerPanel.classList.add('hidden');
+    }
+});
+
+// ── Selección de fecha ──
 function selectDate(ymd) {
     fechaHidden.value = ymd;
-
-    // Actualizar resumen con formato local
     const [y, m, d] = ymd.split('-').map(Number);
-    const displayDate = new Date(y, m - 1, d);
-    resumenFecha.textContent = displayDate.toLocaleDateString('es-CL', { day: 'numeric', month: 'long', year: 'numeric' });
-
-    // Resetear hora seleccionada
+    const displayDate = new Date(y, m-1, d);
+    resumenFecha.textContent = displayDate.toLocaleDateString('es-CL', { day:'numeric', month:'long', year:'numeric' });
     horaSeleccionada = null;
     horaHidden.value = '';
     resumenHora.textContent = '-';
-
-    renderCalendar(); // re-render para marcar seleccionado
-
+    actualizarBarraFlotante();
+    renderCarousel();
     if (servicioSeleccionado && empleadoSeleccionado) cargarHorarios();
     checkFormComplete();
 }
 
-prevMonthBtn.addEventListener('click', () => {
-    if (prevMonthBtn.disabled) return;
-    viewMonth--;
-    if (viewMonth < 0) { viewMonth = 11; viewYear--; }
-    renderCalendar();
-});
-
-nextMonthBtn.addEventListener('click', () => {
-    viewMonth++;
-    if (viewMonth > 11) { viewMonth = 0; viewYear++; }
-    renderCalendar();
-});
-
 // Renderizado inicial
-renderCalendar();
+renderCarousel();
+
+// ── Barra flotante ──
+const floatingBar = document.getElementById('floating-bar');
+const fbResumen   = document.getElementById('fb-resumen');
+const fbPrecio    = document.getElementById('fb-precio');
+
+function actualizarBarraFlotante() {
+    if (servicioSeleccionado && empleadoSeleccionado && fechaHidden.value && horaHidden.value) {
+        const [y,m,d] = fechaHidden.value.split('-').map(Number);
+        const fechaDisp = new Date(y,m-1,d).toLocaleDateString('es-CL',{day:'numeric',month:'short'});
+        fbResumen.textContent = `${servicioSeleccionado.nombre} • ${empleadoSeleccionado.nombre} • ${fechaDisp} • ${horaHidden.value}`;
+        const subtotal = parseFloat(servicioSeleccionado.precio);
+        let desc = 0;
+        if (promocionSeleccionada) {
+            if (promocionSeleccionada.beneficio_tipo === 'descuento') desc = subtotal * parseFloat(promocionSeleccionada.beneficio_valor) / 100;
+            else if (promocionSeleccionada.beneficio_tipo === 'servicio_gratis') desc = subtotal;
+        }
+        fbPrecio.textContent = '$' + Math.max(0, subtotal - desc).toLocaleString('es-CL');
+        floatingBar.classList.remove('hidden');
+    } else {
+        floatingBar.classList.add('hidden');
+    }
+}
+
+document.getElementById('btn-floating-confirm').addEventListener('click', () => {
+    document.getElementById('btn-submit').click();
+});
 
 // ============================================================
 // HORARIOS TIPO PILLS — VARIABLES DOM Y HELPERS
@@ -746,14 +858,13 @@ function selectHora(horaInicio, horaFin, btn) {
         p.classList.remove('bg-[#25B5DA]', 'text-black', 'border-[#25B5DA]', 'shadow-lg', 'shadow-[#25B5DA]/30');
         p.classList.add('border-[#374151]', 'bg-[#1a1a1a]', 'text-white');
     });
-
     // Marcar el seleccionado
     btn.classList.remove('border-[#374151]', 'bg-[#1a1a1a]', 'text-white');
     btn.classList.add('bg-[#25B5DA]', 'text-black', 'border-[#25B5DA]', 'shadow-lg', 'shadow-[#25B5DA]/30');
-
     horaSeleccionada        = horaInicio;
     horaHidden.value        = horaInicio;
     resumenHora.textContent = `${horaInicio} – ${horaFin}`;
+    actualizarBarraFlotante();
     checkFormComplete();
 }
 
