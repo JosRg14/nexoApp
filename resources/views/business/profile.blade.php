@@ -145,6 +145,10 @@ class="w-full text-left px-4 py-2 text-xs text-red-400 hover:text-red-300 hover:
                 <button onclick="switchTab('clientes-promociones')" id="tab-btn-clientes-promociones" class="shrink-0 px-6 py-2 text-xs font-bold uppercase tracking-widest transition-all text-[#9CA3AF] hover:text-white">
                     Promociones
                 </button>
+                <button onclick="switchTab('agenda')" id="tab-btn-agenda"
+                        class="shrink-0 px-6 py-2 text-xs font-bold uppercase tracking-widest transition-all text-[#9CA3AF] hover:text-white">
+                    <i class="fas fa-calendar-alt mr-1"></i>Agenda
+                </button>
                 <a href="{{ route('payment.mi-suscripcion') }}" class="shrink-0 px-6 py-2 text-xs font-bold uppercase tracking-widest transition-all text-[#25B5DA] hover:text-white flex items-center gap-1.5">
                     <i class="fas fa-credit-card text-[10px]"></i>
                     Mi Plan
@@ -160,6 +164,7 @@ class="w-full text-left px-4 py-2 text-xs text-red-400 hover:text-red-300 hover:
             @include('business.profile.finances')
             @include('business.profile.staff')
             @include('business.profile.clientes-promociones')
+            @include('business.profile.agenda')
         </div>
 
 <div id="global-loader" class="fixed inset-0 hidden z-50 flex items-center justify-center bg-black/70">
@@ -173,11 +178,12 @@ class="w-full text-left px-4 py-2 text-xs text-red-400 hover:text-red-300 hover:
     <script>
         
         function switchTab(tab) {
-            const tabs = ['info', 'services', 'schedule', 'finances', 'personnel', 'clientes-promociones'];
+            const tabs = ['info', 'services', 'schedule', 'finances', 'personnel', 'clientes-promociones', 'agenda'];
             
             tabs.forEach(t => {
                 const section = document.getElementById(`tab-${t}`);
                 const btn = document.getElementById(`tab-btn-${t}`);
+                if (!section || !btn) return;
                 
                 if (t === tab) {
                     section.classList.remove('hidden');
@@ -185,9 +191,7 @@ class="w-full text-left px-4 py-2 text-xs text-red-400 hover:text-red-300 hover:
                     btn.classList.remove('text-[#9CA3AF]', 'hover:text-white');
                     
                     if (t === 'finances' && window.myChart) {
-                        setTimeout(() => {
-                            window.myChart.resize();
-                        }, 100);
+                        setTimeout(() => { window.myChart.resize(); }, 100);
                     }
                 } else {
                     section.classList.add('hidden');
@@ -200,7 +204,7 @@ class="w-full text-left px-4 py-2 text-xs text-red-400 hover:text-red-300 hover:
          document.addEventListener('DOMContentLoaded', function() {
             if(window.location.hash) {
                 const tabId = window.location.hash.substring(1);
-                const tabs = ['info', 'services', 'schedule', 'finances', 'personnel', 'clientes-promociones'];
+                const tabs = ['info', 'services', 'schedule', 'finances', 'personnel', 'clientes-promociones', 'agenda'];
                 if(tabs.includes(tabId)) {
                     switchTab(tabId);
                 }
