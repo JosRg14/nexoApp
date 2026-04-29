@@ -166,7 +166,7 @@
                 <!-- ── SELECTOR DE HORARIOS ── -->
                 <div>
                     <p class="text-xs text-[#9CA3AF] uppercase tracking-widest mb-3">Horario disponible</p>
-                    <div id="horarios-container" class="bg-[#1a1a1a] border border-[#374151] rounded-lg p-4 min-h-[180px] max-h-[320px] overflow-y-auto">
+                    <div id="horarios-container" class="bg-[#1a1a1a] border border-[#374151] rounded-lg p-4 min-h-[180px]">
                         <div id="horarios-placeholder" class="flex flex-col items-center justify-center py-8 text-center">
                             <i class="far fa-clock text-[#374151] text-3xl mb-3 block"></i>
                             <p class="text-[#9CA3AF] text-xs">Selecciona servicio, empleado y fecha para ver los horarios</p>
@@ -179,24 +179,28 @@
                             <i class="fas fa-calendar-times text-[#374151] text-3xl mb-3 block"></i>
                             <p class="text-[#9CA3AF] text-xs">No hay horarios disponibles para este día</p>
                         </div>
-                        <div id="horarios-grid" class="hidden space-y-5">
-                            <div id="franja-manana" class="hidden">
-                                <p class="text-[10px] uppercase tracking-widest text-[#9CA3AF] mb-2 flex items-center gap-1">
-                                    <span>&#127749;</span> Mañana <span class="text-[#6B7280]">(antes de 12:00)</span>
+                        <div id="horarios-grid" class="hidden">
+                            <div class="flex items-center justify-between mb-3">
+                                <p class="text-[10px] uppercase tracking-widest text-[#9CA3AF]">
+                                    Horarios disponibles • <span id="fecha-seleccionada-texto">Selecciona un día</span>
                                 </p>
-                                <div id="slots-manana" class="flex flex-wrap gap-2"></div>
+                                <span id="slots-count" class="text-[10px] text-[#6B7280]"></span>
                             </div>
-                            <div id="franja-tarde" class="hidden">
-                                <p class="text-[10px] uppercase tracking-widest text-[#9CA3AF] mb-2 flex items-center gap-1">
-                                    <span>&#9728;&#65039;</span> Tarde <span class="text-[#6B7280]">(12:00 – 17:00)</span>
-                                </p>
-                                <div id="slots-tarde" class="flex flex-wrap gap-2"></div>
+                            
+                            <div id="slots-container" class="flex gap-2.5 overflow-x-auto hide-scrollbar pb-3 snap-x snap-mandatory scroll-smooth" style="scrollbar-width: none; -ms-overflow-style: none;">
+                                {{-- Los chips se insertan dinámicamente con JavaScript --}}
                             </div>
-                            <div id="franja-noche" class="hidden">
-                                <p class="text-[10px] uppercase tracking-widest text-[#9CA3AF] mb-2 flex items-center gap-1">
-                                    <span>&#127769;</span> Noche <span class="text-[#6B7280]">(después de 17:00)</span>
-                                </p>
-                                <div id="slots-noche" class="flex flex-wrap gap-2"></div>
+                            
+                            <div class="flex items-center gap-3 mt-2">
+                                <span class="flex items-center gap-1.5 text-[9px] text-[#6B7280]">
+                                    <span class="w-2 h-2 rounded-full bg-[#1a1a1a] border border-[#374151]"></span> Disponible
+                                </span>
+                                <span class="flex items-center gap-1.5 text-[9px] text-[#6B7280]">
+                                    <span class="w-2 h-2 rounded-full bg-[#262626] border border-[#374151]/50 opacity-40"></span> Ocupado
+                                </span>
+                                <span class="flex items-center gap-1.5 text-[9px] text-[#6B7280]">
+                                    <span class="w-2 h-2 rounded-full bg-[#25B5DA]"></span> Seleccionado
+                                </span>
                             </div>
                         </div>
                     </div>
@@ -794,6 +798,15 @@ function selectDate(ymd) {
     const [y, m, d] = ymd.split('-').map(Number);
     const displayDate = new Date(y, m-1, d);
     resumenFecha.textContent = displayDate.toLocaleDateString('es-CL', { day:'numeric', month:'long', year:'numeric' });
+    
+    const fechaTexto = document.getElementById('fecha-seleccionada-texto');
+    if (fechaTexto) {
+        const diaSemana = displayDate.toLocaleDateString('es-CL', { weekday: 'short' });
+        const diaNum = displayDate.getDate();
+        const mesStr = displayDate.toLocaleDateString('es-CL', { month: 'short' });
+        fechaTexto.textContent = `${diaSemana} ${diaNum} ${mesStr}`.replace(/\./g, '');
+    }
+    
     horaSeleccionada = null;
     horaHidden.value = '';
     resumenHora.textContent = '-';
@@ -834,7 +847,7 @@ document.getElementById('btn-floating-confirm').addEventListener('click', () => 
 });
 
 // ============================================================
-// HORARIOS TIPO PILLS — VARIABLES DOM Y HELPERS
+// HORARIOS TIPO CHIPS HORIZONTALES
 // ============================================================
 const horariosGrid        = document.getElementById('horarios-grid');
 const horariosPlaceholder = document.getElementById('horarios-placeholder');
@@ -852,20 +865,39 @@ function showHorariosState(state) {
     if (state === 'grid')        horariosGrid.classList.remove('hidden');
 }
 
-function selectHora(horaInicio, horaFin, btn) {
-    // Restablecer todos los pills activos
-    document.querySelectorAll('.horario-pill').forEach(p => {
-        p.classList.remove('bg-[#25B5DA]', 'text-black', 'border-[#25B5DA]', 'shadow-lg', 'shadow-[#25B5DA]/30');
-        p.classList.add('border-[#374151]', 'bg-[#1a1a1a]', 'text-white');
+function autoScrollToSelected() {
+    const selected = document.querySelector('.slot-chip.selected');
+    if (selected) {
+        selected.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+    }
+}
+
+function seleccionarSlot(slot) {
+    // Remover selección anterior
+    document.querySelectorAll('.slot-chip.selected').forEach(chip => {
+        chip.classList.remove('selected', 'bg-[#25B5DA]', 'text-black', 'border-[#25B5DA]', 'shadow-[0_0_15px_rgba(37,181,218,0.3)]');
+        chip.classList.add('bg-[#1a1a1a]', 'border-[#374151]', 'text-[#9CA3AF]');
+        
+        // Fix hover colors inside selected elements
+        chip.classList.add('hover:border-[#25B5DA]', 'hover:text-[#25B5DA]', 'hover:bg-[#25B5DA]/10');
     });
-    // Marcar el seleccionado
-    btn.classList.remove('border-[#374151]', 'bg-[#1a1a1a]', 'text-white');
-    btn.classList.add('bg-[#25B5DA]', 'text-black', 'border-[#25B5DA]', 'shadow-lg', 'shadow-[#25B5DA]/30');
-    horaSeleccionada        = horaInicio;
-    horaHidden.value        = horaInicio;
-    resumenHora.textContent = `${horaInicio} – ${horaFin}`;
+    
+    // Marcar nuevo chip como seleccionado
+    const chip = document.querySelector(`[data-hora="${slot.hora_inicio}"]`);
+    if (chip) {
+        chip.classList.add('selected');
+        chip.classList.remove('bg-[#1a1a1a]', 'border-[#374151]', 'text-[#9CA3AF]');
+        chip.classList.remove('hover:border-[#25B5DA]', 'hover:text-[#25B5DA]', 'hover:bg-[#25B5DA]/10');
+        chip.classList.add('bg-[#25B5DA]', 'text-black', 'border-[#25B5DA]', 'shadow-[0_0_15px_rgba(37,181,218,0.3)]');
+    }
+    
+    horaSeleccionada        = slot.hora_inicio;
+    horaHidden.value        = slot.hora_inicio;
+    resumenHora.textContent = `${slot.hora_inicio} – ${slot.hora_fin}`;
     actualizarBarraFlotante();
     checkFormComplete();
+    
+    autoScrollToSelected();
 }
 
 function filtrarSlotsPasados(slots) {
@@ -887,61 +919,54 @@ function filtrarSlotsPasados(slots) {
     return slots;
 }
 
-function getFranjaHoraria(horaStr) {
-    const [h] = horaStr.split(':').map(Number);
-    if (h < 12) return 'manana';
-    if (h < 17) return 'tarde';
-    return 'noche';
-}
-
-function buildHorarioPill(slot, available = true) {
-    const btn = document.createElement('button');
-    btn.type         = 'button';
-    btn.dataset.hora = slot.hora_inicio;
-    btn.textContent  = slot.hora_inicio;
-    btn.title        = `${slot.hora_inicio} – ${slot.hora_fin}`;
-
-    if (available) {
-        btn.className = [
-            'horario-pill',
-            'text-xs font-semibold px-4 py-2 rounded-full border',
-            'border-[#374151] bg-[#1a1a1a] text-white',
-            'hover:border-[#25B5DA] hover:bg-[#25B5DA] hover:text-black',
-            'transition-all duration-150 cursor-pointer'
-        ].join(' ');
-        btn.addEventListener('click', () => selectHora(slot.hora_inicio, slot.hora_fin, btn));
-    } else {
-        btn.className = [
-            'horario-pill-disabled',
-            'text-xs font-semibold px-4 py-2 rounded-full border',
-            'border-transparent bg-[#262626] text-[#6B7280]',
-            'opacity-30 cursor-not-allowed'
-        ].join(' ');
-        btn.disabled = true;
-    }
-
-    return btn;
-}
-
 function renderizarSlots(slots) {
-    // Limpiar franjas
-    const contenedores = { manana: document.getElementById('slots-manana'), tarde: document.getElementById('slots-tarde'), noche: document.getElementById('slots-noche') };
-    const franjas      = { manana: document.getElementById('franja-manana'), tarde: document.getElementById('franja-tarde'), noche: document.getElementById('franja-noche') };
-    Object.values(contenedores).forEach(c => c.innerHTML = '');
-    Object.values(franjas).forEach(f => f.classList.add('hidden'));
-
+    const container = document.getElementById('slots-container');
+    const countEl = document.getElementById('slots-count');
+    
+    container.innerHTML = '';
+    
     if (!slots || slots.length === 0) {
         showHorariosState('empty');
+        if(countEl) countEl.textContent = '';
         return;
     }
-
+    
+    const count = slots.length;
+    if(countEl) countEl.textContent = `${count} disponible${count > 1 ? 's' : ''}`;
+    
+    const duracion = servicioSeleccionado?.duracion || 30;
+    
     slots.forEach(slot => {
-        const franja = getFranjaHoraria(slot.hora_inicio);
-        const pill   = buildHorarioPill(slot, true);
-        contenedores[franja].appendChild(pill);
-        franjas[franja].classList.remove('hidden');
+        const chip = document.createElement('button');
+        chip.type = 'button';
+        chip.className = `slot-chip shrink-0 snap-start w-[72px] h-[80px] flex flex-col items-center justify-center rounded-xl transition-all duration-200 group`;
+        chip.dataset.hora = slot.hora_inicio;
+        
+        const isDisponible = slot.disponible !== false;
+        chip.dataset.disponible = isDisponible;
+        
+        if (isDisponible) {
+            chip.classList.add('bg-[#1a1a1a]', 'border', 'border-[#374151]', 'text-[#9CA3AF]');
+            chip.classList.add('hover:border-[#25B5DA]', 'hover:text-[#25B5DA]', 'hover:bg-[#25B5DA]/10');
+            chip.classList.add('focus:bg-[#25B5DA]', 'focus:text-black', 'focus:border-[#25B5DA]', 'focus:shadow-[0_0_15px_rgba(37,181,218,0.3)]');
+            
+            chip.innerHTML = `
+                <span class="text-sm font-bold group-focus:text-black transition-colors">${slot.hora_inicio}</span>
+                <span class="text-[9px] mt-1 group-focus:text-black/70 transition-colors">${duracion} min</span>
+            `;
+            chip.addEventListener('click', () => seleccionarSlot(slot));
+        } else {
+            chip.classList.add('bg-[#262626]', 'border', 'border-[#374151]/50', 'text-[#6B7280]', 'opacity-40', 'cursor-not-allowed');
+            chip.disabled = true;
+            chip.innerHTML = `
+                <span class="text-sm font-bold">${slot.hora_inicio}</span>
+                <span class="text-[9px] mt-1">Ocupado</span>
+            `;
+        }
+        
+        container.appendChild(chip);
     });
-
+    
     showHorariosState('grid');
 }
 
