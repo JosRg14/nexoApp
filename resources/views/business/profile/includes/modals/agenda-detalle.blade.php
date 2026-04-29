@@ -84,15 +84,15 @@ function abrirModalDetalle(cita) {
     // Filas de información
     const cliente  = cita.cliente?.nombre_completo  || cita.cliente_rapido?.nombre || cita.nombre_cliente || '—';
     const telefono = cita.cliente?.telefono         || cita.cliente_rapido?.telefono || cita.telefono || '—';
-    const servicio = cita.servicio?.nombre          || cita.nombre_servicio       || '—';
+    const servicio = cita.servicio?.nombre_servicio || cita.servicio?.nombre || cita.nombre_servicio || '—';
     const duracion = cita.servicio?.duracion        || cita.duracion              || '';
     const empleado = cita.empleado?.nombre          || cita.nombre_empleado       || '—';
     const fecha    = cita.fecha ? (() => {
-        const [y,m,d] = cita.fecha.split('-').map(Number);
-        return new Date(y,m-1,d).toLocaleDateString('es-CL',{day:'2-digit',month:'2-digit',year:'numeric'});
+        const partes = cita.fecha.split('-');
+        return `${partes[2]}/${partes[1]}/${partes[0]}`;
     })() : '—';
-    const horaI    = cita.hora_inicio || '—';
-    const horaF    = cita.hora_fin    || '';
+    const horaI    = cita.hora_inicio ? cita.hora_inicio.substring(0, 5) : '—';
+    const horaF    = cita.hora_fin    ? cita.hora_fin.substring(0, 5)    : '';
     const precio   = cita.precio !== undefined && cita.precio !== null
                         ? '$' + parseFloat(cita.precio).toLocaleString('es-CL')
                         : '—';
@@ -179,8 +179,10 @@ async function accionCita(accion, id, extra = {}) {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '',
-                'X-Requested-With': 'XMLHttpRequest'
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
+                             || document.querySelector('input[name="_token"]')?.value || '',
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json'
             },
             body: JSON.stringify(extra)
         });

@@ -49,8 +49,7 @@
 
         {{-- Días --}}
         <div id="agenda-days-carousel"
-             class="flex gap-2 overflow-x-auto pb-1"
-             style="scrollbar-width:none;-ms-overflow-style:none;"></div>
+             class="grid grid-cols-7 gap-2 w-full"></div>
     </div>
 
     {{-- Filtros --}}
@@ -157,7 +156,7 @@ function renderAgendaCarousel() {
     const today = new Date(); today.setHours(0,0,0,0);
     let dominantMonth = null;
 
-    for (let i = 0; i < 14; i++) {
+    for (let i = 0; i < 7; i++) {
         const d = new Date(agendaStartDate);
         d.setDate(d.getDate() + i);
         const ymd    = agToYMD(d);
@@ -169,7 +168,7 @@ function renderAgendaCarousel() {
         btn.type = 'button';
         btn.dataset.date = ymd;
         btn.className = [
-            'shrink-0 w-14 flex flex-col items-center justify-center gap-0.5 py-2.5 rounded-xl border transition-all duration-150',
+            'flex flex-col items-center justify-center gap-0.5 py-2.5 rounded-xl border transition-all duration-150 w-full',
             isSel  ? 'bg-[#25B5DA] border-[#25B5DA] text-black shadow-lg shadow-[#25B5DA]/30' :
             isPast ? 'bg-transparent border-[#374151] text-[#4B5563] opacity-30 cursor-not-allowed' :
                      'bg-[#1a1a1a] border-[#374151] text-[#9CA3AF] hover:border-[#25B5DA] hover:text-white'
@@ -279,7 +278,7 @@ function renderizarTabla(citas) {
 
         const cliente  = cita.cliente?.nombre_completo  || cita.cliente_rapido?.nombre || cita.nombre_cliente || '—';
         const telefono = cita.cliente?.telefono         || cita.cliente_rapido?.telefono || '';
-        const servicio = cita.servicio?.nombre          || cita.nombre_servicio        || '—';
+        const servicio = cita.servicio?.nombre_servicio || cita.servicio?.nombre || cita.nombre_servicio || '—';
         const empleado = cita.empleado?.nombre          || cita.nombre_empleado        || '—';
         const precio   = cita.precio !== undefined && cita.precio !== null
                             ? '$' + parseFloat(cita.precio).toLocaleString('es-CL')
@@ -323,7 +322,7 @@ function agendaEstadoBadge(estado) {
 // ─── Carga inicial de empleados y servicios ───────────────────
 async function cargarEmpleadosFiltro() {
     try {
-        const res  = await fetch('/api-proxy/api/empleados', {
+        const res  = await fetch('/api-proxy/api/mis-empleados', {
             headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' }
         });
         const data = await res.json();
@@ -346,11 +345,7 @@ async function cargarEmpleadosFiltro() {
 
 async function cargarServiciosModal() {
     try {
-        const negocioId = document.getElementById('negocio_id')?.value;
-        const url = negocioId
-            ? `/api-proxy/api/servicios?negocio_id=${negocioId}`
-            : '/api-proxy/api/servicios';
-        const res  = await fetch(url, {
+        const res  = await fetch('/api-proxy/api/mis-servicios', {
             headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' }
         });
         const data = await res.json();

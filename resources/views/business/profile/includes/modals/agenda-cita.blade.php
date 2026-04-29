@@ -279,8 +279,10 @@ async function crearCitaRapida() {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '',
-                    'X-Requested-With': 'XMLHttpRequest'
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
+                                 || document.querySelector('input[name="_token"]')?.value || '',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json'
                 },
                 body: JSON.stringify({
                     nombre: nuevoNombre,
@@ -296,8 +298,10 @@ async function crearCitaRapida() {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '',
-                'X-Requested-With': 'XMLHttpRequest'
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
+                             || document.querySelector('input[name="_token"]')?.value || '',
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json'
             },
             body: JSON.stringify(payload)
         });

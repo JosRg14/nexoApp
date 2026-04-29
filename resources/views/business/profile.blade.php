@@ -11,6 +11,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>NexoApp - Mi Negocio</title>
     <link rel="icon" type="image/png" href="{{ asset('logo.png') }}">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -64,6 +65,11 @@ class="absolute right-0 mt-2 w-48 bg-[#1a1a1a] border border-[#374151] shadow-xl
 class="block px-4 py-2 text-xs text-[#9CA3AF] hover:text-white hover:bg-[#374151]/30 uppercase tracking-widest font-bold">
 
 <i class="fa-solid fa-user mr-2"></i> Mi Perfil
+</a>
+
+<a href="{{ route('payment.mi-suscripcion') }}"
+   class="block px-4 py-2 text-xs text-[#9CA3AF] hover:text-white hover:bg-[#374151]/30 uppercase tracking-widest font-bold">
+    <i class="fa-solid fa-credit-card mr-2"></i> Mi Plan
 </a>
 
 <form method="POST" action="/logout">
@@ -149,10 +155,6 @@ class="w-full text-left px-4 py-2 text-xs text-red-400 hover:text-red-300 hover:
                         class="shrink-0 px-6 py-2 text-xs font-bold uppercase tracking-widest transition-all text-[#9CA3AF] hover:text-white">
                     <i class="fas fa-calendar-alt mr-1"></i>Agenda
                 </button>
-                <a href="{{ route('payment.mi-suscripcion') }}" class="shrink-0 px-6 py-2 text-xs font-bold uppercase tracking-widest transition-all text-[#25B5DA] hover:text-white flex items-center gap-1.5">
-                    <i class="fas fa-credit-card text-[10px]"></i>
-                    Mi Plan
-                </a>
             </div>
         </div>
 
