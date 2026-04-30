@@ -387,15 +387,17 @@ async function crearCitaRapida() {
                 })
             });
             const cd = await crRes.json();
-            console.log('[Agenda] Respuesta cliente rápido:', cd);
+            console.log('Después de crear rápido:', cd);
             if (!crRes.ok || cd.success === false) {
                 mostrarErrorCita(cd.message || 'Error al registrar el cliente.');
                 return;
             }
-            modalCitaClienteRapidoId = cd.data?.id ?? cd.id ?? null;
+            modalCitaClienteRapidoId = cd.data?.id_cliente_rapido ?? cd.data?.id ?? cd.id_cliente_rapido ?? null;
             modalCitaClienteId = null;
-            console.log('[Agenda] modalCitaClienteRapidoId asignado:', modalCitaClienteRapidoId);
         }
+
+        console.log('cliente_rapido_id a enviar:', modalCitaClienteRapidoId);
+        console.log('cliente_id a enviar:', modalCitaClienteId);
 
         // Priorizar cliente rápido sobre cliente normal
         if (modalCitaClienteRapidoId) {
@@ -407,8 +409,11 @@ async function crearCitaRapida() {
             delete payload.cliente_rapido_id;
         }
 
-        console.log('[Agenda] modalCitaClienteRapidoId:', modalCitaClienteRapidoId);
-        console.log('[Agenda] Payload final:', JSON.stringify(payload));
+        if (payload.cliente_rapido_id) {
+            delete payload.cliente_id;
+        }
+        
+        console.log('Payload antes de enviar:', JSON.stringify(payload));
 
         // 2. Crear la cita
         const res  = await fetch('/api-proxy/api/empleado/servicio-rapido', {
