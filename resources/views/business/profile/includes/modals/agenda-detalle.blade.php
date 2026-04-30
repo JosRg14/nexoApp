@@ -82,20 +82,16 @@ function abrirModalDetalle(cita) {
     document.getElementById('detalle-estado-label').textContent = label;
 
     // Filas de información
-    const cliente  = cita.cliente?.nombre_completo  || cita.cliente_rapido?.nombre || cita.nombre_cliente || '—';
+    // Ya que formatearFecha() y getNombreCliente() se definieron en agenda.blade.php (global), las llamamos
+    const cliente  = getNombreCliente(cita);
     const telefono = cita.cliente?.telefono         || cita.cliente_rapido?.telefono || cita.telefono || '—';
     const servicio = cita.servicio?.nombre_servicio || cita.servicio?.nombre || cita.nombre_servicio || '—';
     const duracion = cita.servicio?.duracion        || cita.duracion              || '';
     const empleado = cita.empleado?.nombre          || cita.nombre_empleado       || '—';
-    const fecha    = cita.fecha ? (() => {
-        const partes = cita.fecha.split('-');
-        return `${partes[2]}/${partes[1]}/${partes[0]}`;
-    })() : '—';
+    const fecha    = cita.fecha ? formatearFecha(cita.fecha) : '—';
     const horaI    = cita.hora_inicio ? cita.hora_inicio.substring(0, 5) : '—';
     const horaF    = cita.hora_fin    ? cita.hora_fin.substring(0, 5)    : '';
-    const precio   = cita.precio !== undefined && cita.precio !== null
-                        ? '$' + parseFloat(cita.precio).toLocaleString('es-CL')
-                        : '—';
+    const precio   = `$${parseFloat(cita.servicio?.precio || cita.precio || 0).toFixed(2)}`;
 
     const rows = [
         ['Cliente',   cliente],

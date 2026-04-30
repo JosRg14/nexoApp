@@ -253,20 +253,28 @@ function aplicarFiltrosAgenda() {
     renderizarTabla(citas);
 }
 
+// ─── Helper: formateo de fecha ─────────────────────────────
+function formatearFecha(fecha) {
+    if (!fecha) return 'Sin fecha';
+    if (fecha.includes('T')) {
+        fecha = fecha.split('T')[0];
+    }
+    const partes = fecha.split('-');
+    if (partes.length === 3) {
+        return `${partes[2]}/${partes[1]}/${partes[0]}`;
+    }
+    return fecha;
+}
+
 // ─── Helper: nombre legible del cliente ──────────────────────
 function getNombreCliente(cita) {
-    // Cliente registrado: puede traer nombre_completo o campos separados
-    if (cita.cliente) {
-        const c = cita.cliente;
-        if (c.nombre_completo) return c.nombre_completo;
-        // campos separados: nombre + app_paterno
-        const partes = [c.nombre, c.app_paterno, c.app_materno].filter(Boolean);
-        if (partes.length) return partes.join(' ');
+    if (cita.cliente_rapido?.nombre) {
+        return cita.cliente_rapido.nombre;
     }
-    // Cliente rápido (walk-in)
-    if (cita.cliente_rapido?.nombre) return cita.cliente_rapido.nombre;
-    // Fallback planos
-    return cita.nombre_cliente || '—';
+    if (cita.cliente?.nombre) {
+        return `${cita.cliente.nombre} ${cita.cliente.app_paterno || ''}`.trim();
+    }
+    return 'Sin cliente';
 }
 
 function getNombreEmpleado(cita) {
@@ -292,6 +300,9 @@ function renderizarTabla(citas) {
     if(countEl) countEl.textContent = `${citas.length} cita${citas.length>1?'s':''}`;
 
     citas.forEach((cita, i) => {
+        console.log('Cita recibida:', cita);
+        console.log('Cliente rápido:', cita.cliente_rapido);
+
         const tr = document.createElement('tr');
         tr.className = [
             i % 2 === 0 ? 'bg-[#1a1a1a]' : 'bg-[#262626]',
@@ -304,9 +315,7 @@ function renderizarTabla(citas) {
         const telefono = cita.cliente?.telefono || cita.cliente_rapido?.telefono || '';
         const servicio = cita.servicio?.nombre_servicio || cita.servicio?.nombre || cita.nombre_servicio || '—';
         const empleado = getNombreEmpleado(cita);
-        const precio   = cita.precio !== undefined && cita.precio !== null
-                            ? '$' + parseFloat(cita.precio).toLocaleString('es-CL')
-                            : '—';
+        const precioValue = parseFloat(cita.servicio?.precio || cita.precio || 0).toFixed(2);
 
         const { dot, label } = agendaEstadoBadge(cita.estado);
 
@@ -324,7 +333,7 @@ function renderizarTabla(citas) {
                     <span class="text-[#D1D5DB]">${label}</span>
                 </span>
             </td>
-            <td class="px-4 py-3 text-right text-sm font-bold text-[#25B5DA]">${precio}</td>
+            <td class="px-4 py-3 text-right text-[#25B5DA] text-sm font-medium">$${precioValue}</td>
         `;
 
         tr.addEventListener('click', () => abrirModalDetalle(cita));
