@@ -253,6 +253,30 @@ function aplicarFiltrosAgenda() {
     renderizarTabla(citas);
 }
 
+// ─── Helper: nombre legible del cliente ──────────────────────
+function getNombreCliente(cita) {
+    // Cliente registrado: puede traer nombre_completo o campos separados
+    if (cita.cliente) {
+        const c = cita.cliente;
+        if (c.nombre_completo) return c.nombre_completo;
+        // campos separados: nombre + app_paterno
+        const partes = [c.nombre, c.app_paterno, c.app_materno].filter(Boolean);
+        if (partes.length) return partes.join(' ');
+    }
+    // Cliente rápido (walk-in)
+    if (cita.cliente_rapido?.nombre) return cita.cliente_rapido.nombre;
+    // Fallback planos
+    return cita.nombre_cliente || '—';
+}
+
+function getNombreEmpleado(cita) {
+    if (!cita.empleado) return cita.nombre_empleado || '—';
+    const e = cita.empleado;
+    if (e.nombre_completo) return e.nombre_completo;
+    const partes = [e.nombre, e.app_paterno].filter(Boolean);
+    return partes.length ? partes.join(' ') : '—';
+}
+
 function renderizarTabla(citas) {
     const tbody  = document.getElementById('agenda-tbody');
     const countEl = document.getElementById('agenda-citas-count');
@@ -276,10 +300,10 @@ function renderizarTabla(citas) {
             'transition-all duration-150 group'
         ].join(' ');
 
-        const cliente  = cita.cliente?.nombre_completo  || cita.cliente_rapido?.nombre || cita.nombre_cliente || '—';
-        const telefono = cita.cliente?.telefono         || cita.cliente_rapido?.telefono || '';
+        const cliente  = getNombreCliente(cita);
+        const telefono = cita.cliente?.telefono || cita.cliente_rapido?.telefono || '';
         const servicio = cita.servicio?.nombre_servicio || cita.servicio?.nombre || cita.nombre_servicio || '—';
-        const empleado = cita.empleado?.nombre          || cita.nombre_empleado        || '—';
+        const empleado = getNombreEmpleado(cita);
         const precio   = cita.precio !== undefined && cita.precio !== null
                             ? '$' + parseFloat(cita.precio).toLocaleString('es-CL')
                             : '—';

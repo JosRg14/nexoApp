@@ -85,6 +85,7 @@
                     <div>
                         <label class="text-[10px] text-[#9CA3AF] mb-1 block">Empleado</label>
                         <select id="modal-cita-empleado"
+                                onchange="onEmpleadoOFechaChangeCita()"
                                 class="w-full bg-[#262626] border border-[#374151] rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none focus:border-[#25B5DA] transition-colors appearance-none">
                             <option value="">Selecciona...</option>
                         </select>
@@ -95,15 +96,11 @@
             {{-- ── Fecha, Hora y Precio ── --}}
             <div class="space-y-3">
                 <p class="text-[10px] uppercase tracking-widest text-[#9CA3AF] border-b border-[#374151] pb-1">Fecha & Hora</p>
-                <div class="grid grid-cols-3 gap-3">
+                <div class="grid grid-cols-2 gap-3">
                     <div>
                         <label class="text-[10px] text-[#9CA3AF] mb-1 block">Fecha</label>
                         <input type="date" id="modal-cita-fecha"
-                               class="w-full bg-[#262626] border border-[#374151] rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none focus:border-[#25B5DA] transition-colors [color-scheme:dark]">
-                    </div>
-                    <div>
-                        <label class="text-[10px] text-[#9CA3AF] mb-1 block">Hora</label>
-                        <input type="time" id="modal-cita-hora"
+                               onchange="onEmpleadoOFechaChangeCita()"
                                class="w-full bg-[#262626] border border-[#374151] rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none focus:border-[#25B5DA] transition-colors [color-scheme:dark]">
                     </div>
                     <div>
@@ -111,6 +108,21 @@
                         <input type="number" id="modal-cita-precio" min="0" step="0.01"
                                placeholder="0.00"
                                class="w-full bg-[#262626] border border-[#374151] rounded-lg px-3 py-2.5 text-sm text-white placeholder-[#6B7280] focus:outline-none focus:border-[#25B5DA] transition-colors">
+                    </div>
+                </div>
+                {{-- Slots de disponibilidad --}}
+                <div id="bloque-slots-hora">
+                    <label class="text-[10px] text-[#9CA3AF] mb-2 block">Hora disponible</label>
+                    <input type="hidden" id="modal-cita-hora">
+                    <div id="slots-container" class="flex flex-wrap gap-2">
+                        <p class="text-[10px] text-[#6B7280] italic">Selecciona empleado, servicio y fecha para ver horarios.</p>
+                    </div>
+                    <p id="slots-no-disponibles" class="hidden text-xs text-amber-400 bg-amber-500/10 border border-amber-500/20 rounded-lg px-3 py-2 mt-2">
+                        <i class="fas fa-exclamation-triangle mr-1"></i> No hay horarios disponibles para este día.
+                    </p>
+                    <div id="slots-loading" class="hidden flex items-center gap-2 mt-1">
+                        <div class="w-3 h-3 border border-[#25B5DA] border-t-transparent rounded-full animate-spin"></div>
+                        <span class="text-[10px] text-[#9CA3AF]">Cargando horarios...</span>
                     </div>
                 </div>
             </div>
@@ -166,6 +178,12 @@ function resetModalCrearCita() {
     document.getElementById('modal-cita-hora').value  = '';
     document.getElementById('modal-cita-precio').value= '';
     document.getElementById('modal-cita-error').classList.add('hidden');
+    // Reset slots
+    const container = document.getElementById('slots-container');
+    if (container) container.innerHTML = '<p class="text-[10px] text-[#6B7280] italic">Selecciona empleado, servicio y fecha para ver horarios.</p>';
+    document.getElementById('slots-no-disponibles')?.classList.add('hidden');
+    document.getElementById('slots-loading')?.classList.add('hidden');
+    document.getElementById('btn-crear-cita').disabled = false;
     toggleModoCliente('buscar');
 }
 
@@ -189,6 +207,84 @@ function onServicioChangeCita() {
     if (opt && opt.dataset.precio) {
         document.getElementById('modal-cita-precio').value = parseFloat(opt.dataset.precio).toFixed(2);
     }
+    onEmpleadoOFechaChangeCita();
+}
+
+// ─── Slots de disponibilidad ─────────────────────────────────
+let _slotsTimeout = null;
+function onEmpleadoOFechaChangeCita() {
+    clearTimeout(_slotsTimeout);
+    _slotsTimeout = setTimeout(triggerCargarSlots, 200);
+}
+
+function triggerCargarSlots() {
+    const empId    = document.getElementById('modal-cita-empleado').value;
+    const fecha    = document.getElementById('modal-cita-fecha').value;
+    const srvSel   = document.getElementById('modal-cita-servicio');
+    const duracion = srvSel.options[srvSel.selectedIndex]?.dataset?.duracion || 30;
+
+    if (!empId || !fecha) return; // necesitamos al menos empleado y fecha
+    cargarSlotsDisponibles(empId, fecha, duracion);
+}
+
+async function cargarSlotsDisponibles(empleadoId, fecha, duracion) {
+    const container  = document.getElementById('slots-container');
+    const noDisp     = document.getElementById('slots-no-disponibles');
+    const loadingEl  = document.getElementById('slots-loading');
+    const horaHidden = document.getElementById('modal-cita-hora');
+    const btnCrear   = document.getElementById('btn-crear-cita');
+
+    // Reset
+    container.innerHTML  = '';
+    noDisp.classList.add('hidden');
+    loadingEl.classList.remove('hidden');
+    horaHidden.value     = '';
+    btnCrear.disabled    = true;
+
+    try {
+        const res  = await fetch(
+            `/api-proxy/api/disponibilidad/empleado/${empleadoId}?fecha=${fecha}&duracion=${duracion}`,
+            { headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' } }
+        );
+        const data   = await res.json();
+        const slots  = data.data || data.slots || data.disponibilidad || [];
+
+        loadingEl.classList.add('hidden');
+
+        if (!Array.isArray(slots) || slots.length === 0) {
+            noDisp.classList.remove('hidden');
+            btnCrear.disabled = true;
+            return;
+        }
+
+        btnCrear.disabled = false;
+        slots.forEach(slot => {
+            const hora = typeof slot === 'string' ? slot : (slot.hora_inicio || slot.hora || slot);
+            const pill = document.createElement('button');
+            pill.type = 'button';
+            pill.textContent = hora.substring(0, 5);
+            pill.dataset.hora = hora;
+            pill.className = 'slot-pill px-3 py-1.5 text-xs font-bold rounded-lg border border-[#374151] text-[#9CA3AF] hover:border-[#25B5DA] hover:text-white transition-all';
+            pill.addEventListener('click', () => seleccionarSlot(hora, pill));
+            container.appendChild(pill);
+        });
+    } catch(err) {
+        console.error('[Agenda] Error cargando slots:', err);
+        loadingEl.classList.add('hidden');
+        container.innerHTML = '<p class="text-[10px] text-red-400">Error al cargar horarios.</p>';
+        btnCrear.disabled = true;
+    }
+}
+
+function seleccionarSlot(hora, pillEl) {
+    document.getElementById('modal-cita-hora').value = hora;
+    // Resaltar píldora seleccionada
+    document.querySelectorAll('.slot-pill').forEach(p => {
+        p.classList.remove('bg-[#25B5DA]', 'border-[#25B5DA]', 'text-black');
+        p.classList.add('border-[#374151]', 'text-[#9CA3AF]');
+    });
+    pillEl.classList.remove('border-[#374151]', 'text-[#9CA3AF]');
+    pillEl.classList.add('bg-[#25B5DA]', 'border-[#25B5DA]', 'text-black');
 }
 
 // Autocomplete cliente
@@ -276,7 +372,7 @@ async function crearCitaRapida() {
             const nuevoNombre = document.getElementById('modal-cita-nuevo-nombre').value.trim();
             if (!nuevoNombre) { mostrarErrorCita('Ingresa el nombre del cliente.'); return; }
             // Crear cliente rápido
-            const cr = await fetch('/api-proxy/api/clientes/rapido', {
+            const crRes = await fetch('/api-proxy/api/clientes/rapido', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -290,17 +386,29 @@ async function crearCitaRapida() {
                     telefono: document.getElementById('modal-cita-nuevo-telefono').value.trim()
                 })
             });
-            const cd = await cr.json();
-            modalCitaClienteRapidoId = cd.data?.id || cd.id;
+            const cd = await crRes.json();
+            console.log('[Agenda] Respuesta cliente rápido:', cd);
+            if (!crRes.ok || cd.success === false) {
+                mostrarErrorCita(cd.message || 'Error al registrar el cliente.');
+                return;
+            }
+            modalCitaClienteRapidoId = cd.data?.id ?? cd.id ?? null;
             modalCitaClienteId = null;
+            console.log('[Agenda] modalCitaClienteRapidoId asignado:', modalCitaClienteRapidoId);
         }
 
         // Priorizar cliente rápido sobre cliente normal
         if (modalCitaClienteRapidoId) {
             payload.cliente_rapido_id = modalCitaClienteRapidoId;
-        } else if (modalCitaClienteId && !modalCitaClienteRapidoId) {
+            // Asegurar que cliente_id NO esté en el payload
+            delete payload.cliente_id;
+        } else if (modalCitaClienteId) {
             payload.cliente_id = modalCitaClienteId;
+            delete payload.cliente_rapido_id;
         }
+
+        console.log('[Agenda] modalCitaClienteRapidoId:', modalCitaClienteRapidoId);
+        console.log('[Agenda] Payload final:', JSON.stringify(payload));
 
         // 2. Crear la cita
         const res  = await fetch('/api-proxy/api/empleado/servicio-rapido', {
