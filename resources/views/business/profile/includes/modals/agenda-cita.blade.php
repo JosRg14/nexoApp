@@ -212,11 +212,12 @@ async function buscarCliente() {
             res.innerHTML = '<p class="px-4 py-3 text-xs text-[#9CA3AF]">Sin resultados</p>';
         } else {
             res.innerHTML = list.map(c => {
-                const id   = c.id_cliente || c.id;
+                const idRapido = c.id_cliente_rapido || c.cliente_rapido_id || (c.tipo === 'rapido' ? c.id : null);
+                const idNormal = c.id_cliente || (!idRapido ? c.id : null);
                 const nom  = c.nombre_completo || c.nombre || '—';
                 const tel  = c.telefono || '';
                 return `<button type="button"
-                            onclick="seleccionarClienteBusqueda('${id}','${nom}')"
+                            onclick="seleccionarClienteBusqueda('${idNormal || ''}','${idRapido || ''}','${nom.replace(/'/g, "\\'")}')"
                             class="w-full text-left px-4 py-2.5 text-sm text-white hover:bg-[#25B5DA]/10 hover:text-[#25B5DA] transition-colors border-b border-[#374151]/40 last:border-0">
                             <span class="font-medium">${nom}</span>
                             ${tel ? `<span class="text-[10px] text-[#6B7280] ml-2">${tel}</span>` : ''}
@@ -227,8 +228,9 @@ async function buscarCliente() {
     } catch(err) { console.error(err); }
 }
 
-function seleccionarClienteBusqueda(id, nombre) {
-    modalCitaClienteId = id;
+function seleccionarClienteBusqueda(idNormal, idRapido, nombre) {
+    modalCitaClienteId = idNormal || null;
+    modalCitaClienteRapidoId = idRapido || null;
     document.getElementById('modal-cita-buscar-resultados').classList.add('hidden');
     document.getElementById('modal-cita-buscar-cliente').value = nombre;
     document.getElementById('modal-cita-cliente-nombre').textContent = nombre;
@@ -269,8 +271,7 @@ async function crearCitaRapida() {
     try {
         // 1. Gestionar cliente
         if (modoRadio === 'buscar') {
-            if (!modalCitaClienteId) { mostrarErrorCita('Busca y selecciona un cliente.'); return; }
-            payload.cliente_id = modalCitaClienteId;
+            if (!modalCitaClienteId && !modalCitaClienteRapidoId) { mostrarErrorCita('Busca y selecciona un cliente.'); return; }
         } else {
             const nuevoNombre = document.getElementById('modal-cita-nuevo-nombre').value.trim();
             if (!nuevoNombre) { mostrarErrorCita('Ingresa el nombre del cliente.'); return; }
@@ -290,7 +291,15 @@ async function crearCitaRapida() {
                 })
             });
             const cd = await cr.json();
-            payload.cliente_rapido_id = cd.data?.id || cd.id;
+            modalCitaClienteRapidoId = cd.data?.id || cd.id;
+            modalCitaClienteId = null;
+        }
+
+        // Priorizar cliente rápido sobre cliente normal
+        if (modalCitaClienteRapidoId) {
+            payload.cliente_rapido_id = modalCitaClienteRapidoId;
+        } else if (modalCitaClienteId && !modalCitaClienteRapidoId) {
+            payload.cliente_id = modalCitaClienteId;
         }
 
         // 2. Crear la cita
