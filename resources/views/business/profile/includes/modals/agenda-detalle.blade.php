@@ -189,7 +189,19 @@ async function accionCita(accion, id, extra = {}) {
                 const msgs = { iniciar: 'Cita iniciada', completar: 'Cita completada', cancelar: 'Cita cancelada' };
                 showToast(msgs[accion] || 'Operación exitosa');
             }
-            cargarAgenda(agendaFechaActual);
+            
+            // Actualizar estado local inmediatamente para evitar errores de desfase
+            if (typeof agendaCitasRaw !== 'undefined') {
+                const index = agendaCitasRaw.findIndex(c => (c.id_cita || c.id) == id);
+                if (index !== -1) {
+                    if (accion === 'iniciar') agendaCitasRaw[index].estado = 'en_proceso';
+                    if (accion === 'completar') agendaCitasRaw[index].estado = 'completada';
+                    if (accion === 'cancelar') agendaCitasRaw[index].estado = 'cancelada';
+                    if (typeof aplicarFiltrosAgenda === 'function') aplicarFiltrosAgenda();
+                }
+            }
+            
+            await cargarAgenda(agendaFechaActual);
         } else {
             errEl.textContent = data.message || 'Error al procesar la acción.';
             errEl.classList.remove('hidden');
