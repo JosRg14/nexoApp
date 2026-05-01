@@ -227,6 +227,29 @@ function triggerCargarSlots() {
     cargarSlotsDisponibles(empId, fecha, duracion);
 }
 
+function filtrarSlotsFuturos(slots) {
+    const fechaSeleccionada = document.getElementById('modal-cita-fecha')?.value;
+    const hoy = new Date().toLocaleDateString('en-CA'); // Formato YYYY-MM-DD
+    
+    if (fechaSeleccionada !== hoy) return slots; // Solo filtrar si es hoy
+    
+    const ahora = new Date();
+    const horaActualMinutos = ahora.getHours() * 60 + ahora.getMinutes();
+    
+    return slots.filter(slot => {
+        const slotHora = typeof slot === 'string' ? slot : (slot.hora_inicio || slot.hora || slot);
+        if (!slotHora) return false;
+        
+        const partes = slotHora.split(':');
+        if (partes.length < 2) return false;
+        
+        const h = parseInt(partes[0], 10);
+        const m = parseInt(partes[1], 10);
+        const slotMinutos = h * 60 + m;
+        return slotMinutos > horaActualMinutos;
+    });
+}
+
 async function cargarSlotsDisponibles(empleadoId, fecha, duracion) {
     const container  = document.getElementById('slots-container');
     const noDisp     = document.getElementById('slots-no-disponibles');
@@ -247,7 +270,12 @@ async function cargarSlotsDisponibles(empleadoId, fecha, duracion) {
             { headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' } }
         );
         const data   = await res.json();
-        const slots  = data.data || data.slots || data.disponibilidad || [];
+        let slots  = data.data || data.slots || data.disponibilidad || [];
+
+        // Filtrar slots pasados del día actual
+        if (Array.isArray(slots)) {
+            slots = filtrarSlotsFuturos(slots);
+        }
 
         loadingEl.classList.add('hidden');
 
