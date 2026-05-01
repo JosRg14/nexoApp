@@ -331,7 +331,17 @@ async function buscarCliente() {
             headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' }
         });
         const data = await r.json();
-        const list = data.data || data.clientes || data || [];
+        
+        // Combinar clientes normales y rápidos en una sola lista
+        let list = [];
+        if (data.success || data.data) {
+            const clientesNormales = data.data?.clientes || [];
+            const clientesRapidos  = data.data?.clientes_rapidos || [];
+            list = [...clientesNormales, ...clientesRapidos];
+        } else {
+            list = data.clientes || data || [];
+        }
+
         if (!Array.isArray(list) || list.length === 0) {
             res.innerHTML = '<p class="px-4 py-3 text-xs text-[#9CA3AF]">Sin resultados</p>';
         } else {
