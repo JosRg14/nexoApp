@@ -184,23 +184,25 @@ async function accionCita(accion, id, extra = {}) {
         });
         const data = await res.json();
         if (res.ok && data.success !== false) {
+            // 1. Cerrar el modal inmediatamente
             cerrarModalDetalle();
+            
             if (typeof showToast === 'function') {
                 const msgs = { iniciar: 'Cita iniciada', completar: 'Cita completada', cancelar: 'Cita cancelada' };
                 showToast(msgs[accion] || 'Operación exitosa');
             }
             
-            // Actualizar estado local inmediatamente para evitar errores de desfase
+            // 2. Actualizar el estado local de la cita en agendaCitasRaw
             if (typeof agendaCitasRaw !== 'undefined') {
                 const index = agendaCitasRaw.findIndex(c => (c.id_cita || c.id) == id);
                 if (index !== -1) {
                     if (accion === 'iniciar') agendaCitasRaw[index].estado = 'en_proceso';
                     if (accion === 'completar') agendaCitasRaw[index].estado = 'completada';
                     if (accion === 'cancelar') agendaCitasRaw[index].estado = 'cancelada';
-                    if (typeof aplicarFiltrosAgenda === 'function') aplicarFiltrosAgenda();
                 }
             }
             
+            // 3. Esperar a que cargarAgenda() termine antes de permitir nuevas acciones
             await cargarAgenda(agendaFechaActual);
         } else {
             errEl.textContent = data.message || 'Error al procesar la acción.';

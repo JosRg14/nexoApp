@@ -222,7 +222,8 @@ function agendaShowState(state) {
 async function cargarAgenda(fecha) {
     agendaShowState('loading');
     try {
-        const res  = await fetch(`/api-proxy/api/citas?fecha=${fecha}`, {
+        const timestamp = new Date().getTime();
+        const res  = await fetch(`/api-proxy/api/citas?fecha=${fecha}&_t=${timestamp}`, {
             headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' }
         });
         const data = await res.json();
