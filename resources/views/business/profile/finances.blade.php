@@ -21,7 +21,47 @@
             </div>
         </div>
         <p class="text-[#9CA3AF] text-xs mt-2">Métricas actualizadas al día de hoy</p>
-    </di    <!-- Tabs Header -->
+    </div>
+
+    <!-- Tarjeta Resumen General de Hoy -->
+    <div class="bg-[#262626] border border-[#374151]/50 p-6 mb-5 rounded-sm">
+        <div class="flex items-center gap-2 mb-4">
+            <p class="text-[#9CA3AF] text-[10px] uppercase tracking-widest font-bold">Resumen del día</p>
+            <div class="relative group">
+                <i class="fas fa-circle-info text-[#9CA3AF] hover:text-[#25B5DA] cursor-pointer transition-colors text-xs"></i>
+                <div class="absolute bottom-full left-0 mb-2 hidden group-hover:block bg-[#1a1a1a] border border-[#374151] rounded-lg p-3 w-72 z-10 shadow-xl">
+                    <p class="text-[#9CA3AF] text-xs leading-relaxed">
+                        Suma combinada de <span class="text-emerald-400 font-bold">citas agendadas</span> y <span class="text-[#25B5DA] font-bold">servicios walk-in</span> completados hoy.
+                    </p>
+                    <div class="absolute top-full left-4 border-solid border-4 border-transparent border-t-[#374151]"></div>
+                </div>
+            </div>
+        </div>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+            <div class="group relative">
+                <p class="text-[#9CA3AF] text-[10px] uppercase tracking-widest">Ingresos Totales</p>
+                <p class="text-2xl font-bold text-white mt-1">${{ number_format($totales['ingresos_totales'] ?? 0, 2) }}</p>
+                <p class="text-[#6B7280] text-[9px] mt-1 tracking-wide">Con cita + Sin cita</p>
+            </div>
+            <div>
+                <p class="text-[#9CA3AF] text-[10px] uppercase tracking-widest">Servicios Totales</p>
+                <p class="text-2xl font-bold text-white mt-1">{{ $totales['total_servicios'] ?? 0 }}</p>
+                <p class="text-[#6B7280] text-[9px] mt-1 tracking-wide">Realizados hoy</p>
+            </div>
+            <div>
+                <p class="text-emerald-500 text-[10px] uppercase tracking-widest">Con Cita</p>
+                <p class="text-2xl font-bold text-emerald-500 mt-1">{{ $totales['total_citas'] ?? 0 }}</p>
+                <p class="text-emerald-500/50 text-[9px] mt-1 tracking-wide">${{ number_format($totales['ingresos_con_cita'] ?? 0, 2) }}</p>
+            </div>
+            <div>
+                <p class="text-[#25B5DA] text-[10px] uppercase tracking-widest">Sin Cita (Walk-in)</p>
+                <p class="text-2xl font-bold text-[#25B5DA] mt-1">{{ $totales['total_walkin'] ?? 0 }}</p>
+                <p class="text-[#25B5DA]/50 text-[9px] mt-1 tracking-wide">${{ number_format($totales['ingresos_sin_cita'] ?? 0, 2) }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabs Header -->
     <div class="flex border-b border-[#374151] mb-6">
         <button type="button" class="px-4 py-3 text-sm font-medium border-b-2 border-[#25B5DA] text-white focus:outline-none transition-colors tab-finance-btn" data-target="con_cita">
             Ingresos con cita
@@ -39,7 +79,7 @@
             <!-- Card 1: Ingresos Hoy -->
             <div class="bg-[#262626] border border-[#374151]/50 p-6 flex flex-col justify-between h-40 group hover:border-[#F3F4F6]/30 transition-colors duration-300">
                 <div class="flex justify-between items-start">
-                    <div class="w-10 h-10 flex items-center justify-center text-emerald-500">
+                    <div class="w-10 h-10 flex items-center justify-center {{ $tipo === 'con_cita' ? 'text-emerald-500' : 'text-[#25B5DA]' }}">
                         <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                     </div>
                     @php $varHoy = $finanzas[$tipo]['ingresos_hoy']['variacion'] ?? 0; @endphp
@@ -57,18 +97,21 @@
                 <div>
                     <div class="text-3xl font-bold text-white tracking-tight mb-1">${{ number_format($finanzas[$tipo]['ingresos_hoy']['total'] ?? 0, 2) }}</div>
                     <div class="text-[#9CA3AF] text-xs uppercase tracking-wider">Ingresos Hoy</div>
+                    <div class="text-[9px] text-[#6B7280] mt-1 tracking-wide">
+                        {{ $tipo === 'con_cita' ? 'Servicios de citas agendadas' : 'Servicios walk-in / sin cita' }}
+                    </div>
                 </div>
             </div>
 
             <!-- Card 2: Citas Hoy -->
             <div class="bg-[#262626] border border-[#374151]/50 p-6 flex flex-col justify-between h-40 group hover:border-[#F3F4F6]/30 transition-colors duration-300">
                 <div class="flex justify-between items-start">
-                    <div class="w-10 h-10 flex items-center justify-center text-blue-500">
+                    <div class="w-10 h-10 flex items-center justify-center {{ $tipo === 'con_cita' ? 'text-emerald-500' : 'text-[#25B5DA]' }}">
                         <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                     </div>
                     @php $varCitas = $finanzas[$tipo]['citas_hoy']['variacion'] ?? 0; @endphp
                     <span class="text-xs font-bold flex items-center gap-1 {{ $varCitas >= 0 ? 'text-emerald-500' : 'text-red-500' }}">
-                        {{ $varCitas > 0 ? '+' : '' }}{{ $varCitas }}% 
+                        {{ $varCitas > 0 ? '+' : '' }}{{ $varCitas }}%
                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             @if($varCitas >= 0)
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path>
@@ -83,14 +126,14 @@
                         @if($tipo === 'con_cita')
                             title="Completadas: {{ $finanzas[$tipo]['citas_hoy']['completadas'] ?? 0 }} | Pendientes: {{ $finanzas[$tipo]['citas_hoy']['pendientes'] ?? 0 }} | En proceso: {{ $finanzas[$tipo]['citas_hoy']['en_proceso'] ?? 0 }} | Canceladas: {{ $finanzas[$tipo]['citas_hoy']['canceladas'] ?? 0 }}"
                         @else
-                            title="Completadas: {{ $finanzas[$tipo]['citas_hoy']['completadas'] ?? 0 }}"
+                            title="Walk-ins completados hoy: {{ $finanzas[$tipo]['citas_hoy']['completadas'] ?? 0 }}"
                         @endif
                     >
                         {{ $tipo === 'con_cita' ? ($finanzas[$tipo]['citas_hoy']['total'] ?? 0) : ($finanzas[$tipo]['citas_hoy']['completadas'] ?? 0) }}
                     </div>
-                    <div class="text-[#9CA3AF] text-xs uppercase tracking-wider">{{ $tipo === 'con_cita' ? 'Citas Hoy' : 'Servicios Hoy' }}</div>
+                    <div class="text-[#9CA3AF] text-xs uppercase tracking-wider">{{ $tipo === 'con_cita' ? 'Citas Hoy' : 'Walk-ins Hoy' }}</div>
                     <div class="text-[10px] tracking-wide mt-2 flex items-center justify-start gap-2 flex-wrap">
-                        <span class="text-emerald-500 font-medium whitespace-nowrap" title="Completadas"><i class="fas fa-check-circle mr-1"></i> {{ $finanzas[$tipo]['citas_hoy']['completadas'] ?? 0 }}</span>
+                        <span class="{{ $tipo === 'con_cita' ? 'text-emerald-500' : 'text-[#25B5DA]' }} font-medium whitespace-nowrap" title="{{ $tipo === 'con_cita' ? 'Citas completadas' : 'Walk-ins completados' }}"><i class="fas fa-check-circle mr-1"></i> {{ $finanzas[$tipo]['citas_hoy']['completadas'] ?? 0 }}</span>
                         @if($tipo === 'con_cita')
                         <span class="text-[#F59E0B] font-medium whitespace-nowrap" title="Pendientes"><i class="fas fa-clock mr-1"></i> {{ $finanzas[$tipo]['citas_hoy']['pendientes'] ?? 0 }}</span>
                         <span class="text-blue-500 font-medium whitespace-nowrap" title="En Proceso"><i class="fas fa-spinner fa-spin mr-1"></i> {{ $finanzas[$tipo]['citas_hoy']['en_proceso'] ?? 0 }}</span>
@@ -134,7 +177,11 @@
                 </select>
             </div>
             <div class="relative h-64 w-full">
-                <canvas id="weeklyIncomeChart-{{ $tipo }}" data-dias="{{ json_encode($finanzas[$tipo]['ingresos_semanales']['dias'] ?? []) }}" data-ingresos="{{ json_encode($finanzas[$tipo]['ingresos_semanales']['ingresos'] ?? []) }}"></canvas>
+                <canvas id="weeklyIncomeChart-{{ $tipo }}" 
+                    data-dias="{{ json_encode($finanzas[$tipo]['ingresos_semanales']['dias'] ?? []) }}" 
+                    data-ingresos="{{ json_encode($finanzas[$tipo]['ingresos_semanales']['ingresos'] ?? []) }}"
+                    data-tipo="{{ $tipo }}"
+                ></canvas>
             </div>
         </div>
 
@@ -228,6 +275,7 @@
 
             const diasStr = ctx.getAttribute('data-dias');
             const ingresosStr = ctx.getAttribute('data-ingresos');
+            const tipoChart = ctx.getAttribute('data-tipo') || tipo;
             
             let dias = [];
             let ingresos = [];
@@ -243,14 +291,19 @@
                 charInstances[canvasId].destroy();
             }
 
+            // Color diferenciado: emerald para con_cita, cyan para sin_cita
+            const barColor = tipoChart === 'sin_cita' ? '#25B5DA' : '#10B981';
+            const barHoverColor = tipoChart === 'sin_cita' ? '#38BDF8' : '#34D399';
+
             charInstances[canvasId] = new Chart(ctx, {
                 type: 'bar',
                 data: {
                     labels: dias,
                     datasets: [{
-                        label: 'Ingresos',
+                        label: tipoChart === 'sin_cita' ? 'Ingresos Walk-in' : 'Ingresos con Cita',
                         data: ingresos,
-                        backgroundColor: '#ffffff',
+                        backgroundColor: barColor,
+                        hoverBackgroundColor: barHoverColor,
                         borderRadius: 4,
                         barThickness: 30,
                     }]

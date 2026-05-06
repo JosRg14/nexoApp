@@ -45,6 +45,16 @@ class BusinessProfileController extends Controller
             ]
         ];
 
+        // Totales generales combinados (con_cita + sin_cita)
+        $totales = [
+            'ingresos_con_cita'  => 0,
+            'ingresos_sin_cita'  => 0,
+            'ingresos_totales'   => 0,
+            'total_citas'        => 0,
+            'total_walkin'       => 0,
+            'total_servicios'    => 0,
+        ];
+
         try {
             // 1. Obtener los datos del negocio actual (esto ya está bien)
             $responseNegocio = $this->httpClient->get('/api/negocios/mi-negocio');
@@ -94,45 +104,111 @@ class BusinessProfileController extends Controller
                 return $emp; // Devolver el array completo
             })->toArray();
 
-            // 4. Obtener finanzas
+            // 4. Obtener finanzas por tipo
             $tipos = ['con_cita', 'sin_cita'];
             foreach ($tipos as $tipo) {
                 try {
+                    // ✅ tipo=con_cita | tipo=sin_cita → GET /api/finanzas/ingresos-hoy?tipo=
                     $queryParams = ['tipo' => $tipo];
 
                     $resHoy = $this->httpClient->get('/api/finanzas/ingresos-hoy', $queryParams);
                     $dataHoy = $resHoy['data'] ?? [];
                     $finanzas[$tipo]['ingresos_hoy'] = [
-                        'total'     => $dataHoy['ingresos_hoy'] ?? 0,
-                        'variacion' => $dataHoy['variacion']    ?? 0,
+                        // La API devuelve 'ingresos_hoy' o 'total' según versión
+                        'total'     => $dataHoy['ingresos_hoy'] ?? ($dataHoy['total'] ?? 0),
+                        'variacion' => $dataHoy['variacion'] ?? 0,
                     ];
-                    
-                    $resCitas = $this->httpClient->get('/api/finanzas/citas-hoy', $queryParams);
-                    $dataCitas = $resCitas['data'] ?? [];
-                    $finanzas[$tipo]['citas_hoy'] = [
-                        'total'       => $dataCitas['total_citas'] ?? 0,
-                        'completadas' => $dataCitas['completadas'] ?? 0,
-                        'pendientes'  => $dataCitas['pendientes']  ?? 0,
-                        'en_proceso'  => $dataCitas['en_proceso']  ?? 0,
-                        'canceladas'  => $dataCitas['canceladas']  ?? 0,
-                        'variacion'   => $dataCitas['variacion']   ?? 0,
-                    ];
-                    
+
+                    // ✅ tipo=con_cita | tipo=sin_cita → GET /api/finanzas/ingresos-mes?tipo=
                     $resMes = $this->httpClient->get('/api/finanzas/ingresos-mes', $queryParams);
                     $dataMes = $resMes['data'] ?? [];
                     $finanzas[$tipo]['ingresos_mes'] = [
-                        'total'     => $dataMes['ingresos_mes'] ?? 0,
-                        'variacion' => $dataMes['variacion']    ?? 0,
+                        // La API devuelve 'ingresos_mes' o 'total' según versión
+                        'total'     => $dataMes['ingresos_mes'] ?? ($dataMes['total'] ?? 0),
+                        'variacion' => $dataMes['variacion'] ?? 0,
                     ];
-                    
+
+                    // ✅ tipo=con_cita | tipo=sin_cita → GET /api/finanzas/ingresos-semanales?tipo=
                     $resSem = $this->httpClient->get('/api/finanzas/ingresos-semanales', $queryParams);
                     $finanzas[$tipo]['ingresos_semanales'] = $resSem['data'] ?? ['dias' => [], 'ingresos' => []];
-                    
+
+                    // ✅ tipo=con_cita | tipo=sin_cita → GET /api/finanzas/servicios-top?tipo=&limite=5
                     $resTop = $this->httpClient->get('/api/finanzas/servicios-top', array_merge($queryParams, ['limite' => 5]));
                     $finanzas[$tipo]['servicios_top'] = $resTop['data'] ?? [];
+
                 } catch (\Exception $e) {
                     \Log::warning("No se pudieron cargar las finanzas tipo {$tipo}: " . $e->getMessage());
                 }
+            }
+
+            // ✅ GET /api/finanzas/citas-hoy (sin parámetro tipo — endpoint único)
+            try {
+                $resCitas = $this->httpClient->get('/api/finanzas/citas-hoy');
+                $dataCitas = $resCitas['data'] ?? [];
+
+                // Los datos de citas (con agenda) van al slot con_cita
+                $finanzas['con_cita']['citas_hoy'] = [
+                    'total'       => $dataCitas['total_citas']   ?? 0,
+                    'completadas' => $dataCitas['completadas']   ?? 0,
+                    'pendientes'  => $dataCitas['pendientes']    ?? 0,
+                    'en_proceso'  => $dataCitas['en_proceso']    ?? 0,
+                    'canceladas'  => $dataCitas['canceladas']    ?? 0,
+                    'variacion'   => $dataCitas['variacion']     ?? 0,
+                ];
+
+                // Walk-ins del día: la API los incluye como total_walkin o en un campo separado
+                $finanzas['sin_cita']['citas_hoy'] = [
+                    'total'       => $dataCitas['total_walkin']  ?? 0,
+                    'completadas' => $dataCitas['total_walkin']  ?? 0,   // walk-in = siempre completado
+                    'pendientes'  => 0,
+                    'en_proceso'  => 0,
+                    'canceladas'  => 0,
+                    'variacion'   => 0,
+                ];
+            } catch (\Exception $e) {
+                \Log::warning('No se pudieron cargar las citas de hoy: ' . $e->getMessage());
+            }
+
+            // Obtener resumen unificado de totales generales (desde registro_servicio)
+            try {
+                $resResumen = $this->httpClient->get('/api/finanzas/resumen-hoy');
+                $dataResumen = $resResumen['data'] ?? [];
+
+                if (!empty($dataResumen)) {
+                    $totales = [
+                        'ingresos_con_cita' => $dataResumen['ingresos_con_cita'] ?? 0,
+                        'ingresos_sin_cita' => $dataResumen['ingresos_sin_cita'] ?? 0,
+                        'ingresos_totales'  => $dataResumen['ingresos_totales']  ?? 0,
+                        'total_citas'       => $dataResumen['total_citas']       ?? 0,
+                        'total_walkin'      => $dataResumen['total_walkin']      ?? 0,
+                        'total_servicios'   => $dataResumen['total_servicios']   ?? 0,
+                    ];
+                } else {
+                    // Calcular totales derivados de los datos ya cargados si el endpoint unificado no responde
+                    $totales = [
+                        'ingresos_con_cita' => $finanzas['con_cita']['ingresos_hoy']['total'] ?? 0,
+                        'ingresos_sin_cita' => $finanzas['sin_cita']['ingresos_hoy']['total'] ?? 0,
+                        'ingresos_totales'  => ($finanzas['con_cita']['ingresos_hoy']['total'] ?? 0)
+                                            + ($finanzas['sin_cita']['ingresos_hoy']['total'] ?? 0),
+                        'total_citas'       => $finanzas['con_cita']['citas_hoy']['completadas'] ?? 0,
+                        'total_walkin'      => $finanzas['sin_cita']['citas_hoy']['completadas'] ?? 0,
+                        'total_servicios'   => ($finanzas['con_cita']['citas_hoy']['completadas'] ?? 0)
+                                            + ($finanzas['sin_cita']['citas_hoy']['completadas'] ?? 0),
+                    ];
+                }
+            } catch (\Exception $e) {
+                \Log::warning('No se pudo cargar el resumen de finanzas: ' . $e->getMessage());
+                // Fallback: derivar totales de los datos per-tipo ya cargados
+                $totales = [
+                    'ingresos_con_cita' => $finanzas['con_cita']['ingresos_hoy']['total'] ?? 0,
+                    'ingresos_sin_cita' => $finanzas['sin_cita']['ingresos_hoy']['total'] ?? 0,
+                    'ingresos_totales'  => ($finanzas['con_cita']['ingresos_hoy']['total'] ?? 0)
+                                        + ($finanzas['sin_cita']['ingresos_hoy']['total'] ?? 0),
+                    'total_citas'       => $finanzas['con_cita']['citas_hoy']['completadas'] ?? 0,
+                    'total_walkin'      => $finanzas['sin_cita']['citas_hoy']['completadas'] ?? 0,
+                    'total_servicios'   => ($finanzas['con_cita']['citas_hoy']['completadas'] ?? 0)
+                                        + ($finanzas['sin_cita']['citas_hoy']['completadas'] ?? 0),
+                ];
             }
 
 
@@ -143,10 +219,11 @@ class BusinessProfileController extends Controller
         }
 
         return view('business.profile', [
-            'negocio' => $negocio,
-            'services' => $services,
+            'negocio'   => $negocio,
+            'services'  => $services,
             'employees' => $employees,
-            'finanzas' => $finanzas,
+            'finanzas'  => $finanzas,
+            'totales'   => $totales,
         ]);
     }
 
