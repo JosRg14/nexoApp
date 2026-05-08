@@ -78,10 +78,19 @@ class VideoController extends Controller
                 'multipart' => $multipart,
             ]);
 
-            $body       = json_decode($response->getBody()->getContents(), true);
+            $rawBody    = $response->getBody()->getContents();
+            $body       = json_decode($rawBody, true);
             $statusCode = $response->getStatusCode();
 
-            return response()->json($body ?? ['success' => true], $statusCode);
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                Log::error('VideoController@store - API devolvió HTML o respuesta no JSON', [
+                    'status' => $statusCode,
+                    'body_preview' => substr($rawBody, 0, 500)
+                ]);
+                return response($rawBody, $statusCode)->header('Content-Type', 'text/html');
+            }
+
+            return response()->json($body, $statusCode);
 
         } catch (RequestException $e) {
             $statusCode = $e->hasResponse() ? $e->getResponse()->getStatusCode() : 500;
