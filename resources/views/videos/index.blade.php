@@ -507,14 +507,24 @@
             };
 
             xhr.onload = () => {
+                console.log('XHR Status:', xhr.status);
+                console.log('XHR Response:', xhr.responseText);
+
                 btn.disabled  = false;
                 btn.innerHTML = '<i class="fas fa-upload" style="margin-right:6px;"></i>Subir Video';
                 progressWrap.style.display = 'none';
 
                 let data = {};
-                try { data = JSON.parse(xhr.responseText); } catch(_) {}
+                try {
+                    data = JSON.parse(xhr.responseText);
+                    console.log('Parsed data:', data);
+                } catch(e) {
+                    console.error('Error parsing response:', e);
+                    toast('Error al procesar la respuesta del servidor', 'error');
+                    return;
+                }
 
-                if (xhr.status >= 200 && xhr.status < 300) {
+                if (xhr.status === 201 && data.success) {
                     toast('Video subido correctamente ✓', 'success');
                     document.getElementById('v-titulo').value      = '';
                     document.getElementById('v-descripcion').value = '';
