@@ -281,6 +281,31 @@
             background: rgba(239,68,68,.08);
         }
 
+        /* ── Uploader line ── */
+        .video-uploader {
+            font-size: .72rem;
+            color: #6B7280;
+            margin: 0 0 .6rem;
+            display: flex;
+            align-items: center;
+            gap: .35rem;
+            line-height: 1;
+        }
+        .video-uploader i { color: #4B5563; font-size: .7rem; }
+        .video-uploader span { color: #9CA3AF; }
+        .owner-badge {
+            background: rgba(37,181,218,.15);
+            color: #25B5DA;
+            font-size: .6rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            padding: .1rem .4rem;
+            border-radius: 9999px;
+            border: 1px solid rgba(37,181,218,.3);
+            line-height: 1.4;
+        }
+
         /* ── Empty state ── */
         .empty-state {
             text-align: center;
@@ -541,8 +566,9 @@
             }
 
             grid.innerHTML = videos.map(v => {
-                const isOwner = v.usuario_id == SESSION_USER_ID || v.user_id == SESSION_USER_ID;
-                const fecha   = v.created_at
+                const isOwner    = v.usuario_id == SESSION_USER_ID || v.user_id == SESSION_USER_ID;
+                const uploaderName = escHtml(v.usuario_nombre ?? v.user_name ?? 'Usuario');
+                const fecha      = v.created_at
                     ? new Date(v.created_at).toLocaleDateString('es-CL', { day:'2-digit', month:'2-digit', year:'numeric' })
                     : '';
 
@@ -558,6 +584,11 @@
                     <div class="video-meta">
                         <h3 title="${escHtml(v.titulo ?? v.title ?? 'Sin título')}">${escHtml(v.titulo ?? v.title ?? 'Sin título')}</h3>
                         <p>${escHtml(v.descripcion ?? v.description ?? '')}</p>
+                        <p class="video-uploader">
+                            <i class="fas fa-user-circle"></i>
+                            Subido por: <span>${uploaderName}</span>
+                            ${isOwner ? '<span class="owner-badge">Tú</span>' : ''}
+                        </p>
                         <div class="video-footer">
                             <span class="video-date"><i class="fas fa-calendar-alt" style="margin-right:4px;color:#374151;"></i>${fecha}</span>
                             ${isOwner ? `<button class="btn-delete" onclick="deleteVideo(${v.id})"><i class="fas fa-trash" style="margin-right:4px;"></i>Eliminar</button>` : ''}
