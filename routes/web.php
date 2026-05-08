@@ -15,6 +15,7 @@ use App\Http\Controllers\NegocioController;
 use Illuminate\Http\Request;
 use App\Http\Controllers\CitaController;
 use App\Http\Controllers\BookingController;
+use App\Http\Controllers\VideoController;
 
 /*
 |--------------------------------------------------------------------------
@@ -302,6 +303,24 @@ Route::middleware(['auth.session', 'inject.api.token'])->group(function () {
 Route::prefix('api-proxy')->group(function () {
     Route::get('/negocios/{id}/evidencias', [NegocioController::class, 'obtenerEvidenciasPublicas']);
 });
+
+/*
+|--------------------------------------------------------------------------
+| MÓDULO DE VIDEOS (oculto — solo accesible por URL directa)
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['auth.session', 'inject.api.token'])->group(function () {
+
+    // Vista de videos (sin restricción de rol)
+    Route::get('/videos', [VideoController::class, 'index'])->name('videos');
+
+    // Proxy a la API: subir y eliminar
+    Route::prefix('api-proxy')->group(function () {
+        Route::post('/videos',        [VideoController::class, 'store']);
+        Route::delete('/videos/{id}', [VideoController::class, 'destroy']);
+    });
+});
+
 
 /*Rutas de completar registro de negocio
 Route::middleware(['auth.session'])->group(function () {
