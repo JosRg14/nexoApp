@@ -43,46 +43,41 @@ class VideoController extends Controller
         $file = $request->file('video');
 
         try {
-            $guzzle = new GuzzleClient([
-                'verify'  => false,
-                'timeout' => 300, // 5 min para videos grandes
+            Log::info('BFF VideoController - Enviando a API', [
+                'url'       => "{$this->apiBase}/api/videos",
+                'titulo'    => $request->titulo,
+                'file_name' => $file->getClientOriginalName(),
+                'file_size' => $file->getSize(),
             ]);
 
-            $multipart = [
-                [
-                    'name'     => 'titulo',
-                    'contents' => $request->input('titulo'),
-                ],
-                [
-                    'name'     => 'video',
-                    'contents' => fopen($file->getRealPath(), 'r'),
-                    'filename' => $file->getClientOriginalName(),
-                    'headers'  => ['Content-Type' => $file->getMimeType()],
-                ],
-            ];
-
+            $requestData = ['titulo' => $request->input('titulo')];
             if ($request->filled('descripcion')) {
-                $multipart[] = [
-                    'name'     => 'descripcion',
-                    'contents' => $request->input('descripcion'),
-                ];
+                $requestData['descripcion'] = $request->input('descripcion');
             }
 
-            $response = $guzzle->post("{$this->apiBase}/api/videos", [
-                'headers'   => [
-                    'Authorization'              => "Bearer {$token}",
+            $response = \Illuminate\Support\Facades\Http::withToken($token)
+                ->withHeaders([
                     'Accept'                     => 'application/json',
                     'ngrok-skip-browser-warning' => 'true',
                     'User-Agent'                 => 'Mozilla/5.0',
-                ],
-                'multipart' => $multipart,
-            ]);
+                ])
+                ->withOptions([
+                    'verify'  => false,
+                ])
+                ->timeout(300)
+                ->attach(
+                    'video',
+                    fopen($file->getRealPath(), 'r'),
+                    $file->getClientOriginalName()
+                )
+                ->post("{$this->apiBase}/api/videos", $requestData);
 
-            $rawBody    = $response->getBody()->getContents();
-            $body       = json_decode($rawBody, true);
-            $statusCode = $response->getStatusCode();
+            $rawBody    = $response->body();
+            $statusCode = $response->status();
+            $body       = $response->json();
 
-            if (json_last_error() !== JSON_ERROR_NONE) {
+            // Si la respuesta no fue JSON (por ejemplo, HTML de error Nginx)
+            if (is_null($body) && !empty($rawBody)) {
                 Log::error('VideoController@store - API devolvió HTML o respuesta no JSON', [
                     'status' => $statusCode,
                     'body_preview' => substr($rawBody, 0, 500)
@@ -90,26 +85,14 @@ class VideoController extends Controller
                 return response($rawBody, $statusCode)->header('Content-Type', 'text/html');
             }
 
-            return response()->json($body, $statusCode);
+            return response()->json($body ?? ['success' => true], $statusCode);
 
-        } catch (RequestException $e) {
-            $statusCode = $e->hasResponse() ? $e->getResponse()->getStatusCode() : 500;
-            $body       = $e->hasResponse()
-                ? json_decode($e->getResponse()->getBody()->getContents(), true)
-                : null;
-
-            Log::error('VideoController@store - error', [
-                'status'  => $statusCode,
-                'message' => $e->getMessage(),
-            ]);
-
-            return response()->json(
-                $body ?? ['success' => false, 'message' => 'Error al subir el video'],
-                $statusCode
-            );
         } catch (\Exception $e) {
-            Log::error('VideoController@store - unexpected error: ' . $e->getMessage());
-            return response()->json(['success' => false, 'message' => 'Error inesperado al subir el video'], 500);
+            Log::error('VideoController@store - error: ' . $e->getMessage());
+            return response()->json([
+                'success' => false, 
+                'message' => 'Error inesperado al subir el video: ' . $e->getMessage()
+            ], 500);
         }
     }
 
