@@ -43,27 +43,20 @@ class VideoController extends Controller
         $file = $request->file('video');
 
         try {
-            Log::info('BFF VideoController - Enviando a API', [
+            Log::info('BFF VideoController - Iniciando subida', [
                 'url'       => "{$this->apiBase}/api/videos",
                 'titulo'    => $request->titulo,
                 'file_name' => $file->getClientOriginalName(),
                 'file_size' => $file->getSize(),
             ]);
 
-            $requestData = ['titulo' => $request->input('titulo')];
+            $requestData = ['titulo' => $request->titulo];
             if ($request->filled('descripcion')) {
-                $requestData['descripcion'] = $request->input('descripcion');
+                $requestData['descripcion'] = $request->descripcion;
             }
 
             $response = \Illuminate\Support\Facades\Http::withToken($token)
-                ->withHeaders([
-                    'Accept'                     => 'application/json',
-                    'ngrok-skip-browser-warning' => 'true',
-                    'User-Agent'                 => 'Mozilla/5.0',
-                ])
-                ->withOptions([
-                    'verify'  => false,
-                ])
+                ->withOptions(['verify' => false])
                 ->timeout(300)
                 ->attach(
                     'video',
@@ -72,20 +65,21 @@ class VideoController extends Controller
                 )
                 ->post("{$this->apiBase}/api/videos", $requestData);
 
-            $rawBody    = $response->body();
-            $statusCode = $response->status();
-            $body       = $response->json();
+            Log::info('BFF VideoController@store - Respuesta', [
+                'url' => "{$this->apiBase}/api/videos",
+                'file_name' => $file->getClientOriginalName(),
+                'file_size' => $file->getSize(),
+                'response_status' => $response->status(),
+                'response_body' => $response->body(),
+            ]);
 
-            // Si la respuesta no fue JSON (por ejemplo, HTML de error Nginx)
-            if (is_null($body) && !empty($rawBody)) {
-                Log::error('VideoController@store - API devolvió HTML o respuesta no JSON', [
-                    'status' => $statusCode,
-                    'body_preview' => substr($rawBody, 0, 500)
-                ]);
-                return response($rawBody, $statusCode)->header('Content-Type', 'text/html');
+            $body = $response->json();
+            
+            if (!$response->successful() && !$body) {
+                return response($response->body(), $response->status())->header('Content-Type', 'text/html');
             }
 
-            return response()->json($body ?? ['success' => true], $statusCode);
+            return response()->json($body ?? ['success' => true], $response->status());
 
         } catch (\Exception $e) {
             Log::error('VideoController@store - error: ' . $e->getMessage());
