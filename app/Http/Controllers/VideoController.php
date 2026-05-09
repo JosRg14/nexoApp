@@ -29,6 +29,11 @@ class VideoController extends Controller
     // ─────────────────────────────────────────────
     public function store(Request $request)
     {
+        ini_set('upload_max_filesize', '0');
+        ini_set('post_max_size', '0');
+        ini_set('memory_limit', '-1');
+        ini_set('max_execution_time', '0');
+
         $request->validate([
             'titulo'      => 'required|string|max:255',
             'descripcion' => 'nullable|string|max:1000',
