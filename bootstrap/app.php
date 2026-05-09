@@ -7,6 +7,9 @@ use App\Http\Middleware\RedirectIfAuthenticated;
 use App\Http\Middleware\InjectApiToken;
 use App\Http\Middleware\CheckBusinessSuscripcion; // 1. Importamos el nuevo middleware
 
+ini_set('post_max_size', '0');
+ini_set('upload_max_filesize', '0');
+
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         web: __DIR__.'/../routes/web.php',

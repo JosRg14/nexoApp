@@ -314,12 +314,12 @@ Route::middleware(['auth.session', 'inject.api.token'])->group(function () {
     // Vista de videos (sin restricción de rol)
     Route::get('/videos', [VideoController::class, 'index'])->name('videos');
 
-    // Proxy a la API: subir y eliminar
-    Route::prefix('api-proxy')->group(function () {
-        Route::post('/videos',        [VideoController::class, 'store']);
-        Route::post('/videos/chunk',  [VideoController::class, 'storeChunk']);
-        Route::delete('/videos/{id}', [VideoController::class, 'destroy']);
-    });
+    // Proxy a la API: subir y eliminar (COMENTADO para usar Proxy Universal)
+    // Route::prefix('api-proxy')->group(function () {
+    //     Route::post('/videos',        [VideoController::class, 'store']);
+    //     Route::post('/videos/chunk',  [VideoController::class, 'storeChunk']);
+    //     Route::delete('/videos/{id}', [VideoController::class, 'destroy']);
+    // });
 });
 
 
