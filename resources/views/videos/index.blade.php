@@ -470,7 +470,7 @@
         }
 
         // ── Upload con XHR (progreso real) ─────────────────────────────────
-        function uploadVideo() {
+        async function uploadVideo() {
             const titulo      = document.getElementById('v-titulo').value.trim();
             const descripcion = document.getElementById('v-descripcion').value.trim();
             const file        = fileInput.files[0];
@@ -489,61 +489,62 @@
             fill.style.width = '0%';
             label.textContent = '0%';
 
-            const fd = new FormData();
-            fd.append('_token',      CSRF);
-            fd.append('titulo',      titulo);
-            fd.append('descripcion', descripcion);
-            fd.append('video',       file);
+            try {
+                const CHUNK_SIZE = 5 * 1024 * 1024; // 5MB
+                const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
+                let finalData = null;
 
-            const xhr = new XMLHttpRequest();
-            xhr.open('POST', '/api-proxy/videos');
+                for (let i = 0; i < totalChunks; i++) {
+                    const start = i * CHUNK_SIZE;
+                    const end = Math.min(start + CHUNK_SIZE, file.size);
+                    const chunk = file.slice(start, end);
 
-            xhr.upload.onprogress = e => {
-                if (e.lengthComputable) {
-                    const pct = Math.round(e.loaded / e.total * 100);
+                    const fd = new FormData();
+                    fd.append('_token', CSRF);
+                    fd.append('video', chunk, file.name);
+                    fd.append('titulo', titulo);
+                    fd.append('descripcion', descripcion);
+                    fd.append('chunk_index', i);
+                    fd.append('total_chunks', totalChunks);
+                    fd.append('file_name', file.name);
+
+                    const response = await fetch('/api-proxy/videos/chunk', {
+                        method: 'POST',
+                        body: fd
+                    });
+
+                    const data = await response.json();
+                    
+                    if (!response.ok || data.success === false) {
+                        throw new Error(data.message || 'Error al subir chunk');
+                    }
+
+                    // Si es el último chunk, la respuesta contendrá el data final de la API
+                    if (i === totalChunks - 1) {
+                        finalData = data;
+                    }
+
+                    const pct = Math.round(((i + 1) / totalChunks) * 100);
                     fill.style.width   = pct + '%';
                     label.textContent  = pct + '%';
                 }
-            };
 
-            xhr.onload = () => {
-                console.log('XHR Status:', xhr.status);
-                console.log('XHR Response:', xhr.responseText);
+                // Éxito final
+                toast('Video subido correctamente ✓', 'success');
+                document.getElementById('v-titulo').value      = '';
+                document.getElementById('v-descripcion').value = '';
+                fileInput.value = '';
+                fileNameEl.style.display = 'none';
+                loadVideos();
 
+            } catch (e) {
+                console.error('Error de subida:', e);
+                toast(e.message || 'Error de conexión al subir el video', 'error');
+            } finally {
                 btn.disabled  = false;
                 btn.innerHTML = '<i class="fas fa-upload" style="margin-right:6px;"></i>Subir Video';
                 progressWrap.style.display = 'none';
-
-                let data = {};
-                try {
-                    data = JSON.parse(xhr.responseText);
-                    console.log('Parsed data:', data);
-                } catch(e) {
-                    console.error('Error parsing response:', e);
-                    toast('Error al procesar la respuesta del servidor', 'error');
-                    return;
-                }
-
-                if (xhr.status === 201 && data.success) {
-                    toast('Video subido correctamente ✓', 'success');
-                    document.getElementById('v-titulo').value      = '';
-                    document.getElementById('v-descripcion').value = '';
-                    fileInput.value = '';
-                    fileNameEl.style.display = 'none';
-                    loadVideos();
-                } else {
-                    toast(data.message || 'Error al subir el video', 'error');
-                }
-            };
-
-            xhr.onerror = () => {
-                btn.disabled  = false;
-                btn.innerHTML = '<i class="fas fa-upload" style="margin-right:6px;"></i>Subir Video';
-                progressWrap.style.display = 'none';
-                toast('Error de conexión al subir el video', 'error');
-            };
-
-            xhr.send(fd);
+            }
         }
 
         // ── Cargar lista de videos ─────────────────────────────────────────

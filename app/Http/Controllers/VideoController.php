@@ -96,6 +96,64 @@ class VideoController extends Controller
     }
 
     // ─────────────────────────────────────────────
+    // POST /api-proxy/videos/chunk  →  Subir video por chunks
+    // ─────────────────────────────────────────────
+    public function storeChunk(Request $request)
+    {
+        $chunkIndex = $request->chunk_index;
+        $totalChunks = $request->total_chunks;
+        $fileName = $request->file_name;
+        $tempDir = storage_path('app/temp/' . session()->getId());
+        
+        if (!file_exists($tempDir)) {
+            mkdir($tempDir, 0777, true);
+        }
+        
+        // Guardar chunk
+        $request->file('video')->move($tempDir, "chunk_{$chunkIndex}");
+        
+        // Si es el último chunk, unir todos
+        if ($chunkIndex == $totalChunks - 1) {
+            $publicVideosDir = storage_path('app/public/videos');
+            if (!file_exists($publicVideosDir)) {
+                mkdir($publicVideosDir, 0777, true);
+            }
+            
+            $finalPath = $publicVideosDir . '/' . $fileName;
+            $finalFile = fopen($finalPath, 'wb');
+            
+            for ($i = 0; $i < $totalChunks; $i++) {
+                $chunkPath = "{$tempDir}/chunk_{$i}";
+                if (file_exists($chunkPath)) {
+                    $chunk = file_get_contents($chunkPath);
+                    fwrite($finalFile, $chunk);
+                    unlink($chunkPath);
+                }
+            }
+            
+            fclose($finalFile);
+            @rmdir($tempDir);
+            
+            // Enviar archivo completo a la API
+            $response = \Illuminate\Support\Facades\Http::withToken(session('auth_token'))
+                ->withOptions(['verify' => false])
+                ->timeout(300)
+                ->attach('video', fopen($finalPath, 'r'), $fileName)
+                ->post("{$this->apiBase}/api/videos", [
+                    'titulo' => $request->titulo,
+                    'descripcion' => $request->descripcion,
+                ]);
+            
+            // Limpiar archivo temporal
+            unlink($finalPath);
+            
+            return response()->json($response->json());
+        }
+        
+        return response()->json(['success' => true, 'chunk' => $chunkIndex]);
+    }
+
+    // ─────────────────────────────────────────────
     // DELETE /api-proxy/videos/{id}  →  Eliminar video
     // ─────────────────────────────────────────────
     public function destroy($id)

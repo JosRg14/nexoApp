@@ -317,6 +317,7 @@ Route::middleware(['auth.session', 'inject.api.token'])->group(function () {
     // Proxy a la API: subir y eliminar
     Route::prefix('api-proxy')->group(function () {
         Route::post('/videos',        [VideoController::class, 'store']);
+        Route::post('/videos/chunk',  [VideoController::class, 'storeChunk']);
         Route::delete('/videos/{id}', [VideoController::class, 'destroy']);
     });
 });
