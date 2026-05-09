@@ -443,7 +443,6 @@
         // ── Datos de sesión ────────────────────────────────────────────────
         const SESSION_USER_ID = @json(session('usuario.id') ?? session('usuario.empleado.id') ?? null);
         const CSRF = document.querySelector('meta[name="csrf-token"]').content;
-        const AUTH_TOKEN = '{{ session("auth_token") }}';
 
         // ── Drop zone ──────────────────────────────────────────────────────
         const dropZone = document.getElementById('drop-zone');
@@ -497,9 +496,7 @@
             fd.append('video',       file);
 
             const xhr = new XMLHttpRequest();
-            xhr.open('POST', 'https://devlink-servidorapi.td60xq.easypanel.host/api/videos');
-            xhr.setRequestHeader('Authorization', 'Bearer ' + AUTH_TOKEN);
-            xhr.setRequestHeader('Accept', 'application/json');
+            xhr.open('POST', '/api-proxy/videos');
 
             xhr.upload.onprogress = e => {
                 if (e.lengthComputable) {
@@ -552,8 +549,8 @@
         // ── Cargar lista de videos ─────────────────────────────────────────
         async function loadVideos() {
             try {
-                const res  = await fetch('https://devlink-servidorapi.td60xq.easypanel.host/api/videos', {
-                    headers: { 'Accept': 'application/json', 'Authorization': 'Bearer ' + AUTH_TOKEN }
+                const res  = await fetch('/api-proxy/videos', {
+                    headers: { 'Accept': 'application/json', 'X-CSRF-TOKEN': CSRF }
                 });
                 const data = await res.json();
                 const videos = data.data ?? data ?? [];
@@ -616,9 +613,9 @@
             if (!confirm('¿Confirmas que deseas eliminar este video? Esta acción no se puede deshacer.')) return;
 
             try {
-                const res  = await fetch(`https://devlink-servidorapi.td60xq.easypanel.host/api/videos/${id}`, {
+                const res  = await fetch(`/api-proxy/videos/${id}`, {
                     method:  'DELETE',
-                    headers: { 'Accept': 'application/json', 'Authorization': 'Bearer ' + AUTH_TOKEN }
+                    headers: { 'Accept': 'application/json', 'X-CSRF-TOKEN': CSRF }
                 });
                 const data = await res.json();
 
