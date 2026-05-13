@@ -1390,10 +1390,12 @@ async function cargarExcepciones() {
         
         if (data && data.success && data.data) {
             excepcionesList = data.data;
+            console.log('Excepciones cargadas:', excepcionesList);
             renderListaExcepciones();
             renderCalendar(currentDate, excepcionesList);
         } else {
             excepcionesList = [];
+            console.log('Excepciones cargadas:', excepcionesList);
             renderListaExcepciones();
             renderCalendar(currentDate, excepcionesList);
         }
@@ -1510,6 +1512,11 @@ function renderCalendar(date, excepciones) {
         });
 
         const tieneExcepcion = excepcionesDia.length > 0;
+        
+        if (tieneExcepcion) {
+            console.log('Día seleccionado:', currentLoopDateStr);
+            console.log('¿Tiene excepción?', tieneExcepcion);
+        }
 
         const dayDiv = document.createElement('div');
         dayDiv.className = `group relative py-2 text-center text-xs rounded hover:bg-[#374151] cursor-pointer transition-colors ${tieneExcepcion ? 'font-bold': 'text-white'}`;
