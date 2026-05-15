@@ -266,6 +266,12 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        const finanzas = @json($finanzas ?? []);
+        const totales = @json($totales ?? []);
+        console.log('Finanzas con_cita:', finanzas.con_cita);
+        console.log('Finanzas sin_cita:', finanzas.sin_cita);
+        console.log('Totales:', totales);
+
         const charInstances = {};
 
         function initChart(tipo) {
@@ -435,6 +441,8 @@
                 data = json;
                 totales = json.totales_generales || null;
             }
+
+            console.log('Comisiones:', json);
 
             // Actualizar Totales Generales
             if (totalesContainer && totales) {
