@@ -113,18 +113,20 @@ class BusinessProfileController extends Controller
 
                     $resHoy = $this->httpClient->get('/api/finanzas/ingresos-hoy', $queryParams);
                     $dataHoy = $resHoy['data'] ?? [];
+                    // La API devuelve 'ingresos_con_cita' / 'ingresos_sin_cita' según el parámetro tipo
+                    $campoHoy = 'ingresos_' . $tipo; // e.g. 'ingresos_con_cita'
                     $finanzas[$tipo]['ingresos_hoy'] = [
-                        // La API devuelve 'ingresos_hoy' o 'total' según versión
-                        'total'     => $dataHoy['ingresos_hoy'] ?? ($dataHoy['total'] ?? 0),
+                        'total'     => $dataHoy[$campoHoy] ?? ($dataHoy['ingresos_hoy'] ?? ($dataHoy['total'] ?? 0)),
                         'variacion' => $dataHoy['variacion'] ?? 0,
                     ];
 
                     // ✅ tipo=con_cita | tipo=sin_cita → GET /api/finanzas/ingresos-mes?tipo=
                     $resMes = $this->httpClient->get('/api/finanzas/ingresos-mes', $queryParams);
                     $dataMes = $resMes['data'] ?? [];
+                    // La API devuelve 'ingresos_con_cita' / 'ingresos_sin_cita' según el parámetro tipo
+                    $campoMes = 'ingresos_' . $tipo; // e.g. 'ingresos_con_cita'
                     $finanzas[$tipo]['ingresos_mes'] = [
-                        // La API devuelve 'ingresos_mes' o 'total' según versión
-                        'total'     => $dataMes['ingresos_mes'] ?? ($dataMes['total'] ?? 0),
+                        'total'     => $dataMes[$campoMes] ?? ($dataMes['ingresos_mes'] ?? ($dataMes['total'] ?? 0)),
                         'variacion' => $dataMes['variacion'] ?? 0,
                     ];
 
